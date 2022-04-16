@@ -1,0 +1,33 @@
+/* Definição da barra horizontal */
+QSlider::groove {
+    background: qlineargradient(y1: 0, y2: 1, stop: 0 #444444, stop: 1.0 #ffffff);
+    border: 1px solid #444444;
+    border-radius: 2px;
+    height: 3px;
+}
+
+/* Definição do seletor */
+QSlider::handle {
+    background: qlineargradient(y1: 0, y2: 1, stop: 0 #444444, stop: 1.0 #ffffff);
+    border: 1px solid #444444;
+    border-radius: 3px;
+    margin: -2px -1;
+    width: 15px;
+}
+
+/* Passando o mouse encima do seletor */
+QSlider::handle:hover {
+    background: qlineargradient( y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
+}
+
+/* Caso esteja desativado */
+QSlider::handle:disabled {
+    background: qlineargradient(y1: 0, y2: 1, stop: 0 #444444, stop: 1.0 #ffffff);
+}
+
+/* Definição do progresso */
+QSlider::sub-page {
+    background: qlineargradient( y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
+    border: 1px solid #444444;
+    border-radius: 2px;
+}

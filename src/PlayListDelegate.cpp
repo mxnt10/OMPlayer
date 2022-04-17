@@ -97,7 +97,7 @@ QSize PlayListDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
     if (!index.data().canConvert<PlayListItem>()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
-    if (option.state & (QStyle::State_MouseOver) || highlightRow == index.row() ){
+    if (option.state & (QStyle::State_MouseOver) || highlightRow == index.row()){
         return {width, heightMax};
     }
     return {width, heightMin};

@@ -157,7 +157,7 @@ void PlayList::addItems() {
     for (int i = 0; i < 1000; i++)
         Utils::arrowMouse();
 
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select files"));
+    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select files"), QDir::homePath());
     if (files.isEmpty())
         return;
     for (int i = 0; i < files.size(); ++i) {
@@ -170,6 +170,7 @@ void PlayList::addItems() {
             select = true;
         }
     }
+    MI.Close();
     emit firstPlay(isplay);
 }
 
@@ -198,8 +199,6 @@ void PlayList::insert(const QString &url, int row) {
 
 /** Adiciona os itens para serem visualizados na playlist */
 void PlayList::insertItemAt(const PlayListItem &item, int row) {
-    MI.Close(); /** Fechando o media info */
-
     if (maxRows > 0 && model->rowCount(QModelIndex()) >= maxRows)
         model->removeRows(maxRows, model->rowCount(QModelIndex()) - maxRows + 1, QModelIndex());
     int i = model->items().indexOf(item, row + 1);
@@ -224,14 +223,27 @@ void PlayList::setItemAt(const PlayListItem &item, int row) {
 
 /** Retorna o número do item que está atualmente em execução */
 int PlayList::selectItems() {
-    QItemSelectionModel *selection = listView->selectionModel();
-    QModelIndexList s = selection->selectedIndexes();
-
-    /** Se a lista está vazia, bom é evitar erros */
-    if (s.isEmpty())
+    if (listView->currentIndex().row() == -1)
         return 0;
-    else
-        return s.at(0).row();
+    return listView->currentIndex().row();
+}
+
+
+/** Selecionando o próximo item da lista */
+void PlayList::selectNext() {
+    listView->setCurrentIndex(model->index(listView->currentIndex().row() + 1));
+}
+
+
+/** Selecionando um item anterior da lista */
+void PlayList::selectPrevious() {
+    listView->setCurrentIndex(model->index(listView->currentIndex().row() - 1));
+}
+
+
+/** Limpar item selecionado da playlist */
+void PlayList::selectClean() {
+    listView->clearSelection();
 }
 
 
@@ -239,8 +251,6 @@ int PlayList::selectItems() {
 QString PlayList::getItems(int s) {
     save();
     QFile f(mfile);
-    if (!f.exists())
-        return{};
     if (!f.open(QIODevice::ReadOnly))
         return{};
     QDataStream ds(&f);
@@ -256,16 +266,7 @@ QString PlayList::getItems(int s) {
 
 /** Função para retornar o número total de itens da playlist */
 int PlayList::setListSize() {
-    save();
-    QFile f(mfile);
-    if (!f.exists())
-        return{};
-    if (!f.open(QIODevice::ReadOnly))
-        return{};
-    QDataStream ds(&f);
-    QList<PlayListItem> list;
-    ds >> list;
-    return list.size();
+    return model->rowCount(QModelIndex());
 }
 
 

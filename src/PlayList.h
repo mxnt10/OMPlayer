@@ -47,6 +47,12 @@ public:
 
     int selectItems();
 
+    void selectClean();
+
+    void selectNext();
+
+    void selectPrevious();
+
     void setSaveFile(const QString &file);
 
     void load();

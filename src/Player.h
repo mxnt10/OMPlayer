@@ -49,6 +49,8 @@ public Q_SLOTS:
 
     void setSelect(int item);
 
+    void firstPlay(const QString &name);
+
     void play(const QString &name);
 
     void Next();

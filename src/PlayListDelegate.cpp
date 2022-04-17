@@ -42,7 +42,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     bool detail = false;
 
 
-    /** Itens selecionados */
+    /** Itens selecionados - Clicados */
     if (option.state & QStyle::State_Selected) {
         detail = true;
         selectedRows.append(index.row());

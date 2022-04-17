@@ -46,13 +46,13 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (option.state & QStyle::State_Selected) {
         detail = true;
         selectedRows.append(index.row());
-        painter->fillRect(QRect(0, 0, width, heightMax), QColor(0, 100, 200, 100));
+        painter->fillRect(QRect(0, 0, width, heightMin), QColor(0, 100, 200, 100));
     } else {
         selectedRows.removeAll(index.row());
     }
 
 
-    /** Itens não selecionados */
+    /** Itens com o mouse posicionado */
     if (option.state & (QStyle::State_MouseOver)) {
         detail = true;
         auto *m = (PlayListModel *) index.model();
@@ -60,7 +60,10 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             highlightRow = index.row();
             m->updateLayout();
         }
-        painter->fillRect(QRect(0, 0, width, heightMax), QColor(0, 100, 200, 30));
+        if (option.state & (QStyle::State_Selected))
+            painter->fillRect(QRect(0, heightMin, width, heightMax - heightMin), QColor(0, 100, 200, 100));
+        else
+            painter->fillRect(QRect(0, 0, width, heightMax), QColor(0, 100, 200, 50));
     }
 
 
@@ -78,7 +81,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 
     /** Definindo a descrição */
-    if (detail) {
+    if (detail && option.state & (QStyle::State_MouseOver)) {
         painter->save();
         ft.setBold(false);
         painter->setFont(ft);
@@ -94,8 +97,7 @@ QSize PlayListDelegate::sizeHint(const QStyleOptionViewItem &option, const QMode
     if (!index.data().canConvert<PlayListItem>()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
-    bool detail = option.state & (QStyle::State_Selected | QStyle::State_MouseOver);
-    if (detail || highlightRow == index.row() || selectedRows.contains(index.row())) {
+    if (option.state & (QStyle::State_MouseOver) || highlightRow == index.row() ){
         return {width, heightMax};
     }
     return {width, heightMin};

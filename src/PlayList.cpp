@@ -157,7 +157,7 @@ void PlayList::addItems() {
     for (int i = 0; i < 1000; i++)
         Utils::arrowMouse();
 
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select files"), QDir::homePath());
+    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
     if (files.isEmpty())
         return;
     for (int i = 0; i < files.size(); ++i) {

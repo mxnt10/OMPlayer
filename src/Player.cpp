@@ -293,27 +293,7 @@ VideoPlayer::~VideoPlayer() {
 
 /** Função para abrir arquivos multimídia */
 void VideoPlayer::openMedia() {
-    bool select = false;
-    QString isplay;
-
-    /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-    for (int i = 0; i < 1000; i++)
-        Utils::arrowMouse();
-
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
-    if (files.isEmpty())
-        return;
-    for (int i = 0; i < files.size(); ++i) {
-        const QString& file = files.at(i);
-        if (!QFileInfo(file).isFile())
-            continue;
-        playlist->insert(file, i);
-        if (!select) {
-            isplay = file;
-            select = true;
-        }
-    }
-    firstPlay(isplay);
+    playlist->addItems();
 }
 
 

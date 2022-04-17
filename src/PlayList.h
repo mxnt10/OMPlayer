@@ -83,12 +83,13 @@ signals:
     void emitnohide();
 
 
+public slots:
+    void addItems();
+
 private slots:
     void removeSelectedItems();
 
     void clearItems();
-
-    void addItems();
 
     void onSelect(const QModelIndex &index);
 

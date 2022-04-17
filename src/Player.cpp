@@ -26,7 +26,6 @@
 #include "Widget.h"
 
 using namespace QtAV;
-using std::filesystem::exists;
 using std::filesystem::create_directory;
 
 /**********************************************************************************************************************/
@@ -69,7 +68,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(play(QString)));
-    connect(playlist, SIGNAL(firstPlay(QString)), SLOT(play(QString)));
+    connect(playlist, SIGNAL(firstPlay(QString)), SLOT(firstPlay(QString)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
     connect(playlist, SIGNAL(emithide()), SLOT(setHide()));
     connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
@@ -301,7 +300,7 @@ void VideoPlayer::openMedia() {
     for (int i = 0; i < 1000; i++)
         Utils::arrowMouse();
 
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"));
+    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
     if (files.isEmpty())
         return;
     for (int i = 0; i < files.size(); ++i) {
@@ -314,14 +313,7 @@ void VideoPlayer::openMedia() {
             select = true;
         }
     }
-    if (!mediaPlayer->isPlaying()) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
-        this->setWindowTitle(Utils::mediaTitle(isplay));
-        mediaPlayer->play(isplay);
-        previousitem = playlist->setListSize() - 1;
-        actualitem = 0;
-        nextitem = 1;
-    }
+    firstPlay(isplay);
 }
 
 
@@ -335,6 +327,20 @@ void VideoPlayer::blockScreenSaver() {
 /** Setando o item atualmente selecionado */
 void VideoPlayer::setSelect(int item) {
     actualitem = item;
+}
+
+
+/** Para executar os itens recém adicionados da playlist */
+void VideoPlayer::firstPlay(const QString &isplay){
+    if (!mediaPlayer->isPlaying()) {
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
+        this->setWindowTitle(Utils::mediaTitle(isplay));
+        mediaPlayer->play(isplay);
+        playlist->selectNext();
+        previousitem = playlist->setListSize() - 1;
+        actualitem = 0;
+        nextitem = 1;
+    }
 }
 
 
@@ -390,6 +396,7 @@ void VideoPlayer::Next(){
             actualitem = 0;
         if (nextitem == playlist->setListSize())
             nextitem = 0;
+        playlist->selectNext();
     }
 }
 
@@ -413,6 +420,7 @@ void VideoPlayer::Previous(){
             actualitem = playlist->setListSize() - 1;
         if (nextitem == -1)
             nextitem = playlist->setListSize() - 1;
+        playlist->selectPrevious();
     }
 }
 
@@ -424,6 +432,7 @@ void VideoPlayer::playPause() {
             qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
             this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
             mediaPlayer->play(playlist->getItems(actualitem));
+            playlist->selectNext();
         }
         nextitem = actualitem + 1;
         previousitem = actualitem - 1;
@@ -601,6 +610,7 @@ void VideoPlayer::updateSlider(qint64 value) {
         if (actualitem == playlist->setListSize() - 1 && !restart) {
             mediaPlayer->stop();
             playing = false;
+            playlist->selectClean();
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;

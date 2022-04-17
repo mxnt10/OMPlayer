@@ -43,7 +43,7 @@ public:
 
 public Q_SLOTS:
 
-    void openMedia();
+    void openMedia(const QStringList &parms = QStringList());
 
     static void blockScreenSaver();
 

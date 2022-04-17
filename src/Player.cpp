@@ -292,8 +292,8 @@ VideoPlayer::~VideoPlayer() {
 
 
 /** Função para abrir arquivos multimídia */
-void VideoPlayer::openMedia() {
-    playlist->addItems();
+void VideoPlayer::openMedia(const QStringList &parms) {
+    playlist->addItems(parms);
 }
 
 

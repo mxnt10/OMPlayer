@@ -87,9 +87,8 @@ signals:
 
     void emitnohide();
 
-
 public slots:
-    void addItems();
+    void addItems(const QStringList &parms = QStringList());
 
 private slots:
     void removeSelectedItems();

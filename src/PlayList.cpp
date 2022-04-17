@@ -149,15 +149,20 @@ void PlayList::save() {
 
 
 /** Função para adicionar itens a playlist */
-void PlayList::addItems() {
+void PlayList::addItems(const QStringList &parms) {
     bool select = false;
     QString isplay;
+    QStringList files;
 
     /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
     for (int i = 0; i < 1000; i++)
         Utils::arrowMouse();
 
-    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
+    if (parms.isEmpty())
+        files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
+    else
+        files = parms;
+
     if (files.isEmpty())
         return;
     for (int i = 0; i < files.size(); ++i) {

@@ -27,13 +27,11 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
-#include <QDir>
 #include <QLoggingCategory>
-#include <QUrl>
 
 #include "Player.h"
 
-#define DEBUG true /** Somente para depuração */
+#define DEBUG false /** Somente para depuração */
 
 
 /**
@@ -73,13 +71,8 @@ int main(int argc, char *argv[]) {
     /** Define a interface do programa, envia os argumentos para o reprodutor e inicia a interface */
     VideoPlayer player;
     if (!parser.positionalArguments().isEmpty()) {
-        const QUrl url = QUrl::fromUserInput(
-                parser.positionalArguments().constFirst(),
-                QDir::currentPath(),
-                QUrl::AssumeLocalFile);
-//        player.setUrl(url);
+        player.openMedia(parser.positionalArguments());
     }
-
     player.show();
     return QApplication::exec();
 }

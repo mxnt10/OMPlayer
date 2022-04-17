@@ -16,12 +16,13 @@ using namespace MediaInfoDLL;
 
 
 QT_BEGIN_NAMESPACE
+class QModelIndex;
+class QString;
 class QWidget;
 QT_END_NAMESPACE
 
 class Button;
 class ListView;
-class PlayListDelegate;
 class PlayListModel;
 
 namespace MediaInfoDLL {
@@ -49,9 +50,13 @@ public:
 
     void selectClean();
 
+    void selectPlay();
+
     void selectNext();
 
     void selectPrevious();
+
+    void setIndex();
 
     void setSaveFile(const QString &file);
 
@@ -102,6 +107,7 @@ private:
     ListView *listView;
     MediaInfo MI;
     PlayListModel *model;
+    QModelIndex actualitem;
     QString duration, format, mfile;
     QWidget *wpls;
     int maxRows;

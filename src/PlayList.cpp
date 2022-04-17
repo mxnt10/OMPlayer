@@ -229,20 +229,41 @@ int PlayList::selectItems() {
 }
 
 
+/** Selecionando o primeiro item da lista */
+void PlayList::selectPlay() {
+    if (listView->currentIndex().row() == -1) {
+        listView->setCurrentIndex(model->index(0));
+        actualitem = listView->currentIndex();
+    }
+}
+
+
 /** Selecionando o próximo item da lista */
 void PlayList::selectNext() {
+    if (actualitem.isValid())
+        listView->setCurrentIndex(model->index(actualitem.row()));
     listView->setCurrentIndex(model->index(listView->currentIndex().row() + 1));
+    if (listView->currentIndex().row() == -1)
+        listView->setCurrentIndex(model->index(0));
+    actualitem = listView->currentIndex();
 }
 
 
 /** Selecionando um item anterior da lista */
 void PlayList::selectPrevious() {
+    if (actualitem.isValid())
+        listView->setCurrentIndex(model->index(actualitem.row()));
     listView->setCurrentIndex(model->index(listView->currentIndex().row() - 1));
+    if (listView->currentIndex().row() == -1)
+        listView->setCurrentIndex(model->index(setListSize() - 1));
+    actualitem = listView->currentIndex();
 }
 
 
 /** Limpar item selecionado da playlist */
 void PlayList::selectClean() {
+    listView->setCurrentIndex(model->index(-1));
+    actualitem = listView->currentIndex();
     listView->clearSelection();
 }
 
@@ -290,12 +311,21 @@ void PlayList::clearItems() {
 
 /** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
+    actualitem = listView->currentIndex();
     emit aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
     save();
 }
 
+
+/** Função para emitir o intem selecionado na playlist */
 void PlayList::onSelect(const QModelIndex &index) {
     emit selected(int(index.row()));
+}
+
+
+/** Assistente para setar o item atual ao selecionar um item da playlist apenas com a reprodução parada */
+void PlayList::setIndex() {
+    actualitem = listView->currentIndex();
 }
 
 

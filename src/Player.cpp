@@ -307,6 +307,8 @@ void VideoPlayer::blockScreenSaver() {
 /** Setando o item atualmente selecionado */
 void VideoPlayer::setSelect(int item) {
     actualitem = item;
+    if (!playing)
+        playlist->setIndex();
 }
 
 
@@ -412,7 +414,7 @@ void VideoPlayer::playPause() {
             qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
             this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
             mediaPlayer->play(playlist->getItems(actualitem));
-            playlist->selectNext();
+            playlist->selectPlay();
         }
         nextitem = actualitem + 1;
         previousitem = actualitem - 1;
@@ -429,6 +431,7 @@ void VideoPlayer::playPause() {
 /** Função para o botão stop */
 void VideoPlayer::setStop() {
     playing = false;
+    actualitem = playlist->selectItems();
     mediaPlayer->stop();
 }
 

@@ -4,7 +4,9 @@
             OMPlayer - Open Multimedia Player
         </h1>
         <h3 align="center">
-            Multimedia Player.
+            Multimedia player developed in C++ using Qt5 as an interface.
+            To play multimedia files, the program uses the QtAV framework,
+            which uses ffmpeg for handling multimedia files.
         </h3>
         <h3 align="center">
             <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview1.png"></a>

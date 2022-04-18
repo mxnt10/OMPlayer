@@ -7,9 +7,9 @@
             Multimedia Player.
         </h3>
         <h3 align="center">
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview1.png"></a>
+            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview1.png"></a>
             <br/><br/>
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview2.png"></a>
+            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview2.png"></a>
         </h3><br/>
     </body>
 </html>

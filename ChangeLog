@@ -1,0 +1,37 @@
+# ChangeLog
+All notable changes to this project will be documented in this file.
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+
+## [ 1.0 ] - 2022-04-18 #############################################
+
+### Added / Adicionado
+ - Arquivos:
+    - Arquivo .desktop ícone e logo em appdata.
+    - Imagens inseridas em Common, diretório criado para futuras
+      ferramentas extras.
+    - Temas de ícones em icons.
+ - Código-fonte:
+    - Código-fonte inserido em src.
+    - Estilos para o reprodutor inseridos em qss.
+ - Recursos:
+    - Compilação usando cmake.
+    - Playlist:
+        - Adicionar itens.
+        - Remover itens.
+        - Limpar lista.
+    - Controles de reprodução:
+        - Barra de reprodução.
+        - Play/pause.
+        - Stop.
+        - Next.
+        - Previous.
+    - Fullscreen.
+ - Teclas de atalho:
+    - Ctrl+A: Abrir arquivos.
+    - Ctrl+O: Abrir arquivos.
+    - Alt+Enter: Fullscreen.
+    - Esc: Sair do modo Fullscreen.
+###
+
+##########################################################################

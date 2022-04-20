@@ -1,4 +1,4 @@
-<html>
+<html lang="">
     <body>
         <h1 align="center">
             OMPlayer - Open Multimedia Player
@@ -9,9 +9,9 @@
             which uses ffmpeg for handling multimedia files.
         </h3>
         <h3 align="center">
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview1.png"></a>
+            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview1.png" alt=""></a>
             <br/><br/>
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview2.png"></a>
+            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview2.png" alt=""></a>
         </h3><br/>
     </body>
 </html>
@@ -29,6 +29,7 @@
 - Ctrl+A: Open files.
 - Ctrl+O: Open files.
 - Alt+Enter: Fullscreen.
+- Esc: Exit fullscreen.
 
 ## Installation instructions
 

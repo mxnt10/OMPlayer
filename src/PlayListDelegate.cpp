@@ -10,11 +10,9 @@
 
 
 /** Definição de constantes */
-static const int marginLeft = 5;
-static const int marginTop = 4;
+static const int margin = 5;
 static const int width = 320;
-static const int heightMax = 36;
-static const int heightMin = 26;
+static const int height = 28;
 
 
 /**********************************************************************************************************************/
@@ -46,59 +44,53 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     if (option.state & QStyle::State_Selected) {
         detail = true;
         selectedRows.append(index.row());
-        painter->fillRect(QRect(0, 0, width, heightMin), QColor(0, 100, 200, 100));
+        painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 150));
     } else {
         selectedRows.removeAll(index.row());
     }
 
 
-    /** Itens com o mouse posicionado */
-    if (option.state & (QStyle::State_MouseOver)) {
+    /** Itens com o mouse posicionado e destaque das linhas uma das outras */
+    if (option.state & (QStyle::State_MouseOver) || index.row() % 2 == 0 ) {
         detail = true;
         auto *m = (PlayListModel *) index.model();
         if (m && highlightRow != index.row()) {
             highlightRow = index.row();
             m->updateLayout();
         }
-        if (option.state & (QStyle::State_Selected))
-            painter->fillRect(QRect(0, heightMin, width, heightMax - heightMin), QColor(0, 100, 200, 100));
-        else
-            painter->fillRect(QRect(0, 0, width, heightMax), QColor(0, 100, 200, 50));
+        if (option.state & (QStyle::State_MouseOver))
+            painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 100));
+        if (index.row() % 2 == 0)
+            painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 30));
     }
 
 
-    /** Definições de fonte */
+    /** Definindo os itens da playlist */
     QFont ft;
     ft.setBold(detail);
-    ft.setPixelSize(12);
-
-
-    /** Definindo o texto do item da playlist */
+    ft.setPixelSize(11);
     painter->setFont(ft);
-    painter->translate(marginLeft, marginTop);
-    painter->drawText(QRect(0, 0, width - 2 * marginLeft, heightMin - 2 * marginTop), pli.title());
-    painter->translate(0, heightMin + marginTop);
+    painter->translate(margin, margin);
+    painter->drawText(QRect(0, -5, width - 2 * margin, height - 2 * margin), pli.title());
+    painter->translate(0, height + margin - 1);
 
 
     /** Definindo a descrição */
-    if (detail && option.state & (QStyle::State_MouseOver)) {
+    if (detail && option.state & (QStyle::State_MouseOver | QStyle::State_Selected) && !pli.format().isEmpty()) {
         painter->save();
         ft.setBold(false);
         painter->setFont(ft);
-        painter->drawText(0, 0, pli.durationString() + QString::fromLatin1(" - ") + pli.format());
+        painter->drawText(0, -12, pli.durationString() + QString::fromLatin1(" - ") + pli.format());
         painter->restore();
     }
     painter->restore();
 }
 
 
-/** Mapeador de eventos para o redirecionamento dos itens selecionados */
+/** Mapeador de eventos para o redirecionamento das linhas dos itens da playlist */
 QSize PlayListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
     if (!index.data().canConvert<PlayListItem>()) {
         return QStyledItemDelegate::sizeHint(option, index);
     }
-    if (option.state & (QStyle::State_MouseOver) || highlightRow == index.row()){
-        return {width, heightMax};
-    }
-    return {width, heightMin};
+    return {width, height};
 }

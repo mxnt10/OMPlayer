@@ -11,6 +11,7 @@
 #include <QTimer>
 
 #include <filesystem>
+#include <MediaInfoDLL.h>
 
 #pragma push_macro("slots")
 #undef slots
@@ -25,7 +26,7 @@
 #include "Utils.h"
 #include "Widget.h"
 
-using namespace QtAV;
+using namespace MediaInfoDLL;
 using std::filesystem::create_directory;
 
 /**********************************************************************************************************************/
@@ -34,7 +35,7 @@ using std::filesystem::create_directory;
 /** Construtor que define a interface do programa */
 VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Iniciando o Reprodutor Multimídia ...\033[0m");
-    contextmenu = enterpos = maximize = moving = playing = false;
+    contextmenu = enterpos = maximize = moving = playing = setinfo = false;
     restart = false;
     actualitem = nextitem = previousitem = 0;
     theme = "circle";
@@ -334,6 +335,7 @@ void VideoPlayer::play(const QString &name) {
     item.setUrl(name);
     item.setTitle(Utils::mediaTitle(name));
     mediaPlayer->stop();
+    setinfo = false;
     mediaPlayer->play(name);
 
     /**
@@ -365,6 +367,7 @@ void VideoPlayer::Next(){
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo o próximo item ...\033[0m");
         this->setWindowTitle(Utils::mediaTitle(playlist->getItems(nextitem)));
         mediaPlayer->stop();
+        setinfo = false;
         mediaPlayer->play(playlist->getItems(nextitem));
 
         /** Cálculo dos próximos itens a serem executados */
@@ -389,6 +392,7 @@ void VideoPlayer::Previous(){
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um item anterior ...\033[0m");
         this->setWindowTitle(Utils::mediaTitle(playlist->getItems(previousitem)));
         mediaPlayer->stop();
+        setinfo = false;
         mediaPlayer->play(playlist->getItems(previousitem));
 
         /** Cálculo dos próximos itens a serem executados */
@@ -413,6 +417,7 @@ void VideoPlayer::playPause() {
         if (playlist->setListSize() > 0) {
             qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
             this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
+            setinfo = false;
             mediaPlayer->play(playlist->getItems(actualitem));
             playlist->selectPlay();
         }
@@ -588,6 +593,22 @@ void VideoPlayer::updateSlider(qint64 value) {
     slider->setRange(0, int(mediaPlayer->duration() / mUnit));
     slider->setValue(int(value / mUnit));
 
+    if (!setinfo && playlist->setDuration() == 0) {
+        int row = playlist->selectItems();
+        QString url = mediaPlayer->file();
+        qint64 duration = mediaPlayer->duration();
+
+        MI.Open(url.toStdString());
+        QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
+        MI.Close();
+
+        /** Atualizando status do item da playlist */
+        playlist->removeSelectedItems();
+        playlist->insert(url, row, duration, format);
+    } else {
+        setinfo = true;
+    }
+
     /** Próxima mídia */
     if (int(value / mUnit) == mediaPlayer->duration() / mUnit - 1) {
         if (actualitem == playlist->setListSize() - 1 && !restart) {
@@ -597,9 +618,10 @@ void VideoPlayer::updateSlider(qint64 value) {
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;
-        }
-        else
+        } else {
+            setinfo = false;
             Next();
+        }
     }
 }
 

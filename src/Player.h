@@ -3,8 +3,10 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
+#include <MediaInfoDLL.h>
 
 using namespace QtAV;
+using MediaInfoDLL::MediaInfo;
 
 
 /**
@@ -15,6 +17,10 @@ using namespace QtAV;
 namespace QtAV {
     class AVPlayer;
     class VideoOutput;
+}
+
+namespace MediaInfoDLL {
+    class MediaInfo;
 }
 
 QT_BEGIN_NAMESPACE
@@ -109,6 +115,7 @@ protected:
 private:
     AVPlayer *mediaPlayer;
     Button *playBtn, *stopBtn, *nextBtn, *previousBtn;
+    MediaInfo MI;
     PlayList *playlist;
     QLabel *logo;
     QTimer *noscreensaver;
@@ -118,7 +125,7 @@ private:
     int mUnit;
     int previousitem, actualitem, nextitem;
     bool restart;
-    bool contextmenu, enterpos, maximize, moving, playing;
+    bool contextmenu, enterpos, maximize, moving, playing, setinfo;
     const char *theme;
 };
 

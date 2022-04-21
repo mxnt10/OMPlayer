@@ -10,10 +10,7 @@
  *      - QtAV
  *      - libmediainfo
  *      - libzen
- *
- * Início do desenvolvimento: 22/01/2022
- * Término do desenvolvimento:
- * Última atualização:
+ *      - pyUserInput
  *
  * Licença: GNU General Public License Version 3 (GLPv3)
  *

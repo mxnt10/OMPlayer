@@ -3,11 +3,8 @@
 
 #include <QWidget>
 #include <QModelIndex>
-#include <MediaInfoDLL.h>
 
 #include "PlayListItem.h"
-
-using namespace MediaInfoDLL;
 
 
 /**
@@ -24,10 +21,6 @@ QT_END_NAMESPACE
 class Button;
 class ListView;
 class PlayListModel;
-
-namespace MediaInfoDLL {
-    class MediaInfo;
-}
 
 
 /**
@@ -58,17 +51,19 @@ public:
 
     void setIndex();
 
-    void setSaveFile(const QString &file);
-
     void load();
 
     void save();
 
-    void insert(const QString &url, int row = 0);
+    void setSaveFile(const QString &file);
+
+    void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
 
     void insertItemAt(const PlayListItem &item, int row = 0);
 
     void setItemAt(const PlayListItem &item, int row = 0);
+
+    qint64 setDuration();
 
 protected:
     bool event(QEvent *event) override;
@@ -90,8 +85,9 @@ signals:
 public slots:
     void addItems(const QStringList &parms = QStringList());
 
-private slots:
     void removeSelectedItems();
+
+private slots:
 
     void clearItems();
 
@@ -104,10 +100,9 @@ private slots:
 private:
     Button *clearBtn, *removeBtn, *addBtn;
     ListView *listView;
-    MediaInfo MI;
     PlayListModel *model;
     QModelIndex actualitem;
-    QString duration, format, mfile;
+    QString mfile;
     QWidget *wpls;
     int maxRows;
     bool isshow;

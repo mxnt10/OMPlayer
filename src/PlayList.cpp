@@ -8,8 +8,6 @@
 #include <QMoveEvent>
 #include <QSpacerItem>
 
-#include <MediaInfoDLL.h>
-
 #include "Button.h"
 #include "Defines.h"
 #include "PlayList.h"
@@ -17,7 +15,6 @@
 #include "Utils.h"
 #include "ListView.h"
 
-using namespace MediaInfoDLL;
 using QSizePolicy::Expanding;
 //listView->setToolTip(QString::fromLatin1("Ctrl/Shift + ") + tr("Click to select multiple"));
 
@@ -175,30 +172,27 @@ void PlayList::addItems(const QStringList &parms) {
             select = true;
         }
     }
-    MI.Close();
     emit firstPlay(isplay);
 }
 
 
 /** Adiciona os itens para salvar na playlist */
-void PlayList::insert(const QString &url, int row) {
-    PlayListItem item;
-
-    /** Buscando as informações*/
+void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Adicionando %s...\033[0m", url.toStdString().c_str());
-    MI.Open(url.toStdString());
-    duration = MI.Get(Stream_General, 0, "Duration", Info_Text, Info_Name).c_str();
-    format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
-
-    /** Adicionando a playlist */
+    PlayListItem item;
     item.setUrl(url);
-    item.setDuration(duration.toInt());
+    item.setDuration(duration);
     item.setFormat(format);
+
     QString title = url;
     if (!url.contains(QLatin1String("://")) || url.startsWith(QLatin1String("file://")))
         title = QFileInfo(url).fileName();
     item.setTitle(title);
     insertItemAt(item, row);
+
+    /** Se a duração é diferente de zero, é porque algum item foi atualizado */
+    if (duration != 0)
+        listView->setCurrentIndex(model->index(row));
 }
 
 
@@ -311,6 +305,14 @@ void PlayList::removeSelectedItems() {
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+}
+
+
+/** Setando a duração do item atual */
+qint64 PlayList::setDuration() {
+    QModelIndex index = listView->currentIndex();
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    return pli.duration();
 }
 
 

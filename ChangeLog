@@ -3,7 +3,22 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.0 ] - 2022-04-18 #############################################
+## [ 1.0 rev2 ] - 2022-04-20 #############################################
+
+### Changed / Modificado
+ - Changed playlist style.
+###
+
+### Fixed / Corrigido
+ - Performance optimization:
+    - Add info when playing multimedia files.
+    - Don't add info when inserting multimedia files.
+###
+
+##########################################################################
+
+
+## [ 1.0 ] - 2022-04-18 ##################################################
 
 ### Added / Adicionado
  - Arquivos:

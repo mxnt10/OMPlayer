@@ -11,16 +11,12 @@
 
 class Widget : public QWidget {
 Q_OBJECT
-
 protected:
     void enterEvent(QEvent *event) override;
-
     void leaveEvent(QEvent *event) override;
 
 signals:
-
     void emitEnter();
-
     void emitLeave();
 };
 

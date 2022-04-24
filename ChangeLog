@@ -3,16 +3,49 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.0 rev2 ] - 2022-04-20 #############################################
+## [ 1.1 ] - 2022-04-24 ##################################################
+
+### Added / Adicionado
+ -
+###
+
+### Upgraded / Atualizado
+ - Código-Fonte:
+    - Atualizado a função defaultIcon().
+###
 
 ### Changed / Modificado
- - Changed playlist style.
+ - Código-Fonte:
+    - Mínimas alterações em alguns sources para melhor organização.
+###
+
+### Removed / Removido
+ -
 ###
 
 ### Fixed / Corrigido
- - Performance optimization:
-    - Add info when playing multimedia files.
-    - Don't add info when inserting multimedia files.
+ - Código-Fonte:
+    - Corrigido a detecção do ícone do programa em setIcon().
+    - Corrigido busca por arquivos png em setIconTheme().
+ - Recursos:
+    - Pequenas correções no estilo da playlist.
+###
+
+##########################################################################
+
+
+## [ 1.0 rev2 ] - 2022-04-20 #############################################
+
+### Changed / Modificado
+ - Modificado o estilo da playlist.
+###
+
+### Fixed / Corrigido
+ - Otimização de performance:
+    - Adiciona informações na playlist apenas ao executar os
+      arquivos multimídia.
+    - Não adicionar as informações aos arquivos multimídia enquanto
+      estão sendo adicionado na playlist.
 ###
 
 ##########################################################################

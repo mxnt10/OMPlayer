@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QGraphicsEffect>
 #include <QMenu>
+#include <QRandomGenerator>
 #include <QShortcut>
 #include <QSpacerItem>
 #include <QStyle>
@@ -36,7 +37,7 @@ using std::filesystem::create_directory;
 VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Iniciando o Reprodutor Multimídia ...\033[0m");
     contextmenu = enterpos = maximize = moving = playing = setinfo = false;
-    restart = false;
+    restart = randplay = false;
     actualitem = nextitem = previousitem = 0;
     theme = "circle";
     mUnit = 1000;
@@ -93,10 +94,14 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     stopBtn = new Button("stop", 32);
     nextBtn = new Button("next", 32);
     previousBtn = new Button("previous", 32);
+    replayBtn = new Button("replay", 32);
+    shuffleBtn = new Button("shuffle", 32);
     connect(playBtn, CLICKED, SLOT(playPause()));
     connect(stopBtn, CLICKED, SLOT(setStop()));
     connect(nextBtn, CLICKED, SLOT(Next()));
     connect(previousBtn, CLICKED, SLOT(Previous()));
+    connect(replayBtn, CLICKED, SLOT(setReplay()));
+    connect(shuffleBtn, CLICKED, SLOT(setShuffle()));
 
 
     /** Emissões personalizadas */
@@ -104,6 +109,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     connect(stopBtn, EMITENTER, SLOT(hideFalse()));
     connect(nextBtn, EMITENTER, SLOT(hideFalse()));
     connect(previousBtn, EMITENTER, SLOT(hideFalse()));
+    connect(replayBtn, EMITENTER, SLOT(hideFalse()));
+    connect(shuffleBtn, EMITENTER, SLOT(hideFalse()));
     connect(slider, EMITENTER, SLOT(hideFalse()));
     connect(slider, EMITLEAVE, SLOT(hideTrue()));
 
@@ -227,9 +234,22 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     bgctl->addWidget(nohide3, 0, 0);
 
 
+    /** Gerando uma linha */
+    auto line = new QFrame();
+    line->setFixedWidth(2);
+    line->setFixedHeight(25);
+    line->setFrameShadow(QFrame::Sunken);
+    line->setStyleSheet("background: #cccccc");
+
+
     /** Layout dos botões */
     auto *buttons = new QHBoxLayout();
     buttons->addWidget(nohide1);
+    buttons->addWidget(replayBtn);
+    buttons->addWidget(shuffleBtn);
+    buttons->addSpacing(5);
+    buttons->addWidget(line);
+    buttons->addSpacing(5);
     buttons->addWidget(previousBtn);
     buttons->addWidget(playBtn);
     buttons->addWidget(stopBtn);
@@ -361,8 +381,45 @@ void VideoPlayer::play(const QString &name) {
 }
 
 
+/** Função para selecionar aleatóriamente a próxima mídia */
+void VideoPlayer::nextRand() {
+    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo item aleatório ...\033[0m");
+
+    if (listnum.size() < playlist->setListSize() - 1) {
+        actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
+
+        /** O método aleatório convencional, alguns itens são reproduzidos mais que os outros. Portanto,
+         * criei esse método para executar os itens aleatoriamente só que um de cada vez. Quando todos os
+         * arquivos multimídia forem reproduzidos aleatoriamente, aí sim é zerado o contador para recameçar a
+         * execução aleatória dos itens denovo. */
+        while (!listnum.filter(QRegExp("^(" + QString::number(actualitem) + ")$")).isEmpty())
+            actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
+
+        listnum.append(QString::number(actualitem));
+    } else {
+        actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
+        listnum.clear();
+        listnum.append(QString::number(actualitem));
+    }
+
+    this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
+    mediaPlayer->stop();
+    setinfo = false;
+    mediaPlayer->play(playlist->getItems(actualitem));
+
+    /** Cálculo dos próximos itens a serem executados */
+    nextitem = actualitem + 1;
+    previousitem = actualitem - 1;
+    if (actualitem == 0)
+        previousitem = playlist->setListSize() - 1;
+    if (actualitem == playlist->setListSize() - 1)
+        nextitem = 0;
+    playlist->selectCurrent(actualitem);
+}
+
+
 /** Botão next */
-void VideoPlayer::Next(){
+void VideoPlayer::Next() {
     if (mediaPlayer->isPlaying()) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo o próximo item ...\033[0m");
         this->setWindowTitle(Utils::mediaTitle(playlist->getItems(nextitem)));
@@ -387,7 +444,7 @@ void VideoPlayer::Next(){
 
 
 /** Botão previous */
-void VideoPlayer::Previous(){
+void VideoPlayer::Previous() {
     if (mediaPlayer->isPlaying()) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um item anterior ...\033[0m");
         this->setWindowTitle(Utils::mediaTitle(playlist->getItems(previousitem)));
@@ -496,6 +553,38 @@ void VideoPlayer::onStop() {
         logo->setVisible(true);
         noscreensaver->stop();
         Py_FinalizeEx();
+    }
+}
+
+
+/** Ativação do modo repetição */
+void VideoPlayer::setReplay() {
+    if (!restart) {
+        restart = true;
+        if (Utils::setIconTheme(theme, "replay-on") == nullptr)
+            replayBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("replay-on")));
+        else replayBtn->setIcon(QIcon(Utils::setIconTheme(theme, "replay-on")));
+    } else {
+        restart = false;
+        if (Utils::setIconTheme(theme, "replay") == nullptr)
+            replayBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("replay")));
+        else replayBtn->setIcon(QIcon(Utils::setIconTheme(theme, "replay")));
+    }
+}
+
+
+/** Ativação do modo aleatório */
+void VideoPlayer::setShuffle() {
+    if (!randplay) {
+        randplay = true;
+        if (Utils::setIconTheme(theme, "shuffle-on") == nullptr)
+            shuffleBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("shuffle-on")));
+        else shuffleBtn->setIcon(QIcon(Utils::setIconTheme(theme, "shuffle-on")));
+    } else {
+        randplay = false;
+        if (Utils::setIconTheme(theme, "shuffle") == nullptr)
+            shuffleBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("shuffle")));
+        else shuffleBtn->setIcon(QIcon(Utils::setIconTheme(theme, "shuffle")));
     }
 }
 
@@ -611,7 +700,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 
     /** Próxima mídia */
     if (int(value / mUnit) == mediaPlayer->duration() / mUnit - 1) {
-        if (actualitem == playlist->setListSize() - 1 && !restart) {
+        if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             mediaPlayer->stop();
             playing = false;
             playlist->selectClean();
@@ -620,7 +709,10 @@ void VideoPlayer::updateSlider(qint64 value) {
             nextitem = 1;
         } else {
             setinfo = false;
-            Next();
+            if (randplay)
+                nextRand();
+            else
+                Next();
         }
     }
 }
@@ -736,18 +828,37 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
 
 
     /** Menu tela cheia */
-    QAction fullscreen("Fullscreen", this);
+    QAction fullscreen("Show Fullscreen", this);
+    if (this->isFullScreen())
+        fullscreen.setText("Exit Fullscreen");
     fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
     if (Utils::setIconTheme(theme, "fullscreen") == nullptr)
         fullscreen.setIcon(QIcon::fromTheme("view-fullscreen"));
     else fullscreen.setIcon(QIcon(Utils::setIconTheme(theme, "fullscreen")));
 
 
+    /** Menu aleatório */
     QAction shuffle("Shuffle", this);
+    shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
+    if (Utils::setIconTheme(theme, "shuffle-menu") == nullptr)
+        shuffle.setIcon(QIcon::fromTheme("media-playlist-shuffle"));
+    else shuffle.setIcon(QIcon(Utils::setIconTheme(theme, "shuffle-menu")));
 
+
+    /** Menu repetir */
     QAction replay("Replay", this);
+    replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
+    if (Utils::setIconTheme(theme, "replay-menu") == nullptr)
+        replay.setIcon(QIcon::fromTheme("media-playlist-repeat"));
+    else replay.setIcon(QIcon(Utils::setIconTheme(theme, "replay-menu")));
 
+
+    /** Menu de configuração */
     QAction settings("Settings", this);
+    settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
+    if (Utils::setIconTheme(theme, "settings") == nullptr)
+        settings.setIcon(QIcon(style()->standardIcon(QStyle::SP_DialogApplyButton)));
+    else settings.setIcon(QIcon(Utils::setIconTheme(theme, "settings")));
 
 
     /** Menu sobre */
@@ -758,19 +869,22 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
 
 
     /** Ações do menu */
-    connect(&open, TRIGGERED,  SLOT(openMedia()));
-    connect(&fullscreen, TRIGGERED,  SLOT(changeFullScreen()));
-    connect(&mabout, TRIGGERED,  SLOT(setAbout()));
+    connect(&open, TRIGGERED, SLOT(openMedia()));
+    connect(&fullscreen, TRIGGERED, SLOT(changeFullScreen()));
+    connect(&shuffle, TRIGGERED, SLOT(setShuffle()));
+    connect(&replay, TRIGGERED, SLOT(setReplay()));
+    connect(&mabout, TRIGGERED, SLOT(setAbout()));
 
 
+    /** Montagem do menu */
     contextMenu.addAction(&open);
     contextMenu.addSeparator();
     contextMenu.addAction(&fullscreen);
-//    contextMenu.addSeparator();
-//    contextMenu.addAction(&shuffle);
-//    contextMenu.addAction(&replay);
     contextMenu.addSeparator();
-//    contextMenu.addAction(&settings);
+    contextMenu.addAction(&shuffle);
+    contextMenu.addAction(&replay);
+    contextMenu.addSeparator();
+    contextMenu.addAction(&settings);
     contextMenu.addAction(&mabout);
 
     Utils::arrowMouse();

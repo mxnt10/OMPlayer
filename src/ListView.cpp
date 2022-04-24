@@ -1,5 +1,4 @@
 #include <QDebug>
-
 #include "ListView.h"
 #include "PlayListDelegate.h"
 

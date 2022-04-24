@@ -14,19 +14,12 @@ using namespace std;
 class Utils {
 public:
     static QString getLocal();
-
     static QString setIcon(bool logo = false);
-
     static QString setIconTheme(const string &theme, const string &icon);
-
     static QString setStyle(const string &style);
-
     static QString mediaTitle(const QString &mediafile);
-
     static QString defaultIcon(const string &icon);
-
     static void arrowMouse();
-
     static void blankMouse();
 
 private:

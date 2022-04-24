@@ -25,8 +25,8 @@ QString Utils::getLocal() {
 
 /** Retorna o ícone do programa */
 QString Utils::setIcon(bool logo) {
-    QString icon = "/usr/share/pixmaps/omp.png";
-    QString lIcon = getLocal() + "/appdata/omp.png";
+    QString icon = "/usr/share/pixmaps/OMPlayer.png";
+    QString lIcon = getLocal() + "/appdata/OMPlayer.png";
 
     if (logo) {
         icon = "/usr/share/OMPlayer/logo/logo.png";
@@ -58,11 +58,12 @@ QString Utils::setIconTheme(const string &theme, const string &icon) {
     QString lIconFile = getLocal() + "/icons/" + fileTheme;
 
     /** Compatibilidade com formatos svg e png */
-    QString iconFileSVG = iconFile.append(".svg");
-    QString iconFilePNG = iconFile.append(".png");
-    QString lIconFileSVG = lIconFile.append(".svg");
-    QString lIconFilePNG = lIconFile.append(".png");
+    QString iconFileSVG = iconFile + ".svg";
+    QString iconFilePNG = iconFile + ".png";
+    QString lIconFileSVG = lIconFile + ".svg";
+    QString lIconFilePNG = lIconFile + ".png";
 
+    /** A função sempre vai dar prioridade aos arquivos svg */
     if (exists(iconFileSVG.toStdString())) return iconFileSVG;
     else if (exists(iconFilePNG.toStdString())) return iconFilePNG;
     else if (exists(lIconFileSVG.toStdString())) return lIconFileSVG;
@@ -108,6 +109,10 @@ QString Utils::defaultIcon(const string &icon) {
         return "media-skip-forward";
     if (icon == "previous")
         return "media-skip-backward";
+    if (icon == "replay")
+        return "media-playlist-repeat";
+    if (icon == "shuffle")
+        return "media-playlist-shuffle";
 
     /** Ícones dos botões da playlist */
     if (icon == "add")
@@ -119,6 +124,9 @@ QString Utils::defaultIcon(const string &icon) {
 
     return{}; /** Se não estiver disponível, vai sem mesmo */
 }
+
+
+/**********************************************************************************************************************/
 
 
 /** Desocultar mouse */

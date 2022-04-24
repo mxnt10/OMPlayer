@@ -691,6 +691,7 @@ void VideoPlayer::updateSlider(qint64 value) {
     slider->setRange(0, int(mediaPlayer->duration() / mUnit));
     slider->setValue(int(value / mUnit));
 
+    /** Atualizar o status do item da playlist se necessário */
     if (!setinfo && playlist->setDuration() == 0) {
         int row = playlist->selectItems();
         QString url = mediaPlayer->file();
@@ -700,7 +701,6 @@ void VideoPlayer::updateSlider(qint64 value) {
         QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
         MI.Close();
 
-        /** Atualizando status do item da playlist */
         playlist->removeSelectedItems();
         playlist->insert(url, row, duration, format);
     } else {
@@ -709,6 +709,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 
     /** Próxima mídia */
     if (int(value / mUnit) == mediaPlayer->duration() / mUnit - 1) {
+        //QTimer::singleShot(900, this, SLOT());
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             mediaPlayer->stop();
             playing = false;

@@ -28,20 +28,22 @@
 
 - Ctrl+A: Open files.
 - Ctrl+O: Open files.
+- Ctrl+H: Shuffle mode.
+- Ctrl+T: Repeat mode.
 - Alt+Enter: Fullscreen.
 - Esc: Exit fullscreen.
 
 ## Installation instructions
 
 To install "OMPlayer", use the following commands:
-```sh
+```
 $ git clone https://github.com/mxnt10/OMPlayer.git
 $ cd OMPlayer
 
-$ mkdir build
-$ cd build; cmake ..
-$ make
+$ sudo su
+# install_root=/usr ./install.sh
 ```
+The script already does the compilation.
 
 ## GNU General Public License
 

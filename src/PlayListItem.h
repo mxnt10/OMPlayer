@@ -13,25 +13,15 @@
 class PlayListItem {
 public:
     PlayListItem();
-
     [[nodiscard]] QString title() const;
-
     [[nodiscard]] QString url() const;
-
     [[nodiscard]] qint64 duration() const;
-
     [[nodiscard]] QString durationString() const;
-
     [[nodiscard]] QString format() const;
-
     void setTitle(const QString &title);
-
     void setUrl(const QString &url);
-
     void setFormat(const QString &format);
-
     void setDuration(qint64 ms);
-
     bool operator==(const PlayListItem &other) const;
 
 private:

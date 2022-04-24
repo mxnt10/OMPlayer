@@ -13,18 +13,14 @@ class ListView : public QListView {
 Q_OBJECT
 public:
     ListView();
-
     ~ListView() override;
 
 protected:
     void enterEvent(QEvent *event) override;
-
     void leaveEvent(QEvent *event) override;
 
 signals:
-
     void emitEnter();
-
     void emitLeave();
 };
 

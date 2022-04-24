@@ -1,6 +1,9 @@
+#include <QVector>
 #include "PlayListModel.h"
 #include "PlayListItem.h"
-#include <QVector>
+
+using Qt::EditRole;
+using Qt::DisplayRole;
 
 
 /**********************************************************************************************************************/
@@ -30,7 +33,7 @@ QVariant PlayListModel::data(const QModelIndex &index, int role) const {
     if (index.row() < 0 || index.row() >= mediaItems.size())
         return var;
 
-    if (role == Qt::DisplayRole || role == Qt::EditRole)
+    if (role == DisplayRole || role == EditRole)
         var.setValue(mediaItems.at(index.row()));
 
     return var;
@@ -39,8 +42,7 @@ QVariant PlayListModel::data(const QModelIndex &index, int role) const {
 
 /** Função auxiliar para buscar itens da playlist */
 bool PlayListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    if (index.row() >= 0 && index.row() < mediaItems.size()
-        && (role == Qt::EditRole || role == Qt::DisplayRole)) {
+    if (index.row() >= 0 && index.row() < mediaItems.size() && (role == EditRole || role == DisplayRole)) {
         mediaItems.replace(index.row(), value.value<PlayListItem>());
         emit dataChanged(index, index, QVector<int>() << role);
         return true;

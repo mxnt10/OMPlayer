@@ -3,7 +3,7 @@
 
 
 /** Depuração */
-#define DEBUG true
+#define DEBUG false
 
 
 /** Defines para o sobre */

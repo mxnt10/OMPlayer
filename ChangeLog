@@ -6,7 +6,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ## [ 1.1 ] - 2022-04-24 ##################################################
 
 ### Added / Adicionado
- -
+ - Controles:
+    - Adicionado botões Repetir e Aleatório juntamente com as opções
+      no menu de contexto.
+ - Teclas de atalho:
+    - Ctrl+H: Alterar modo aleatório.
+    - Ctrl+T: Alterar modo de repetição.
 ###
 
 ### Upgraded / Atualizado
@@ -19,16 +24,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Mínimas alterações em alguns sources para melhor organização.
 ###
 
-### Removed / Removido
- -
-###
-
 ### Fixed / Corrigido
  - Código-Fonte:
     - Corrigido a detecção do ícone do programa em setIcon().
     - Corrigido busca por arquivos png em setIconTheme().
  - Recursos:
     - Pequenas correções no estilo da playlist.
+ - Pequenas correções no script "install.sh".
 ###
 
 ##########################################################################

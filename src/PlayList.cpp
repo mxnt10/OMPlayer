@@ -37,13 +37,15 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     /** Lista para visualização da playlist */
     listView = new ListView();
     listView->setModel(model);
-//    listView->setToolTip(QString::fromLatin1("Ctrl/Shift + ") + tr("Click to select multiple"));
 
 
     /** Botões para o painel da playlist */
-    clearBtn = new Button("clean", 32);
-    removeBtn = new Button("remove", 32);
     addBtn = new Button("add", 32);
+    addBtn->setToolTip(tr("Add items"));
+    removeBtn = new Button("remove", 32);
+    removeBtn->setToolTip(tr("Remove items"));
+    clearBtn = new Button("clean", 32);
+    clearBtn->setToolTip(tr("Clear playlist"));
 
 
     /** Plano de fundo da playlist */

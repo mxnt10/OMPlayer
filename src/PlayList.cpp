@@ -258,6 +258,11 @@ void PlayList::selectPrevious() {
     actualitem = listView->currentIndex();
 }
 
+void PlayList::selectCurrent(int indx) {
+    listView->setCurrentIndex(model->index(indx));
+    actualitem = listView->currentIndex();
+}
+
 
 /** Limpar item selecionado da playlist */
 void PlayList::selectClean() {

@@ -10,13 +10,12 @@
 
 #include "Button.h"
 #include "Defines.h"
+#include "ListView.h"
 #include "PlayList.h"
 #include "PlayListModel.h"
 #include "Utils.h"
-#include "ListView.h"
 
 using QSizePolicy::Expanding;
-//listView->setToolTip(QString::fromLatin1("Ctrl/Shift + ") + tr("Click to select multiple"));
 
 
 /**********************************************************************************************************************/
@@ -31,17 +30,14 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Efeito semitransparente para o fundo da playlist */
-    auto *effect1 = new QGraphicsOpacityEffect();
-    effect1->setOpacity(OPACY);
-    auto *effect2 = new QGraphicsOpacityEffect();
-    effect2->setOpacity(OPACY);
+    auto *effect = new QGraphicsOpacityEffect();
+    effect->setOpacity(OPACY);
 
 
     /** Lista para visualização da playlist */
     listView = new ListView();
     listView->setModel(model);
-    listView->setGraphicsEffect(effect1);
-    listView->setStyleSheet(Utils::setStyle("playlist"));
+//    listView->setToolTip(QString::fromLatin1("Ctrl/Shift + ") + tr("Click to select multiple"));
 
 
     /** Botões para o painel da playlist */
@@ -52,7 +48,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Plano de fundo da playlist */
     auto *bgpls = new QWidget();
-    bgpls->setGraphicsEffect(effect2);
+    bgpls->setGraphicsEffect(effect);
     bgpls->setStyleSheet(Utils::setStyle("widget"));
 
 

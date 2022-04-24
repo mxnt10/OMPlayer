@@ -128,6 +128,12 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     auto *keyEsc = new QShortcut(this);
     keyEsc->setKey(QKeySequence(ESC));
     connect(keyEsc, ACTIVATED, SLOT(leaveFullScreen()));
+    auto *keyCtrlH = new QShortcut(this);
+    keyCtrlH->setKey(QKeySequence(CTRL | Qt::Key_H));
+    connect(keyCtrlH, ACTIVATED, SLOT(setShuffle()));
+    auto *keyCtrlT = new QShortcut(this);
+    keyCtrlT->setKey(QKeySequence(CTRL | Qt::Key_T));
+    connect(keyCtrlT, ACTIVATED, SLOT(setReplay()));
 
 
     /** Opacidade de 80% para os widgets de fundo dos controles e playlist */

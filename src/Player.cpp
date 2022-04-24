@@ -394,10 +394,13 @@ void VideoPlayer::nextRand() {
     if (listnum.size() < playlist->setListSize() - 1) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
-        /** O método aleatório convencional, alguns itens são reproduzidos mais que os outros. Portanto,
-         * criei esse método para executar os itens aleatoriamente só que um de cada vez. Quando todos os
+        /**
+         * No método aleatório convencional, alguns itens são reproduzidos mais vezes que os outros. Portanto,
+         * criei esse método para executar os itens aleatoriamente só que um de cada vez. Assim, quando todos os
          * arquivos multimídia forem reproduzidos aleatoriamente, aí sim é zerado o contador para recameçar a
-         * execução aleatória dos itens denovo. */
+         * execução aleatória dos itens denovo.
+         */
+
         while (!listnum.filter(QRegExp("^(" + QString::number(actualitem) + ")$")).isEmpty())
             actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
@@ -524,9 +527,9 @@ void VideoPlayer::onPaused(bool paused) {
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void VideoPlayer::onStart() {
     Py_Initialize();
-    noscreensaver->start(15 * 1000);
     PyRun_SimpleString("from pykeyboard import PyKeyboard\n"
                        "key = PyKeyboard()\n");
+    noscreensaver->start(15 * 1000);
 
     if (Utils::setIconTheme(theme, "pause") == nullptr)
         playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));

@@ -27,8 +27,7 @@
 #include <QLoggingCategory>
 
 #include "Player.h"
-
-#define DEBUG false /** Somente para depuração */
+#include "Defines.h"
 
 
 /**
@@ -51,19 +50,22 @@ int main(int argc, char *argv[]) {
 
     /** Propriedades do Programa */
     QCoreApplication::setApplicationName("OMPlayer");
-    QCoreApplication::setOrganizationName("MXNT10");
-    QCoreApplication::setApplicationVersion("1.0");
+    QCoreApplication::setApplicationVersion(VERSION);
     QGuiApplication::setApplicationDisplayName(QCoreApplication::applicationName());
 
 
     /** Instruções que permite a passagem de argumentos para o reprodutor */
     QCommandLineParser parser;
-    parser.setApplicationDescription("Open Multimedia Player");
+    parser.setApplicationDescription(PRG_NAME);
     parser.addHelpOption();
     parser.addVersionOption();
-    parser.addPositionalArgument("url", "The URL to open");
+    parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
     parser.process(OMPlayer);
 
+//    QCommandLineOption targetDirectoryOption(QStringList() << "t" << "target-directory",
+//                                             QCoreApplication::translate("main", "Copy all source files into <directory>."),
+//                                             QCoreApplication::translate("main", "directory"));
+//    parser.addOption(targetDirectoryOption);
 
     /** Define a interface do programa, envia os argumentos para o reprodutor e inicia a interface */
     VideoPlayer player;

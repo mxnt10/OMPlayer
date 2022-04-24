@@ -52,14 +52,15 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
     /** Itens com o mouse posicionado e destaque das linhas uma das outras */
     if (option.state & (QStyle::State_MouseOver) || index.row() % 2 == 0 ) {
-        detail = true;
         auto *m = (PlayListModel *) index.model();
         if (m && highlightRow != index.row()) {
             highlightRow = index.row();
             m->updateLayout();
         }
-        if (option.state & (QStyle::State_MouseOver))
+        if (option.state & (QStyle::State_MouseOver)) {
+            detail = true;
             painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 100));
+        }
         if (index.row() % 2 == 0)
             painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 30));
     }

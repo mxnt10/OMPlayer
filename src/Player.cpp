@@ -46,6 +46,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     /** Propriedades do Programa */
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
+    this->setStyleSheet(Utils::setStyle("global"));
     this->setMinimumSize(906, 510);
     this->setMouseTracking(true); /** Mapeamento do mouse */
 

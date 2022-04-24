@@ -2,6 +2,10 @@
 #define OMPLAYER_DEFINES_H
 
 
+/** Depuração */
+#define DEBUG true
+
+
 /** Defines para o sobre */
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"

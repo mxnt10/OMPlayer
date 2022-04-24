@@ -1,0 +1,7 @@
+/* Definições globais para o setTollTip() */
+QToolTip {
+    background: rgb(0,0,0,200);
+    color: #ffffff;
+    border: 2px ridge #cccccc;
+    border-radius: 10px;
+}

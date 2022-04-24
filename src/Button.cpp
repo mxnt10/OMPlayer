@@ -25,7 +25,7 @@ Button::Button(const string& icon, int size) {
     else setIcon(QIcon(Utils::setIconTheme(theme, icon)));
 
     setFocusPolicy(Qt::NoFocus);
-    setStyleSheet("border: 0");
+    setStyleSheet("QPushButton { border: 0; }");
     connect(this, PRESSED, SLOT(onEffect()));
 }
 

@@ -17,11 +17,9 @@ public:
 
 protected:
     void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
 
 signals:
     void emitEnter();
-    void emitLeave();
 };
 
 #endif //OMPLAYER_LISTVIEW_H

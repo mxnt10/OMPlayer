@@ -59,11 +59,13 @@ void Button::enterEvent( QEvent *event ) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[35m Mouse posicionado no botão %s ...\033[0m", ico.toStdString().c_str());
     setIconSize(QSize(num + 2, num + 2));
     emit emitEnter();
+    QPushButton::enterEvent(event);
 }
 
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent( QEvent *event ) {
     setIconSize(QSize(num, num));
+    QPushButton::leaveEvent(event);
 }
 

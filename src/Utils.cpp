@@ -5,6 +5,10 @@
 #include <QString>
 #include <filesystem>
 
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
+#include <X11/extensions/XTest.h>
+
 #include "Utils.h"
 
 using namespace std;
@@ -123,6 +127,18 @@ QString Utils::defaultIcon(const string &icon) {
         return "edit-delete";
 
     return{}; /** Se não estiver disponível, vai sem mesmo */
+}
+
+
+/** Função anti-bloqueio de tela usando recursos nativos do X11 */
+void Utils::noBlockScreen() {
+    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Acionando anti-bloqueio ...\033[0m");
+    Display *display;
+    display = XOpenDisplay(nullptr);
+    uint keycode = XKeysymToKeycode(display, XK_Control_L);
+    XTestFakeKeyEvent(display, keycode, True, 0);
+    XTestFakeKeyEvent(display, keycode, False, 0);
+    XFlush(display);
 }
 
 

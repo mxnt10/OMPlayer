@@ -17,6 +17,7 @@ public:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
     void enterEvent(QEvent *event) override;
     void leaveEvent(QEvent *event) override;
 
@@ -27,6 +28,7 @@ private:
 signals:
     void emitEnter();
     void emitLeave();
+    void onHover(int pos, int value);
 };
 
 #endif //OMPLAYER_SLIDER_H

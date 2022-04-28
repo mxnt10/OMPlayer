@@ -3,6 +3,44 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.1 rev2 ] - 2022-04-28 #############################################
+
+### Added / Adicionado
+ - Arquivos:
+    - Adicionado script clean_conf em common para limpar as configurações.
+ - Recursos:
+    - Adicioando recurso onHover para o preview em slider.
+###
+
+### Upgraded / Atualizado
+ - Atualizado a função para adicionar arquivos multimídia addItems().
+###
+
+### Changed / Modificado
+ - Arquivos:
+    - Reajuste em CMakeLists.txt
+ - Sources:
+    - Modificado o sistema anti-bloqueio de tela.
+    - Funções para reprodução refatoradas.
+    - Refatorada a função getItems().
+###
+
+### Removed / Removido
+ - Removido instruções temporárias de incorporação do python no código.
+###
+
+### Fixed / Corrigido
+ - Recursos:
+    - Correção no modo aleatório.
+ - Sources:
+    - Pequenas correções na listview.
+    - Vários ajustes nos eventos de mouse.
+    - Corrigido problemas de travamento no slider.
+###
+
+##########################################################################
+
+
 ## [ 1.1 ] - 2022-04-24 ##################################################
 
 ### Added / Adicionado

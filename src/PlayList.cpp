@@ -7,6 +7,7 @@
 #include <QFrame>
 #include <QMoveEvent>
 #include <QSpacerItem>
+#include <QStandardPaths>
 
 #include "Button.h"
 #include "Defines.h"
@@ -15,6 +16,7 @@
 #include "PlayListModel.h"
 #include "Utils.h"
 
+using QStandardPaths::MoviesLocation;
 using QSizePolicy::Expanding;
 
 
@@ -154,7 +156,24 @@ void PlayList::addItems(const QStringList &parms) {
         Utils::arrowMouse();
 
     if (parms.isEmpty())
-        files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), QDir::homePath());
+        files = \
+        QFileDialog::getOpenFileNames(
+            nullptr, tr("Select multimedia files"),
+            QStandardPaths::standardLocations(MoviesLocation).value(0, QDir::homePath()),
+            "Video Files (*.3gp *.3gpp *.m4v *.mp4 *.m2v *.mp2 *.mpeg *.mpg *.vob *.ogg *.ogv *.mov *.rmvb *.webm "
+            "*.flv *.mkv *.wmv *.avi *.divx);;"
+            "Audio Files (*.ac3 *.flac *.mid *.midi *.m4a *.mp3 *.opus *.mka *.wma *.wav);;"
+            "3GPP Multimedia Files (*.3ga *.3gp *.3gpp);;3GPP2 Multimedia Files (*.3g2 *.3gp2 *.3gpp2);;"
+            "AVI Video (*.avf *.avi *.divx);;Flash Video (*.flv);;Matroska Video (*.mkv);;"
+            "Microsoft Media Format (*.wmp);;MPEG Video (*.m2v *.mp2 *.mpe *.mpeg *.mpg *.ts *.vob *.vdr);;"
+            "MPEG-4 Video (*.f4v *.lrv *.m4v *.mp4);;OGG Video (*.ogg *.ogv);;"
+            "QuickTime Video (*.moov *.mov *.qt *.qtvr);;RealMedia Format (*.rv *.rvx *.rmvb);;"
+            "WebM Video (*.webm);;Windows Media Video (*.wmv);;"
+            "AAC Audio (*.aac *.adts *.ass );;Dolby Digital Audio (*.ac3);;FLAC Audio (*.flac);;"
+            "Matroska Audio (*.mka);;MIDI Audio (*.kar *.mid *.midi);;MPEG-4 Audio (*.f4a *.m4a);;"
+            "MP3 Audio (*.mp3 *.mpga);;OGG Audio (*.oga *.opus *.spx);;Windows Media Audio (*.wma);;"
+            "WAV Audio (*.wav);;WavPack Audio (*.wp *.wvp);;Media Playlist (*.m3u *.m3u8);;All Files (*);;"
+        );
     else
         files = parms;
 
@@ -176,7 +195,10 @@ void PlayList::addItems(const QStringList &parms) {
 
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Adicionando %s...\033[0m", url.toStdString().c_str());
+    if (duration == 0)
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Adicionando %s...\033[0m", url.toStdString().c_str());
+    else
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Atualizando %s...\033[0m", url.toStdString().c_str());
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);
@@ -257,6 +279,7 @@ void PlayList::selectPrevious() {
 }
 
 void PlayList::selectCurrent(int indx) {
+    listView->clearSelection();
     listView->setCurrentIndex(model->index(indx));
     actualitem = listView->currentIndex();
 }
@@ -272,18 +295,9 @@ void PlayList::selectClean() {
 
 /** Retorna uma url de um arquivo multimídia usando um valor inteiro especificado */
 QString PlayList::getItems(int s) {
-    save();
-    QFile f(mfile);
-    if (!f.open(QIODevice::ReadOnly))
-        return{};
-    QDataStream ds(&f);
-    QList<PlayListItem> list;
-    ds >> list;
-    QString item;
-    if ( s < list.size())
-        item = list.at(s).url();
-    else return{};
-    return item;
+    QModelIndex index = model->index(s);
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    return pli.url();
 }
 
 
@@ -350,14 +364,15 @@ void PlayList::noHide() {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (event->x() > (this->width() - 300) && !isshow) {
+    if (event->x() > (this->width() - 300) && event->y() < this->height() - 5 && !isshow) {
         emit emitnohide();
         wpls->setVisible(true);
         isshow = true;
-    } else if (event->x() < (this->width() - 300) && isshow) {
+    } else if ((event->x() < (this->width() - 300) || event->y() > this->height() - 5) && isshow) {
         wpls->setVisible(false);
         isshow = false;
     }
+    QWidget::mouseMoveEvent(event);
 }
 
 

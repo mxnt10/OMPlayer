@@ -14,11 +14,6 @@
 #include <filesystem>
 #include <MediaInfoDLL.h>
 
-#pragma push_macro("slots")
-#undef slots
-#include "Python.h"
-#pragma pop_macro("slots")
-
 #include "Button.h"
 #include "Defines.h"
 #include "Player.h"
@@ -70,7 +65,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
     playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
-    connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(play(QString)));
+    connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString)), SLOT(firstPlay(QString)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
     connect(playlist, SIGNAL(emithide()), SLOT(setHide()));
@@ -327,8 +322,7 @@ void VideoPlayer::openMedia(const QStringList &parms) {
 
 /** Função anti-bloqueio de tela */
 void VideoPlayer::blockScreenSaver() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Acionando anti-bloqueio ...\033[0m");
-    PyRun_SimpleString("key.tap_key(key.control_key)\n");
+    Utils::noBlockScreen();
 }
 
 
@@ -340,12 +334,19 @@ void VideoPlayer::setSelect(int item) {
 }
 
 
+void VideoPlayer::play(const QString &isplay) {
+    this->setWindowTitle(Utils::mediaTitle(isplay));
+    mediaPlayer->stop();
+    setinfo = false;
+    mediaPlayer->play(isplay);
+}
+
+
 /** Para executar os itens recém adicionados da playlist */
 void VideoPlayer::firstPlay(const QString &isplay){
     if (!mediaPlayer->isPlaying()) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
-        this->setWindowTitle(Utils::mediaTitle(isplay));
-        mediaPlayer->play(isplay);
+        play(isplay);
         playlist->selectNext();
         previousitem = playlist->setListSize() - 1;
         actualitem = 0;
@@ -355,15 +356,12 @@ void VideoPlayer::firstPlay(const QString &isplay){
 
 
 /** Executa um item selecionado da playlist */
-void VideoPlayer::play(const QString &name) {
+void VideoPlayer::doubleplay(const QString &name) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
-    this->setWindowTitle(Utils::mediaTitle(name));
     PlayListItem item;
     item.setUrl(name);
     item.setTitle(Utils::mediaTitle(name));
-    mediaPlayer->stop();
-    setinfo = false;
-    mediaPlayer->play(name);
+    play(name);
 
     /**
      * Cálculo dos próximos itens a serem executados. O cálculo foi baseado na seguinte forma, uma lista começa
@@ -403,19 +401,17 @@ void VideoPlayer::nextRand() {
          */
 
         while (!listnum.filter(QRegExp("^(" + QString::number(actualitem) + ")$")).isEmpty())
-            actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
+            actualitem = QRandomGenerator::global()->bounded(playlist->setListSize());
 
         listnum.append(QString::number(actualitem));
+        qDebug() << listnum;
     } else {
-        actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
+        actualitem = QRandomGenerator::global()->bounded(playlist->setListSize());
         listnum.clear();
         listnum.append(QString::number(actualitem));
     }
 
-    this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
-    mediaPlayer->stop();
-    setinfo = false;
-    mediaPlayer->play(playlist->getItems(actualitem));
+    play(playlist->getItems(actualitem));
 
     /** Cálculo dos próximos itens a serem executados */
     nextitem = actualitem + 1;
@@ -431,11 +427,15 @@ void VideoPlayer::nextRand() {
 /** Botão next */
 void VideoPlayer::Next() {
     if (mediaPlayer->isPlaying()) {
+
+        /** Reprodução aleatória */
+        if (randplay) {
+            nextRand();
+            return;
+        }
+
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo o próximo item ...\033[0m");
-        this->setWindowTitle(Utils::mediaTitle(playlist->getItems(nextitem)));
-        mediaPlayer->stop();
-        setinfo = false;
-        mediaPlayer->play(playlist->getItems(nextitem));
+        play(playlist->getItems(nextitem));
 
         /** Cálculo dos próximos itens a serem executados */
         nextitem++;
@@ -457,10 +457,7 @@ void VideoPlayer::Next() {
 void VideoPlayer::Previous() {
     if (mediaPlayer->isPlaying()) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um item anterior ...\033[0m");
-        this->setWindowTitle(Utils::mediaTitle(playlist->getItems(previousitem)));
-        mediaPlayer->stop();
-        setinfo = false;
-        mediaPlayer->play(playlist->getItems(previousitem));
+        play(playlist->getItems(previousitem));
 
         /** Cálculo dos próximos itens a serem executados */
         nextitem--;
@@ -483,9 +480,7 @@ void VideoPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
             qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
-            this->setWindowTitle(Utils::mediaTitle(playlist->getItems(actualitem)));
-            setinfo = false;
-            mediaPlayer->play(playlist->getItems(actualitem));
+            play(playlist->getItems(actualitem));
             playlist->selectPlay();
         }
         nextitem = actualitem + 1;
@@ -527,9 +522,6 @@ void VideoPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void VideoPlayer::onStart() {
-    Py_Initialize();
-    PyRun_SimpleString("from pykeyboard import PyKeyboard\n"
-                       "key = PyKeyboard()\n");
     noscreensaver->start(15 * 1000);
 
     if (Utils::setIconTheme(theme, "pause") == nullptr)
@@ -562,7 +554,6 @@ void VideoPlayer::onStop() {
         slider->setDisabled(true);
         logo->setVisible(true);
         noscreensaver->stop();
-        Py_FinalizeEx();
     }
 }
 
@@ -654,17 +645,19 @@ void VideoPlayer::setAbout() {
 
 /** Ativar ocultação  */
 void VideoPlayer::hideTrue() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Ocultação liberada ...\033[0m");
-    if (enterpos)
+    if (enterpos) {
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Ocultação liberada ...\033[0m");
         enterpos = false;
+    }
 }
 
 
 /** Desativar ocultação */
 void VideoPlayer::hideFalse() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Ocultação impedida ...\033[0m");
-    if (!enterpos)
+    if (!enterpos) {
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Ocultação impedida ...\033[0m");
         enterpos = true;
+    }
 }
 
 
@@ -709,8 +702,7 @@ void VideoPlayer::updateSlider(qint64 value) {
     }
 
     /** Próxima mídia */
-    if (int(value / mUnit) == mediaPlayer->duration() / mUnit - 1) {
-        //QTimer::singleShot(900, this, SLOT());
+    if (int(value) > mediaPlayer->duration() - (mUnit * 3)) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             mediaPlayer->stop();
             playing = false;
@@ -720,10 +712,7 @@ void VideoPlayer::updateSlider(qint64 value) {
             nextitem = 1;
         } else {
             setinfo = false;
-            if (randplay)
-                nextRand();
-            else
-                Next();
+            Next();
         }
     }
 }
@@ -731,7 +720,10 @@ void VideoPlayer::updateSlider(qint64 value) {
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
-    mUnit = mediaPlayer->notifyInterval();
+    if (mediaPlayer->notifyInterval() < 100)
+        mUnit = mediaPlayer->notifyInterval();
+    else
+        mUnit = 200;
     onStart();
 }
 
@@ -763,8 +755,9 @@ void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
     if (about->isVisible()) {
         about->setVisible(false);
         Utils::blankMouse();
-        return;
+        return QWidget::mouseReleaseEvent(event);
     }
+    QWidget::mouseReleaseEvent(event);
 }
 
 
@@ -772,6 +765,7 @@ void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
 void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Duplo clique com o mouse ...\033[0m");
     changeFullScreen();
+    QWidget::mouseDoubleClickEvent(event);
 }
 
 
@@ -788,6 +782,7 @@ void VideoPlayer::enterEvent(QEvent *event) {
         if (!about->isVisible())
             wctl->setVisible(true);
     }
+    QWidget::enterEvent(event);
 }
 
 
@@ -797,6 +792,7 @@ void VideoPlayer::leaveEvent(QEvent *event) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Ponteito do Mouse Fora da Interface ...\033[0m");
     wctl->setVisible(false);
     enterpos = false;
+    QWidget::leaveEvent(event);
 }
 
 
@@ -804,7 +800,6 @@ void VideoPlayer::leaveEvent(QEvent *event) {
 void VideoPlayer::closeEvent(QCloseEvent *event) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Finalizando o Reprodutor Multimídia !\033[0m");
     playlist->save();
-    Py_FinalizeEx();
     event->accept();
 }
 

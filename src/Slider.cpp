@@ -1,8 +1,7 @@
-#include <QtCore>
-#include <QFile>
+#include <QApplication>
 #include <QMouseEvent>
 #include <QSlider>
-#include <QStyleOptionSlider>
+#include <QStyleOption>
 
 #include "Slider.h"
 #include "Utils.h"
@@ -19,7 +18,8 @@ using QStyle::SC_SliderHandle;
 /** Construtor principal do Slider. */
 Slider::Slider(QWidget *parent) : QSlider(parent) {
     setOrientation(Horizontal);
-    setFocusPolicy(Qt::NoFocus);
+    setFocusPolicy(NoFocus);
+    setMouseTracking(true);
     setStyleSheet(Utils::setStyle("progressbar"));
 }
 
@@ -92,14 +92,25 @@ void Slider::mousePressEvent(QMouseEvent *event) {
 }
 
 
+/** Evento para mapear a posição do mouse no slider */
+void Slider::mouseMoveEvent(QMouseEvent *event) {
+    const int o = style()->pixelMetric(QStyle::PM_SliderLength ) - 1;
+    int v = QStyle::sliderValueFromPosition(minimum(), maximum(), event->pos().x()-o/2, width()-o, false);
+    emit onHover(event->x(), v);
+    QSlider::mouseMoveEvent(event);
+}
+
+
 /** Ação ao posicionar o mouse sobre o botão */
 void Slider::enterEvent(QEvent *event) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[35m Mouse posicionado na barra de reprodução ...\033[0m");
     emit emitEnter();
+    QSlider::enterEvent(event);
 }
 
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Slider::leaveEvent(QEvent *event) {
     emit emitLeave();
+    QSlider::leaveEvent(event);
 }

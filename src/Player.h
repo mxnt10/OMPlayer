@@ -51,7 +51,7 @@ public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
     void setSelect(int item);
     void firstPlay(const QString &name);
-    void play(const QString &name);
+    void doubleplay(const QString &name);
     void Next();
     void Previous();
     void setReplay();
@@ -61,6 +61,7 @@ public Q_SLOTS:
     void ShowContextMenu(const QPoint &pos);
 
 private Q_SLOTS:
+    void play(const QString &isplay);
     void playPause();
     void setStop();
     void nextRand();

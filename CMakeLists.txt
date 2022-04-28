@@ -7,11 +7,6 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 find_package(
-        PythonLibs
-        REQUIRED
-)
-
-find_package(
         Qt5 COMPONENTS
         Core
         Gui
@@ -24,34 +19,24 @@ include_directories(
         /usr/include/qt5/QtAVWidgets
         /usr/include/MediaInfo
         /usr/include/MediaInfoDLL
-        ${PYTHON_INCLUDE_DIRS}
 )
 
 add_executable(
         OMPlayer
         src/main.cpp
-        src/Player.cpp
-        src/Player.h
-        src/Slider.cpp
-        src/Slider.h
-        src/Utils.cpp
-        src/Utils.h
-        src/Button.cpp
-        src/Button.h
-        src/Widget.cpp
-        src/Widget.h
-        src/Defines.h
-        src/Defines.cpp
-        src/PlayList.cpp
-        src/PlayList.h
-        src/PlayListDelegate.cpp
-        src/PlayListDelegate.h
-        src/PlayListItem.cpp
-        src/PlayListItem.h
-        src/PlayListModel.cpp
-        src/PlayListModel.h
-        src/ListView.cpp
-        src/ListView.h)
+        src/Button.cpp   src/Button.h
+        src/Defines.cpp  src/Defines.h
+        src/ListView.cpp src/ListView.h
+        src/Player.cpp   src/Player.h
+        src/Slider.cpp   src/Slider.h
+        src/Utils.cpp    src/Utils.h
+        src/Widget.cpp   src/Widget.h
+
+        src/PlayList.cpp         src/PlayList.h
+        src/PlayListDelegate.cpp src/PlayListDelegate.h
+        src/PlayListItem.cpp     src/PlayListItem.h
+        src/PlayListModel.cpp    src/PlayListModel.h
+)
 
 target_link_libraries(
         OMPlayer
@@ -60,7 +45,8 @@ target_link_libraries(
         Qt5::Widgets
         QtAV
         QtAVWidgets
-        python3.9
+        X11
+        Xtst
         mediainfo
         dl
         z

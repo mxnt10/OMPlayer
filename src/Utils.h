@@ -22,6 +22,7 @@ public:
     static void noBlockScreen();
     static void arrowMouse();
     static void blankMouse();
+    static int calcX(int z, int x, int y);
 
 private:
     static QString setQssLocal(const string &file);

@@ -3,13 +3,14 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.1 rev2 ] - 2022-04-28 #############################################
+## [ 1.1 rev2 ] - 2022-04-30 #############################################
 
 ### Added / Adicionado
  - Arquivos:
     - Adicionado script clean_conf em common para limpar as configurações.
  - Recursos:
     - Adicioando recurso onHover para o preview em slider.
+    - Adicionado a função de preview no slider.
 ###
 
 ### Upgraded / Atualizado

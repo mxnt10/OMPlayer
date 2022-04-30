@@ -142,6 +142,12 @@ void Utils::noBlockScreen() {
 }
 
 
+/** Cálculo somente da largura do quadro uma vez que a altura vem pré-estabelecida */
+int Utils::calcX(int z, int x, int y) {
+    return x / (y / z);
+}
+
+
 /**********************************************************************************************************************/
 
 

@@ -17,6 +17,7 @@ using MediaInfoDLL::MediaInfo;
 namespace QtAV {
     class AVPlayer;
     class VideoOutput;
+    class VideoPreviewWidget;
 }
 
 namespace MediaInfoDLL {
@@ -75,6 +76,8 @@ private Q_SLOTS:
     void changeFullScreen();
     void enterFullScreen();
     void leaveFullScreen();
+    void onTimeSliderHover(int pos, int value);
+    void onTimeSliderLeave();
     void updateSlider(qint64 value);
     void updateSliderUnit();
 
@@ -98,6 +101,7 @@ private:
     QWidget *about, *wctl;
     Slider *slider;
     VideoOutput *video;
+    VideoPreviewWidget *preview;
     int mUnit;
     int previousitem, actualitem, nextitem;
     bool restart, randplay;

@@ -10,6 +10,7 @@
 #include <QStyle>
 #include <QWidget>
 #include <QTimer>
+#include <QToolTip>
 
 #include <filesystem>
 #include <MediaInfoDLL.h>
@@ -29,21 +30,27 @@ using std::filesystem::create_directory;
 
 
 /** Construtor que define a interface do programa */
-VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
+VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
+    contextmenu(false),
+    enterpos(false),
+    maximize(false),
+    moving(false),
+    playing(false),
+    randplay(false),
+    restart(false),
+    setinfo(false),
+    actualitem(0),
+    nextitem(0),
+    previousitem(0),
+    mUnit(1000),
+    preview(nullptr) {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Iniciando o Reprodutor Multimídia ...\033[0m");
-    contextmenu = enterpos = maximize = moving = playing = setinfo = false;
-    restart = randplay = false;
-    actualitem = nextitem = previousitem = 0;
-    theme = "circle";
-    mUnit = 1000;
-
-
-    /** Propriedades do Programa */
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
     this->setStyleSheet(Utils::setStyle("global"));
     this->setMinimumSize(906, 510);
     this->setMouseTracking(true); /** Mapeamento do mouse */
+    theme = "circle";
 
 
     /** Habilitando o menu de contexto */
@@ -75,8 +82,12 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     /** Barra de progresso de execução */
     slider = new Slider();
     slider->setDisabled(true);
+    slider->setTracking(true);
+    slider->setFixedHeight(28);
     slider->setMaximum(0);
+    connect(slider, SIGNAL(onHover(int,int)), SLOT(onTimeSliderHover(int,int)));
     connect(slider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
+    connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
     connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
@@ -246,6 +257,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Layout dos botões */
     auto *buttons = new QHBoxLayout();
+    buttons->setSpacing(5);
     buttons->addWidget(nohide1);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
@@ -261,7 +273,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Ajuste dos controles */
     auto *fgctl = new QVBoxLayout();
-    fgctl->setMargin(20);
+    fgctl->setContentsMargins(20, 10, 20, 20);
     fgctl->addWidget(slider);
     fgctl->addLayout(buttons);
 
@@ -274,6 +286,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     /** Layout dos controles de reprodução */
     auto *controls = new QGridLayout(wctl);
     controls->setMargin(0);
+    controls->setSpacing(0);
     controls->addWidget(playlist, 0, 0);
     controls->addLayout(bgctl, 1, 0);
     controls->addLayout(fgctl, 1, 0);
@@ -336,14 +349,15 @@ void VideoPlayer::setSelect(int item) {
 
 void VideoPlayer::play(const QString &isplay) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
-    mediaPlayer->stop();
+    if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
+        mediaPlayer->stop();
     setinfo = false;
     mediaPlayer->play(isplay);
 }
 
 
 /** Para executar os itens recém adicionados da playlist */
-void VideoPlayer::firstPlay(const QString &isplay){
+void VideoPlayer::firstPlay(const QString &isplay) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
         play(isplay);
@@ -661,12 +675,50 @@ void VideoPlayer::hideFalse() {
 }
 
 
-/**********************************************************************************************************************/
+/** Pré-visualização ao posicionar o mouse no slider */
+void VideoPlayer::onTimeSliderHover(int pos, int value) {
+    MI.Open(mediaPlayer->file().toStdString());
+    QString Width = MI.Get(Stream_Video, 0, "Width", Info_Text, Info_Name).c_str();
+    QString Height = MI.Get(Stream_Video, 0, "Height", Info_Text, Info_Name).c_str();
+    int fixH = 72;
+
+    /** Definição da posição na tela e exibição do tooltip */
+    QPoint gpos1 = mapToGlobal(slider->pos() + QPoint(pos + 12, 5));
+    QPoint gpos2 = mapToGlobal(slider->pos() + QPoint(pos, -5));
+    QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
+
+    /** Exibição da pré-visualização */
+    if (!preview) {
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Exibindo a pré-visualização ...\033[0m");
+        preview = new VideoPreviewWidget();
+    }
+    preview->setFile(mediaPlayer->file());
+    preview->setTimestamp(value * mUnit);
+    preview->preview();
+    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    preview->resize(Utils::calcX(fixH, Width.toInt(), Height.toInt()), fixH);
+    preview->move(gpos2 - QPoint(Utils::calcX(fixH, Width.toInt(), Height.toInt())/2, fixH));
+    preview->show();
+}
+
+
+/** Saindo da pré-visualização */
+void VideoPlayer::onTimeSliderLeave() {
+    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Finalizando a pré-visualização ...\033[0m");
+    if (!preview) return;
+    if (preview->isVisible()) {
+        preview->close();
+    }
+    delete preview;
+    preview = nullptr;
+    MI.Close();
+}
 
 
 /** Altera o tempo de execução ao pressionar ou mover a barra de progresso de execução */
 void VideoPlayer::seekBySlider(int value) {
     if (!mediaPlayer->isPlaying()) return;
+    mediaPlayer->setSeekType(QtAV::AccurateSeek);
     mediaPlayer->seek(qint64(qint64(value) * mUnit));
 }
 
@@ -675,9 +727,6 @@ void VideoPlayer::seekBySlider(int value) {
 void VideoPlayer::seekBySlider() {
     seekBySlider(slider->value());
 }
-
-
-/**********************************************************************************************************************/
 
 
 /** Função para atualizar a barra de progresso de execução */
@@ -720,10 +769,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
-    if (mediaPlayer->notifyInterval() < 100)
-        mUnit = mediaPlayer->notifyInterval();
-    else
-        mUnit = 200;
+    mUnit = mediaPlayer->notifyInterval();
     onStart();
 }
 

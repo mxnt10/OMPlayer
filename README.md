@@ -22,7 +22,6 @@
 - QtAV >= 1.13.0
 - libmediainfo >= 22.03
 - libzen >= 0.4.39
-- pyUserInput (temporary)
 
 ## Shotcuts
 

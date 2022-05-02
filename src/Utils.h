@@ -23,6 +23,7 @@ public:
     static void arrowMouse();
     static void blankMouse();
     static int calcX(int z, int x, int y);
+    static int setDifere(int mUnit);
 
 private:
     static QString setQssLocal(const string &file);

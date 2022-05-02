@@ -3,6 +3,7 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
+#include <QThread>
 #include <MediaInfoDLL.h>
 
 using namespace QtAV;
@@ -27,7 +28,7 @@ namespace MediaInfoDLL {
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QTimer;
-class QString;
+class QThread;
 class QWidget;
 QT_END_NAMESPACE
 
@@ -48,13 +49,10 @@ public:
     ~VideoPlayer() override;
 
 public Q_SLOTS:
-    static void blockScreenSaver();
     void openMedia(const QStringList &parms = QStringList());
     void setSelect(int item);
     void firstPlay(const QString &name);
     void doubleplay(const QString &name);
-    void Next();
-    void Previous();
     void setReplay();
     void setShuffle();
     void seekBySlider();
@@ -66,6 +64,8 @@ private Q_SLOTS:
     void playPause();
     void setStop();
     void nextRand();
+    void Next();
+    void Previous();
     void onPaused(bool p);
     void onStart();
     void onStop();
@@ -95,9 +95,10 @@ private:
     Button *replayBtn, *shuffleBtn;
     MediaInfo MI;
     PlayList *playlist;
-    QLabel *logo;
+    QLabel *logo, *current, *end;
+    QString Width, Height;
     QStringList listnum;
-    QTimer *noscreensaver;
+    QThread *qthread;
     QWidget *about, *wctl;
     Slider *slider;
     VideoOutput *video;
@@ -105,7 +106,7 @@ private:
     int mUnit;
     int previousitem, actualitem, nextitem;
     bool restart, randplay;
-    bool contextmenu, enterpos, maximize, moving, playing, setinfo;
+    bool contextmenu, enterpos, maximize, moving, playing;
     const char *theme;
 };
 

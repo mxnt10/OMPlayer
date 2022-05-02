@@ -136,15 +136,31 @@ void Utils::noBlockScreen() {
     Display *display;
     display = XOpenDisplay(nullptr);
     uint keycode = XKeysymToKeycode(display, XK_Control_L);
-    XTestFakeKeyEvent(display, keycode, True, 0);
-    XTestFakeKeyEvent(display, keycode, False, 0);
-    XFlush(display);
+    while (true) {
+        XTestFakeKeyEvent(display, keycode, True, 0);
+        XTestFakeKeyEvent(display, keycode, False, 0);
+        XFlush(display);
+        if (QThread::currentThread()->isInterruptionRequested()) {
+            qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Parando anti-bloqueio ...\033[0m");
+            return;
+        }
+        sleep(15);
+    }
 }
 
 
 /** Cálculo somente da largura do quadro uma vez que a altura vem pré-estabelecida */
 int Utils::calcX(int z, int x, int y) {
     return x / (y / z);
+}
+
+
+/** Cálculo do diferença do intervalo de tempo */
+int Utils::setDifere(int mUnit) {
+    if (mUnit == 500) return mUnit;
+    if (mUnit == 250) return mUnit * 2;
+    if (mUnit <= 47) return mUnit * 4;
+    return mUnit * 3;
 }
 
 

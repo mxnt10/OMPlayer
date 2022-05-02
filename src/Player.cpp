@@ -11,6 +11,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <QToolTip>
+#include <QThread>
 
 #include <filesystem>
 #include <MediaInfoDLL.h>
@@ -26,6 +27,7 @@
 using namespace MediaInfoDLL;
 using std::filesystem::create_directory;
 
+
 /**********************************************************************************************************************/
 
 
@@ -38,12 +40,14 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     playing(false),
     randplay(false),
     restart(false),
-    setinfo(false),
     actualitem(0),
     nextitem(0),
     previousitem(0),
-    mUnit(1000),
-    preview(nullptr) {
+    mUnit(500),
+    preview(nullptr),
+    qthread(nullptr),
+    Width("192"),
+    Height("108") {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Iniciando o Reprodutor Multimídia ...\033[0m");
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
@@ -55,8 +59,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Habilitando o menu de contexto */
     this->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)),
-            SLOT(ShowContextMenu(QPoint)));
+    connect(this, SIGNAL(customContextMenuRequested(QPoint)), SLOT(ShowContextMenu(QPoint)));
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
@@ -96,13 +99,32 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
 
 
+    /** Labels para mostrar o tempo de execução e a duração */
+    current = new QLabel();
+    current->setToolTip(tr("Current time"));
+    current->setFixedWidth(70);
+    current->setAlignment(CENTER);
+    current->setText(QString::fromLatin1("-- -- : -- --"));
+    end = new QLabel();
+    end->setToolTip(tr("Duration"));
+    end->setFixedWidth(70);
+    end->setAlignment(CENTER);
+    end->setText(QString::fromLatin1("-- -- : -- --"));
+
+
     /** Botões para os controles de reprodução */
     playBtn = new Button("play", 48);
+    playBtn->setToolTip(tr("Play"));
     stopBtn = new Button("stop", 32);
+    stopBtn->setToolTip(tr("Stop"));
     nextBtn = new Button("next", 32);
+    nextBtn->setToolTip(tr("Next"));
     previousBtn = new Button("previous", 32);
+    previousBtn->setToolTip(tr("Previous"));
     replayBtn = new Button("replay", 32);
+    replayBtn->setToolTip(tr("Replay"));
     shuffleBtn = new Button("shuffle", 32);
+    shuffleBtn->setToolTip(tr("Shuffle"));
     connect(playBtn, CLICKED, SLOT(playPause()));
     connect(stopBtn, CLICKED, SLOT(setStop()));
     connect(nextBtn, CLICKED, SLOT(Next()));
@@ -271,10 +293,17 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     buttons->addWidget(nohide2);
 
 
+    /** Ajustes na barra de execução para inserir o tempo de execução e a duração */
+    auto *fgslider = new QHBoxLayout();
+    fgslider->addWidget(current);
+    fgslider->addWidget(slider);
+    fgslider->addWidget(end);
+
+
     /** Ajuste dos controles */
     auto *fgctl = new QVBoxLayout();
-    fgctl->setContentsMargins(20, 10, 20, 20);
-    fgctl->addWidget(slider);
+    fgctl->setContentsMargins(10, 12, 10, 22);
+    fgctl->addLayout(fgslider);
     fgctl->addLayout(buttons);
 
 
@@ -310,11 +339,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     this->setLayout(layout);
     about->setVisible(false);
     wctl->setVisible(false);
-
-
-    /** Temporizador para manter a tela sempre ativa */
-    noscreensaver = new QTimer();
-    connect(noscreensaver, SIGNAL(timeout()), SLOT(blockScreenSaver()));
 }
 
 
@@ -333,12 +357,6 @@ void VideoPlayer::openMedia(const QStringList &parms) {
 }
 
 
-/** Função anti-bloqueio de tela */
-void VideoPlayer::blockScreenSaver() {
-    Utils::noBlockScreen();
-}
-
-
 /** Setando o item atualmente selecionado */
 void VideoPlayer::setSelect(int item) {
     actualitem = item;
@@ -351,7 +369,6 @@ void VideoPlayer::play(const QString &isplay) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
         mediaPlayer->stop();
-    setinfo = false;
     mediaPlayer->play(isplay);
 }
 
@@ -520,7 +537,7 @@ void VideoPlayer::setStop() {
 /** Função para alterar o botão play/pause */
 void VideoPlayer::onPaused(bool paused) {
     if (paused) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Pausado ...\033[0m");
+        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Pausando ...\033[0m");
         if (Utils::setIconTheme(theme, "play") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
@@ -536,18 +553,46 @@ void VideoPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void VideoPlayer::onStart() {
-    noscreensaver->start(15 * 1000);
-
-    if (Utils::setIconTheme(theme, "pause") == nullptr)
-        playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
-    else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
     logo->setVisible(false);
     slider->setDisabled(false);
     playing = true;
 
+    if (Utils::setIconTheme(theme, "pause") == nullptr)
+        playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
+    else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
+
+    /** Definindo dimensões para o preview */
+    MI.Open(mediaPlayer->file().toStdString());
+    Width = MI.Get(Stream_Video, 0, "Width", Info_Text, Info_Name).c_str();
+    Height = MI.Get(Stream_Video, 0, "Height", Info_Text, Info_Name).c_str();
+    MI.Close();
+
+    /** Atualizando o status do item da playlist se necessário */
+    if (playlist->setDuration() == 0) {
+        int row = playlist->selectItems();
+        QString url = mediaPlayer->file();
+        qint64 duration = mediaPlayer->mediaStopPosition();
+
+        MI.Open(url.toStdString());
+        QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
+        MI.Close();
+
+        playlist->removeSelectedItems();
+        playlist->insert(url, row, duration, format);
+    }
+
+    /** Definindo o tempo de duração no slider */
+    slider->setMinimum(int(mediaPlayer->mediaStartPosition()));
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(mUnit))/ mUnit);
+    end->setText(QTime(0, 0, 0).addMSecs(int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
+
     /** Correção dos itens adicionados */
     if (playlist->setListSize() == 1)
         previousitem = nextitem = 0;
+
+    /** Acionando anti-bloqueio de tela */
+    qthread = QThread::create([] { return Utils::noBlockScreen(); });
+    qthread->start();
 
     updateSlider(mediaPlayer->position());
 }
@@ -558,7 +603,6 @@ void VideoPlayer::onStop() {
     if (!playing) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Finalizando a Reprodução ...\033[0m");
         this->setWindowTitle(QString(PRG_NAME));
-        mediaPlayer->stop();
 
         if (Utils::setIconTheme(theme, "play") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
@@ -567,7 +611,12 @@ void VideoPlayer::onStop() {
         slider->setMaximum(0);
         slider->setDisabled(true);
         logo->setVisible(true);
-        noscreensaver->stop();
+        current->setText(QString::fromLatin1("-- -- : -- --"));
+        end->setText(QString::fromLatin1("-- -- : -- --"));
+        onTimeSliderLeave();
+
+        if(qthread->isRunning())
+            qthread->requestInterruption();
     }
 }
 
@@ -677,27 +726,27 @@ void VideoPlayer::hideFalse() {
 
 /** Pré-visualização ao posicionar o mouse no slider */
 void VideoPlayer::onTimeSliderHover(int pos, int value) {
-    MI.Open(mediaPlayer->file().toStdString());
-    QString Width = MI.Get(Stream_Video, 0, "Width", Info_Text, Info_Name).c_str();
-    QString Height = MI.Get(Stream_Video, 0, "Height", Info_Text, Info_Name).c_str();
     int fixH = 72;
+    int setX = Utils::calcX(fixH, Width.toInt(), Height.toInt());
+    QPoint gpos = slider->pos();
 
     /** Definição da posição na tela e exibição do tooltip */
-    QPoint gpos1 = mapToGlobal(slider->pos() + QPoint(pos + 12, 5));
-    QPoint gpos2 = mapToGlobal(slider->pos() + QPoint(pos, -5));
+    QPoint gpos1 = mapToGlobal(gpos + QPoint(pos + 12, 5));
+    QPoint gpos2 = mapToGlobal(gpos + QPoint(pos, -7));
     QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
 
     /** Exibição da pré-visualização */
     if (!preview) {
         qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Exibindo a pré-visualização ...\033[0m");
-        preview = new VideoPreviewWidget();
+        qDebug() << Width << Height;
+        preview = new VideoPreviewWidget(this);
     }
     preview->setFile(mediaPlayer->file());
     preview->setTimestamp(value * mUnit);
     preview->preview();
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    preview->resize(Utils::calcX(fixH, Width.toInt(), Height.toInt()), fixH);
-    preview->move(gpos2 - QPoint(Utils::calcX(fixH, Width.toInt(), Height.toInt())/2, fixH));
+    preview->resize(setX, fixH);
+    preview->move(gpos2 - QPoint(setX/2, fixH));
     preview->show();
 }
 
@@ -706,12 +755,8 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 void VideoPlayer::onTimeSliderLeave() {
     qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Finalizando a pré-visualização ...\033[0m");
     if (!preview) return;
-    if (preview->isVisible()) {
+    if (preview->isVisible())
         preview->close();
-    }
-    delete preview;
-    preview = nullptr;
-    MI.Close();
 }
 
 
@@ -731,27 +776,12 @@ void VideoPlayer::seekBySlider() {
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSlider(qint64 value) {
-    slider->setRange(0, int(mediaPlayer->duration() / mUnit));
-    slider->setValue(int(value / mUnit));
-
-    /** Atualizar o status do item da playlist se necessário */
-    if (!setinfo && playlist->setDuration() == 0) {
-        int row = playlist->selectItems();
-        QString url = mediaPlayer->file();
-        qint64 duration = mediaPlayer->duration();
-
-        MI.Open(url.toStdString());
-        QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
-        MI.Close();
-
-        playlist->removeSelectedItems();
-        playlist->insert(url, row, duration, format);
-    } else {
-        setinfo = true;
-    }
+    if (mediaPlayer->isSeekable())
+        slider->setValue(int(value / mUnit));
+    current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
 
     /** Próxima mídia */
-    if (int(value) > mediaPlayer->duration() - (mUnit * 3)) {
+    if (int(value) > mediaPlayer->duration() - Utils::setDifere(mUnit)) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             mediaPlayer->stop();
             playing = false;
@@ -759,16 +789,15 @@ void VideoPlayer::updateSlider(qint64 value) {
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;
-        } else {
-            setinfo = false;
+        } else
             Next();
-        }
     }
 }
 
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
+    qDebug() << mediaPlayer->notifyInterval();
     mUnit = mediaPlayer->notifyInterval();
     onStart();
 }

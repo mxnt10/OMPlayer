@@ -3,6 +3,29 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.2 ] - 2022-05-01 ##################################################
+
+### Added / Adicionado
+ - Exibição de tempo de execução e duração da mídia.
+###
+
+### Changed / Modificado
+ - Ajustes no recurso para avançar para a próxima mídia.
+###
+
+### Removed / Removido
+ - Temporizador para o anti-bloqueio de tela.
+###
+
+### Fixed / Corrigido
+ - Otimização de performance:
+    - Anti-bloqueio em loop infinito em um processo separado.
+    - Otimização de performance em preview.
+###
+
+##########################################################################
+
+
 ## [ 1.1 rev2 ] - 2022-04-30 #############################################
 
 ### Added / Adicionado

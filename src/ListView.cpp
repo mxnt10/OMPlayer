@@ -1,4 +1,3 @@
-#include <QDebug>
 #include <QGraphicsOpacityEffect>
 
 #include "Defines.h"
@@ -34,7 +33,6 @@ ListView::~ListView() = default;
 
 /** Ação ao posicionar o mouse sobre a listview */
 void ListView::enterEvent(QEvent *event) {
-    qDebug() << "\033[32m(\033[31mDEBUG\033[32m):\033[35m Mouse posicionado na playlist ...\033[0m";
     emit emitEnter();
     QListView::enterEvent(event);
 }

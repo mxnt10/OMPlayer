@@ -164,9 +164,6 @@ int Utils::setDifere(int mUnit) {
 }
 
 
-/**********************************************************************************************************************/
-
-
 /** Desocultar mouse */
 void Utils::arrowMouse() {
     QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));

@@ -77,9 +77,11 @@ private Q_SLOTS:
     void enterFullScreen();
     void leaveFullScreen();
     void onTimeSliderHover(int pos, int value);
+    void onTimeSliderEnter();
     void onTimeSliderLeave();
     void updateSlider(qint64 value);
     void updateSliderUnit();
+    void detectClick();
 
 protected:
     bool event(QEvent *event) override;
@@ -99,11 +101,12 @@ private:
     QString Width, Height;
     QStringList listnum;
     QThread *qthread;
+    QTimer *click;
     QWidget *about, *wctl;
     Slider *slider;
     VideoOutput *video;
     VideoPreviewWidget *preview;
-    int mUnit;
+    int mUnit, count;
     int previousitem, actualitem, nextitem;
     bool restart, randplay;
     bool contextmenu, enterpos, maximize, moving, playing;

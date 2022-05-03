@@ -58,6 +58,7 @@ signals:
     void firstPlay(const QString &url);
     void selected(int item);
     void emithide();
+    void emithiden();
     void emitnohide();
 
 public slots:

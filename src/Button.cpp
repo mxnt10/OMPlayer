@@ -39,7 +39,7 @@ Button::~Button() = default;
 
 /** Iniciando o efeito do botão */
 void Button::onEffect() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[35m Clique no botão %s ...\033[0m", ico.toStdString().c_str());
+    qDebug("%s(%sDEBUG%s):%s Clique no botão %s ...\033[0m", GRE, RED, GRE, VIO, ico.toStdString().c_str());
     setIconSize(QSize(num - 2, num - 2));
     QTimer::singleShot(100, this, SLOT(unEffect()));
 }
@@ -56,7 +56,7 @@ void Button::unEffect() {
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent( QEvent *event ) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[35m Mouse posicionado no botão %s ...\033[0m", ico.toStdString().c_str());
+    qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, ico.toStdString().c_str());
     setIconSize(QSize(num + 2, num + 2));
     emit emitEnter();
     QPushButton::enterEvent(event);

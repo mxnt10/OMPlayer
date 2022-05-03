@@ -3,6 +3,7 @@
 #include <QSlider>
 #include <QStyleOption>
 
+#include "Defines.h"
 #include "Slider.h"
 #include "Utils.h"
 
@@ -103,7 +104,7 @@ void Slider::mouseMoveEvent(QMouseEvent *event) {
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Slider::enterEvent(QEvent *event) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[35m Mouse posicionado na barra de reprodução ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Mouse posicionado na barra de reprodução ...\033[0m", GRE, RED, GRE, VIO);
     emit emitEnter();
     QSlider::enterEvent(event);
 }

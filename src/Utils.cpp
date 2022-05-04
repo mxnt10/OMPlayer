@@ -9,6 +9,7 @@
 #include <X11/keysym.h>
 #include <X11/extensions/XTest.h>
 
+#include "Defines.h"
 #include "Utils.h"
 
 using namespace std;
@@ -33,9 +34,11 @@ QString Utils::setIcon(bool logo) {
     QString lIcon = getLocal() + "/appdata/OMPlayer.png";
 
     if (logo) {
+        qDebug("%s(%sDEBUG%s):%s Setando uma logo ...\033[0m", GRE, RED, GRE, BLU);
         icon = "/usr/share/OMPlayer/logo/logo.png";
         lIcon = getLocal() + "/appdata/logo.png";
-    }
+    } else
+        qDebug("%s(%sDEBUG%s):%s Setando o ícone do programa ...\033[0m", GRE, RED, GRE, BLU);
 
     if (exists(icon.toStdString())) return icon;
     else if (exists(lIcon.toStdString())) return lIcon;
@@ -78,6 +81,7 @@ QString Utils::setIconTheme(const string &theme, const string &icon) {
 
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const string &style) {
+    qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, style.c_str());
     QString qss = setQssLocal(style);
     QFile file(qss);
     file.open(QFile::ReadOnly);
@@ -100,7 +104,7 @@ QString Utils::mediaTitle(const QString &mediafile){
 
 /** Função criada para retornar os ícones equivalentes disponíveis no sistema */
 QString Utils::defaultIcon(const string &icon) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Usando ícones do sistema para %s...\033[0m", icon.c_str());
+    qDebug("%s(%sDEBUG%s):%s Usando ícone do sistema para %s ...\033[0m", GRE, RED, GRE, BLU, icon.c_str());
 
     /** ícones dos controles de reprodução */
     if (icon == "play")
@@ -132,7 +136,7 @@ QString Utils::defaultIcon(const string &icon) {
 
 /** Função anti-bloqueio de tela usando recursos nativos do X11 */
 void Utils::noBlockScreen() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Acionando anti-bloqueio ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Acionando anti-bloqueio ...\033[0m", GRE, RED, GRE, BLU);
     Display *display;
     display = XOpenDisplay(nullptr);
     uint keycode = XKeysymToKeycode(display, XK_Control_L);
@@ -141,7 +145,7 @@ void Utils::noBlockScreen() {
         XTestFakeKeyEvent(display, keycode, False, 0);
         XFlush(display);
         if (QThread::currentThread()->isInterruptionRequested()) {
-            qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Parando anti-bloqueio ...\033[0m");
+            qDebug("%s(%sDEBUG%s):%s Parando anti-bloqueio ...\033[0m", GRE, RED, GRE, BLU);
             return;
         }
         sleep(15);

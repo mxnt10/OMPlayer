@@ -196,9 +196,9 @@ void PlayList::addItems(const QStringList &parms) {
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
     if (duration == 0)
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Adicionando %s...\033[0m", url.toStdString().c_str());
+        qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, ADD, url.toStdString().c_str());
     else
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[31m Atualizando %s...\033[0m", url.toStdString().c_str());
+        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, url.toStdString().c_str());
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);
@@ -365,10 +365,12 @@ void PlayList::noHide() {
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
     if (event->x() > (this->width() - 300) && event->y() < this->height() - 5 && !isshow) {
+        qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
         emit emitnohide();
         wpls->setVisible(true);
         isshow = true;
     } else if ((event->x() < (this->width() - 300) || event->y() > this->height() - 5) && isshow) {
+        emit emithide();
         wpls->setVisible(false);
         isshow = false;
     }
@@ -379,6 +381,6 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
 /** Emissão que serve como assistência para ocultar os controles */
 bool PlayList::event(QEvent *event) {
     if (int(event->type()) == 110 && !isshow)
-        emit emithide();
+        emit emithiden();
     return QWidget::event(event);
 }

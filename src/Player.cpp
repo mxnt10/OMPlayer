@@ -3,15 +3,17 @@
 #include <QLabel>
 #include <QLayout>
 #include <QGraphicsEffect>
+#include <QGuiApplication>
 #include <QMenu>
 #include <QRandomGenerator>
+#include <QScreen>
 #include <QShortcut>
 #include <QSpacerItem>
 #include <QStyle>
-#include <QWidget>
 #include <QTimer>
-#include <QToolTip>
 #include <QThread>
+#include <QToolTip>
+#include <QWidget>
 
 #include <filesystem>
 #include <MediaInfoDLL.h>
@@ -43,17 +45,19 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     actualitem(0),
     nextitem(0),
     previousitem(0),
+    count(0),
     mUnit(500),
     preview(nullptr),
     qthread(nullptr),
     Width("192"),
     Height("108") {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Iniciando o Reprodutor Multimídia ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
     this->setStyleSheet(Utils::setStyle("global"));
     this->setMinimumSize(906, 510);
     this->setMouseTracking(true); /** Mapeamento do mouse */
+    this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     theme = "circle";
 
 
@@ -63,11 +67,11 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
-    qDebug("\033[31m------------------------------\033[34m");
+    qDebug("%s------------------------------%s", RED, BLU);
     mediaPlayer = new AVPlayer(this);
     video = new VideoOutput(this);
     mediaPlayer->setRenderer(video);
-    qDebug("\033[31m------------------------------\033[0m");
+    qDebug("%s------------------------------\033[0m", RED);
 
 
     /** Playlist do reprodutor */
@@ -78,7 +82,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString)), SLOT(firstPlay(QString)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
-    connect(playlist, SIGNAL(emithide()), SLOT(setHide()));
+    connect(playlist, SIGNAL(emithiden()), SLOT(setHide()));
+    connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
     connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
 
 
@@ -90,6 +95,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     slider->setMaximum(0);
     connect(slider, SIGNAL(onHover(int,int)), SLOT(onTimeSliderHover(int,int)));
     connect(slider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
+    connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
     connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
     connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
@@ -166,7 +172,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Opacidade de 80% para os widgets de fundo dos controles e playlist */
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Preparando o layout da interface ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
     auto *effect1 = new QGraphicsOpacityEffect();
     effect1->setOpacity(OPACY);
     auto *effect2 = new QGraphicsOpacityEffect();
@@ -339,6 +345,13 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     this->setLayout(layout);
     about->setVisible(false);
     wctl->setVisible(false);
+
+
+    /** Temporizador para o cálculo do número de cliques em 300ms */
+    click = new QTimer(this);
+    click->setSingleShot(true);
+    click->setInterval(300);
+    connect(click, SIGNAL(timeout()), this, SLOT(detectClick()));
 }
 
 
@@ -360,11 +373,15 @@ void VideoPlayer::openMedia(const QStringList &parms) {
 /** Setando o item atualmente selecionado */
 void VideoPlayer::setSelect(int item) {
     actualitem = item;
-    if (!playing)
+    if (!playing) {
+        qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
+               Utils::mediaTitle(playlist->getItems(item)).toStdString().c_str());
         playlist->setIndex();
+    }
 }
 
 
+/** Função geral para execução de arquivos multimídia */
 void VideoPlayer::play(const QString &isplay) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
@@ -376,7 +393,7 @@ void VideoPlayer::play(const QString &isplay) {
 /** Para executar os itens recém adicionados da playlist */
 void VideoPlayer::firstPlay(const QString &isplay) {
     if (!mediaPlayer->isPlaying()) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
         play(isplay);
         playlist->selectNext();
         previousitem = playlist->setListSize() - 1;
@@ -388,7 +405,7 @@ void VideoPlayer::firstPlay(const QString &isplay) {
 
 /** Executa um item selecionado da playlist */
 void VideoPlayer::doubleplay(const QString &name) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
     PlayListItem item;
     item.setUrl(name);
     item.setTitle(Utils::mediaTitle(name));
@@ -419,8 +436,7 @@ void VideoPlayer::doubleplay(const QString &name) {
 
 /** Função para selecionar aleatóriamente a próxima mídia */
 void VideoPlayer::nextRand() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo item aleatório ...\033[0m");
-
+    qDebug("%s(%sDEBUG%s):%s Reproduzindo uma mídia aleatória ...\033[0m", GRE, RED, GRE, ORA);
     if (listnum.size() < playlist->setListSize() - 1) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
@@ -435,7 +451,6 @@ void VideoPlayer::nextRand() {
             actualitem = QRandomGenerator::global()->bounded(playlist->setListSize());
 
         listnum.append(QString::number(actualitem));
-        qDebug() << listnum;
     } else {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize());
         listnum.clear();
@@ -465,7 +480,7 @@ void VideoPlayer::Next() {
             return;
         }
 
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo o próximo item ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Reproduzindo o próximo item ...\033[0m", GRE, RED, GRE, ORA);
         play(playlist->getItems(nextitem));
 
         /** Cálculo dos próximos itens a serem executados */
@@ -487,7 +502,7 @@ void VideoPlayer::Next() {
 /** Botão previous */
 void VideoPlayer::Previous() {
     if (mediaPlayer->isPlaying()) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um item anterior ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, ORA);
         play(playlist->getItems(previousitem));
 
         /** Cálculo dos próximos itens a serem executados */
@@ -510,7 +525,7 @@ void VideoPlayer::Previous() {
 void VideoPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
-            qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo um Arquivo Multimídia ...\033[0m");
+            qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
             play(playlist->getItems(actualitem));
             playlist->selectPlay();
         }
@@ -537,13 +552,12 @@ void VideoPlayer::setStop() {
 /** Função para alterar o botão play/pause */
 void VideoPlayer::onPaused(bool paused) {
     if (paused) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Pausando ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Pausando ...\033[0m", GRE, RED, GRE, ORA);
         if (Utils::setIconTheme(theme, "play") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
     } else {
-
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Reproduzindo ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Reproduzindo ...\033[0m", GRE, RED, GRE, ORA);
         if (Utils::setIconTheme(theme, "pause") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
@@ -601,7 +615,7 @@ void VideoPlayer::onStart() {
 /** Função que define alguns parâmetros ao parar a reprodução */
 void VideoPlayer::onStop() {
     if (!playing) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Finalizando a Reprodução ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, ORA);
         this->setWindowTitle(QString(PRG_NAME));
 
         if (Utils::setIconTheme(theme, "play") == nullptr)
@@ -653,6 +667,14 @@ void VideoPlayer::setShuffle() {
 }
 
 
+/** Função que mapeia um único clique e executa as ações de pausar e executar */
+void VideoPlayer::detectClick(){
+    if (count == 1 && !enterpos && playing)
+        playPause();
+    count = 0;
+}
+
+
 /** Gerenciar tela cheia */
 void VideoPlayer::changeFullScreen() {
     if (this->isFullScreen())
@@ -664,7 +686,7 @@ void VideoPlayer::changeFullScreen() {
 
 /** Entrar no modo tela cheia */
 void VideoPlayer::enterFullScreen() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Entrando no Modo Tela Cheia ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Entrando no Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
 
     if (this->isMaximized()) /** Mapear interface maximizada */
         maximize = true;
@@ -677,7 +699,7 @@ void VideoPlayer::enterFullScreen() {
 
 /** Sair do modo tela cheia */
 void VideoPlayer::leaveFullScreen() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Saindo do Modo Tela Cheia ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Saindo do Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
     this->showNormal();
 
     /**
@@ -701,7 +723,7 @@ void VideoPlayer::setHide() {
 
 /** Exibir sobre */
 void VideoPlayer::setAbout() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Diálogo sobre ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     about->setVisible(true);
 }
 
@@ -709,7 +731,7 @@ void VideoPlayer::setAbout() {
 /** Ativar ocultação  */
 void VideoPlayer::hideTrue() {
     if (enterpos) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Ocultação liberada ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Ocultação liberada ...\033[0m", GRE, RED, GRE, SHW);
         enterpos = false;
     }
 }
@@ -718,7 +740,7 @@ void VideoPlayer::hideTrue() {
 /** Desativar ocultação */
 void VideoPlayer::hideFalse() {
     if (!enterpos) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Ocultação impedida ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Ocultação impedida ...\033[0m", GRE, RED, GRE, HID);
         enterpos = true;
     }
 }
@@ -736,11 +758,8 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
     QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
 
     /** Exibição da pré-visualização */
-    if (!preview) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Exibindo a pré-visualização ...\033[0m");
-        qDebug() << Width << Height;
+    if (!preview)
         preview = new VideoPreviewWidget(this);
-    }
     preview->setFile(mediaPlayer->file());
     preview->setTimestamp(value * mUnit);
     preview->preview();
@@ -751,12 +770,21 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 }
 
 
+/** Apenas para exibição do debug */
+void VideoPlayer::onTimeSliderEnter() {
+    if (playing) {
+        qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+    }
+}
+
+
 /** Saindo da pré-visualização */
 void VideoPlayer::onTimeSliderLeave() {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Finalizando a pré-visualização ...\033[0m");
     if (!preview) return;
-    if (preview->isVisible())
+    if (preview->isVisible()) {
+        qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
+    }
 }
 
 
@@ -797,7 +825,6 @@ void VideoPlayer::updateSlider(qint64 value) {
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
-    qDebug() << mediaPlayer->notifyInterval();
     mUnit = mediaPlayer->notifyInterval();
     onStart();
 }
@@ -809,12 +836,13 @@ void VideoPlayer::updateSliderUnit() {
 /** Mapeador de eventos para mapear o posicionamento do mouse */
 bool VideoPlayer::event(QEvent *event) {
     if (int(event->type()) == 5 && !moving && !about->isVisible()) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Mouse com Movimentação ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
+
         wctl->setVisible(true);
         moving = true;
         Utils::arrowMouse();
     } else if (int(event->type()) == 110 && moving) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Mouse sem Movimentação ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
         if (!enterpos) {
             wctl->setVisible(false);
             Utils::blankMouse();
@@ -828,17 +856,20 @@ bool VideoPlayer::event(QEvent *event) {
 /** Mapeador para executar ações com um clique do mouse */
 void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
     if (about->isVisible()) {
+        qDebug("%s(%sDEBUG%s):%s Fechando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
         about->setVisible(false);
         Utils::blankMouse();
         return QWidget::mouseReleaseEvent(event);
     }
+    if (!click->isActive())
+        click->start();
+    count = count + 1; /** Contador de cliques */
     QWidget::mouseReleaseEvent(event);
 }
 
 
 /** Mapeador para executar ações com um duplo clique */
 void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Duplo clique com o mouse ...\033[0m");
     changeFullScreen();
     QWidget::mouseDoubleClickEvent(event);
 }
@@ -847,13 +878,13 @@ void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
 /** Mapeador para executar ações quando o ponteiro do mouse se encontra dentro da interface */
 void VideoPlayer::enterEvent(QEvent *event) {
     if (contextmenu) {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Finalizando o Menu de Contexto ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
         if (!about->isVisible())
             Utils::blankMouse();
         contextmenu = moving = false;
         wctl->setVisible(false);
     } else {
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[32m Ponteito do Mouse Sobre a Interface ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Sobre a Interface ...\033[0m", GRE, RED, GRE, DGR);
         if (!about->isVisible())
             wctl->setVisible(true);
     }
@@ -864,7 +895,7 @@ void VideoPlayer::enterEvent(QEvent *event) {
 /** Mapeador para executar ações quando o ponteiro do mouse se encontra fora da interface */
 void VideoPlayer::leaveEvent(QEvent *event) {
     if (!contextmenu)
-        qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[33m Ponteito do Mouse Fora da Interface ...\033[0m");
+        qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Fora da Interface ...\033[0m", GRE, RED, GRE, YEL);
     wctl->setVisible(false);
     enterpos = false;
     QWidget::leaveEvent(event);
@@ -873,7 +904,7 @@ void VideoPlayer::leaveEvent(QEvent *event) {
 
 /** Ação ao fechar o programa */
 void VideoPlayer::closeEvent(QCloseEvent *event) {
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[36m Finalizando o Reprodutor Multimídia !\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
     playlist->save();
     event->accept();
 }
@@ -885,12 +916,13 @@ void VideoPlayer::closeEvent(QCloseEvent *event) {
 /** Função para o menu de contexto do programa */
 void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     if (about->isVisible()) {
+        qDebug("%s(%sDEBUG%s):%s Fechando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
         about->setVisible(false);
         return;
     } /** Para fechar a interface sobre */
 
     contextmenu = true;
-    qDebug("\033[32m(\033[31mDEBUG\033[32m):\033[34m Iniciando o Menu de Contexto ...\033[0m");
+    qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
 
     auto *effect = new QGraphicsOpacityEffect();
     effect->setOpacity(OPACY);

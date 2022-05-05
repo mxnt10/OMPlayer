@@ -77,7 +77,7 @@ private Q_SLOTS:
     void enterFullScreen();
     void leaveFullScreen();
     void onTimeSliderHover(int pos, int value);
-    void onTimeSliderEnter();
+    void onTimeSliderEnter() const;
     void onTimeSliderLeave();
     void updateSlider(qint64 value);
     void updateSliderUnit();

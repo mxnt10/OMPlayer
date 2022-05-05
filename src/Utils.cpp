@@ -24,7 +24,7 @@ using std::filesystem::exists;
  * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível apenas à caráter
  * de testes de execução e depuração do reprodutor. */
 QString Utils::getLocal() {
-    return QDir::currentPath().remove(QRegularExpression("\\/(?:.(?!\\/))+$"));
+    return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));
 }
 
 

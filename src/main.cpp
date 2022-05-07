@@ -24,10 +24,17 @@
 
 #include <QApplication>
 #include <QCommandLineParser>
+#include <QDir>
 #include <QLoggingCategory>
 
-#include "Player.h"
+#include <filesystem>
+#include <SingleApplication>
+
 #include "Defines.h"
+#include "Player.h"
+#include "Receiver.h"
+
+using std::filesystem::create_directory;
 
 
 /**
@@ -36,14 +43,19 @@
 
 
 int main(int argc, char *argv[]) {
-    QApplication OMPlayer(argc, argv);
+    SingleApplication OMPlayer(argc, argv, true);
+    create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
+
 
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "Simplify"
     #pragma ide diagnostic ignored "UnreachableCode"
 
+    QLoggingCategory::setFilterRules("*.error=false\n*.warning=false\n"
+                                     "*.critical=false\n*.info=false");
+
     if (!DEBUG) /** Instrução apenas para depuração */
-        QLoggingCategory::setFilterRules("*.debug=false");
+        QLoggingCategory::setFilterRules("*=false");
 
     #pragma clang diagnostic pop
 
@@ -53,7 +65,6 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setApplicationVersion(VERSION);
     QGuiApplication::setApplicationDisplayName(QCoreApplication::applicationName());
 
-
     /** Instruções que permite a passagem de argumentos para o reprodutor */
     QCommandLineParser parser;
     parser.setApplicationDescription(PRG_NAME);
@@ -62,16 +73,22 @@ int main(int argc, char *argv[]) {
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
     parser.process(OMPlayer);
 
-//    QCommandLineOption targetDirectoryOption(QStringList() << "t" << "target-directory",
-//                                             QCoreApplication::translate("main", "Copy all source files into <directory>."),
-//                                             QCoreApplication::translate("main", "directory"));
-//    parser.addOption(targetDirectoryOption);
-
-    /** Define a interface do programa, envia os argumentos para o reprodutor e inicia a interface */
+    /** Define a interface do programa, envia os argumentos para o reprodutor*/
     VideoPlayer player;
     if (!parser.positionalArguments().isEmpty()) {
         player.openMedia(parser.positionalArguments());
     }
+
+    /** Verificando instâncias abertas e impedindo novas instâncias */
+    MessageReceiver msgReceiver;
+    if( OMPlayer.isSecondary() ) {
+        OMPlayer.sendMessage("Aberto outra instância");
+        return 0;
+    } else {
+        QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, &msgReceiver,
+                         &MessageReceiver::receivedMessage);
+    }
+
     player.show();
     return QApplication::exec();
 }

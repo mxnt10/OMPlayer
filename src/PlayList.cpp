@@ -316,12 +316,14 @@ void PlayList::removeSelectedItems() {
     for (int i = s.size() - 1; i >= 0; --i) {
         model->removeRow(s.at(i).row());
     }
+    save();
 }
 
 
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+    save();
 }
 
 

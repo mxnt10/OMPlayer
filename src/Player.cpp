@@ -15,7 +15,6 @@
 #include <QToolTip>
 #include <QWidget>
 
-#include <filesystem>
 #include <MediaInfoDLL.h>
 
 #include "Button.h"
@@ -27,7 +26,6 @@
 #include "Widget.h"
 
 using namespace MediaInfoDLL;
-using std::filesystem::create_directory;
 
 
 /**********************************************************************************************************************/
@@ -76,7 +74,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Playlist do reprodutor */
     playlist = new PlayList(this);
-    create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
     playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
@@ -771,7 +768,7 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 
 
 /** Apenas para exibição do debug */
-void VideoPlayer::onTimeSliderEnter() {
+void VideoPlayer::onTimeSliderEnter() const {
     if (playing) {
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
     }

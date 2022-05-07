@@ -6,6 +6,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
 find_package(
         Qt5 COMPONENTS
@@ -22,6 +23,10 @@ include_directories(
         /usr/include/MediaInfoDLL
 )
 
+add_subdirectory(
+        ./common/SingleApplication
+)
+
 add_executable(
         OMPlayer
         src/main.cpp
@@ -29,6 +34,7 @@ add_executable(
         src/Defines.cpp  src/Defines.h
         src/ListView.cpp src/ListView.h
         src/Player.cpp   src/Player.h
+        src/Receiver.cpp src/Receiver.h
         src/Slider.cpp   src/Slider.h
         src/Utils.cpp    src/Utils.h
         src/Widget.cpp   src/Widget.h
@@ -41,6 +47,7 @@ add_executable(
 
 target_link_libraries(
         OMPlayer
+        SingleApplication::SingleApplication
         Qt5::Core
         Qt5::Gui
         Qt5::Widgets

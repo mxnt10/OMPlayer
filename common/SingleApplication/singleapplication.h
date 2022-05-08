@@ -92,37 +92,37 @@ public:
      * @brief Returns if the instance is the primary instance
      * @returns {bool}
      */
-    bool isPrimary() const;
+    [[nodiscard]] bool isPrimary() const;
 
     /**
      * @brief Returns if the instance is a secondary instance
      * @returns {bool}
      */
-    bool isSecondary() const;
+    [[nodiscard]] bool isSecondary() const;
 
     /**
      * @brief Returns a unique identifier for the current instance
      * @returns {qint32}
      */
-    quint32 instanceId() const;
+    [[nodiscard]] quint32 instanceId() const;
 
     /**
      * @brief Returns the process ID (PID) of the primary instance
      * @returns {qint64}
      */
-    qint64 primaryPid() const;
+    [[nodiscard]] qint64 primaryPid() const;
 
     /**
      * @brief Returns the username of the user running the primary instance
      * @returns {QString}
      */
-    QString primaryUser() const;
+    [[nodiscard]] QString primaryUser() const;
 
     /**
      * @brief Returns the username of the current user
      * @returns {QString}
      */
-    QString currentUser() const;
+    static QString currentUser() ;
 
     /**
      * @brief Mode of operation of sendMessage.
@@ -147,7 +147,7 @@ public:
      * @brief Get the set user data.
      * @returns {QStringList}
      */
-    QStringList userData() const;
+    [[nodiscard]] QStringList userData() const;
 
 Q_SIGNALS:
     void instanceStarted();

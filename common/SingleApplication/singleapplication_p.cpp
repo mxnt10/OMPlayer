@@ -29,10 +29,8 @@
 // version without notice, or may even be removed.
 //
 
-#include <cstdlib>
 #include <cstddef>
 
-#include <QtCore/QDir>
 #include <QtCore/QThread>
 #include <QtCore/QByteArray>
 #include <QtCore/QDataStream>
@@ -158,7 +156,7 @@ void SingleApplicationPrivate::genBlockServerName()
             appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
         } else { // Running as AppImage: Use absolute path to AppImage file
             appData.addData( appImagePath );
-        };
+        }
 #else
         appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
 #endif
@@ -283,7 +281,7 @@ void SingleApplicationPrivate::writeAck( QLocalSocket *sock ) {
     sock->putChar('\n');
 }
 
-bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArray &msg, SingleApplication::SendMode sendMode)
+bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArray &msg, SingleApplication::SendMode sendMode) const
 {
     QElapsedTimer time;
     time.start();
@@ -310,7 +308,7 @@ bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArra
     return result;
 }
 
-bool SingleApplicationPrivate::writeConfirmedFrame( int msecs, const QByteArray &msg )
+bool SingleApplicationPrivate::writeConfirmedFrame( int msecs, const QByteArray &msg ) const
 {
     socket->write( msg );
     socket->flush();
@@ -399,7 +397,7 @@ void SingleApplicationPrivate::slotConnectionEstablished()
                 break;
             default:
                 break;
-            };
+            }
         }
     );
 }
@@ -425,7 +423,7 @@ void SingleApplicationPrivate::readMessageHeader( QLocalSocket *sock, SingleAppl
     headerStream >> msgLen;
     ConnectionInfo &info = connectionMap[sock];
     info.stage = nextStage;
-    info.msgLen = msgLen;
+    info.msgLen = int(msgLen);
 
     writeAck( sock );
 }

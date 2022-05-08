@@ -50,6 +50,8 @@ public:
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
+    void runLoad();
+    void onLoad();
     void setSelect(int item);
     void firstPlay(const QString &name);
     void doubleplay(const QString &name);

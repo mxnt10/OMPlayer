@@ -347,7 +347,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     /** Temporizador para o cálculo do número de cliques em 300ms */
     click = new QTimer(this);
     click->setSingleShot(true);
-    click->setInterval(300);
+    click->setInterval(250);
     connect(click, SIGNAL(timeout()), this, SLOT(detectClick()));
 }
 
@@ -364,6 +364,19 @@ VideoPlayer::~VideoPlayer() {
 /** Função para abrir arquivos multimídia */
 void VideoPlayer::openMedia(const QStringList &parms) {
     playlist->addItems(parms);
+}
+
+
+/** Rodando as funções após aberto outras instâncias */
+void VideoPlayer::runLoad() {
+    playlist->load(true);
+    playlist->selectCurrent(actualitem);
+}
+
+
+/** Função para acionar a função load() dando um tempo para adicionar os itens */
+void VideoPlayer::onLoad() {
+    QTimer::singleShot(800, this, SLOT(runLoad()));
 }
 
 
@@ -590,6 +603,7 @@ void VideoPlayer::onStart() {
 
         playlist->removeSelectedItems();
         playlist->insert(url, row, duration, format);
+        playlist->save();
     }
 
     /** Definindo o tempo de duração no slider */
@@ -665,7 +679,7 @@ void VideoPlayer::setShuffle() {
 
 
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
-void VideoPlayer::detectClick(){
+void VideoPlayer::detectClick() {
     if (count == 1 && !enterpos && playing)
         playPause();
     count = 0;

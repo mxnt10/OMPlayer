@@ -10,7 +10,6 @@
  *      - QtAV
  *      - libmediainfo
  *      - libzen
- *      - pyUserInput
  *
  * Licença: GNU General Public License Version 3 (GLPv3)
  *
@@ -87,6 +86,12 @@ int main(int argc, char *argv[]) {
     } else {
         QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, &msgReceiver,
                          &MessageReceiver::receivedMessage);
+        QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, [&player]() {
+            player.hide();
+            player.show();
+            player.activateWindow();
+            player.onLoad();
+        });
     }
 
     player.show();

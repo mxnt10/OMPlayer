@@ -1,3 +1,4 @@
+#include <QCryptographicHash>
 #include <QDataStream>
 #include <QDebug>
 #include <QFile>
@@ -105,9 +106,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
 /** Destrutor */
-PlayList::~PlayList() {
-    save();
-}
+PlayList::~PlayList() = default;
 
 
 /**********************************************************************************************************************/
@@ -120,28 +119,60 @@ void PlayList::setSaveFile(const QString &file) {
 
 
 /** Função para carregar a playlist ao abrir */
-void PlayList::load() {
+void PlayList::load(bool second) {
+    QCryptographicHash hash(QCryptographicHash::Md5);
     QFile f(mfile);
-    if (!f.exists())
-        return;
-    if (!f.open(QIODevice::ReadOnly))
-        return;
-    QDataStream ds(&f);
-    QList<PlayListItem> list;
-    ds >> list;
-    for (int i = 0; i < list.size(); ++i) {
-        insertItemAt(list.at(i), i);
+    if (!f.exists()) save();
+    if (!f.open(QIODevice::ReadOnly)) return;
+
+    /** Capturando o hash */
+    char buf[2048];
+    while (f.read(buf, 2048) > 0) {
+        hash.addData(buf, 2048);
     }
+    f.close();
+    actsum = hash.result().toHex();
+    qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, actsum.toStdString().c_str());
+
+    if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
+        qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
+        if (second)
+            model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+        f.open(QIODevice::ReadOnly);
+        QDataStream ds(&f);
+        QList<PlayListItem> list;
+        ds >> list;
+        for (int i = 0; i < list.size(); ++i) {
+            insertItemAt(list.at(i), i);
+        }
+        f.close();
+        sum = actsum;
+    } else {
+        qDebug("%s(%sDEBUG%s):%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, BLU);
+    }
+    save();
 }
 
 
 /** Função para salvar a playlist ao fechar */
 void PlayList::save() {
+    qDebug("%s(%sDEBUG%s):%s Salvando a playlist ...\033[0m", GRE, RED, GRE, ORA);
+    QCryptographicHash hash(QCryptographicHash::Md5);
     QFile f(mfile);
-    if (!f.open(QIODevice::WriteOnly))
-        return;
+    if (!f.open(QIODevice::WriteOnly)) return;
     QDataStream ds(&f);
     ds << model->items();
+    f.close();
+
+    /** Capturando o hash */
+    f.open(QIODevice::ReadOnly);
+    char buf[2048];
+    while (f.read(buf, 2048) > 0) {
+        hash.addData(buf, 2048);
+    }
+    f.close();
+    actsum = hash.result().toHex();
+    sum = actsum;
 }
 
 
@@ -177,18 +208,20 @@ void PlayList::addItems(const QStringList &parms) {
     else
         files = parms;
 
-    if (files.isEmpty())
-        return;
+    int t = model->rowCount(QModelIndex());
+
+    if (files.isEmpty()) return;
     for (int i = 0; i < files.size(); ++i) {
         const QString& file = files.at(i);
         if (!QFileInfo(file).isFile())
             continue;
-        insert(file, i);
+        insert(file, i + t);
         if (!select) {
             isplay = file;
             select = true;
         }
     }
+    save();
     emit firstPlay(isplay);
 }
 
@@ -339,7 +372,6 @@ qint64 PlayList::setDuration() {
 void PlayList::onAboutToPlay(const QModelIndex &index) {
     actualitem = listView->currentIndex();
     emit aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
-    save();
 }
 
 

@@ -41,7 +41,7 @@ public:
     void selectNext();
     void selectPrevious();
     void setIndex();
-    void load();
+    void load(bool second = false);
     void save();
     void selectCurrent(int indx);
     void setSaveFile(const QString &file);
@@ -76,7 +76,7 @@ private:
     ListView *listView;
     PlayListModel *model;
     QModelIndex actualitem;
-    QString mfile;
+    QString mfile, sum, actsum;
     QWidget *wpls;
     int maxRows;
     bool isshow;

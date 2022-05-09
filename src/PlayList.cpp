@@ -10,6 +10,8 @@
 #include <QSpacerItem>
 #include <QStandardPaths>
 
+#include <filesystem>
+
 #include "Button.h"
 #include "Defines.h"
 #include "ListView.h"
@@ -19,6 +21,7 @@
 
 using QStandardPaths::MoviesLocation;
 using QSizePolicy::Expanding;
+using std::filesystem::exists;
 
 
 /**********************************************************************************************************************/
@@ -143,7 +146,8 @@ void PlayList::load(bool second) {
         QList<PlayListItem> list;
         ds >> list;
         for (int i = 0; i < list.size(); ++i) {
-            insertItemAt(list.at(i), i);
+            if (exists(list.at(i).url().toStdString()))
+                insertItemAt(list.at(i), i);
         }
         f.close();
         sum = actsum;

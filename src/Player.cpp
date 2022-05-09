@@ -760,13 +760,16 @@ void VideoPlayer::hideFalse() {
 /** Pré-visualização ao posicionar o mouse no slider */
 void VideoPlayer::onTimeSliderHover(int pos, int value) {
     int fixH = 72;
-    int setX = Utils::calcX(fixH, Width.toInt(), Height.toInt());
     QPoint gpos = slider->pos();
 
     /** Definição da posição na tela e exibição do tooltip */
     QPoint gpos1 = mapToGlobal(gpos + QPoint(pos + 12, 5));
     QPoint gpos2 = mapToGlobal(gpos + QPoint(pos, -7));
     QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
+
+    /** Arquivos de áudio não são vídeos */
+    if (mediaPlayer->currentVideoStream() == (-1)) return;
+    int setX = Utils::calcX(fixH, Width.toInt(), Height.toInt());
 
     /** Exibição da pré-visualização */
     if (!preview)
@@ -837,7 +840,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
     mUnit = mediaPlayer->notifyInterval();
-    onStart();
+    updateSlider(mediaPlayer->position());
 }
 
 

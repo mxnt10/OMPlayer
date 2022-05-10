@@ -82,6 +82,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(playlist, SIGNAL(emithiden()), SLOT(setHide()));
     connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
     connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
+    connect(playlist, SIGNAL(emitstop()), SLOT(setStop()));
 
 
     /** Barra de progresso de execução */
@@ -405,7 +406,7 @@ void VideoPlayer::firstPlay(const QString &isplay) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
         play(isplay);
-        playlist->selectNext();
+        playlist->selectPlay();
         previousitem = playlist->setListSize() - 1;
         actualitem = 0;
         nextitem = 1;

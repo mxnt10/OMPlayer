@@ -36,13 +36,13 @@ public:
     qint64 setDuration();
     int setListSize();
     int selectItems();
+    void load(bool second = false);
+    void save();
     void selectClean();
     void selectPlay();
     void selectNext();
     void selectPrevious();
     void setIndex();
-    void load(bool second = false);
-    void save();
     void selectCurrent(int indx);
     void setSaveFile(const QString &file);
     void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
@@ -57,6 +57,7 @@ signals:
     void aboutToPlay(const QString &url);
     void firstPlay(const QString &url);
     void selected(int item);
+    void emitstop();
     void emithide();
     void emithiden();
     void emitnohide();

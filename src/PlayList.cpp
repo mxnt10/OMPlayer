@@ -360,6 +360,7 @@ void PlayList::removeSelectedItems() {
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+    emit emitstop();
     save();
 }
 

@@ -53,6 +53,7 @@ public Q_SLOTS:
     void runLoad();
     void onLoad();
     void setSelect(int item);
+    void ajustActualItem(int item);
     void firstPlay(const QString &name);
     void doubleplay(const QString &name);
     void setReplay();
@@ -62,7 +63,7 @@ public Q_SLOTS:
     void ShowContextMenu(const QPoint &pos);
 
 private Q_SLOTS:
-    void play(const QString &isplay);
+    void play(const QString &isplay, int index = (-1));
     void playPause();
     void setStop();
     void nextRand();

@@ -83,6 +83,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
     connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
     connect(playlist, SIGNAL(emitstop()), SLOT(setStop()));
+    connect(playlist, SIGNAL(emitremove(int)), SLOT(ajustActualItem(int)));
 
 
     /** Barra de progresso de execução */
@@ -381,23 +382,47 @@ void VideoPlayer::onLoad() {
 }
 
 
+/** Função que possui o propósito de ajustar a ordem de execução ao remover itens da playlist anteriores ao
+ * arquivo multimídia sendo reproduzido no momento */
+void VideoPlayer::ajustActualItem(int item) {
+    int actual = nextitem - 1;
+    int c = 0;
+    if (item <= actual) {
+        c++;
+        nextitem--;
+        actualitem--;
+        previousitem--;
+        if (previousitem == -1)
+            previousitem = playlist->setListSize() - 1;
+        if (actualitem == -1)
+            actualitem = playlist->setListSize() - 1;
+        if (nextitem == -1)
+            nextitem = playlist->setListSize() - 1;
+        if (item < actual)
+            playlist->selectCurrent(actual - c + 1);
+    } else
+        playlist->selectCurrent(actual);
+}
+
+
 /** Setando o item atualmente selecionado */
 void VideoPlayer::setSelect(int item) {
     actualitem = item;
     if (!playing) {
         qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
                Utils::mediaTitle(playlist->getItems(item)).toStdString().c_str());
-        playlist->setIndex();
     }
 }
 
 
 /** Função geral para execução de arquivos multimídia */
-void VideoPlayer::play(const QString &isplay) {
+void VideoPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
         mediaPlayer->stop();
     mediaPlayer->play(isplay);
+    if (index > (-1))
+        playlist->selectCurrent(index);
 }
 
 
@@ -405,8 +430,7 @@ void VideoPlayer::play(const QString &isplay) {
 void VideoPlayer::firstPlay(const QString &isplay) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
-        play(isplay);
-        playlist->selectPlay();
+        play(isplay, 0);
         previousitem = playlist->setListSize() - 1;
         actualitem = 0;
         nextitem = 1;
@@ -468,7 +492,7 @@ void VideoPlayer::nextRand() {
         listnum.append(QString::number(actualitem));
     }
 
-    play(playlist->getItems(actualitem));
+    play(playlist->getItems(actualitem), actualitem);
 
     /** Cálculo dos próximos itens a serem executados */
     nextitem = actualitem + 1;
@@ -477,7 +501,6 @@ void VideoPlayer::nextRand() {
         previousitem = playlist->setListSize() - 1;
     if (actualitem == playlist->setListSize() - 1)
         nextitem = 0;
-    playlist->selectCurrent(actualitem);
 }
 
 
@@ -492,7 +515,7 @@ void VideoPlayer::Next() {
         }
 
         qDebug("%s(%sDEBUG%s):%s Reproduzindo o próximo item ...\033[0m", GRE, RED, GRE, ORA);
-        play(playlist->getItems(nextitem));
+        play(playlist->getItems(nextitem), nextitem);
 
         /** Cálculo dos próximos itens a serem executados */
         nextitem++;
@@ -505,7 +528,6 @@ void VideoPlayer::Next() {
             actualitem = 0;
         if (nextitem == playlist->setListSize())
             nextitem = 0;
-        playlist->selectNext();
     }
 }
 
@@ -514,7 +536,7 @@ void VideoPlayer::Next() {
 void VideoPlayer::Previous() {
     if (mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, ORA);
-        play(playlist->getItems(previousitem));
+        play(playlist->getItems(previousitem), previousitem);
 
         /** Cálculo dos próximos itens a serem executados */
         nextitem--;
@@ -527,7 +549,6 @@ void VideoPlayer::Previous() {
             actualitem = playlist->setListSize() - 1;
         if (nextitem == -1)
             nextitem = playlist->setListSize() - 1;
-        playlist->selectPrevious();
     }
 }
 
@@ -537,8 +558,7 @@ void VideoPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
             qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
-            play(playlist->getItems(actualitem));
-            playlist->selectPlay();
+            play(playlist->getItems(actualitem), actualitem);
         }
         nextitem = actualitem + 1;
         previousitem = actualitem - 1;
@@ -602,7 +622,7 @@ void VideoPlayer::onStart() {
         QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
         MI.Close();
 
-        playlist->removeSelectedItems();
+        playlist->removeSelectedItems(true);
         playlist->insert(url, row, duration, format);
         playlist->save();
     }

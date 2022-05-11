@@ -39,10 +39,6 @@ public:
     void load(bool second = false);
     void save();
     void selectClean();
-    void selectPlay();
-    void selectNext();
-    void selectPrevious();
-    void setIndex();
     void selectCurrent(int indx);
     void setSaveFile(const QString &file);
     void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
@@ -57,6 +53,7 @@ signals:
     void aboutToPlay(const QString &url);
     void firstPlay(const QString &url);
     void selected(int item);
+    void emitremove(int item);
     void emitstop();
     void emithide();
     void emithiden();
@@ -64,7 +61,7 @@ signals:
 
 public slots:
     void addItems(const QStringList &parms = QStringList());
-    void removeSelectedItems();
+    void removeSelectedItems(bool update = false);
 
 private slots:
     void clearItems();
@@ -76,7 +73,6 @@ private:
     Button *clearBtn, *removeBtn, *addBtn;
     ListView *listView;
     PlayListModel *model;
-    QModelIndex actualitem;
     QString mfile, sum, actsum;
     QWidget *wpls;
     int maxRows;

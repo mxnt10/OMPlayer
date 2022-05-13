@@ -32,6 +32,7 @@ add_executable(
         src/main.cpp
         src/Button.cpp   src/Button.h
         src/Defines.cpp  src/Defines.h
+        src/Label.cpp    src/Label.h
         src/ListView.cpp src/ListView.h
         src/Player.cpp   src/Player.h
         src/Receiver.cpp src/Receiver.h

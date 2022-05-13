@@ -26,13 +26,13 @@ namespace MediaInfoDLL {
 }
 
 QT_BEGIN_NAMESPACE
-class QLabel;
 class QTimer;
 class QThread;
 class QWidget;
 QT_END_NAMESPACE
 
 class Button;
+class Label;
 class PlayList;
 class Slider;
 
@@ -88,6 +88,7 @@ private Q_SLOTS:
 
 protected:
     bool event(QEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void enterEvent(QEvent *event) override;
@@ -100,7 +101,7 @@ private:
     Button *replayBtn, *shuffleBtn;
     MediaInfo MI;
     PlayList *playlist;
-    QLabel *logo, *current, *end;
+    Label *logo, *current, *end;
     QString Width, Height;
     QStringList listnum;
     QThread *qthread;
@@ -112,7 +113,7 @@ private:
     int mUnit, count;
     int previousitem, actualitem, nextitem;
     bool restart, randplay;
-    bool contextmenu, enterpos, maximize, moving, playing;
+    bool contextmenu, enterpos, maximize, moving, playing, pausing;
     const char *theme;
 };
 

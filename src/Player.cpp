@@ -1,6 +1,5 @@
 #include <QCloseEvent>
 #include <QFileDialog>
-#include <QLabel>
 #include <QLayout>
 #include <QGraphicsEffect>
 #include <QGuiApplication>
@@ -19,6 +18,7 @@
 
 #include "Button.h"
 #include "Defines.h"
+#include "Label.h"
 #include "Player.h"
 #include "PlayList.h"
 #include "Slider.h"
@@ -37,6 +37,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     enterpos(false),
     maximize(false),
     moving(false),
+    pausing(false),
     playing(false),
     randplay(false),
     restart(false),
@@ -66,9 +67,14 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     qDebug("%s------------------------------%s", RED, BLU);
-    mediaPlayer = new AVPlayer(this);
     video = new VideoOutput(this);
+    mediaPlayer = new AVPlayer(this);
     mediaPlayer->setRenderer(video);
+    connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
+    connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
+    connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
+    connect(mediaPlayer, SIGNAL(stopped()), SLOT(onStop()));
+    connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
     qDebug("%s------------------------------\033[0m", RED);
 
 
@@ -97,56 +103,43 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
     connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
     connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
-    connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
-    connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
-    connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
-    connect(mediaPlayer, SIGNAL(stopped()), SLOT(onStop()));
-    connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
+    connect(slider, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(slider, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Labels para mostrar o tempo de execução e a duração */
-    current = new QLabel();
-    current->setToolTip(tr("Current time"));
-    current->setFixedWidth(70);
-    current->setAlignment(CENTER);
-    current->setText(QString::fromLatin1("-- -- : -- --"));
-    end = new QLabel();
-    end->setToolTip(tr("Duration"));
-    end->setFixedWidth(70);
-    end->setAlignment(CENTER);
-    end->setText(QString::fromLatin1("-- -- : -- --"));
+    current = new Label(70, "Current time", "-- -- : -- --");
+    connect(current, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(current, SIGNAL(emitLeave()), SLOT(hideTrue()));
+    end = new Label(70, "Duration", "-- -- : -- --");
+    connect(end, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(end, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Botões para os controles de reprodução */
     playBtn = new Button("play", 48);
-    playBtn->setToolTip(tr("Play"));
-    stopBtn = new Button("stop", 32);
-    stopBtn->setToolTip(tr("Stop"));
-    nextBtn = new Button("next", 32);
-    nextBtn->setToolTip(tr("Next"));
-    previousBtn = new Button("previous", 32);
-    previousBtn->setToolTip(tr("Previous"));
-    replayBtn = new Button("replay", 32);
-    replayBtn->setToolTip(tr("Replay"));
-    shuffleBtn = new Button("shuffle", 32);
-    shuffleBtn->setToolTip(tr("Shuffle"));
     connect(playBtn, CLICKED, SLOT(playPause()));
+    connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+
+    stopBtn = new Button("stop", 32);
     connect(stopBtn, CLICKED, SLOT(setStop()));
+    connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+
+    nextBtn = new Button("next", 32);
     connect(nextBtn, CLICKED, SLOT(Next()));
+    connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+
+    previousBtn = new Button("previous", 32);
     connect(previousBtn, CLICKED, SLOT(Previous()));
+    connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+
+    replayBtn = new Button("replay", 32);
     connect(replayBtn, CLICKED, SLOT(setReplay()));
+    connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+
+    shuffleBtn = new Button("shuffle", 32);
     connect(shuffleBtn, CLICKED, SLOT(setShuffle()));
-
-
-    /** Emissões personalizadas */
-    connect(playBtn, EMITENTER, SLOT(hideFalse()));
-    connect(stopBtn, EMITENTER, SLOT(hideFalse()));
-    connect(nextBtn, EMITENTER, SLOT(hideFalse()));
-    connect(previousBtn, EMITENTER, SLOT(hideFalse()));
-    connect(replayBtn, EMITENTER, SLOT(hideFalse()));
-    connect(shuffleBtn, EMITENTER, SLOT(hideFalse()));
-    connect(slider, EMITENTER, SLOT(hideFalse()));
-    connect(slider, EMITLEAVE, SLOT(hideTrue()));
+    connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
 
     /** Teclas de atalho */
@@ -180,14 +173,14 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
     auto *nohide1 = new Widget();
-    connect(nohide1, EMITENTER, SLOT(hideFalse()));
-    connect(nohide1, EMITLEAVE, SLOT(hideTrue()));
+    connect(nohide1, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(nohide1, SIGNAL(emitLeave()), SLOT(hideTrue()));
     auto *nohide2 = new Widget();
-    connect(nohide2, EMITENTER, SLOT(hideFalse()));
-    connect(nohide2, EMITLEAVE, SLOT(hideTrue()));
+    connect(nohide2, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(nohide2, SIGNAL(emitLeave()), SLOT(hideTrue()));
     auto *nohide3 = new Widget();
-    connect(nohide3, EMITENTER, SLOT(hideFalse()));
-    connect(nohide3, EMITLEAVE, SLOT(hideTrue()));
+    connect(nohide3, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(nohide3, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Plano de fundo semitransparente da função about */
@@ -328,9 +321,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Definição da logo */
-    logo = new QLabel();
+    logo = new Label();
     logo->setPixmap(QPixmap(Utils::setIcon(true)));
-    logo->setAlignment(CENTER);
 
 
     /** Layout principal criado usando sobreposição de widgets */
@@ -349,7 +341,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     /** Temporizador para o cálculo do número de cliques em 300ms */
     click = new QTimer(this);
     click->setSingleShot(true);
-    click->setInterval(250);
+    click->setInterval(300);
     connect(click, SIGNAL(timeout()), this, SLOT(detectClick()));
 }
 
@@ -701,9 +693,10 @@ void VideoPlayer::setShuffle() {
 
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void VideoPlayer::detectClick() {
-    if (count == 1 && !enterpos && playing)
+    if (count == 1 && !enterpos && playing && pausing)
         playPause();
     count = 0;
+    pausing = false;
 }
 
 
@@ -888,6 +881,13 @@ bool VideoPlayer::event(QEvent *event) {
 }
 
 
+/** Mapeador para executar ações ao pressionar o mouse */
+void VideoPlayer::mousePressEvent(QMouseEvent *event) {
+    pausing = true;
+    QWidget::mousePressEvent(event);
+}
+
+
 /** Mapeador para executar ações com um clique do mouse */
 void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
     if (about->isVisible()) {
@@ -906,6 +906,7 @@ void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
 /** Mapeador para executar ações com um duplo clique */
 void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
     changeFullScreen();
+    pausing = false;
     QWidget::mouseDoubleClickEvent(event);
 }
 
@@ -1017,11 +1018,11 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
 
 
     /** Ações do menu */
-    connect(&open, TRIGGERED, SLOT(openMedia()));
-    connect(&fullscreen, TRIGGERED, SLOT(changeFullScreen()));
-    connect(&shuffle, TRIGGERED, SLOT(setShuffle()));
-    connect(&replay, TRIGGERED, SLOT(setReplay()));
-    connect(&mabout, TRIGGERED, SLOT(setAbout()));
+    connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
+    connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
+    connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
+    connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
+    connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
 
 
     /** Montagem do menu */

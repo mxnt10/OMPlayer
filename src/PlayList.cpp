@@ -19,6 +19,7 @@
 #include "PlayListModel.h"
 #include "Utils.h"
 
+using namespace Qt;
 using QStandardPaths::MoviesLocation;
 using QSizePolicy::Expanding;
 using std::filesystem::exists;
@@ -43,15 +44,20 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     /** Lista para visualização da playlist */
     listView = new ListView();
     listView->setModel(model);
+    connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
+    connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
+    connect(listView, SIGNAL(emitEnter()), SLOT(noHide()));
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button("add", 32);
-    addBtn->setToolTip(tr("Add items"));
-    removeBtn = new Button("remove", 32);
-    removeBtn->setToolTip(tr("Remove items"));
-    clearBtn = new Button("clean", 32);
-    clearBtn->setToolTip(tr("Clear playlist"));
+    addBtn = new Button("add", 32, "Add items");
+    connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
+
+    removeBtn = new Button("remove", 32, "Remove items");
+    connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
+
+    clearBtn = new Button("clean", 32, "Clear playlist");
+    connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
 
 
     /** Plano de fundo da playlist */
@@ -93,18 +99,9 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     gbl->addItem(new QSpacerItem(0, 0, Expanding, Expanding), 0, 0, 1, 2);
     gbl->addWidget(bgpls, 0, 1, 1, 3);
     gbl->addWidget(wpls, 0, 1, 1, 3);
-    gbl->setAlignment(Qt::AlignRight);
+    gbl->setAlignment(AlignRight);
     wpls->setVisible(false);
     setLayout(gbl);
-
-
-    /** Eventos da playlist */
-    connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
-    connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
-    connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
-    connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
-    connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
-    connect(listView, SIGNAL(emitEnter()), SLOT(noHide()));
 }
 
 
@@ -137,7 +134,7 @@ void PlayList::load(bool second) {
     actsum = hash.result().toHex();
     qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, actsum.toStdString().c_str());
 
-    if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
+    if (QString::compare(sum, actsum, CaseInsensitive)) {
         qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
         if (second)
             model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
@@ -145,9 +142,12 @@ void PlayList::load(bool second) {
         QDataStream ds(&f);
         QList<PlayListItem> list;
         ds >> list;
-        for (int i = 0; i < list.size(); ++i) {
-            if (exists(list.at(i).url().toStdString()))
-                insertItemAt(list.at(i), i);
+        int add = 0;
+        for (const auto & i : list) {
+            if (exists(i.url().toStdString())) {
+                insertItemAt(i, add);
+                add++;
+            }
         }
         f.close();
         sum = actsum;
@@ -273,7 +273,7 @@ void PlayList::insertItemAt(const PlayListItem &item, int row) {
 
 /** Localiza um item para exibir na playlist */
 void PlayList::setItemAt(const PlayListItem &item, int row) {
-    model->setData(model->index(row), QVariant::fromValue(item), Qt::DisplayRole);
+    model->setData(model->index(row), QVariant::fromValue(item), DisplayRole);
 }
 
 
@@ -302,7 +302,7 @@ void PlayList::selectClean() {
 /** Retorna uma url de um arquivo multimídia usando um valor inteiro especificado */
 QString PlayList::getItems(int s) {
     QModelIndex index = model->index(s);
-    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    auto pli = qvariant_cast<PlayListItem>(index.data(DisplayRole));
     return pli.url();
 }
 
@@ -339,14 +339,14 @@ void PlayList::clearItems() {
 /** Setando a duração do item atual */
 qint64 PlayList::setDuration() {
     QModelIndex index = listView->currentIndex();
-    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    auto pli = qvariant_cast<PlayListItem>(index.data(DisplayRole));
     return pli.duration();
 }
 
 
 /** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
-    emit aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
+    emit aboutToPlay(index.data(DisplayRole).value<PlayListItem>().url());
 }
 
 

@@ -3,8 +3,6 @@
 
 #include <QPushButton>
 
-using namespace std;
-
 QT_BEGIN_NAMESPACE
 class QPushButton;
 class QString;
@@ -19,7 +17,7 @@ QT_END_NAMESPACE
 class Button : public QPushButton {
 Q_OBJECT
 public:
-    explicit Button(const string &icon, int num);
+    explicit Button(const QString &icon, int num, const QString &tooltip = nullptr);
     ~Button() override;
 
 private Q_SLOTS:

@@ -144,11 +144,13 @@ void Utils::noBlockScreen() {
         XTestFakeKeyEvent(display, keycode, True, 0);
         XTestFakeKeyEvent(display, keycode, False, 0);
         XFlush(display);
-        if (QThread::currentThread()->isInterruptionRequested()) {
-            qDebug("%s(%sDEBUG%s):%s Parando anti-bloqueio ...\033[0m", GRE, RED, GRE, BLU);
-            return;
+        for (int i = 0; i < 15; i++) {
+            if (QThread::currentThread()->isInterruptionRequested()) {
+                qDebug("%s(%sDEBUG%s):%s Parando anti-bloqueio ...\033[0m", GRE, RED, GRE, BLU);
+                return;
+            }
+            sleep(1);
         }
-        sleep(15);
     }
 }
 

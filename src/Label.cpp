@@ -5,6 +5,7 @@
 /**********************************************************************************************************************/
 
 
+/** Contrutor para o Label */
 Label::Label(int w, const QString& tooltip, const QString& text) {
     setAlignment(CENTER);
     txt = tooltip;
@@ -19,6 +20,8 @@ Label::Label(int w, const QString& tooltip, const QString& text) {
         setText(text);
 }
 
+
+/** Destrutor */
 Label::~Label() = default;
 
 

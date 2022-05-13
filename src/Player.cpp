@@ -118,49 +118,49 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Botões para os controles de reprodução */
     playBtn = new Button("play", 48);
-    connect(playBtn, CLICKED, SLOT(playPause()));
+    connect(playBtn, SIGNAL(clicked()), SLOT(playPause()));
     connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     stopBtn = new Button("stop", 32);
-    connect(stopBtn, CLICKED, SLOT(setStop()));
+    connect(stopBtn, SIGNAL(clicked()), SLOT(setStop()));
     connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     nextBtn = new Button("next", 32);
-    connect(nextBtn, CLICKED, SLOT(Next()));
+    connect(nextBtn, SIGNAL(clicked()), SLOT(Next()));
     connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     previousBtn = new Button("previous", 32);
-    connect(previousBtn, CLICKED, SLOT(Previous()));
+    connect(previousBtn, SIGNAL(clicked()), SLOT(Previous()));
     connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     replayBtn = new Button("replay", 32);
-    connect(replayBtn, CLICKED, SLOT(setReplay()));
+    connect(replayBtn, SIGNAL(clicked()), SLOT(setReplay()));
     connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     shuffleBtn = new Button("shuffle", 32);
-    connect(shuffleBtn, CLICKED, SLOT(setShuffle()));
+    connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
 
     /** Teclas de atalho */
     auto *keyCtrlA = new QShortcut(this);
     keyCtrlA->setKey(QKeySequence(CTRL | Qt::Key_A));
-    connect(keyCtrlA, ACTIVATED, SLOT(openMedia()));
+    connect(keyCtrlA, SIGNAL(activated()), SLOT(openMedia()));
     auto *keyCtrlO = new QShortcut(this);
     keyCtrlO->setKey(QKeySequence(CTRL | Qt::Key_O));
-    connect(keyCtrlO, ACTIVATED, SLOT(openMedia()));
+    connect(keyCtrlO, SIGNAL(activated()), SLOT(openMedia()));
     auto *keyAltEnter = new QShortcut(this);
     keyAltEnter->setKey(QKeySequence(ALT | ENTER));
-    connect(keyAltEnter, ACTIVATED, SLOT(changeFullScreen()));
+    connect(keyAltEnter, SIGNAL(activated()), SLOT(changeFullScreen()));
     auto *keyEsc = new QShortcut(this);
     keyEsc->setKey(QKeySequence(ESC));
-    connect(keyEsc, ACTIVATED, SLOT(leaveFullScreen()));
+    connect(keyEsc, SIGNAL(activated()), SLOT(leaveFullScreen()));
     auto *keyCtrlH = new QShortcut(this);
     keyCtrlH->setKey(QKeySequence(CTRL | Qt::Key_H));
-    connect(keyCtrlH, ACTIVATED, SLOT(setShuffle()));
+    connect(keyCtrlH, SIGNAL(activated()), SLOT(setShuffle()));
     auto *keyCtrlT = new QShortcut(this);
     keyCtrlT->setKey(QKeySequence(CTRL | Qt::Key_T));
-    connect(keyCtrlT, ACTIVATED, SLOT(setReplay()));
+    connect(keyCtrlT, SIGNAL(activated()), SLOT(setReplay()));
 
 
     /** Opacidade de 80% para os widgets de fundo dos controles e playlist */

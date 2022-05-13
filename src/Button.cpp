@@ -35,7 +35,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip) {
 
     setFocusPolicy(Qt::NoFocus);
     setStyleSheet("QPushButton { border: 0; }");
-    connect(this, PRESSED, SLOT(onEffect()));
+    connect(this, SIGNAL(pressed()), SLOT(onEffect()));
 }
 
 

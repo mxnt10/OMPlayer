@@ -3,6 +3,37 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.3.1 ] - 2022-05-09 ################################################
+
+### Added / Adicionado
+ - Adicionado Label.{cpp/h} para refatoração.
+ - Incluído instruções para corrigir o andamento da playlist ao remover
+   itens anteriores a mídia sendo reproduzida no momento.
+###
+
+### Changed / Modificado
+ - A reprodução deve parar imediatamente ao limpar a playlist.
+ - Código refatorado.
+###
+
+### Removed / Removido
+ - Removido funções selectNext(), SelectPrevious(), selectPlay() e
+   setIndex() em playlist desnecessárias.
+###
+
+### Fixed / Corrigido
+ - O programa não carrega mais arquivos multimídias inexistentes ao
+   iniciar o programa.
+ - Corrigido fechamento inesperado com arquivos de áudio ao passar o
+   mouse na barra de progresso de execução.
+ - Corrigido problemas com o preenchimento da playlist.
+ - Correções no recurso para remover itens.
+ - Corrigido recurso de pausar com um clique.
+###
+
+##########################################################################
+
+
 ## [ 1.3 ] - 2022-05-07 ##################################################
 
 ### Added / Adicionado

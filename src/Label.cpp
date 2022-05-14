@@ -6,8 +6,8 @@
 
 
 /** Contrutor para o Label */
-Label::Label(int w, const QString& tooltip, const QString& text) {
-    setAlignment(CENTER);
+Label::Label(const QFlag& align, int w, const QString& tooltip, const QString& text) {
+    setAlignment(align);
     txt = tooltip;
 
     if ( w > 0)

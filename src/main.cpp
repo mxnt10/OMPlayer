@@ -31,7 +31,6 @@
 
 #include "Defines.h"
 #include "Player.h"
-#include "Receiver.h"
 
 using std::filesystem::create_directory;
 
@@ -79,14 +78,12 @@ int main(int argc, char *argv[]) {
     }
 
     /** Verificando instâncias abertas e impedindo novas instâncias */
-    MessageReceiver msgReceiver;
     if( OMPlayer.isSecondary() ) {
-        OMPlayer.sendMessage("Aberto outra instância");
+        OMPlayer.sendMessage("OK");
         return 0;
     } else {
-        QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, &msgReceiver,
-                         &MessageReceiver::receivedMessage);
         QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, [&player]() {
+            qDebug("%s(%sDEBUG%s):%s Aberto outra instância ...\033[m", GRE, RED, GRE, BLU);
             player.hide();
             player.show();
             player.activateWindow();

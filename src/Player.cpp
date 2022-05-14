@@ -93,11 +93,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Barra de progresso de execução */
-    slider = new Slider();
-    slider->setDisabled(true);
+    slider = new Slider(this, true, 28, 0);
     slider->setTracking(true);
-    slider->setFixedHeight(28);
-    slider->setMaximum(0);
     connect(slider, SIGNAL(onHover(int,int)), SLOT(onTimeSliderHover(int,int)));
     connect(slider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
     connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
@@ -108,10 +105,10 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Labels para mostrar o tempo de execução e a duração */
-    current = new Label(70, "Current time", "-- -- : -- --");
+    current = new Label(CENTER, 70, "Current time", "-- -- : -- --");
     connect(current, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(current, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    end = new Label(70, "Duration", "-- -- : -- --");
+    end = new Label(CENTER, 70, "Duration", "-- -- : -- --");
     connect(end, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(end, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
@@ -120,23 +117,18 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     playBtn = new Button("play", 48);
     connect(playBtn, SIGNAL(clicked()), SLOT(playPause()));
     connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
     stopBtn = new Button("stop", 32);
     connect(stopBtn, SIGNAL(clicked()), SLOT(setStop()));
     connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
     nextBtn = new Button("next", 32);
     connect(nextBtn, SIGNAL(clicked()), SLOT(Next()));
     connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
     previousBtn = new Button("previous", 32);
     connect(previousBtn, SIGNAL(clicked()), SLOT(Previous()));
     connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
     replayBtn = new Button("replay", 32);
     connect(replayBtn, SIGNAL(clicked()), SLOT(setReplay()));
     connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
     shuffleBtn = new Button("shuffle", 32);
     connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
@@ -196,38 +188,23 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     vlabout->setAlignment(CENTER);
 
 
-    /** Nome do programa */
-    auto *name = new QLabel();
-    name->setText(PRG_DESC);
+    /** Nome do programa e descrição */
+    auto *description = new Label(TOP, 0, nullptr, About::getDescription());
+    auto *name = new Label(TOP, 0, nullptr, PRG_DESC);
     name->setMaximumHeight(40);
-    name->setAlignment(TOP);
     name->setStyleSheet("font-size: 24pt");
 
 
-    /** Descrição do programa */
-    auto *description = new QLabel();
-    description->setText(About::getDescription());
-    name->setAlignment(TOP);
-
-
     /** Definição do icon logo */
-    auto *iconlogo = new QLabel();
+    auto *iconlogo = new Label(CENTER);
     iconlogo->setMinimumHeight(200);
     iconlogo->setPixmap(QPixmap(Utils::setIcon()));
-    iconlogo->setAlignment(CENTER);
 
 
-    /** Versão do programa */
-    auto *version = new QLabel();
-    version->setText("Version " + QString::fromStdString(VERSION));
-    version->setAlignment(RIGHT);
+    /** Versão do programa e demais informações*/
+    auto *version = new Label(RIGHT, 0, nullptr, "Version " + QString::fromStdString(VERSION));
+    auto *maintainer = new Label(BOTTON, 0, nullptr, About::getTextMaintainer());
     version->setStyleSheet("font-size: 12pt");
-
-
-    /** Demais informações */
-    auto *maintainer = new QLabel();
-    maintainer->setText(About::getTextMaintainer());
-    maintainer->setAlignment(BOTTON);
     maintainer->setStyleSheet("font-size: 12pt");
 
 
@@ -321,7 +298,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Definição da logo */
-    logo = new Label();
+    logo = new Label(CENTER);
     logo->setPixmap(QPixmap(Utils::setIcon(true)));
 
 
@@ -347,9 +324,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
 /** Destrutor */
-VideoPlayer::~VideoPlayer() {
-    playlist->save();
-}
+VideoPlayer::~VideoPlayer() = default;
 
 
 /**********************************************************************************************************************/
@@ -394,6 +369,7 @@ void VideoPlayer::ajustActualItem(int item) {
             playlist->selectCurrent(actual - c + 1);
     } else
         playlist->selectCurrent(actual);
+    listnum.clear();
 }
 
 
@@ -433,9 +409,6 @@ void VideoPlayer::firstPlay(const QString &isplay) {
 /** Executa um item selecionado da playlist */
 void VideoPlayer::doubleplay(const QString &name) {
     qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
-    PlayListItem item;
-    item.setUrl(name);
-    item.setTitle(Utils::mediaTitle(name));
     play(name);
 
     /**
@@ -550,6 +523,7 @@ void VideoPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
             qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            if (playlist->getItems(actualitem).isEmpty()) actualitem = 0;
             play(playlist->getItems(actualitem), actualitem);
         }
         nextitem = actualitem + 1;
@@ -579,11 +553,13 @@ void VideoPlayer::onPaused(bool paused) {
         if (Utils::setIconTheme(theme, "play") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
+        playBtn->setToolTip("Play");
     } else {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo ...\033[0m", GRE, RED, GRE, ORA);
         if (Utils::setIconTheme(theme, "pause") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
+        playBtn->setToolTip("Pause");
     }
 }
 
@@ -597,6 +573,7 @@ void VideoPlayer::onStart() {
     if (Utils::setIconTheme(theme, "pause") == nullptr)
         playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
     else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
+    playBtn->setToolTip("Pause");
 
     /** Definindo dimensões para o preview */
     MI.Open(mediaPlayer->file().toStdString());
@@ -645,6 +622,7 @@ void VideoPlayer::onStop() {
         if (Utils::setIconTheme(theme, "play") == nullptr)
             playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
         else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
+        playBtn->setToolTip("Play");
 
         slider->setMaximum(0);
         slider->setDisabled(true);
@@ -865,7 +843,6 @@ void VideoPlayer::updateSliderUnit() {
 bool VideoPlayer::event(QEvent *event) {
     if (int(event->type()) == 5 && !moving && !about->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
-
         wctl->setVisible(true);
         moving = true;
         Utils::arrowMouse();

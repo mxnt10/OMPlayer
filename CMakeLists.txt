@@ -35,7 +35,6 @@ add_executable(
         src/Label.cpp    src/Label.h
         src/ListView.cpp src/ListView.h
         src/Player.cpp   src/Player.h
-        src/Receiver.cpp src/Receiver.h
         src/Slider.cpp   src/Slider.h
         src/Utils.cpp    src/Utils.h
         src/Widget.cpp   src/Widget.h
@@ -58,5 +57,4 @@ target_link_libraries(
         Xtst
         mediainfo
         dl
-        z
 )

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.3.1 ] - 2022-05-09 ################################################
+## [ 1.3.1 ] - 2022-05-13 ################################################
 
 ### Added / Adicionado
  - Adicionado Label.{cpp/h} para refatoração.
@@ -19,6 +19,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### Removed / Removido
  - Removido funções selectNext(), SelectPrevious(), selectPlay() e
    setIndex() em playlist desnecessárias.
+ - Removido sources Receiver.{cpp/h} desnecessários.
 ###
 
 ### Fixed / Corrigido
@@ -29,6 +30,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Corrigido problemas com o preenchimento da playlist.
  - Correções no recurso para remover itens.
  - Corrigido recurso de pausar com um clique.
+ - Correção ao pressionar play após excluir um item antes de qualquer
+   reprodução.
 ###
 
 ##########################################################################

@@ -19,7 +19,7 @@ QT_END_NAMESPACE
 class Label : public QLabel {
 Q_OBJECT
 public:
-    explicit Label(int w = 0, const QString& tooltip = nullptr, const QString& text = nullptr);
+    explicit Label(const QFlag& align, int w = 0, const QString& tooltip = nullptr, const QString& text = nullptr);
     ~Label() override;
 
 protected:

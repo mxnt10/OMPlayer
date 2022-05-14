@@ -17,11 +17,18 @@ using QStyle::SC_SliderHandle;
 
 
 /** Construtor principal do Slider. */
-Slider::Slider(QWidget *parent) : QSlider(parent) {
+Slider::Slider(QWidget *parent, bool disable, int size, int maximum) : QSlider(parent) {
     setOrientation(Horizontal);
     setFocusPolicy(NoFocus);
     setMouseTracking(true);
+    setDisabled(disable);
     setStyleSheet(Utils::setStyle("progressbar"));
+
+    if (size > (-1))
+        setFixedHeight(size);
+
+    if (maximum > (-1))
+        setMaximum(maximum);
 }
 
 

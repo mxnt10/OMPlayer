@@ -3,7 +3,6 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
-#include <QThread>
 #include <MediaInfoDLL.h>
 
 using namespace QtAV;
@@ -27,7 +26,6 @@ namespace MediaInfoDLL {
 
 QT_BEGIN_NAMESPACE
 class QTimer;
-class QThread;
 class QWidget;
 QT_END_NAMESPACE
 
@@ -104,7 +102,6 @@ private:
     Label *logo, *current, *end;
     QString Width, Height;
     QStringList listnum;
-    QThread *qthread;
     QTimer *click;
     QWidget *about, *wctl;
     Slider *slider;
@@ -112,8 +109,8 @@ private:
     VideoPreviewWidget *preview;
     int mUnit, count;
     int previousitem, actualitem, nextitem;
-    bool restart, randplay;
-    bool contextmenu, enterpos, maximize, moving, playing, pausing;
+    bool playing, pausing, restart, randplay;
+    bool contextmenu, enterpos, isblock, maximize, moving;
     const char *theme;
 };
 

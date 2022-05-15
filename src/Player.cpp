@@ -10,11 +10,11 @@
 #include <QSpacerItem>
 #include <QStyle>
 #include <QTimer>
-#include <QThread>
 #include <QToolTip>
 #include <QWidget>
 
 #include <MediaInfoDLL.h>
+#include <ScreenSaver>
 
 #include "Button.h"
 #include "Defines.h"
@@ -35,6 +35,7 @@ using namespace MediaInfoDLL;
 VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     contextmenu(false),
     enterpos(false),
+    isblock(false),
     maximize(false),
     moving(false),
     pausing(false),
@@ -47,7 +48,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     count(0),
     mUnit(500),
     preview(nullptr),
-    qthread(nullptr),
     Width("192"),
     Height("108") {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
@@ -605,9 +605,11 @@ void VideoPlayer::onStart() {
     if (playlist->setListSize() == 1)
         previousitem = nextitem = 0;
 
-    /** Acionando anti-bloqueio de tela */
-    qthread = QThread::create([] { return Utils::noBlockScreen(); });
-    qthread->start();
+    /** Desativando Bloqueio de tela */
+    if (!isblock) {
+        ScreenSaver::instance().disable();
+        isblock = true;
+    }
 
     updateSlider(mediaPlayer->position());
 }
@@ -631,8 +633,11 @@ void VideoPlayer::onStop() {
         end->setText(QString::fromLatin1("-- -- : -- --"));
         onTimeSliderLeave();
 
-        if(qthread->isRunning())
-            qthread->requestInterruption();
+        /** Reativando Bloqueio de tela */
+        if (isblock) {
+            ScreenSaver::instance().enable();
+            isblock = false;
+        }
     }
 }
 
@@ -832,6 +837,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
     mUnit = mediaPlayer->notifyInterval();
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(mUnit))/ mUnit);
     updateSlider(mediaPlayer->position());
 }
 
@@ -918,6 +924,7 @@ void VideoPlayer::leaveEvent(QEvent *event) {
 /** Ação ao fechar o programa */
 void VideoPlayer::closeEvent(QCloseEvent *event) {
     qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
+    if (isblock) ScreenSaver::instance().enable();
     playlist->save();
     event->accept();
 }

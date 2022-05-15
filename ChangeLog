@@ -3,6 +3,30 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.3.2 ] - 2022-05-14 ################################################
+
+### Added / Adicionado
+ - Adicionado diretório ScreenSaver em common como recurso de
+   anti-bloqueio.
+###
+
+### Changed / Modificado
+ - Modificado método anti-bloqueio de tela.
+###
+
+### Removed / Removido
+ - Removido funções em thread de simulação de pressionamento de tecla
+   como método anti-bloqueio de tela.
+###
+
+### Fixed / Corrigido
+ - Corrigido atualização do tempo de duração do arquivo multimídia na
+   barra de reprodução.
+###
+
+##########################################################################
+
+
 ## [ 1.3.1 ] - 2022-05-13 ################################################
 
 ### Added / Adicionado

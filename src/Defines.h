@@ -32,7 +32,7 @@
 
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"
-#define VERSION "1.3.1"
+#define VERSION "1.3.2"
 #define MAINTAINER "Mauricio Ferrari"
 #define EMAIL "m10ferrari1200@gmail.com"
 #define LICENSE "GNU General Public License Version 3 (GLPv3)"

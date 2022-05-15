@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
 find_package(
@@ -21,10 +21,11 @@ include_directories(
         /usr/include/qt5/QtAVWidgets
         /usr/include/MediaInfo
         /usr/include/MediaInfoDLL
+        common/ScreenSaver
 )
 
 add_subdirectory(
-        ./common/SingleApplication
+        common/SingleApplication
 )
 
 add_executable(
@@ -43,6 +44,9 @@ add_executable(
         src/PlayListDelegate.cpp src/PlayListDelegate.h
         src/PlayListItem.cpp     src/PlayListItem.h
         src/PlayListModel.cpp    src/PlayListModel.h
+
+        common/ScreenSaver/ScreenSaver.cpp
+        common/ScreenSaver/ScreenSaver.h
 )
 
 target_link_libraries(
@@ -53,8 +57,6 @@ target_link_libraries(
         Qt5::Widgets
         QtAV
         QtAVWidgets
-        X11
-        Xtst
         mediainfo
         dl
 )

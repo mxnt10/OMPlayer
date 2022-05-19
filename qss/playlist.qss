@@ -1,13 +1,13 @@
 /* Definições do list view */
 QListView {
-    background: transparent;
-    color: #ffffff;
-    border: 0px solid #000000;
+    background-color: transparent;
+    color: white;
+    border: 0px solid transparent;
 }
 
 /* Definição do scroolbar */
 QScrollBar {
-    background: transparent;
+    background-color: transparent;
 }
 
 /* Definição das barras do scroolbar */
@@ -36,5 +36,5 @@ QScrollBar::add-line, QScrollBar::sub-line {
 QScrollBar::up-arrow, QScrollBar::down-arrow, QScrollBar::left-arrow, QScrollBar::right-arrow {
     width: 3px;
     height: 3px;
-    background: #cccccc;
+    background-color: #cccccc;
 }

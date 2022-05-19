@@ -1,7 +1,7 @@
 /* Definição geral do menu */
 QMenu {
-    background: #000000;
-    color: #ffffff;
+    background-color: black;
+    color: white;
     border: 2px ridge #cccccc;
     border-radius: 10px;
 }
@@ -9,19 +9,19 @@ QMenu {
 /* Definição do separador do menu */
 QMenu::separator {
     height: 2px;
-    background: #cccccc;
-    border: 4px solid #000000;
+    background-color: #cccccc;
+    border: 4px solid black;
     border-radius: 5px;
 }
 
 /* Definição dos itens do menu */
 QMenu::item {
-    border: 6px solid #000000;
+    border: 6px solid black;
     border-radius: 8px;
 }
 
 /* Definição dos itens selecionados */
 QMenu::item:selected {
-    background: #0064c8;
+    background-color: #0064c8;
     border: 6px solid #0064c8;
 }

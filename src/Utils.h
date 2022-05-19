@@ -19,7 +19,6 @@ public:
     static QString setStyle(const string &style);
     static QString mediaTitle(const QString &mediafile);
     static QString defaultIcon(const string &icon);
-    static void noBlockScreen();
     static void arrowMouse();
     static void blankMouse();
     static int calcX(int z, int x, int y);

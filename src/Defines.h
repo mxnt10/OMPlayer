@@ -32,7 +32,7 @@
 
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"
-#define VERSION "1.3.2"
+#define VERSION "1.4"
 #define MAINTAINER "Mauricio Ferrari"
 #define EMAIL "m10ferrari1200@gmail.com"
 #define LICENSE "GNU General Public License Version 3 (GLPv3)"
@@ -41,6 +41,7 @@
 #define TOP    Qt::AlignTop
 #define BOTTON Qt::AlignBottom
 #define RIGHT  Qt::AlignRight
+#define LEFT   Qt::AlignLeft
 
 #define CTRL  Qt::ControlModifier
 #define ALT   Qt::AltModifier

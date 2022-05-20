@@ -32,6 +32,7 @@ QT_END_NAMESPACE
 class Button;
 class Label;
 class PlayList;
+class Settings;
 class Slider;
 
 
@@ -73,6 +74,8 @@ private Q_SLOTS:
     void setHide();
     void hideTrue();
     void hideFalse();
+    void setSettings();
+    void closeSettings();
     void setAbout();
     void changeFullScreen();
     void enterFullScreen();
@@ -104,13 +107,14 @@ private:
     QStringList listnum;
     QTimer *click;
     QWidget *about, *wctl;
+    Settings *sett;
     Slider *slider;
     VideoOutput *video;
     VideoPreviewWidget *preview;
     int mUnit, count;
     int previousitem, actualitem, nextitem;
     bool playing, pausing, restart, randplay;
-    bool contextmenu, enterpos, isblock, maximize, moving;
+    bool contextmenu, enterpos, isblock, maximize, moving, showsett;
     const char *theme;
 };
 

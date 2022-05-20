@@ -21,6 +21,7 @@
 #include "Label.h"
 #include "Player.h"
 #include "PlayList.h"
+#include "Settings.h"
 #include "Slider.h"
 #include "Utils.h"
 #include "Widget.h"
@@ -42,11 +43,13 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     playing(false),
     randplay(false),
     restart(false),
+    showsett(false),
     actualitem(0),
     nextitem(0),
     previousitem(0),
     count(0),
     mUnit(500),
+    sett(nullptr),
     preview(nullptr),
     Width("192"),
     Height("108") {
@@ -67,9 +70,10 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     qDebug("%s------------------------------%s", RED, BLU);
-    video = new VideoOutput(this);
+    video = new VideoOutput(VideoRendererId_OpenGLWidget, this);
     mediaPlayer = new AVPlayer(this);
     mediaPlayer->setRenderer(video);
+    mediaPlayer->renderer()->forcePreferredPixelFormat(false);
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
     connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
@@ -729,7 +733,24 @@ void VideoPlayer::setHide() {
 }
 
 
-/** Exibir sobre */
+/** Função para abrir as configurações */
+void VideoPlayer::setSettings() {
+    showsett = true;
+    if (!sett)
+        sett = new Settings(this);
+    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
+    sett->show();
+}
+
+
+/** Função que fecha as configurações ao receber a emissão */
+void VideoPlayer::closeSettings() {
+    showsett = false;
+    sett->close();
+}
+
+
+/** Função para exibir o sobre */
 void VideoPlayer::setAbout() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     about->setVisible(true);
@@ -900,6 +921,8 @@ void VideoPlayer::enterEvent(QEvent *event) {
         qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
         if (!about->isVisible())
             Utils::blankMouse();
+        if (showsett)
+            Utils::arrowMouse();
         contextmenu = moving = false;
         wctl->setVisible(false);
     } else {
@@ -923,9 +946,9 @@ void VideoPlayer::leaveEvent(QEvent *event) {
 
 /** Ação ao fechar o programa */
 void VideoPlayer::closeEvent(QCloseEvent *event) {
-    qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
     if (isblock) ScreenSaver::instance().enable();
     playlist->save();
+    qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
     event->accept();
 }
 
@@ -1006,6 +1029,7 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
     connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
     connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
+    connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
     connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
 
 

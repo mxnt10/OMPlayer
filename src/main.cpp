@@ -30,10 +30,21 @@
 #include <SingleApplication>
 
 #include "Defines.h"
+#include "JsonTools.h"
 #include "Player.h"
 
 using std::filesystem::create_directory;
 
+//{
+//        { "opengl", VideoRendererId_OpenGLWidget },
+//        { "gl", VideoRendererId_GLWidget2 },
+//        { "d2d", VideoRendererId_Direct2D },
+//        { "gdi", VideoRendererId_GDI },
+//        { "xv", VideoRendererId_XV },
+//        { "x11", VideoRendererId_X11 },
+//        { "qt", VideoRendererId_Widget },
+//        { nullptr, 0 }
+//};
 
 /**
  * Início do Programa.
@@ -43,6 +54,7 @@ using std::filesystem::create_directory;
 int main(int argc, char *argv[]) {
     SingleApplication OMPlayer(argc, argv, true);
     create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
+    JsonTools::verifySettings();
 
 
     #pragma clang diagnostic push

@@ -7,17 +7,20 @@
 #include "Defines.h"
 #include "Utils.h"
 
+using namespace std;
 
 /**********************************************************************************************************************/
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(const QString &icon, int size, const QString &tooltip) {
+Button::Button(const QString &icon, int size, const QString &tooltip, const QString &text, bool fixed) {
     theme = "circle";
-    num = size;
     ico = icon; /** Apenas para o debug */
-    setFixedSize(num, num);
+    num = size;
     setIconSize(QSize(num, num));
+
+    if (fixed) setFixedSize(num, num);
+    if (!text.isEmpty()) setText("  " + text);
 
     /** Definindo ícone */
     if (Utils::setIconTheme(theme, icon.toStdString()) == nullptr)
@@ -27,7 +30,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip) {
     /** ToolTip */
     if (tooltip.isEmpty()) {
         string upper = icon.toStdString();
-        std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
+        transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
         upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
         setToolTip(QString::fromStdString(upper));
     } else

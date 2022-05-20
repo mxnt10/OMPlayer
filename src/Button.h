@@ -17,7 +17,7 @@ QT_END_NAMESPACE
 class Button : public QPushButton {
 Q_OBJECT
 public:
-    explicit Button(const QString &icon, int num, const QString &tooltip = nullptr);
+    explicit Button(const QString &icon, int size = 0, const QString &tooltip = nullptr, const QString &text = nullptr, bool fixed = true);
     ~Button() override;
 
 private Q_SLOTS:

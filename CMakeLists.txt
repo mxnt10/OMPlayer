@@ -31,8 +31,9 @@ add_subdirectory(
 add_executable(
         OMPlayer
         src/main.cpp
+        src/Defines.h
+        src/About.cpp     src/About.h
         src/Button.cpp    src/Button.h
-        src/Defines.cpp   src/Defines.h
         src/JsonTools.cpp src/JsonTools.h
         src/Label.cpp     src/Label.h
         src/ListView.cpp  src/ListView.h

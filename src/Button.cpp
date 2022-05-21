@@ -1,5 +1,3 @@
-#include <QDebug>
-#include <QPushButton>
 #include <QTimer>
 #include <string>
 

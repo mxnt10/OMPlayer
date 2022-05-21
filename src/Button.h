@@ -3,12 +3,6 @@
 
 #include <QPushButton>
 
-QT_BEGIN_NAMESPACE
-class QPushButton;
-class QString;
-QT_END_NAMESPACE
-
-
 /**
  * Classe Button, para inserir efeito nos Botões.
  **********************************************************************************************************************/

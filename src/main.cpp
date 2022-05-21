@@ -20,12 +20,7 @@
  *
  **********************************************************************************************************************/
 
-
-#include <QApplication>
-#include <QCommandLineParser>
-#include <QDir>
-#include <QLoggingCategory>
-
+#include <QtCore> // Inclui tudo e não te incomoda
 #include <filesystem>
 #include <SingleApplication>
 
@@ -35,16 +30,6 @@
 
 using std::filesystem::create_directory;
 
-//{
-//        { "opengl", VideoRendererId_OpenGLWidget },
-//        { "gl", VideoRendererId_GLWidget2 },
-//        { "d2d", VideoRendererId_Direct2D },
-//        { "gdi", VideoRendererId_GDI },
-//        { "xv", VideoRendererId_XV },
-//        { "x11", VideoRendererId_X11 },
-//        { "qt", VideoRendererId_Widget },
-//        { nullptr, 0 }
-//};
 
 /**
  * Início do Programa.
@@ -77,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     /** Instruções que permite a passagem de argumentos para o reprodutor */
     QCommandLineParser parser;
-    parser.setApplicationDescription(PRG_NAME);
+    parser.setApplicationDescription("Open Multimedia Player");
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));

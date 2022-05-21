@@ -1,10 +1,11 @@
 #ifndef OMPLAYER_DEFINES_H
 #define OMPLAYER_DEFINES_H
-#include <QString>
+#include <Qt>
 
 
-/** Depuração */
-#define DEBUG false
+/** Definições para alteração */
+#define DEBUG true
+#define VERSION "1.4"
 
 
 /** Definição de cores para o Debug em RGB: \x1b[38;2;000;000;000m */
@@ -30,13 +31,6 @@
 #define UPD "\x1b[38;2;100;100;255m" //Atualizar
 
 
-#define PRG_NAME "Open Multimedia Player"
-#define PRG_DESC "OMPlayer - Open Multimedia Player"
-#define VERSION "1.4"
-#define MAINTAINER "Mauricio Ferrari"
-#define EMAIL "m10ferrari1200@gmail.com"
-#define LICENSE "GNU General Public License Version 3 (GLPv3)"
-
 #define CENTER Qt::AlignCenter
 #define TOP    Qt::AlignTop
 #define BOTTON Qt::AlignBottom
@@ -48,19 +42,7 @@
 #define ENTER Qt::Key_Return
 #define ESC   Qt::Key_Escape
 
+
 #define OPACY 0.8
-
-
-/**
- * Classe para auxílio dos defines.
- **********************************************************************************************************************/
-
-
-class About {
-public:
-    static QString getTextMaintainer();
-
-    static QString getDescription();
-};
 
 #endif //OMPLAYER_DEFINES_H

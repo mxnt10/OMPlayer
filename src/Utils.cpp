@@ -1,8 +1,6 @@
 #include <QApplication>
-#include <QtCore>
 #include <QDir>
 #include <QFile>
-#include <QString>
 #include <filesystem>
 
 #include "Defines.h"

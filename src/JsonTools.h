@@ -1,24 +1,21 @@
 #ifndef OMPLAYER_JSONTOOLS_H
 #define OMPLAYER_JSONTOOLS_H
 
-#define BOOL 0
 
-QT_BEGIN_NAMESPACE
-class QString;
-QT_END_NAMESPACE
+/**
+ * Classe JsonTools, para manipular arquivos json.
+ **********************************************************************************************************************/
 
 
 class JsonTools {
 public:
-
     static void verifySettings();
-    static QString readJson(const QString &text, int type = BOOL);
-    static QString writeJson();
+    static QString readJson(const QString &text);
+    static void writeJson(const QString &text, const QString &type);
 
 private:
     static QString defaultJson();
     static QString setJson();
-
 };
 
 #endif //OMPLAYER_JSONTOOLS_H

@@ -1,11 +1,19 @@
 #include <QDir>
 #include <QFile>
-#include <QString>
 #include <QJsonDocument>
 #include <QJsonObject>
 
 #include "JsonTools.h"
 
+/** Renderização:
+ * VideoRendererId_OpenGLWidget - openglwidget
+ * VideoRendererId_GLWidget2    - qglwidget2
+ * VideoRendererId_Direct2D     - direct2d
+ * VideoRendererId_GDI          - gdi
+ * VideoRendererId_XV           - xvideo
+ * VideoRendererId_X11          - x11
+ * VideoRendererId_Widget       - widget
+ */
 
 /**********************************************************************************************************************/
 
@@ -13,11 +21,7 @@
 /** Função que retorna a estrutura que irá possuir o arquivo json original */
 QString JsonTools::defaultJson() {
     return "{"
-           "    \"openglwidget\": false,"
-           "    \"qglwidget2\": true,"
-           "    \"widget\": false,"
-           "    \"xvideo\": false,"
-           "    \"x11\": false"
+           "    \"renderer\": \"openglwidget\""
            "}";
 }
 
@@ -42,26 +46,20 @@ void JsonTools::verifySettings() {
 
 
 /** */
-QString JsonTools::readJson(const QString &text, int type) {
+QString JsonTools::readJson(const QString &text) {
     QFile f(setJson());
     if (!f.open(QIODevice::ReadOnly)) verifySettings();
     QJsonDocument d = QJsonDocument::fromJson(f.readAll());
     QJsonObject sett = d.object();
     QJsonValue item = sett[text];
-    if (type == BOOL)
-        return QVariant(item.toBool()).toString();
-    return nullptr;
+    return item.toString();
 }
 
 
 /** */
-QString JsonTools::writeJson() {
+void JsonTools::writeJson(const QString &text, const QString &type) {
     QFile f(setJson());
     if (!f.open(QIODevice::ReadOnly)) verifySettings();
     QJsonDocument d = QJsonDocument::fromJson(f.readAll());
     QJsonObject sett = d.object();
-    return {};
 }
-
-//QString s = "true";
-//bool bInUse = QVariant(s).toBool();

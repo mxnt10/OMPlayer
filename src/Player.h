@@ -29,6 +29,7 @@ class QTimer;
 class QWidget;
 QT_END_NAMESPACE
 
+class About;
 class Button;
 class Label;
 class PlayList;
@@ -77,6 +78,7 @@ private Q_SLOTS:
     void setSettings();
     void closeSettings();
     void setAbout();
+    void closeAbout();
     void changeFullScreen();
     void enterFullScreen();
     void leaveFullScreen();
@@ -97,6 +99,7 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    About *about;
     AVPlayer *mediaPlayer;
     Button *playBtn, *stopBtn, *nextBtn, *previousBtn;
     Button *replayBtn, *shuffleBtn;
@@ -106,7 +109,7 @@ private:
     QString Width, Height;
     QStringList listnum;
     QTimer *click;
-    QWidget *about, *wctl;
+    QWidget *wctl;
     Settings *sett;
     Slider *slider;
     VideoOutput *video;

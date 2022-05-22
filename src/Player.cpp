@@ -1,21 +1,10 @@
-#include <QCloseEvent>
-#include <QFileDialog>
-#include <QLayout>
-#include <QGraphicsEffect>
-#include <QGuiApplication>
-#include <QMenu>
-#include <QRandomGenerator>
-#include <QScreen>
-#include <QShortcut>
-#include <QSpacerItem>
-#include <QStyle>
-#include <QTimer>
-#include <QToolTip>
-#include <QWidget>
+#include <QtCore>
+#include <QtWidgets> // Inclui tudo e não se incomoda
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
 
+#include "About.h"
 #include "Button.h"
 #include "Defines.h"
 #include "Label.h"
@@ -49,6 +38,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     previousitem(0),
     count(0),
     mUnit(500),
+    about(nullptr),
     sett(nullptr),
     preview(nullptr),
     Width("192"),
@@ -69,7 +59,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
-    qDebug("%s------------------------------%s", RED, BLU);
     video = new VideoOutput(VideoRendererId_OpenGLWidget, this);
     mediaPlayer = new AVPlayer(this);
     mediaPlayer->setRenderer(video);
@@ -79,7 +68,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
     connect(mediaPlayer, SIGNAL(stopped()), SLOT(onStop()));
     connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
-    qDebug("%s------------------------------\033[0m", RED);
 
 
     /** Playlist do reprodutor */
@@ -159,12 +147,10 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(keyCtrlT, SIGNAL(activated()), SLOT(setReplay()));
 
 
-    /** Opacidade de 80% para os widgets de fundo dos controles e playlist */
+    /** Semitransparência para o widget dos controles e playlist */
     qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
-    auto *effect1 = new QGraphicsOpacityEffect();
-    effect1->setOpacity(OPACY);
-    auto *effect2 = new QGraphicsOpacityEffect();
-    effect2->setOpacity(OPACY);
+    auto *effect = new QGraphicsOpacityEffect();
+    effect->setOpacity(OPACY);
 
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
@@ -179,60 +165,10 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(nohide3, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
-    /** Plano de fundo semitransparente da função about */
-    auto *qabout = new QWidget();
-    qabout->setFixedSize(856, 460);
-    qabout->setGraphicsEffect(effect2);
-    qabout->setStyleSheet(Utils::setStyle("widget"));
-
-
-    /** Ajuste do layout do about */
-    auto *vlabout = new QVBoxLayout();
-    vlabout->addWidget(qabout);
-    vlabout->setAlignment(CENTER);
-
-
-    /** Nome do programa e descrição */
-    auto *description = new Label(TOP, 0, nullptr, About::getDescription());
-    auto *name = new Label(TOP, 0, nullptr, PRG_DESC);
-    name->setMaximumHeight(40);
-    name->setStyleSheet("font-size: 24pt");
-
-
-    /** Definição do icon logo */
-    auto *iconlogo = new Label(CENTER);
-    iconlogo->setMinimumHeight(200);
-    iconlogo->setPixmap(QPixmap(Utils::setIcon()));
-
-
-    /** Versão do programa e demais informações*/
-    auto *version = new Label(RIGHT, 0, nullptr, "Version " + QString::fromStdString(VERSION));
-    auto *maintainer = new Label(BOTTON, 0, nullptr, About::getTextMaintainer());
-    version->setStyleSheet("font-size: 12pt");
-    maintainer->setStyleSheet("font-size: 12pt");
-
-
-    /** Organizaçãodas informações do Sobre */
-    auto *labout = new QGridLayout();
-    labout->setMargin(20);
-    labout->addWidget(name, 0, 0);
-    labout->addWidget(version, 0, 1);
-    labout->addWidget(description, 1, 0, 1, 2);
-    labout->addWidget(iconlogo, 2, 0, 1, 2);
-    labout->addWidget(maintainer, 3, 0);
-
-
-    /** Montando a interface do Sobre */
-    about = new QWidget();
-    auto *gabout = new QGridLayout(about);
-    gabout->addLayout(vlabout, 0, 0);
-    gabout->addLayout(labout, 0, 0);
-
-
     /** Plano de fundo semitransparente dos controles de reprodução */
     auto *bgcontrol = new QWidget();
     bgcontrol->setMaximumHeight(120);
-    bgcontrol->setGraphicsEffect(effect1);
+    bgcontrol->setGraphicsEffect(effect);
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
 
 
@@ -312,10 +248,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     layout->addWidget(video->widget(), 0, 0);
     layout->addWidget(logo, 0, 0);
     layout->addWidget(mpos, 0, 0);
-    layout->addWidget(about, 0, 0);
     layout->addWidget(wctl, 0, 0);
     this->setLayout(layout);
-    about->setVisible(false);
     wctl->setVisible(false);
 
 
@@ -752,8 +686,18 @@ void VideoPlayer::closeSettings() {
 
 /** Função para exibir o sobre */
 void VideoPlayer::setAbout() {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
-    about->setVisible(true);
+    showsett = true;
+    if (!about)
+        about = new About(this);
+    connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
+    about->show();
+}
+
+
+/** Função que fecha o sobre ao receber a emissão */
+void VideoPlayer::closeAbout() {
+    showsett = false;
+    about->close();
 }
 
 
@@ -804,9 +748,8 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 
 /** Apenas para exibição do debug */
 void VideoPlayer::onTimeSliderEnter() const {
-    if (playing) {
+    if (playing)
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
-    }
 }
 
 
@@ -868,7 +811,7 @@ void VideoPlayer::updateSliderUnit() {
 
 /** Mapeador de eventos para mapear o posicionamento do mouse */
 bool VideoPlayer::event(QEvent *event) {
-    if (int(event->type()) == 5 && !moving && !about->isVisible()) {
+    if (int(event->type()) == 5 && !moving) {
         qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
         wctl->setVisible(true);
         moving = true;
@@ -894,12 +837,6 @@ void VideoPlayer::mousePressEvent(QMouseEvent *event) {
 
 /** Mapeador para executar ações com um clique do mouse */
 void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
-    if (about->isVisible()) {
-        qDebug("%s(%sDEBUG%s):%s Fechando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
-        about->setVisible(false);
-        Utils::blankMouse();
-        return QWidget::mouseReleaseEvent(event);
-    }
     if (!click->isActive())
         click->start();
     count = count + 1; /** Contador de cliques */
@@ -919,16 +856,15 @@ void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
 void VideoPlayer::enterEvent(QEvent *event) {
     if (contextmenu) {
         qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-        if (!about->isVisible())
-            Utils::blankMouse();
         if (showsett)
             Utils::arrowMouse();
+        else
+            Utils::blankMouse();
         contextmenu = moving = false;
         wctl->setVisible(false);
     } else {
         qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Sobre a Interface ...\033[0m", GRE, RED, GRE, DGR);
-        if (!about->isVisible())
-            wctl->setVisible(true);
+        wctl->setVisible(true);
     }
     QWidget::enterEvent(event);
 }
@@ -958,12 +894,6 @@ void VideoPlayer::closeEvent(QCloseEvent *event) {
 
 /** Função para o menu de contexto do programa */
 void VideoPlayer::ShowContextMenu(const QPoint &pos) {
-    if (about->isVisible()) {
-        qDebug("%s(%sDEBUG%s):%s Fechando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
-        about->setVisible(false);
-        return;
-    } /** Para fechar a interface sobre */
-
     contextmenu = true;
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
 

@@ -4,6 +4,17 @@
 /**********************************************************************************************************************/
 
 
+/** Construtor */
+Widget::Widget(QWidget *parent) : QWidget(parent) {}
+
+
+/** Destrutor */
+Widget::~Widget() = default;
+
+
+/**********************************************************************************************************************/
+
+
 /** Ação ao posicionar o mouse sobre o widget */
 void Widget::enterEvent(QEvent *event) {
     emit emitEnter();

@@ -1,6 +1,5 @@
 #include <QCryptographicHash>
 #include <QDataStream>
-#include <QDebug>
 #include <QFile>
 #include <QFileDialog>
 #include <QGraphicsOpacityEffect>

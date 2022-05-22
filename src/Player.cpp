@@ -71,7 +71,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Playlist do reprodutor */
-    playlist = new PlayList(this);
+    playlist = new PlayList();
     playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));

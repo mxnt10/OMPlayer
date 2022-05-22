@@ -32,10 +32,7 @@ signals:
 private slots:
     void onClose();
     void setOpenglwidget();
-    void setQglwidget2();
     void setWidgetrend();
-    void setXvideorend();
-    void setX11rend();
 
 private:
     Button *openglwidget, *qglwidget2, *widgetrend, *xvideorend, *x11rend;

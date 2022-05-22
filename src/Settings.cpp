@@ -1,11 +1,7 @@
-#include <QDebug>
 #include <QDialog>
 #include <QGraphicsEffect>
-#include <QGridLayout>
-#include <QGuiApplication>
+#include <QLayout>
 #include <QMouseEvent>
-#include <QPainterPath>
-#include <QScreen>
 #include <QTabWidget>
 #include <QWidget>
 
@@ -23,7 +19,8 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    setStyleSheet(Utils::setStyle("global"));
+    setStyleSheet(Utils::setStyle("global")); // ToolTip
+    setMaximumSize(0, 0);
     setModal(false);
 
 
@@ -39,10 +36,10 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     auto *renderer = new QWidget();
     auto *oprenderer = new QGridLayout(renderer);
     oprenderer->addWidget(openglwidget, 0, 0, LEFT);
-    oprenderer->addWidget(qglwidget2, 1, 0, LEFT);
+//    oprenderer->addWidget(qglwidget2, 1, 0, LEFT);
     oprenderer->addWidget(widgetrend, 2, 0, LEFT);
-    oprenderer->addWidget(xvideorend, 3, 0, LEFT);
-    oprenderer->addWidget(x11rend, 4, 0, LEFT);
+//    oprenderer->addWidget(xvideorend, 3, 0, LEFT);
+//    oprenderer->addWidget(x11rend, 4, 0, LEFT);
 
 
    /** Organização por abas */
@@ -103,25 +100,7 @@ void Settings::setOpenglwidget() {
 
 
 /** */
-void Settings::setQglwidget2() {
-
-}
-
-
-/** */
 void Settings::setWidgetrend() {
-
-}
-
-
-/** */
-void Settings::setXvideorend() {
-
-}
-
-
-/** */
-void Settings::setX11rend() {
 
 }
 
@@ -129,14 +108,14 @@ void Settings::setX11rend() {
 /**********************************************************************************************************************/
 
 
-/** */
+/** Evento para capturar a posição da janela */
 void Settings::mousePressEvent(QMouseEvent *event) {
     setPos = event->pos();
     QWidget::mousePressEvent(event);
 }
 
 
-/** */
+/** Evento para mover a janela */
 void Settings::mouseMoveEvent(QMouseEvent *event) {
     QPoint delta = QPoint(event->pos() - setPos);
     this->move(this->x() + delta.x(), this->y() + delta.y());

@@ -7,6 +7,7 @@
 #include "About.h"
 #include "Button.h"
 #include "Defines.h"
+#include "JsonTools.h"
 #include "Label.h"
 #include "Player.h"
 #include "PlayList.h"
@@ -41,6 +42,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     about(nullptr),
     sett(nullptr),
     preview(nullptr),
+    video(nullptr),
     Width("192"),
     Height("108") {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
@@ -58,11 +60,25 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), SLOT(ShowContextMenu(QPoint)));
 
 
+    /** Pré-visualização */
+    preview = new VideoPreviewWidget(this);
+    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+
+
+    /** Janela de configurações */
+    sett = new Settings(this);
+    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
+    connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
+
+
+    /** Janela sobre */
+    about = new About(this);
+    connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
+
+
     /** Parte principal do programa que permite o funcionamento do reprodutor */
-    video = new VideoOutput(VideoRendererId_OpenGLWidget, this);
     mediaPlayer = new AVPlayer(this);
-    mediaPlayer->setRenderer(video);
-    mediaPlayer->renderer()->forcePreferredPixelFormat(false);
+    setRenderer(JsonTools::readJson("renderer"));
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
     connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
@@ -271,6 +287,28 @@ VideoPlayer::~VideoPlayer() = default;
 /** Função para abrir arquivos multimídia */
 void VideoPlayer::openMedia(const QStringList &parms) {
     playlist->addItems(parms);
+}
+
+
+/** Opções de Rendenização */
+void VideoPlayer::setRenderer(const QString &op) {
+    VideoRenderer *vo;
+    QString ogl = "openglwidget";
+    QString wdg = "widget";
+
+    if (QString::compare(op, ogl, Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_OpenGLWidget);
+
+    if (QString::compare(op, wdg, Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_Widget);
+
+    vo->widget()->setMouseTracking(true);
+    video = new VideoOutput(vo->id(), this);
+    mediaPlayer->setRenderer(video);
+
+    if (mediaPlayer->renderer()->id() == VideoRendererId_OpenGLWidget)
+        mediaPlayer->renderer()->forcePreferredPixelFormat(true);
+    qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(op), vo->id());
 }
 
 
@@ -669,10 +707,8 @@ void VideoPlayer::setHide() {
 
 /** Função para abrir as configurações */
 void VideoPlayer::setSettings() {
+    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
-    if (!sett)
-        sett = new Settings(this);
-    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
     sett->show();
 }
 
@@ -686,10 +722,8 @@ void VideoPlayer::closeSettings() {
 
 /** Função para exibir o sobre */
 void VideoPlayer::setAbout() {
+    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
-    if (!about)
-        about = new About(this);
-    connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
     about->show();
 }
 
@@ -734,12 +768,9 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
     int setX = Utils::calcX(fixH, Width.toInt(), Height.toInt());
 
     /** Exibição da pré-visualização */
-    if (!preview)
-        preview = new VideoPreviewWidget(this);
     preview->setFile(mediaPlayer->file());
     preview->setTimestamp(value * mUnit);
     preview->preview();
-    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     preview->resize(setX, fixH);
     preview->move(gpos2 - QPoint(setX/2, fixH));
     preview->show();
@@ -755,7 +786,6 @@ void VideoPlayer::onTimeSliderEnter() const {
 
 /** Saindo da pré-visualização */
 void VideoPlayer::onTimeSliderLeave() {
-    if (!preview) return;
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();

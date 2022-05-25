@@ -64,6 +64,7 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void play(const QString &isplay, int index = (-1));
+    void setRenderer(const QString &op);
     void playPause();
     void setStop();
     void nextRand();

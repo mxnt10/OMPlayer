@@ -13,7 +13,6 @@
 
 
 About::About(QWidget *parent) : QDialog(parent) {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -41,7 +40,7 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    auto *closebtn = new Button("apply", 32, "Apply and Close");
+    auto *closebtn = new Button("apply", 32, "Close");
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 

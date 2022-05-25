@@ -28,10 +28,6 @@ public:
     explicit About(QWidget *parent = nullptr);
     ~About() override;
 
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-
 signals:
     void emitclose();
 
@@ -39,9 +35,6 @@ private slots:
     static QString getTextMaintainer();
     static QString getDescription();
     void onClose();
-
-private:
-    QPoint setPos;
 };
 
 #endif //OMPLAYER_ABOUT_H

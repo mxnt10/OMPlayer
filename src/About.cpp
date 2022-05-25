@@ -104,21 +104,3 @@ QString About::getDescription() {
     tr("To play multimedia files, the program uses the ") + "\n" + \
     tr("QtAV framework, which uses ffmpeg for handling multimedia files.");
 }
-
-
-/**********************************************************************************************************************/
-
-
-/** Evento para capturar a posição da janela */
-void About::mousePressEvent(QMouseEvent *event) {
-    setPos = event->pos();
-    QWidget::mousePressEvent(event);
-}
-
-
-/** Evento para mover a janela */
-void About::mouseMoveEvent(QMouseEvent *event) {
-    QPoint delta = QPoint(event->pos() - setPos);
-    this->move(this->x() + delta.x(), this->y() + delta.y());
-    QWidget::mouseMoveEvent(event);
-}

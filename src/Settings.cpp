@@ -1,14 +1,26 @@
 #include <QDialog>
 #include <QGraphicsEffect>
 #include <QLayout>
-#include <QMouseEvent>
 #include <QTabWidget>
+#include <QStyle>
 #include <QWidget>
 
 #include "Button.h"
 #include "Defines.h"
+#include "JsonTools.h"
 #include "Settings.h"
 #include "Utils.h"
+
+
+/** Renderização:
+ * VideoRendererId_OpenGLWidget - openglwidget
+ * VideoRendererId_GLWidget2    - qglwidget2
+ * VideoRendererId_Direct2D     - direct2d
+ * VideoRendererId_GDI          - gdi
+ * VideoRendererId_XV           - xvideo
+ * VideoRendererId_X11          - x11
+ * VideoRendererId_Widget       - widget
+ */
 
 
 /**********************************************************************************************************************/
@@ -22,14 +34,29 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setStyleSheet(Utils::setStyle("global")); // ToolTip
     setMaximumSize(0, 0);
     setModal(false);
+    theme = "circle";
 
 
     /** Opções para Renderização */
-    openglwidget = new Button("settings", 32, nullptr, "OpenGLWidget", false);
-    qglwidget2 = new Button("settings", 32, nullptr, "QGLWidget2", false);
-    widgetrend = new Button("settings", 32, nullptr, "Widget", false);
-    xvideorend = new Button("settings", 32, nullptr, "XVideo", false);
-    x11rend = new Button("settings", 32, nullptr, "X11", false);
+    openglwidget = new Button("unselect", 32, "VideoRendererId_OpenGLWidget", "OpenGLWidget", false);
+    qglwidget2 = new Button("unselect", 32, "VideoRendererId_GLWidget2", "QGLWidget2", false);
+    widgetrend = new Button("unselect", 32, "VideoRendererId_Widget", "Widget", false);
+    xvideorend = new Button("unselect", 32, "VideoRendererId_XV", "XVideo", false);
+    x11rend = new Button("unselect", 32, "VideoRendererId_X11", "X11", false);
+    connect(openglwidget, SIGNAL(pressed()), SLOT(setOpenglwidget()));
+    connect(widgetrend, SIGNAL(pressed()), SLOT(setWidgetrend()));
+
+    if (QString::compare(JsonTools::readJson("renderer"), "openglwidget") == 0) {
+        if (Utils::setIconTheme(theme, "select") == nullptr)
+            openglwidget->setIcon(QIcon::fromTheme("emblem-checked"));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+    }
+
+    if (QString::compare(JsonTools::readJson("renderer"), "widget") == 0) {
+        if (Utils::setIconTheme(theme, "select") == nullptr)
+            widgetrend->setIcon(QIcon::fromTheme("emblem-checked"));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+    }
 
 
     /** Layout da Renderização */
@@ -89,35 +116,40 @@ Settings::~Settings() = default;
 
 /** Emissão para fechar a janela */
 void Settings::onClose() {
+    qDebug("%s(%sDEBUG%s):%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     emit emitclose();
 }
 
 
 /** */
 void Settings::setOpenglwidget() {
+    if (QString::compare(JsonTools::readJson("renderer"), "openglwidget") != 0) {
+        JsonTools::writeJson("renderer", "openglwidget");
+        emit emitvalue("openglwidget");
 
+        if (Utils::setIconTheme(theme, "select") == nullptr)
+            openglwidget->setIcon(QIcon::fromTheme("emblem-checked"));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+
+        if (Utils::setIconTheme(theme, "unselect") == nullptr)
+            widgetrend->setIcon(QIcon::fromTheme("package-available"));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "unselect")));
+    }
 }
 
 
 /** */
 void Settings::setWidgetrend() {
+    if (QString::compare(JsonTools::readJson("renderer"), "widget") != 0) {
+        JsonTools::writeJson("renderer", "widget");
+        emit emitvalue("widget");
 
-}
+        if (Utils::setIconTheme(theme, "select") == nullptr)
+            widgetrend->setIcon(QIcon::fromTheme("emblem-checked"));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
 
-
-/**********************************************************************************************************************/
-
-
-/** Evento para capturar a posição da janela */
-void Settings::mousePressEvent(QMouseEvent *event) {
-    setPos = event->pos();
-    QWidget::mousePressEvent(event);
-}
-
-
-/** Evento para mover a janela */
-void Settings::mouseMoveEvent(QMouseEvent *event) {
-    QPoint delta = QPoint(event->pos() - setPos);
-    this->move(this->x() + delta.x(), this->y() + delta.y());
-    QWidget::mouseMoveEvent(event);
+        if (Utils::setIconTheme(theme, "unselect") == nullptr)
+            openglwidget->setIcon(QIcon::fromTheme("package-available"));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "unselect")));
+    }
 }

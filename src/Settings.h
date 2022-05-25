@@ -5,7 +5,6 @@
 
 QT_BEGIN_NAMESPACE
 class QDialog;
-class QPoint;
 QT_END_NAMESPACE
 
 class Button;
@@ -22,12 +21,9 @@ public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings() override;
 
-protected:
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-
 signals:
     void emitclose();
+    void emitvalue(const QString &value);
 
 private slots:
     void onClose();
@@ -36,7 +32,7 @@ private slots:
 
 private:
     Button *openglwidget, *qglwidget2, *widgetrend, *xvideorend, *x11rend;
-    QPoint setPos;
+    const char *theme;
 };
 
 

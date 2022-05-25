@@ -5,15 +5,6 @@
 
 #include "JsonTools.h"
 
-/** Renderização:
- * VideoRendererId_OpenGLWidget - openglwidget
- * VideoRendererId_GLWidget2    - qglwidget2
- * VideoRendererId_Direct2D     - direct2d
- * VideoRendererId_GDI          - gdi
- * VideoRendererId_XV           - xvideo
- * VideoRendererId_X11          - x11
- * VideoRendererId_Widget       - widget
- */
 
 /**********************************************************************************************************************/
 
@@ -45,7 +36,7 @@ void JsonTools::verifySettings() {
 }
 
 
-/** */
+/** Função para ler um determinado item de um arquivo json */
 QString JsonTools::readJson(const QString &text) {
     QFile f(setJson());
     if (!f.open(QIODevice::ReadOnly)) verifySettings();
@@ -56,10 +47,16 @@ QString JsonTools::readJson(const QString &text) {
 }
 
 
-/** */
+/** Função para modificar um determinado item de um arquivo json */
 void JsonTools::writeJson(const QString &text, const QString &type) {
     QFile f(setJson());
-    if (!f.open(QIODevice::ReadOnly)) verifySettings();
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) verifySettings();
     QJsonDocument d = QJsonDocument::fromJson(f.readAll());
+    f.close();
     QJsonObject sett = d.object();
+    sett.insert(text,type);
+    d.setObject(sett);
+    f.open(QFile::WriteOnly | QFile::Text | QFile::Truncate);
+    f.write(d.toJson());
+    f.close();
 }

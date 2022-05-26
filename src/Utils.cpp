@@ -125,9 +125,9 @@ QString Utils::defaultIcon(const string &icon) {
         return "edit-delete";
 
     /** Botões em settings */
-    if (icon == "select")
+    if (icon == "radio-select")
         return "emblem-checked";
-    if (icon == "unselect")
+    if (icon == "radio-unselect")
         return "package-available";
     if (icon == "apply")
         return "dialog-ok-apply";

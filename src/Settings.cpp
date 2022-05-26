@@ -38,24 +38,24 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Opções para Renderização */
-    openglwidget = new Button("unselect", 32, "VideoRendererId_OpenGLWidget", "OpenGLWidget", false);
-    qglwidget2 = new Button("unselect", 32, "VideoRendererId_GLWidget2", "QGLWidget2", false);
-    widgetrend = new Button("unselect", 32, "VideoRendererId_Widget", "Widget", false);
-    xvideorend = new Button("unselect", 32, "VideoRendererId_XV", "XVideo", false);
-    x11rend = new Button("unselect", 32, "VideoRendererId_X11", "X11", false);
+    openglwidget = new Button("radio-unselect", 24, "VideoRendererId_OpenGLWidget", "OpenGLWidget", false);
+    qglwidget2 = new Button("radio-unselect", 24, "VideoRendererId_GLWidget2", "QGLWidget2", false);
+    widgetrend = new Button("radio-unselect", 24, "VideoRendererId_Widget", "Widget", false);
+    xvideorend = new Button("radio-unselect", 24, "VideoRendererId_XV", "XVideo", false);
+    x11rend = new Button("radio-unselect", 24, "VideoRendererId_X11", "X11", false);
     connect(openglwidget, SIGNAL(pressed()), SLOT(setOpenglwidget()));
     connect(widgetrend, SIGNAL(pressed()), SLOT(setWidgetrend()));
 
     if (QString::compare(JsonTools::readJson("renderer"), "openglwidget") == 0) {
-        if (Utils::setIconTheme(theme, "select") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-select") == nullptr)
             openglwidget->setIcon(QIcon::fromTheme("emblem-checked"));
-        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "radio-select")));
     }
 
     if (QString::compare(JsonTools::readJson("renderer"), "widget") == 0) {
-        if (Utils::setIconTheme(theme, "select") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-select") == nullptr)
             widgetrend->setIcon(QIcon::fromTheme("emblem-checked"));
-        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "radio-select")));
     }
 
 
@@ -127,13 +127,13 @@ void Settings::setOpenglwidget() {
         JsonTools::writeJson("renderer", "openglwidget");
         emit emitvalue("openglwidget");
 
-        if (Utils::setIconTheme(theme, "select") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-select") == nullptr)
             openglwidget->setIcon(QIcon::fromTheme("emblem-checked"));
-        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "radio-select")));
 
-        if (Utils::setIconTheme(theme, "unselect") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-unselect") == nullptr)
             widgetrend->setIcon(QIcon::fromTheme("package-available"));
-        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "unselect")));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "radio-unselect")));
     }
 }
 
@@ -144,12 +144,12 @@ void Settings::setWidgetrend() {
         JsonTools::writeJson("renderer", "widget");
         emit emitvalue("widget");
 
-        if (Utils::setIconTheme(theme, "select") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-select") == nullptr)
             widgetrend->setIcon(QIcon::fromTheme("emblem-checked"));
-        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "select")));
+        else widgetrend->setIcon(QIcon(Utils::setIconTheme(theme, "radio-select")));
 
-        if (Utils::setIconTheme(theme, "unselect") == nullptr)
+        if (Utils::setIconTheme(theme, "radio-unselect") == nullptr)
             openglwidget->setIcon(QIcon::fromTheme("package-available"));
-        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "unselect")));
+        else openglwidget->setIcon(QIcon(Utils::setIconTheme(theme, "radio-unselect")));
     }
 }

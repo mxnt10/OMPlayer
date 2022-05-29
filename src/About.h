@@ -9,11 +9,6 @@
 #define EMAIL "m10ferrari1200@gmail.com"
 #define LICENSE "GNU General Public License Version 3 (GLPv3)"
 
-QT_BEGIN_NAMESPACE
-class QDialog;
-class QPoint;
-QT_END_NAMESPACE
-
 class Button;
 
 

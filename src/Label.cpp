@@ -10,7 +10,7 @@ Label::Label(const QFlag& align, int w, const QString& tooltip, const QString& t
     setAlignment(align);
     txt = tooltip;
 
-    if ( w > 0)
+    if (w > 0)
         setFixedWidth(w);
 
     if (!tooltip.isEmpty())

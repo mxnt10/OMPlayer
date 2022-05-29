@@ -5,11 +5,6 @@
 
 using namespace std;
 
-QT_BEGIN_NAMESPACE
-class QLabel;
-class QString;
-QT_END_NAMESPACE
-
 
 /**
  * Classe Label.

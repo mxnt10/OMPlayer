@@ -13,6 +13,8 @@
 #define RED "\x1b[38;2;255;050;050m" //Debug
 
 #define CYA "\x1b[38;2;000;255;255m" //Interface
+#define SND "\x1b[38;2;040;125;200m" //Sender
+#define ERR "\x1b[38;2;000;150;100m" //AVError
 
 #define DGR "\x1b[38;2;000;150;020m" //Eventos
 #define YEL "\x1b[38;2;255;255;000m" //Eventos
@@ -30,7 +32,6 @@
 #define ADD "\x1b[38;2;255;100;100m" //Adicionar
 #define UPD "\x1b[38;2;100;100;255m" //Atualizar
 
-
 #define CENTER Qt::AlignCenter
 #define TOP    Qt::AlignTop
 #define BOTTON Qt::AlignBottom
@@ -41,8 +42,5 @@
 #define ALT   Qt::AltModifier
 #define ENTER Qt::Key_Return
 #define ESC   Qt::Key_Escape
-
-
-#define OPACY 0.8
 
 #endif //OMPLAYER_DEFINES_H

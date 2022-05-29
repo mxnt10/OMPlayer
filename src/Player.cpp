@@ -39,9 +39,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     previousitem(0),
     count(0),
     mUnit(500),
-    about(nullptr),
-    sett(nullptr),
-    preview(nullptr),
     video(nullptr),
     Width("192"),
     Height("108") {
@@ -84,6 +81,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
     connect(mediaPlayer, SIGNAL(stopped()), SLOT(onStop()));
     connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
+    connect(mediaPlayer, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), SLOT(onMediaStatusChanged()));
+    connect(mediaPlayer, SIGNAL(error(QtAV::AVError)), SLOT(handleError(QtAV::AVError)));
 
 
     /** Playlist do reprodutor */
@@ -91,7 +90,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
-    connect(playlist, SIGNAL(firstPlay(QString)), SLOT(firstPlay(QString)));
+    connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
     connect(playlist, SIGNAL(emithiden()), SLOT(setHide()));
     connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
@@ -163,13 +162,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(keyCtrlT, SIGNAL(activated()), SLOT(setReplay()));
 
 
-    /** Semitransparência para o widget dos controles e playlist */
-    qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
-    auto *effect = new QGraphicsOpacityEffect();
-    effect->setOpacity(OPACY);
-
-
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
+    qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
     auto *nohide1 = new Widget();
     connect(nohide1, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(nohide1, SIGNAL(emitLeave()), SLOT(hideTrue()));
@@ -184,7 +178,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     /** Plano de fundo semitransparente dos controles de reprodução */
     auto *bgcontrol = new QWidget();
     bgcontrol->setMaximumHeight(120);
-    bgcontrol->setGraphicsEffect(effect);
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
 
 
@@ -259,7 +252,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
 
     /** Layout principal criado usando sobreposição de widgets */
-    auto *layout = new QGridLayout();
+    layout = new QGridLayout();
     layout->setMargin(0);
     layout->addWidget(video->widget(), 0, 0);
     layout->addWidget(logo, 0, 0);
@@ -290,24 +283,41 @@ void VideoPlayer::openMedia(const QStringList &parms) {
 }
 
 
-/** Opções de Rendenização */
+/** Setando opções de Rendenização */
 void VideoPlayer::setRenderer(const QString &op) {
     VideoRenderer *vo;
-    QString ogl = "openglwidget";
-    QString wdg = "widget";
 
-    if (QString::compare(op, ogl, Qt::CaseSensitive) == 0)
+    if (QString::compare(op, "openglwidget", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_OpenGLWidget);
 
-    if (QString::compare(op, wdg, Qt::CaseSensitive) == 0)
+    if (QString::compare(op, "qglwidget2", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_GLWidget2);
+
+    if (QString::compare(op, "widget", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_Widget);
 
-    vo->widget()->setMouseTracking(true);
+    if (QString::compare(op, "xvideo", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_XV);
+
+    if (QString::compare(op, "x11", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_X11);
+
+
+    /** Verificando se o layout já foi criado. É necessário readicionar o widget ao mudar a renderização. */
+    if (layout) layout->removeWidget(video->widget());
+
     video = new VideoOutput(vo->id(), this);
     mediaPlayer->setRenderer(video);
 
-    if (mediaPlayer->renderer()->id() == VideoRendererId_OpenGLWidget)
+    /** Readicionando o widget ao layout */
+    if (layout) layout->addWidget(video->widget(), 0, 0);
+
+    const VideoRendererId vid = mediaPlayer->renderer()->id();
+    if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
+    else
+        mediaPlayer->renderer()->forcePreferredPixelFormat(false);
+
     qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(op), vo->id());
 }
 
@@ -330,8 +340,9 @@ void VideoPlayer::onLoad() {
 void VideoPlayer::ajustActualItem(int item) {
     int actual = nextitem - 1;
     int c = 0;
-    if (item <= actual) {
+    if (item < actual) {
         c++;
+        playlist->selectCurrent(nextitem - c);
         nextitem--;
         actualitem--;
         previousitem--;
@@ -341,10 +352,14 @@ void VideoPlayer::ajustActualItem(int item) {
             actualitem = playlist->setListSize() - 1;
         if (nextitem == -1)
             nextitem = playlist->setListSize() - 1;
-        if (item < actual)
-            playlist->selectCurrent(actual - c + 1);
-    } else
+    }
+
+    if (item > actual)
         playlist->selectCurrent(actual);
+
+    if (item == actual)
+        play(playlist->getItems(nextitem), nextitem);
+
     listnum.clear();
 }
 
@@ -371,13 +386,18 @@ void VideoPlayer::play(const QString &isplay, int index) {
 
 
 /** Para executar os itens recém adicionados da playlist */
-void VideoPlayer::firstPlay(const QString &isplay) {
+void VideoPlayer::firstPlay(const QString &isplay, int pos) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
-        play(isplay, 0);
-        previousitem = playlist->setListSize() - 1;
-        actualitem = 0;
-        nextitem = 1;
+        play(isplay, pos);
+
+        actualitem = pos;
+        nextitem = actualitem + 1;
+        previousitem = actualitem - 1;
+        if (actualitem == 0)
+            previousitem = playlist->setListSize() - 1;
+        if (actualitem == playlist->setListSize() - 1)
+            nextitem = 0;
     }
 }
 
@@ -755,7 +775,7 @@ void VideoPlayer::hideFalse() {
 
 /** Pré-visualização ao posicionar o mouse no slider */
 void VideoPlayer::onTimeSliderHover(int pos, int value) {
-    int fixH = 72;
+    int fixV = 72;
     QPoint gpos = slider->pos();
 
     /** Definição da posição na tela e exibição do tooltip */
@@ -764,22 +784,22 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
     QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
 
     /** Arquivos de áudio não são vídeos */
-    if (mediaPlayer->currentVideoStream() == (-1)) return;
-    int setX = Utils::calcX(fixH, Width.toInt(), Height.toInt());
+    if (mediaPlayer->currentVideoStream() == (-1) || Width.isEmpty() || Height.isEmpty()) return;
+    int setX = Utils::calcX(fixV, Width.toInt(), Height.toInt());
 
     /** Exibição da pré-visualização */
     preview->setFile(mediaPlayer->file());
     preview->setTimestamp(value * mUnit);
     preview->preview();
-    preview->resize(setX, fixH);
-    preview->move(gpos2 - QPoint(setX/2, fixH));
+    preview->resize(setX, fixV);
+    preview->move(gpos2 - QPoint(setX/2, fixV));
     preview->show();
 }
 
 
 /** Apenas para exibição do debug */
 void VideoPlayer::onTimeSliderEnter() const {
-    if (playing)
+    if (playing && !Width.isEmpty() && !Height.isEmpty())
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
 }
 
@@ -833,6 +853,47 @@ void VideoPlayer::updateSliderUnit() {
     mUnit = mediaPlayer->notifyInterval();
     slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(mUnit))/ mUnit);
     updateSlider(mediaPlayer->position());
+}
+
+
+/** Função para mapear o status de um arquivo multimídia */
+void VideoPlayer::onMediaStatusChanged() {
+    QString status;
+    auto *player = reinterpret_cast<AVPlayer*>(sender());
+    if (!player) return;
+
+    switch (player->mediaStatus()) {
+        case InvalidMedia:
+            status = "Invalid media !";
+            break;
+        case BufferingMedia:
+            status = QString();
+            break;
+        case BufferedMedia:
+            status = "Buffered !";
+            break;
+        case LoadingMedia:
+            status = QString();
+            break;
+        case LoadedMedia:
+            status = "Loaded !";
+            break;
+        case StalledMedia:
+            status = "Stalled !";
+            break;
+        default:
+            status = QString();
+            break;
+    }
+
+    if (!status.isEmpty())
+        qDebug("%s(%sDEBUG%s):%s Status do Arquivo Multimídia %s\033[0m", GRE, RED, GRE, SND, qUtf8Printable(status));
+}
+
+
+/** Debug em caso de eventuais erros */
+void VideoPlayer::handleError(const AVError &error) {
+    qDebug("%s(%sAVError%s):%s %s", GRE, RED, GRE, ERR, qUtf8Printable(error.string()));
 }
 
 
@@ -928,7 +989,7 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
 
     auto *effect = new QGraphicsOpacityEffect();
-    effect->setOpacity(OPACY);
+    effect->setOpacity(0.8);
 
     QMenu contextMenu(tr("Context menu"), this);
     contextMenu.setGraphicsEffect(effect);

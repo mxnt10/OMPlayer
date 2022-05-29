@@ -3,10 +3,6 @@
 
 #include <QDialog>
 
-QT_BEGIN_NAMESPACE
-class QDialog;
-QT_END_NAMESPACE
-
 class Button;
 
 
@@ -27,8 +23,12 @@ signals:
 
 private slots:
     void onClose();
+    void rendererReset();
     void setOpenglwidget();
     void setWidgetrend();
+    void setQGLWidget2();
+    void setX11rend();
+    void setXVideorend();
 
 private:
     Button *openglwidget, *qglwidget2, *widgetrend, *xvideorend, *x11rend;

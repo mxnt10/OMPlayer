@@ -51,7 +51,7 @@ protected:
 
 signals:
     void aboutToPlay(const QString &url);
-    void firstPlay(const QString &url);
+    void firstPlay(const QString &url, int row);
     void selected(int item);
     void emitremove(int item);
     void emitstop();

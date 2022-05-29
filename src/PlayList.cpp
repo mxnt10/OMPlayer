@@ -2,7 +2,6 @@
 #include <QDataStream>
 #include <QFile>
 #include <QFileDialog>
-#include <QGraphicsOpacityEffect>
 #include <QLayout>
 #include <QFrame>
 #include <QMoveEvent>
@@ -28,16 +27,11 @@ using std::filesystem::exists;
 
 
 /** Construtor do painel da playlist */
-PlayList::PlayList(QWidget *parent) : QWidget(parent) {
+PlayList::PlayList(QWidget *parent) : QWidget(parent),
+    isshow(false),
+    maxRows(-1) {
     this->setMouseTracking(true);
-    isshow = false;
-    maxRows = -1;
     model = new PlayListModel(this);
-
-
-    /** Efeito semitransparente para o fundo da playlist */
-    auto *effect = new QGraphicsOpacityEffect();
-    effect->setOpacity(OPACY);
 
 
     /** Lista para visualização da playlist */
@@ -61,7 +55,6 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Plano de fundo da playlist */
     auto *bgpls = new QWidget();
-    bgpls->setGraphicsEffect(effect);
     bgpls->setStyleSheet(Utils::setStyle("widget"));
 
 
@@ -98,7 +91,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     gbl->addItem(new QSpacerItem(0, 0, Expanding, Expanding), 0, 0, 1, 2);
     gbl->addWidget(bgpls, 0, 1, 1, 3);
     gbl->addWidget(wpls, 0, 1, 1, 3);
-    gbl->setAlignment(AlignRight);
+    gbl->setAlignment(RIGHT);
     wpls->setVisible(false);
     setLayout(gbl);
 }
@@ -225,7 +218,7 @@ void PlayList::addItems(const QStringList &parms) {
         }
     }
     save();
-    emit firstPlay(isplay);
+    emit firstPlay(isplay, t);
 }
 
 

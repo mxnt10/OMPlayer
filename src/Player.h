@@ -25,6 +25,7 @@ namespace MediaInfoDLL {
 }
 
 QT_BEGIN_NAMESPACE
+class QGridLayout;
 class QTimer;
 class QWidget;
 QT_END_NAMESPACE
@@ -50,19 +51,19 @@ public:
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
-    void runLoad();
     void onLoad();
+
+private Q_SLOTS:
+    void runLoad();
     void setSelect(int item);
     void ajustActualItem(int item);
-    void firstPlay(const QString &name);
+    void firstPlay(const QString &name, int pos);
     void doubleplay(const QString &name);
     void setReplay();
     void setShuffle();
     void seekBySlider();
     void seekBySlider(int value);
     void ShowContextMenu(const QPoint &pos);
-
-private Q_SLOTS:
     void play(const QString &isplay, int index = (-1));
     void setRenderer(const QString &op);
     void playPause();
@@ -89,6 +90,8 @@ private Q_SLOTS:
     void updateSlider(qint64 value);
     void updateSliderUnit();
     void detectClick();
+    void onMediaStatusChanged();
+    static void handleError(const QtAV::AVError &error);
 
 protected:
     bool event(QEvent *event) override;
@@ -107,6 +110,7 @@ private:
     MediaInfo MI;
     PlayList *playlist;
     Label *logo, *current, *end;
+    QGridLayout *layout;
     QString Width, Height;
     QStringList listnum;
     QTimer *click;

@@ -1,6 +1,6 @@
 /* Definição para os widgets de fundo */
 QWidget {
-    background-color: black;
+    background-color: rgba(0, 0, 0, 200);
     border: 2px ridge #cccccc;
     border-radius: 10px;
 }

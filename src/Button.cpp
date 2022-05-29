@@ -15,7 +15,10 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     theme = "circle";
     ico = icon; /** Apenas para o debug */
     num = size;
+    fix = fixed;
     setIconSize(QSize(num, num));
+    setFocusPolicy(Qt::NoFocus);
+    setStyleSheet("QPushButton { border: 0; }");
 
     if (fixed) setFixedSize(num, num);
     if (!text.isEmpty()) setText("  " + text);
@@ -31,12 +34,11 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
         transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
         upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
         setToolTip(QString::fromStdString(upper));
-    } else
+    } else if (QString::compare(tooltip, NOTOOLTIP, Qt::CaseSensitive) != 0)
         setToolTip(tooltip);
 
-    setFocusPolicy(Qt::NoFocus);
-    setStyleSheet("QPushButton { border: 0; }");
-    connect(this, SIGNAL(pressed()), SLOT(onEffect()));
+    if (fixed)
+        connect(this, SIGNAL(pressed()), SLOT(onEffect()));
 }
 
 
@@ -67,8 +69,9 @@ void Button::unEffect() {
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent(QEvent *event) {
     qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
-    setIconSize(QSize(num + 2, num + 2));
     emit emitEnter();
+
+    if (fix) setIconSize(QSize(num + 2, num + 2));
     QPushButton::enterEvent(event);
 }
 

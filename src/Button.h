@@ -1,6 +1,8 @@
 #ifndef OMPLAYER_BUTTON_H
 #define OMPLAYER_BUTTON_H
 
+#define NOTOOLTIP "NONE"
+
 #include <QPushButton>
 
 /**
@@ -24,6 +26,7 @@ protected:
 
 private:
     int num;
+    bool fix;
     QString ico;
     const char *theme;
 

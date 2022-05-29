@@ -1,5 +1,4 @@
-#include <QGraphicsEffect>
-#include <QGridLayout>
+#include <QLayout>
 #include <QMouseEvent>
 
 #include "About.h"
@@ -55,14 +54,8 @@ About::About(QWidget *parent) : QDialog(parent) {
     labout->addWidget(closebtn, 3, 1, RIGHT | BOTTON);
 
 
-    /** Efeito para o widget principal */
-    auto *effect = new QGraphicsOpacityEffect();
-    effect->setOpacity(OPACY);
-
-
     /** Widget para o plano de fundo */
     auto *found = new QWidget();
-    found->setGraphicsEffect(effect);
     found->setStyleSheet(Utils::setStyle("widget"));
 
 

@@ -2,8 +2,7 @@
 #define OMPLAYER_SETTINGS_H
 
 #include <QDialog>
-
-class Button;
+#include "Button.h"
 
 
 /**
@@ -32,7 +31,6 @@ private slots:
 
 private:
     Button *openglwidget, *qglwidget2, *widgetrend, *xvideorend, *x11rend;
-    const char *theme;
 };
 
 

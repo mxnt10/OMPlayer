@@ -4,9 +4,9 @@
 #include <filesystem>
 
 #include "Defines.h"
+#include "JsonTools.h"
 #include "Utils.h"
 
-using namespace std;
 using std::filesystem::exists;
 
 
@@ -40,21 +40,9 @@ QString Utils::setIcon(bool logo) {
 }
 
 
-/** Detecção de localização dos arquivos Qss */
-QString Utils::setQssLocal(const string &file) {
-    QString qFile = QString::fromStdString(file) + ".qss";
-    QString qss = "/usr/share/OMPlayer/qss/" + qFile;
-    QString lQss = getLocal() + "/qss/" + qFile;
-
-    if (exists(qss.toStdString())) return qss;
-    else if (exists(lQss.toStdString())) return lQss;
-    return {};
-}
-
-
 /** Função que vai selecionar o tema dos ícones */
-QString Utils::setIconTheme(const string &theme, const string &icon) {
-    QString fileTheme = QString::fromStdString(theme) + "/" + QString::fromStdString(icon);
+QString Utils::setIconTheme(const QString &ftheme, const QString &icon) {
+    QString fileTheme = ftheme + "/" + icon;
     QString iconFile = "/usr/share/OMPlayer/icons/" + fileTheme;
     QString lIconFile = getLocal() + "/icons/" + fileTheme;
 
@@ -74,10 +62,18 @@ QString Utils::setIconTheme(const string &theme, const string &icon) {
 
 
 /** Função que retorna as configurações do estilo selecionado */
-QString Utils::setStyle(const string &style) {
-    qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, style.c_str());
-    QString qss = setQssLocal(style);
-    QFile file(qss);
+QString Utils::setStyle(const QString &style) {
+    qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, qUtf8Printable(style));
+
+    QString qst = nullptr;
+    QString qFile = style + ".qss";
+    QString qss = "/usr/share/OMPlayer/qss/" + qFile;
+    QString lQss = getLocal() + "/qss/" + qFile;
+
+    if (exists(qss.toStdString())) qst = qss;
+    else if (exists(lQss.toStdString())) qst = lQss;
+
+    QFile file(qst);
     file.open(QFile::ReadOnly);
     QString styleSheet{QLatin1String(file.readAll())};
     return styleSheet;
@@ -97,40 +93,32 @@ QString Utils::mediaTitle(const QString &mediafile){
 
 
 /** Função criada para retornar os ícones equivalentes disponíveis no sistema */
-QString Utils::defaultIcon(const string &icon) {
-    qDebug("%s(%sDEBUG%s):%s Usando ícone do sistema para %s ...\033[0m", GRE, RED, GRE, BLU, icon.c_str());
+QString Utils::defaultIcon(const QString &icon) {
+    qDebug("%s(%sDEBUG%s):%s Usando ícone do sistema para %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(icon));
 
-    /** ícones dos controles de reprodução */
-    if (icon == "play")
-        return "media-playback-start";
-    if (icon == "pause")
-        return "media-playback-pause";
-    if (icon == "stop")
-        return "media-playback-stop";
-    if (icon == "next")
-        return "media-skip-forward";
-    if (icon == "previous")
-        return "media-skip-backward";
-    if (icon == "replay")
+    if (icon == "play")     return "media-playback-start";
+    if (icon == "pause")    return "media-playback-pause";
+    if (icon == "stop")     return "media-playback-stop";
+    if (icon == "next")     return "media-skip-forward";
+    if (icon == "previous") return "media-skip-backward";
+
+    if (icon == "replay" || icon == "replay-menu")
         return "media-playlist-repeat";
-    if (icon == "shuffle")
+    if (icon == "shuffle" || icon == "shuffle-menu")
         return "media-playlist-shuffle";
 
-    /** Ícones dos botões da playlist */
-    if (icon == "add")
-        return "list-add";
-    if (icon == "remove")
-        return "list-remove";
-    if (icon == "clean")
-        return "edit-delete";
+    if (icon == "add")    return "list-add";
+    if (icon == "remove") return "list-remove";
+    if (icon == "clean")  return "im-ban-kick-user";
 
-    /** Botões em settings */
-    if (icon == "radio-select")
-        return "emblem-checked";
-    if (icon == "radio-unselect")
-        return "package-available";
-    if (icon == "apply")
-        return "dialog-ok-apply";
+    if (icon == "radio-select")   return "emblem-checked";
+    if (icon == "radio-unselect") return "package-available";
+    if (icon == "apply")          return "dialog-ok-apply";
+
+    if (icon == "folder")     return "document-open-folder";
+    if (icon == "fullscreen") return "view-fullscreen";
+    if (icon == "settings")   return "configure";
+    if (icon == "about")      return "help-about";
 
     return{}; /** Se não estiver disponível, vai sem mesmo */
 }
@@ -143,11 +131,11 @@ int Utils::calcX(int z, int x, int y) {
 
 
 /** Cálculo do diferença do intervalo de tempo */
-int Utils::setDifere(int mUnit) {
-    if (mUnit == 500) return mUnit;
-    if (mUnit == 250) return mUnit * 2;
-    if (mUnit <= 47) return mUnit * 4;
-    return mUnit * 3;
+int Utils::setDifere(int unit) {
+    if (unit == 500) return unit;
+    if (unit == 250) return unit * 2;
+    if (unit <= 47)  return unit * 4;
+    return unit * 3;
 }
 
 
@@ -160,4 +148,22 @@ void Utils::arrowMouse() {
 /** Ocultar mouse */
 void Utils::blankMouse() {
     QApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
+}
+
+
+/** Alteração dos botões */
+void Utils::changeIcon(Button *btn, const QString &thm) {
+    QString theme = JsonTools::readJson("theme");
+    if (Utils::setIconTheme(theme, thm) == nullptr)
+        btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
+    else btn->setIcon(QIcon(Utils::setIconTheme(theme, thm)));
+}
+
+
+/** Definição dos ícones do menu */
+void Utils::changeMenuIcon(QAction &btn, const QString &thm) {
+    QString theme = JsonTools::readJson("theme");
+    if (Utils::setIconTheme(theme, thm) == nullptr)
+        btn.setIcon(QIcon::fromTheme(defaultIcon(thm)));
+    else btn.setIcon(QIcon(Utils::setIconTheme(theme, thm)));
 }

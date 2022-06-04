@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QMouseEvent>
-#include <QSlider>
 #include <QStyleOption>
 
 #include "Defines.h"

@@ -4,7 +4,7 @@
 
 
 /** Definições para alteração */
-#define DEBUG true
+#define DEBUG false
 #define VERSION "1.4"
 
 

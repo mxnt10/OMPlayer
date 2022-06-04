@@ -17,7 +17,7 @@ class Utils {
 public:
     static QString getLocal();
     static QString setIcon(bool logo = false);
-    static QString setIconTheme(const QString &ftheme, const QString &icon);
+    static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
     static QString mediaTitle(const QString &mediafile);
     static QString defaultIcon(const QString &icon);

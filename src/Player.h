@@ -109,7 +109,7 @@ private:
     MediaInfo MI;
     PlayList *playlist;
     Label *logo, *current, *end;
-    QGridLayout *layout;
+    QGridLayout *layout{};
     QString Width, Height;
     QStringList listnum;
     QTimer *click;
@@ -120,8 +120,7 @@ private:
     VideoPreviewWidget *preview;
     bool playing, pausing, restart, randplay;
     bool contextmenu, enterpos, isblock, maximize, moving, showsett;
-    int previousitem, actualitem, nextitem, mUnit, count;
-    const char a{};
+    int previousitem, actualitem, nextitem, unit, count;
 };
 
 #endif //OMPLAYER_PLAYER_H

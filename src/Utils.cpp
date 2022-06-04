@@ -41,8 +41,8 @@ QString Utils::setIcon(bool logo) {
 
 
 /** Função que vai selecionar o tema dos ícones */
-QString Utils::setIconTheme(const QString &ftheme, const QString &icon) {
-    QString fileTheme = ftheme + "/" + icon;
+QString Utils::setIconTheme(const QString &theme, const QString &icon) {
+    QString fileTheme = theme + "/" + icon;
     QString iconFile = "/usr/share/OMPlayer/icons/" + fileTheme;
     QString lIconFile = getLocal() + "/icons/" + fileTheme;
 

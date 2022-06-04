@@ -38,7 +38,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     nextitem(0),
     previousitem(0),
     count(0),
-    mUnit(500),
+    unit(500),
     Width("192"),
     Height("108") {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
@@ -582,7 +582,7 @@ void VideoPlayer::onStart() {
 
     /** Definindo o tempo de duração no slider */
     slider->setMinimum(int(mediaPlayer->mediaStartPosition()));
-    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(mUnit))/ mUnit);
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
     end->setText(QTime(0, 0, 0).addMSecs(int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
 
     /** Correção dos itens adicionados */
@@ -759,7 +759,7 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
     /** Definição da posição na tela e exibição do tooltip */
     QPoint gpos1 = mapToGlobal(gpos + QPoint(pos + 12, 5));
     QPoint gpos2 = mapToGlobal(gpos + QPoint(pos, -7));
-    QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * mUnit).toString(QString::fromLatin1("HH:mm:ss")), this);
+    QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * unit).toString(QString::fromLatin1("HH:mm:ss")), this);
 
     /** Arquivos de áudio não são vídeos */
     if (mediaPlayer->currentVideoStream() == (-1) || Width.isEmpty() || Height.isEmpty()) return;
@@ -767,7 +767,7 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 
     /** Exibição da pré-visualização */
     preview->setFile(mediaPlayer->file());
-    preview->setTimestamp(value * mUnit);
+    preview->setTimestamp(value * unit);
     preview->preview();
     preview->resize(setX, fixV);
     preview->move(gpos2 - QPoint(setX/2, fixV));
@@ -795,7 +795,7 @@ void VideoPlayer::onTimeSliderLeave() {
 void VideoPlayer::seekBySlider(int value) {
     if (!mediaPlayer->isPlaying()) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
-    mediaPlayer->seek(qint64(qint64(value) * mUnit));
+    mediaPlayer->seek(qint64(qint64(value) * unit));
 }
 
 
@@ -808,11 +808,11 @@ void VideoPlayer::seekBySlider() {
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSlider(qint64 value) {
     if (mediaPlayer->isSeekable())
-        slider->setValue(int(value / mUnit));
+        slider->setValue(int(value / unit));
     current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
 
     /** Próxima mídia */
-    if (int(value) > mediaPlayer->duration() - Utils::setDifere(mUnit)) {
+    if (int(value) > mediaPlayer->duration() - Utils::setDifere(unit)) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             mediaPlayer->stop();
             playing = false;
@@ -828,8 +828,8 @@ void VideoPlayer::updateSlider(qint64 value) {
 
 /** Função para atualizar a barra de progresso de execução */
 void VideoPlayer::updateSliderUnit() {
-    mUnit = mediaPlayer->notifyInterval();
-    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(mUnit))/ mUnit);
+    unit = mediaPlayer->notifyInterval();
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
     updateSlider(mediaPlayer->position());
 }
 

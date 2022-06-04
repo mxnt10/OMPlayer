@@ -27,8 +27,7 @@ protected:
 private:
     int num;
     bool fix;
-    QString ico;
-    const char *theme;
+    QString ico, txt;
 
 signals:
     void emitEnter();

@@ -3,6 +3,7 @@
 
 #include "Button.h"
 #include "Defines.h"
+#include "JsonTools.h"
 #include "Utils.h"
 
 using namespace std;
@@ -12,21 +13,22 @@ using namespace std;
 
 /** Construtor que define a classe dos botões do reprodutor */
 Button::Button(const QString &icon, int size, const QString &tooltip, const QString &text, bool fixed) {
-    theme = "circle";
     ico = icon; /** Apenas para o debug */
     num = size;
     fix = fixed;
+    txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
     setStyleSheet("QPushButton { border: 0; }");
 
     if (fixed) setFixedSize(num, num);
-    if (!text.isEmpty()) setText("  " + text);
+    if (!text.isEmpty()) setText(txt);
 
     /** Definindo ícone */
-    if (Utils::setIconTheme(theme, icon.toStdString()) == nullptr)
-        setIcon(QIcon::fromTheme(Utils::defaultIcon(icon.toStdString())));
-    else setIcon(QIcon(Utils::setIconTheme(theme, icon.toStdString())));
+    QString theme = JsonTools::readJson("theme");
+    if (Utils::setIconTheme(theme, icon) == nullptr)
+        setIcon(QIcon::fromTheme(Utils::defaultIcon(icon)));
+    else setIcon(QIcon(Utils::setIconTheme(theme, icon)));
 
     /** ToolTip */
     if (tooltip.isEmpty()) {
@@ -68,17 +70,24 @@ void Button::unEffect() {
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent(QEvent *event) {
-    qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
     emit emitEnter();
 
-    if (fix) setIconSize(QSize(num + 2, num + 2));
+    if (fix) {
+        qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
+        setIconSize(QSize(num + 2, num + 2));
+    } else {
+        qDebug("%s(%sDEBUG%s):%s Mouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
+        setText(" " + txt);
+    }
     QPushButton::enterEvent(event);
 }
 
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    setIconSize(QSize(num, num));
+    if (fix)
+        setIconSize(QSize(num, num));
+    else
+        setText(txt);
     QPushButton::leaveEvent(event);
 }
-

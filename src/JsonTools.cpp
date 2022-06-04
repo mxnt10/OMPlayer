@@ -12,6 +12,7 @@
 /** Função que retorna a estrutura que irá possuir o arquivo json original */
 QString JsonTools::defaultJson() {
     return "{"
+           "    \"theme\": \"circle\","
            "    \"renderer\": \"openglwidget\""
            "}";
 }

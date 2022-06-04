@@ -1,25 +1,12 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
-#include <QWidget>
 #include <QModelIndex>
+
+#include "Button.h"
+#include "ListView.h"
 #include "PlayListItem.h"
-
-
-/**
- * Declaração das classes.
- **********************************************************************************************************************/
-
-
-QT_BEGIN_NAMESPACE
-class QModelIndex;
-class QString;
-class QWidget;
-QT_END_NAMESPACE
-
-class Button;
-class ListView;
-class PlayListModel;
+#include "PlayListModel.h"
 
 
 /**

@@ -1,20 +1,14 @@
 #include <QCryptographicHash>
-#include <QDataStream>
 #include <QFile>
 #include <QFileDialog>
 #include <QLayout>
-#include <QFrame>
 #include <QMoveEvent>
-#include <QSpacerItem>
 #include <QStandardPaths>
 
 #include <filesystem>
 
-#include "Button.h"
 #include "Defines.h"
-#include "ListView.h"
 #include "PlayList.h"
-#include "PlayListModel.h"
 #include "Utils.h"
 
 using namespace Qt;

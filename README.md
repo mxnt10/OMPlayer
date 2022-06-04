@@ -9,9 +9,7 @@
             which uses ffmpeg for handling multimedia files.
         </h3>
         <h3 align="center">
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview1.png" alt=""></a>
-            <br/><br/>
-            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/common/preview2.png" alt=""></a>
+            <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
         </h3><br/>
     </body>
 </html>

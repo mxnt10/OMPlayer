@@ -42,6 +42,13 @@ $ sudo su
 ```
 The script already does the compilation.
 
+## Limitations
+
+- The framework does not have the next and previous functions,
+so it was necessary to create methods in the code to guarantee these functionalities.
+- It is only possible to get the information of the multimedia file while it is playing,
+so it was necessary to adjust the code to obtain this information using other methods.
+
 ## GNU General Public License
 
 This repository has scripts that were created to be free software.<br/>

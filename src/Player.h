@@ -3,7 +3,19 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
+
+#include <QLayout>
+#include <QTimer>
+
 #include <MediaInfoDLL.h>
+
+#include "About.h"
+#include "Button.h"
+#include "Label.h"
+#include "PlayList.h"
+#include "Settings.h"
+#include "Slider.h"
+#include "Widget.h"
 
 using namespace QtAV;
 using MediaInfoDLL::MediaInfo;
@@ -23,19 +35,6 @@ namespace QtAV {
 namespace MediaInfoDLL {
     class MediaInfo;
 }
-
-QT_BEGIN_NAMESPACE
-class QGridLayout;
-class QTimer;
-class QWidget;
-QT_END_NAMESPACE
-
-class About;
-class Button;
-class Label;
-class PlayList;
-class Settings;
-class Slider;
 
 
 /**
@@ -117,13 +116,12 @@ private:
     QWidget *wctl;
     Settings *sett;
     Slider *slider;
-    VideoOutput *video;
+    VideoOutput *video{};
     VideoPreviewWidget *preview;
-    int mUnit, count;
-    int previousitem, actualitem, nextitem;
     bool playing, pausing, restart, randplay;
     bool contextmenu, enterpos, isblock, maximize, moving, showsett;
-    const char *theme;
+    int previousitem, actualitem, nextitem, mUnit, count;
+    const char a{};
 };
 
 #endif //OMPLAYER_PLAYER_H

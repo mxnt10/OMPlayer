@@ -1,20 +1,20 @@
-#include <QtCore>
-#include <QtWidgets> // Inclui tudo e não se incomoda
+#include <QDir>
+#include <QGraphicsOpacityEffect>
+#include <QGuiApplication>
+#include <QMenu>
+#include <QMouseEvent>
+#include <QRandomGenerator>
+#include <QShortcut>
+#include <QScreen>
+#include <QToolTip>
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
 
-#include "About.h"
-#include "Button.h"
 #include "Defines.h"
 #include "JsonTools.h"
-#include "Label.h"
 #include "Player.h"
-#include "PlayList.h"
-#include "Settings.h"
-#include "Slider.h"
 #include "Utils.h"
-#include "Widget.h"
 
 using namespace MediaInfoDLL;
 
@@ -39,7 +39,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     previousitem(0),
     count(0),
     mUnit(500),
-    video(nullptr),
     Width("192"),
     Height("108") {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
@@ -49,7 +48,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     this->setMinimumSize(906, 510);
     this->setMouseTracking(true); /** Mapeamento do mouse */
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
-    theme = "circle";
 
 
     /** Habilitando o menu de contexto */
@@ -181,11 +179,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
 
 
-    /** Não tem como mapear a posição do mouse sem isso */
-    auto *mpos = new QWidget();
-    mpos->setMouseTracking(true);
-
-
     /** Ajuste do plano de fundo dos controles */
     auto *bgctl = new QGridLayout();
     bgctl->setMargin(10);
@@ -249,6 +242,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     /** Definição da logo */
     logo = new Label(CENTER);
     logo->setPixmap(QPixmap(Utils::setIcon(true)));
+    logo->setMouseTracking(true);
 
 
     /** Layout principal criado usando sobreposição de widgets */
@@ -256,7 +250,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     layout->setMargin(0);
     layout->addWidget(video->widget(), 0, 0);
     layout->addWidget(logo, 0, 0);
-    layout->addWidget(mpos, 0, 0);
     layout->addWidget(wctl, 0, 0);
     this->setLayout(layout);
     wctl->setVisible(false);
@@ -307,6 +300,7 @@ void VideoPlayer::setRenderer(const QString &op) {
     if (layout) layout->removeWidget(video->widget());
 
     video = new VideoOutput(vo->id(), this);
+    video->widget()->setMouseTracking(true);
     mediaPlayer->setRenderer(video);
 
     /** Readicionando o widget ao layout */
@@ -546,15 +540,11 @@ void VideoPlayer::setStop() {
 void VideoPlayer::onPaused(bool paused) {
     if (paused) {
         qDebug("%s(%sDEBUG%s):%s Pausando ...\033[0m", GRE, RED, GRE, ORA);
-        if (Utils::setIconTheme(theme, "play") == nullptr)
-            playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
-        else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
+        Utils::changeIcon(playBtn, "play");
         playBtn->setToolTip("Play");
     } else {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo ...\033[0m", GRE, RED, GRE, ORA);
-        if (Utils::setIconTheme(theme, "pause") == nullptr)
-            playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
-        else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
+        Utils::changeIcon(playBtn, "pause");
         playBtn->setToolTip("Pause");
     }
 }
@@ -566,9 +556,7 @@ void VideoPlayer::onStart() {
     slider->setDisabled(false);
     playing = true;
 
-    if (Utils::setIconTheme(theme, "pause") == nullptr)
-        playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("pause")));
-    else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "pause")));
+    Utils::changeIcon(playBtn, "pause");
     playBtn->setToolTip("Pause");
 
     /** Definindo dimensões para o preview */
@@ -617,9 +605,7 @@ void VideoPlayer::onStop() {
         qDebug("%s(%sDEBUG%s):%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, ORA);
         this->setWindowTitle(QString(PRG_NAME));
 
-        if (Utils::setIconTheme(theme, "play") == nullptr)
-            playBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("play")));
-        else playBtn->setIcon(QIcon(Utils::setIconTheme(theme, "play")));
+        Utils::changeIcon(playBtn, "play");
         playBtn->setToolTip("Play");
 
         slider->setMaximum(0);
@@ -642,14 +628,10 @@ void VideoPlayer::onStop() {
 void VideoPlayer::setReplay() {
     if (!restart) {
         restart = true;
-        if (Utils::setIconTheme(theme, "replay-on") == nullptr)
-            replayBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("replay-on")));
-        else replayBtn->setIcon(QIcon(Utils::setIconTheme(theme, "replay-on")));
+        Utils::changeIcon(replayBtn, "replay-on");
     } else {
         restart = false;
-        if (Utils::setIconTheme(theme, "replay") == nullptr)
-            replayBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("replay")));
-        else replayBtn->setIcon(QIcon(Utils::setIconTheme(theme, "replay")));
+        Utils::changeIcon(replayBtn, "replay");
     }
 }
 
@@ -658,14 +640,10 @@ void VideoPlayer::setReplay() {
 void VideoPlayer::setShuffle() {
     if (!randplay) {
         randplay = true;
-        if (Utils::setIconTheme(theme, "shuffle-on") == nullptr)
-            shuffleBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("shuffle-on")));
-        else shuffleBtn->setIcon(QIcon(Utils::setIconTheme(theme, "shuffle-on")));
+        Utils::changeIcon(shuffleBtn, "shuffle-on");
     } else {
         randplay = false;
-        if (Utils::setIconTheme(theme, "shuffle") == nullptr)
-            shuffleBtn->setIcon(QIcon::fromTheme(Utils::defaultIcon("shuffle")));
-        else shuffleBtn->setIcon(QIcon(Utils::setIconTheme(theme, "shuffle")));
+        Utils::changeIcon(shuffleBtn, "shuffle");
     }
 }
 
@@ -986,6 +964,7 @@ void VideoPlayer::closeEvent(QCloseEvent *event) {
 /** Função para o menu de contexto do programa */
 void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     contextmenu = true;
+    Utils::arrowMouse();
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
 
     auto *effect = new QGraphicsOpacityEffect();
@@ -999,9 +978,8 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     /** Menu de abrir */
     QAction open("Open Files", this);
     open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
-    if (Utils::setIconTheme(theme, "folder") == nullptr)
-        open.setIcon(QIcon(style()->standardIcon(QStyle::SP_DirOpenIcon)));
-    else open.setIcon(QIcon(Utils::setIconTheme(theme, "folder")));
+    Utils::changeMenuIcon(open, "folder");
+    connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
 
 
     /** Menu tela cheia */
@@ -1009,48 +987,34 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     if (this->isFullScreen())
         fullscreen.setText("Exit Fullscreen");
     fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
-    if (Utils::setIconTheme(theme, "fullscreen") == nullptr)
-        fullscreen.setIcon(QIcon::fromTheme("view-fullscreen"));
-    else fullscreen.setIcon(QIcon(Utils::setIconTheme(theme, "fullscreen")));
+    Utils::changeMenuIcon(fullscreen, "fullscreen");
+    connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
 
     /** Menu aleatório */
     QAction shuffle("Shuffle", this);
     shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
-    if (Utils::setIconTheme(theme, "shuffle-menu") == nullptr)
-        shuffle.setIcon(QIcon::fromTheme("media-playlist-shuffle"));
-    else shuffle.setIcon(QIcon(Utils::setIconTheme(theme, "shuffle-menu")));
+    Utils::changeMenuIcon(shuffle, "shuffle-menu");
+    connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
 
 
     /** Menu repetir */
     QAction replay("Replay", this);
     replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
-    if (Utils::setIconTheme(theme, "replay-menu") == nullptr)
-        replay.setIcon(QIcon::fromTheme("media-playlist-repeat"));
-    else replay.setIcon(QIcon(Utils::setIconTheme(theme, "replay-menu")));
+    Utils::changeMenuIcon(replay, "replay-menu");
+    connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
 
 
     /** Menu de configuração */
     QAction settings("Settings", this);
     settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
-    if (Utils::setIconTheme(theme, "settings") == nullptr)
-        settings.setIcon(QIcon(style()->standardIcon(QStyle::SP_DialogApplyButton)));
-    else settings.setIcon(QIcon(Utils::setIconTheme(theme, "settings")));
+    Utils::changeMenuIcon(settings, "settings");
+    connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
 
 
     /** Menu sobre */
     QAction mabout("About", this);
-    if (Utils::setIconTheme(theme, "about") == nullptr)
-        mabout.setIcon(QIcon::fromTheme("help-about"));
-    else mabout.setIcon(QIcon(Utils::setIconTheme(theme, "about")));
-
-
-    /** Ações do menu */
-    connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
-    connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
-    connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
-    connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
-    connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
+    Utils::changeMenuIcon(mabout, "about");
     connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
 
 
@@ -1064,7 +1028,5 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     contextMenu.addSeparator();
     contextMenu.addAction(&settings);
     contextMenu.addAction(&mabout);
-
-    Utils::arrowMouse();
     contextMenu.exec(mapToGlobal(pos));
 }

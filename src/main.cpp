@@ -20,7 +20,10 @@
  *
  **********************************************************************************************************************/
 
-#include <QtCore> // Inclui tudo e não te incomoda
+#include <QDir>
+#include <QLoggingCategory>
+#include <QCommandLineParser>
+
 #include <filesystem>
 #include <SingleApplication>
 

@@ -46,8 +46,8 @@ The script already does the compilation.
 
 - The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
-- It is only possible to get the information of the multimedia file while it is playing,
-so it was necessary to adjust the code to obtain this information using other methods.
+- It is only possible to obtain the information of the multimedia file during its playback,
+so adjustments in the code were necessary to obtain this information through other methods.
 
 ## GNU General Public License
 

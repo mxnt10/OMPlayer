@@ -27,7 +27,7 @@
 - Ctrl+O: Open files.
 - Ctrl+H: Shuffle mode.
 - Ctrl+T: Repeat mode.
-- Alt+Enter: Fullscreen.
+- Alt+Enter: Show/exit fullscreen.
 - Esc: Exit fullscreen.
 
 ## Installation instructions

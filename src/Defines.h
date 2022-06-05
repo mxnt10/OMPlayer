@@ -2,13 +2,8 @@
 #define OMPLAYER_DEFINES_H
 #include <Qt>
 
-
-/** Definições para alteração */
-#define DEBUG false
 #define VERSION "1.4"
 
-
-/** Definição de cores para o Debug em RGB: \x1b[38;2;000;000;000m */
 #define GRE "\x1b[38;2;000;255;000m" //Debug
 #define RED "\x1b[38;2;255;050;050m" //Debug
 

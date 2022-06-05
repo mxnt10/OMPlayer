@@ -31,6 +31,8 @@
 #include "JsonTools.h"
 #include "Player.h"
 
+#define DEBUG true
+
 using std::filesystem::create_directory;
 
 

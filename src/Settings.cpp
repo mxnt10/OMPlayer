@@ -65,10 +65,10 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     auto *renderer = new QWidget();
     auto *oprenderer = new QGridLayout(renderer);
     oprenderer->addWidget(openglwidget, 0, 0, LEFT);
-//    oprenderer->addWidget(qglwidget2, 1, 0, LEFT);
+    oprenderer->addWidget(qglwidget2, 1, 0, LEFT);
     oprenderer->addWidget(widgetrend, 2, 0, LEFT);
-//    oprenderer->addWidget(xvideorend, 3, 0, LEFT);
-//    oprenderer->addWidget(x11rend, 4, 0, LEFT);
+    oprenderer->addWidget(xvideorend, 3, 0, LEFT);
+    oprenderer->addWidget(x11rend, 4, 0, LEFT);
 
 
    /** Organização por abas */

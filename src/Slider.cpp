@@ -82,20 +82,19 @@ void Slider::mousePressEvent(QMouseEvent *event) {
 
         if (!sliderRect.contains(event->pos())) {
             event->accept();
-            setSliderPosition(pixelPosToRangeValue(pick(event->pos() - center)));
+            int value = pixelPosToRangeValue(pick(event->pos() - center));
+            setSliderPosition(value);
             triggerAction(SliderMove);
             setRepeatAction(SliderNoAction);
 
             /** Emições que são feitas para habilitar o recurso de mudar a posição do QSlider clicando em
              * qualquer lugar do QSlider. */
-            emit sliderMoved(pixelPosToRangeValue(pick(event->pos() - center)));
+            emit sliderMoved(value);
             emit sliderPressed();
-        } else {
+        } else
             QSlider::mousePressEvent(event);
-        }
-    } else {
+    } else
         QSlider::mousePressEvent(event);
-    }
 }
 
 

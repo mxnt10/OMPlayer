@@ -26,7 +26,7 @@ signals:
     void emitLeave();
 
 private:
-    QString txt;
+    QString txt{};
 };
 
 #endif //OMPLAYER_LABEL_H

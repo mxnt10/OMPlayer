@@ -25,9 +25,10 @@ protected:
     void leaveEvent(QEvent *event) override;
 
 private:
-    int num;
-    bool fix;
-    QString ico, txt;
+    int num{0};
+    bool fix{false};
+    QString ico{};
+    QString txt{};
 
 signals:
     void emitEnter();

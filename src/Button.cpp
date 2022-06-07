@@ -13,7 +13,7 @@ using namespace std;
 
 /** Construtor que define a classe dos botões do reprodutor */
 Button::Button(const QString &icon, int size, const QString &tooltip, const QString &text, bool fixed) {
-    ico = icon; /** Apenas para o debug */
+    ico = icon;
     num = size;
     fix = fixed;
     txt = text;
@@ -26,13 +26,13 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
 
     /** Definindo ícone */
     QString theme = JsonTools::readJson("theme");
-    if (Utils::setIconTheme(theme, icon) == nullptr)
-        setIcon(QIcon::fromTheme(Utils::defaultIcon(icon)));
-    else setIcon(QIcon(Utils::setIconTheme(theme, icon)));
+    if (Utils::setIconTheme(theme, ico) == nullptr)
+        setIcon(QIcon::fromTheme(Utils::defaultIcon(ico)));
+    else setIcon(QIcon(Utils::setIconTheme(theme, ico)));
 
     /** ToolTip */
     if (tooltip.isEmpty()) {
-        string upper = icon.toStdString();
+        string upper = ico.toStdString();
         transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
         upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
         setToolTip(QString::fromStdString(upper));

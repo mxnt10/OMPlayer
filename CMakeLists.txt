@@ -32,16 +32,17 @@ add_executable(
         OMPlayer
         src/main.cpp
         src/Defines.h
-        src/About.cpp     src/About.h
-        src/Button.cpp    src/Button.h
-        src/JsonTools.cpp src/JsonTools.h
-        src/Label.cpp     src/Label.h
-        src/ListView.cpp  src/ListView.h
-        src/Player.cpp    src/Player.h
-        src/Settings.cpp  src/Settings.h
-        src/Slider.cpp    src/Slider.h
-        src/Utils.cpp     src/Utils.h
-        src/Widget.cpp    src/Widget.h
+        src/About.cpp       src/About.h
+        src/Button.cpp      src/Button.h
+        src/EventFilter.cpp src/EventFilter.h
+        src/JsonTools.cpp   src/JsonTools.h
+        src/Label.cpp       src/Label.h
+        src/ListView.cpp    src/ListView.h
+        src/Player.cpp      src/Player.h
+        src/Settings.cpp    src/Settings.h
+        src/Slider.cpp      src/Slider.h
+        src/Utils.cpp       src/Utils.h
+        src/Widget.cpp      src/Widget.h
 
         src/PlayList.cpp         src/PlayList.h
         src/PlayListDelegate.cpp src/PlayListDelegate.h

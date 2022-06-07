@@ -27,7 +27,6 @@ public:
     void save();
     void selectClean();
     void selectCurrent(int indx);
-    void setSaveFile(const QString &file);
     void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
     void insertItemAt(const PlayListItem &item, int row = 0);
     void setItemAt(const PlayListItem &item, int row = 0);
@@ -57,13 +56,17 @@ private slots:
     void noHide();
 
 private:
-    Button *clearBtn, *removeBtn, *addBtn;
-    ListView *listView;
-    PlayListModel *model;
-    QString mfile, sum, actsum;
-    QWidget *wpls;
-    int maxRows;
-    bool isshow;
+    Button *clearBtn{};
+    Button *removeBtn{};
+    Button *addBtn{};
+    ListView *listView{};
+    PlayListModel *model{};
+    QString mfile{};
+    QString sum{};
+    QString actsum{};
+    QWidget *wpls{};
+    int maxRows{-1};
+    bool isshow{false};
 };
 
 #endif // PLAYLIST_H

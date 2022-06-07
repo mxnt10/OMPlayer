@@ -11,6 +11,7 @@
 
 #include "About.h"
 #include "Button.h"
+#include "EventFilter.h"
 #include "Label.h"
 #include "PlayList.h"
 #include "Settings.h"
@@ -19,22 +20,6 @@
 
 using namespace QtAV;
 using MediaInfoDLL::MediaInfo;
-
-
-/**
- * Declaração das classes.
- **********************************************************************************************************************/
-
-
-namespace QtAV {
-    class AVPlayer;
-    class VideoOutput;
-    class VideoPreviewWidget;
-}
-
-namespace MediaInfoDLL {
-    class MediaInfo;
-}
 
 
 /**
@@ -74,6 +59,7 @@ private Q_SLOTS:
     void onStart();
     void onStop();
     void setHide();
+    void setShow();
     void hideTrue();
     void hideFalse();
     void setSettings();
@@ -84,43 +70,59 @@ private Q_SLOTS:
     void enterFullScreen();
     void leaveFullScreen();
     void onTimeSliderHover(int pos, int value);
-    void onTimeSliderEnter() const;
+    void onTimeSliderEnter();
     void onTimeSliderLeave();
     void updateSlider(qint64 value);
     void updateSliderUnit();
+    void enablePause();
+    void clickCount();
     void detectClick();
     void onMediaStatusChanged();
     static void handleError(const QtAV::AVError &error);
 
 protected:
-    bool event(QEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-    void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
+    void moveEvent(QMoveEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    About *about;
-    AVPlayer *mediaPlayer;
-    Button *playBtn, *stopBtn, *nextBtn, *previousBtn;
-    Button *replayBtn, *shuffleBtn;
-    MediaInfo MI;
-    PlayList *playlist;
-    Label *logo, *current, *end;
+    About *about{};
+    AVPlayer *mediaPlayer{};
+    Button *playBtn{};
+    Button *stopBtn{};
+    Button *nextBtn{};
+    Button *previousBtn{};
+    Button *replayBtn{};
+    Button *shuffleBtn{};
+    EventFilter *filter{};
+    MediaInfo MI{};
+    PlayList *playlist{};
+    Label *logo{};
+    Label *current{};
+    Label *end{};
     QGridLayout *layout{};
-    QString Width, Height;
-    QStringList listnum;
-    QTimer *click;
-    QWidget *wctl;
-    Settings *sett;
-    Slider *slider;
+    QString Width{"192"};
+    QString Height{"108"};
+    QStringList listnum{};
+    QTimer *click{};
+    QWidget *wctl{};
+    Settings *sett{};
+    Slider *slider{};
     VideoOutput *video{};
-    VideoPreviewWidget *preview;
-    bool playing, pausing, restart, randplay;
-    bool contextmenu, enterpos, isblock, maximize, moving, showsett;
-    int previousitem, actualitem, nextitem, unit, count;
+    VideoPreviewWidget *preview{};
+    bool playing{false};
+    bool pausing{false};
+    bool restart{false};
+    bool randplay{false};
+    bool enterpos{false};
+    bool isblock{false};
+    bool maximize{false};
+    bool showsett{false};
+    int previousitem{0};
+    int actualitem{0};
+    int nextitem{0};
+    int count{0};
+    int unit{500};
 };
 
 #endif //OMPLAYER_PLAYER_H

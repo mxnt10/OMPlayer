@@ -1,10 +1,7 @@
-#include <QDir>
 #include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
 #include <QMenu>
-#include <QMouseEvent>
 #include <QRandomGenerator>
-#include <QShortcut>
 #include <QScreen>
 #include <QToolTip>
 
@@ -23,36 +20,13 @@ using namespace MediaInfoDLL;
 
 
 /** Construtor que define a interface do programa */
-VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
-    contextmenu(false),
-    enterpos(false),
-    isblock(false),
-    maximize(false),
-    moving(false),
-    pausing(false),
-    playing(false),
-    randplay(false),
-    restart(false),
-    showsett(false),
-    actualitem(0),
-    nextitem(0),
-    previousitem(0),
-    count(0),
-    unit(500),
-    Width("192"),
-    Height("108") {
+VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
-    this->setStyleSheet(Utils::setStyle("global"));
     this->setMinimumSize(906, 510);
-    this->setMouseTracking(true); /** Mapeamento do mouse */
+    this->setMouseTracking(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
-
-
-    /** Habilitando o menu de contexto */
-    this->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(this, SIGNAL(customContextMenuRequested(QPoint)), SLOT(ShowContextMenu(QPoint)));
 
 
     /** Pré-visualização */
@@ -85,7 +59,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
 
     /** Playlist do reprodutor */
     playlist = new PlayList();
-    playlist->setSaveFile(QDir::homePath() + "/.config/OMPlayer/playlist.qds");
     playlist->load();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
@@ -105,8 +78,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
     connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
     connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
-    connect(slider, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(slider, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Labels para mostrar o tempo de execução e a duração */
@@ -137,27 +108,6 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     shuffleBtn = new Button("shuffle", 32);
     connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
-
-    /** Teclas de atalho */
-    auto *keyCtrlA = new QShortcut(this);
-    keyCtrlA->setKey(QKeySequence(CTRL | Qt::Key_A));
-    connect(keyCtrlA, SIGNAL(activated()), SLOT(openMedia()));
-    auto *keyCtrlO = new QShortcut(this);
-    keyCtrlO->setKey(QKeySequence(CTRL | Qt::Key_O));
-    connect(keyCtrlO, SIGNAL(activated()), SLOT(openMedia()));
-    auto *keyAltEnter = new QShortcut(this);
-    keyAltEnter->setKey(QKeySequence(ALT | ENTER));
-    connect(keyAltEnter, SIGNAL(activated()), SLOT(changeFullScreen()));
-    auto *keyEsc = new QShortcut(this);
-    keyEsc->setKey(QKeySequence(ESC));
-    connect(keyEsc, SIGNAL(activated()), SLOT(leaveFullScreen()));
-    auto *keyCtrlH = new QShortcut(this);
-    keyCtrlH->setKey(QKeySequence(CTRL | Qt::Key_H));
-    connect(keyCtrlH, SIGNAL(activated()), SLOT(setShuffle()));
-    auto *keyCtrlT = new QShortcut(this);
-    keyCtrlT->setKey(QKeySequence(CTRL | Qt::Key_T));
-    connect(keyCtrlT, SIGNAL(activated()), SLOT(setReplay()));
 
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
@@ -224,9 +174,13 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     fgctl->addLayout(buttons);
 
 
-    /** Conteiner que permite o mapeamento do mouse, ocultação e exibição dos controles */
+    /** Widget separado do pai para os controles e a playlist */
     wctl = new QWidget();
     wctl->setMouseTracking(true);
+    wctl->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    wctl->setAttribute(Qt::WA_NoSystemBackground, true);
+    wctl->setAttribute(Qt::WA_TranslucentBackground, true);
+    wctl->setStyleSheet(Utils::setStyle("global"));
 
 
     /** Layout dos controles de reprodução */
@@ -249,10 +203,28 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent),
     layout = new QGridLayout();
     layout->setMargin(0);
     layout->addWidget(video->widget(), 0, 0);
-    layout->addWidget(logo, 0, 0);
-    layout->addWidget(wctl, 0, 0);
+//    layout->addWidget(logo, 0, 0);
     this->setLayout(layout);
-    wctl->setVisible(false);
+
+
+    /** Filtro de eventos */
+    filter = new EventFilter(this);
+    auto *cfilter = new cEventFilter(this);
+    this->installEventFilter(filter);
+    wctl->installEventFilter(filter);
+    wctl->installEventFilter(cfilter);
+    connect(filter, SIGNAL(emitMouseMove()), SLOT(setShow()));
+    connect(filter, SIGNAL(emitDoubleClick()), SLOT(changeFullScreen()));
+    connect(filter, SIGNAL(emitMousePress()), SLOT(enablePause()));
+    connect(filter, SIGNAL(emitMouseRelease()), SLOT(clickCount()));
+    connect(filter, SIGNAL(customContextMenuRequested(QPoint)), SLOT(ShowContextMenu(QPoint)));
+    connect(filter, SIGNAL(emitOpen()), SLOT(openMedia()));
+    connect(filter, SIGNAL(emitEsc()), SLOT(leaveFullScreen()));
+    connect(filter, SIGNAL(emitShuffle()), SLOT(setShuffle()));
+    connect(filter, SIGNAL(emitReplay()), SLOT(setReplay()));
+    connect(filter, SIGNAL(emitSettings()), SLOT(setSettings()));
+    connect(filter, SIGNAL(emitLeave()), SLOT(setHide()));
+    connect(cfilter, SIGNAL(emitLeave()), SLOT(setHide()));
 
 
     /** Temporizador para o cálculo do número de cliques em 300ms */
@@ -363,7 +335,7 @@ void VideoPlayer::setSelect(int item) {
     actualitem = item;
     if (!playing) {
         qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
-               Utils::mediaTitle(playlist->getItems(item)).toStdString().c_str());
+               qUtf8Printable(Utils::mediaTitle(playlist->getItems(item))));
     }
 }
 
@@ -552,7 +524,7 @@ void VideoPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void VideoPlayer::onStart() {
-    logo->setVisible(false);
+//    logo->setVisible(false);
     slider->setDisabled(false);
     playing = true;
 
@@ -610,7 +582,7 @@ void VideoPlayer::onStop() {
 
         slider->setMaximum(0);
         slider->setDisabled(true);
-        logo->setVisible(true);
+//        logo->setVisible(true);
         current->setText(QString::fromLatin1("-- -- : -- --"));
         end->setText(QString::fromLatin1("-- -- : -- --"));
         onTimeSliderLeave();
@@ -648,6 +620,20 @@ void VideoPlayer::setShuffle() {
 }
 
 
+/** Função para ativar a função pause com um clique */
+void VideoPlayer::enablePause() {
+    pausing = true;
+}
+
+
+/** Contador para mapear o clique único */
+void VideoPlayer::clickCount() {
+    if (!click->isActive())
+        click->start();
+    count = count + 1; /** Contador de cliques */
+}
+
+
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void VideoPlayer::detectClick() {
     if (count == 1 && !enterpos && playing && pausing)
@@ -674,8 +660,9 @@ void VideoPlayer::enterFullScreen() {
         maximize = true;
 
     this->showFullScreen();
-    wctl->setVisible(false);
-    moving = enterpos = false;
+    wctl->close();
+    filter->setMove(false);
+    enterpos = false;
 }
 
 
@@ -691,22 +678,33 @@ void VideoPlayer::leaveFullScreen() {
     if (maximize)
         this->showMaximized();
 
-    wctl->setVisible(false);
-    moving = enterpos = maximize = false;
+    wctl->close();
+    filter->setMove(false);
+    enterpos = maximize = false;
 }
 
 
-/** Função auxiliar para minimizar os controles e a playlist */
+/** Função auxiliar para fechar os controles e a playlist */
 void VideoPlayer::setHide() {
-    wctl->setVisible(false);
+    wctl->close();
     hideTrue();
+    filter->setMove(false);
 }
 
+
+/** Função auxiliar para abrir os controles e a playlist */
+void VideoPlayer::setShow() {
+    if (!showsett) {
+        wctl->show();
+        wctl->activateWindow();
+    }
+}
 
 /** Função para abrir as configurações */
 void VideoPlayer::setSettings() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
+    Utils::arrowMouse();
     sett->show();
 }
 
@@ -715,6 +713,8 @@ void VideoPlayer::setSettings() {
 void VideoPlayer::closeSettings() {
     showsett = false;
     sett->close();
+    filter->setMove(false);
+    wctl->close();
 }
 
 
@@ -730,6 +730,8 @@ void VideoPlayer::setAbout() {
 void VideoPlayer::closeAbout() {
     showsett = false;
     about->close();
+    filter->setMove(false);
+    wctl->close();
 }
 
 
@@ -739,6 +741,7 @@ void VideoPlayer::hideTrue() {
         qDebug("%s(%sDEBUG%s):%s Ocultação liberada ...\033[0m", GRE, RED, GRE, SHW);
         enterpos = false;
     }
+    filter->setFixed(enterpos);
 }
 
 
@@ -748,6 +751,7 @@ void VideoPlayer::hideFalse() {
         qDebug("%s(%sDEBUG%s):%s Ocultação impedida ...\033[0m", GRE, RED, GRE, HID);
         enterpos = true;
     }
+    filter->setFixed(enterpos);
 }
 
 
@@ -776,9 +780,10 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 
 
 /** Apenas para exibição do debug */
-void VideoPlayer::onTimeSliderEnter() const {
+void VideoPlayer::onTimeSliderEnter() {
     if (playing && !Width.isEmpty() && !Height.isEmpty())
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+    hideFalse();
 }
 
 
@@ -788,6 +793,7 @@ void VideoPlayer::onTimeSliderLeave() {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
     }
+    hideTrue();
 }
 
 
@@ -844,14 +850,8 @@ void VideoPlayer::onMediaStatusChanged() {
         case InvalidMedia:
             status = "Invalid media !";
             break;
-        case BufferingMedia:
-            status = QString();
-            break;
         case BufferedMedia:
             status = "Buffered !";
-            break;
-        case LoadingMedia:
-            status = QString();
             break;
         case LoadedMedia:
             status = "Loaded !";
@@ -878,74 +878,17 @@ void VideoPlayer::handleError(const AVError &error) {
 /**********************************************************************************************************************/
 
 
-/** Mapeador de eventos para mapear o posicionamento do mouse */
-bool VideoPlayer::event(QEvent *event) {
-    if (int(event->type()) == 5 && !moving) {
-        qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
-        wctl->setVisible(true);
-        moving = true;
-        Utils::arrowMouse();
-    } else if (int(event->type()) == 110 && moving) {
-        qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
-        if (!enterpos) {
-            wctl->setVisible(false);
-            Utils::blankMouse();
-        }
-        moving = false;
-    }
-    return QWidget::event(event);
+/** Evento que fornece a posição da interface pai para posicionar corretamente os controles */
+void VideoPlayer::moveEvent(QMoveEvent *event) {
+    wctl->move(event->pos());
+    QWidget::moveEvent(event);
 }
 
 
-/** Mapeador para executar ações ao pressionar o mouse */
-void VideoPlayer::mousePressEvent(QMouseEvent *event) {
-    pausing = true;
-    QWidget::mousePressEvent(event);
-}
-
-
-/** Mapeador para executar ações com um clique do mouse */
-void VideoPlayer::mouseReleaseEvent(QMouseEvent *event) {
-    if (!click->isActive())
-        click->start();
-    count = count + 1; /** Contador de cliques */
-    QWidget::mouseReleaseEvent(event);
-}
-
-
-/** Mapeador para executar ações com um duplo clique */
-void VideoPlayer::mouseDoubleClickEvent(QMouseEvent *event) {
-    changeFullScreen();
-    pausing = false;
-    QWidget::mouseDoubleClickEvent(event);
-}
-
-
-/** Mapeador para executar ações quando o ponteiro do mouse se encontra dentro da interface */
-void VideoPlayer::enterEvent(QEvent *event) {
-    if (contextmenu) {
-        qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-        if (showsett)
-            Utils::arrowMouse();
-        else
-            Utils::blankMouse();
-        contextmenu = moving = false;
-        wctl->setVisible(false);
-    } else {
-        qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Sobre a Interface ...\033[0m", GRE, RED, GRE, DGR);
-        wctl->setVisible(true);
-    }
-    QWidget::enterEvent(event);
-}
-
-
-/** Mapeador para executar ações quando o ponteiro do mouse se encontra fora da interface */
-void VideoPlayer::leaveEvent(QEvent *event) {
-    if (!contextmenu)
-        qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Fora da Interface ...\033[0m", GRE, RED, GRE, YEL);
-    wctl->setVisible(false);
-    enterpos = false;
-    QWidget::leaveEvent(event);
+/** Evento que mapeia o redirecionamento da interface para o ajuste dos controles */
+void VideoPlayer::resizeEvent(QResizeEvent *event) {
+    wctl->setFixedSize(event->size());
+    QWidget::resizeEvent(event);
 }
 
 
@@ -963,24 +906,20 @@ void VideoPlayer::closeEvent(QCloseEvent *event) {
 
 /** Função para o menu de contexto do programa */
 void VideoPlayer::ShowContextMenu(const QPoint &pos) {
-    contextmenu = true;
-    Utils::arrowMouse();
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-
     auto *effect = new QGraphicsOpacityEffect();
     effect->setOpacity(0.8);
+    Utils::arrowMouse();
 
     QMenu contextMenu(tr("Context menu"), this);
     contextMenu.setGraphicsEffect(effect);
     contextMenu.setStyleSheet(Utils::setStyle("contextmenu"));
-
 
     /** Menu de abrir */
     QAction open("Open Files", this);
     open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
     Utils::changeMenuIcon(open, "folder");
     connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
-
 
     /** Menu tela cheia */
     QAction fullscreen("Show Fullscreen", this);
@@ -990,13 +929,11 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     Utils::changeMenuIcon(fullscreen, "fullscreen");
     connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
-
     /** Menu aleatório */
     QAction shuffle("Shuffle", this);
     shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
     Utils::changeMenuIcon(shuffle, "shuffle-menu");
     connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
-
 
     /** Menu repetir */
     QAction replay("Replay", this);
@@ -1004,19 +941,16 @@ void VideoPlayer::ShowContextMenu(const QPoint &pos) {
     Utils::changeMenuIcon(replay, "replay-menu");
     connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
 
-
     /** Menu de configuração */
     QAction settings("Settings", this);
     settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
     Utils::changeMenuIcon(settings, "settings");
     connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
 
-
     /** Menu sobre */
     QAction mabout("About", this);
     Utils::changeMenuIcon(mabout, "about");
     connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
-
 
     /** Montagem do menu */
     contextMenu.addAction(&open);

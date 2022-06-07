@@ -21,11 +21,10 @@ using std::filesystem::exists;
 
 
 /** Construtor do painel da playlist */
-PlayList::PlayList(QWidget *parent) : QWidget(parent),
-    isshow(false),
-    maxRows(-1) {
+PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     model = new PlayListModel(this);
+    mfile = QDir::homePath() + "/.config/OMPlayer/playlist.qds";
 
 
     /** Lista para visualização da playlist */
@@ -96,12 +95,6 @@ PlayList::~PlayList() = default;
 
 
 /**********************************************************************************************************************/
-
-
-/** Usado para setar a localização do arquivo da playlist para carregar e salvar a playlist */
-void PlayList::setSaveFile(const QString &file) {
-    mfile = file;
-}
 
 
 /** Função para carregar a playlist ao abrir */
@@ -265,8 +258,7 @@ void PlayList::setItemAt(const PlayListItem &item, int row) {
 
 /** Retorna o número do item que está atualmente em execução */
 int PlayList::selectItems() {
-    if (listView->currentIndex().row() == -1)
-        return 0;
+    if (listView->currentIndex().row() == -1) return 0;
     return listView->currentIndex().row();
 }
 

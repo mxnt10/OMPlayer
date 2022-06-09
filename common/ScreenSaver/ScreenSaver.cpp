@@ -119,17 +119,8 @@ ScreenSaver& ScreenSaver::instance() {
 }
 
 ScreenSaver::ScreenSaver() {
-    state_saved = false;
-    modified = false;
-
     #ifdef Q_OS_LINUX
-        timeout = 0;
-        interval = 0;
-        preferBlanking = 0;
-        allowExposures = 0;
-        if (qEnvironmentVariableIsEmpty("DISPLAY")) {
-            isX11 = false;
-        } else {
+        if (!qEnvironmentVariableIsEmpty("DISPLAY")) {
             xlib.setFileName(QString::fromLatin1("libX11.so"));
             isX11 = xlib.load();
             if (!isX11) {
@@ -148,8 +139,6 @@ ScreenSaver::ScreenSaver() {
             isX11 = XOpenDisplay && XCloseDisplay && XSetScreenSaver && XGetScreenSaver && XResetScreenSaver;
         }
     #endif //Q_OS_LINUX
-
-    ssTimerId = 0;
     retrieveState();
 }
 
@@ -210,8 +199,7 @@ bool ScreenSaver::enable(bool yes) {
             if (ssTimerId)
                 killTimer(ssTimerId);
         }
-        rv = true;
-        modified = true;
+        rv = modified = true;
     #endif //Q_OS_LINUX
 
     if (!rv) {
@@ -235,9 +223,20 @@ void ScreenSaver::disable() {
     enable(false);
 }
 
+#ifdef Q_OS_LINUX
+void ScreenSaver::active() {
+    qDebug("%s(%sScreenSaver%s)%s::%sEnable block screen saver ...\033[0m", GRE, RED, GRE, RED, CYA);
+    activeBlock = true;
+}
+
+void ScreenSaver::deactive() {
+    qDebug("%s(%sScreenSaver%s)%s::%sDisable block screen saver ...\033[0m", GRE, RED, GRE, RED, CYA);
+    activeBlock = false;
+}
+#endif //Q_OS_LINUX
+
 bool ScreenSaver::retrieveState() {
     bool rv = false;
-    qInfo("ScreenSaver::retrieveState");
     if (!state_saved) {
         #ifdef Q_OS_LINUX
             if (isX11) {
@@ -246,8 +245,7 @@ bool ScreenSaver::retrieveState() {
                 XCloseDisplay(display);
                 qDebug("%s(%sScreenSaver%s)%s::%sretrieveState timeout: %d, interval: %d, preferBlanking: %d, allowExposures: %d ...\033[0m",
                        GRE, RED, GRE, RED, CYA, timeout, interval, preferBlanking, allowExposures);
-                state_saved = true;
-                rv = true;
+                state_saved = rv = true;
             }
         #endif //Q_OS_LINUX
     } else {
@@ -291,7 +289,8 @@ bool ScreenSaver::restoreState() const {
 void ScreenSaver::timerEvent(QTimerEvent *e) {
     if (e->timerId() != ssTimerId) return;
     #ifdef Q_OS_LINUX
-        if (!isX11) return;
+        if (!isX11 || !activeBlock) return;
+        qDebug("%s(%sScreenSaver%s)%s::%sActivating anti-lock ...\033[0m", GRE, RED, GRE, RED, CYA);
         Display *display = XOpenDisplay(nullptr);
         XResetScreenSaver(display);
         XCloseDisplay(display);

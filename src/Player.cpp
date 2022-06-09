@@ -27,6 +27,8 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     this->setMinimumSize(906, 510);
     this->setMouseTracking(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
+    this->setStyleSheet(Utils::setStyle("global"));
+    ScreenSaver::instance().disable();
 
 
     /** Pré-visualização */
@@ -175,12 +177,11 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Widget separado do pai para os controles e a playlist */
-    wctl = new QWidget();
+    wctl = new QWidget(this);
     wctl->setMouseTracking(true);
     wctl->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     wctl->setAttribute(Qt::WA_NoSystemBackground, true);
     wctl->setAttribute(Qt::WA_TranslucentBackground, true);
-    wctl->setStyleSheet(Utils::setStyle("global"));
 
 
     /** Layout dos controles de reprodução */
@@ -203,7 +204,7 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
     layout = new QGridLayout();
     layout->setMargin(0);
     layout->addWidget(video->widget(), 0, 0);
-//    layout->addWidget(logo, 0, 0);
+    layout->addWidget(logo, 0, 0);
     this->setLayout(layout);
 
 
@@ -524,7 +525,7 @@ void VideoPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void VideoPlayer::onStart() {
-//    logo->setVisible(false);
+    logo->setVisible(false);
     slider->setDisabled(false);
     playing = true;
 
@@ -563,7 +564,7 @@ void VideoPlayer::onStart() {
 
     /** Desativando Bloqueio de tela */
     if (!isblock) {
-        ScreenSaver::instance().disable();
+        ScreenSaver::instance().active();
         isblock = true;
     }
 
@@ -582,14 +583,14 @@ void VideoPlayer::onStop() {
 
         slider->setMaximum(0);
         slider->setDisabled(true);
-//        logo->setVisible(true);
+        logo->setVisible(true);
         current->setText(QString::fromLatin1("-- -- : -- --"));
         end->setText(QString::fromLatin1("-- -- : -- --"));
         onTimeSliderLeave();
 
         /** Reativando Bloqueio de tela */
         if (isblock) {
-            ScreenSaver::instance().enable();
+            ScreenSaver::instance().deactive();
             isblock = false;
         }
     }
@@ -640,6 +641,17 @@ void VideoPlayer::detectClick() {
         playPause();
     count = 0;
     pausing = false;
+    QTimer::singleShot(500, this, SLOT(hideControls()));
+}
+
+
+/** Função auxiliar para fechar os controles, a função de pausar não emite outros sinais se estiver parado
+ * ao dar um clique na tela, por isso esse recurso. */
+void VideoPlayer::hideControls() {
+    if (!enterpos) {
+        setHide();
+        Utils::blankMouse();
+    }
 }
 
 
@@ -704,7 +716,7 @@ void VideoPlayer::setShow() {
 void VideoPlayer::setSettings() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
-    Utils::arrowMouse();
+    filter->setSett(showsett);
     sett->show();
 }
 
@@ -713,8 +725,8 @@ void VideoPlayer::setSettings() {
 void VideoPlayer::closeSettings() {
     showsett = false;
     sett->close();
-    filter->setMove(false);
-    wctl->close();
+    filter->setSett(showsett);
+    QTimer::singleShot(500, this, SLOT(hideControls()));
 }
 
 
@@ -722,6 +734,7 @@ void VideoPlayer::closeSettings() {
 void VideoPlayer::setAbout() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
+    filter->setSett(showsett);
     about->show();
 }
 
@@ -730,8 +743,8 @@ void VideoPlayer::setAbout() {
 void VideoPlayer::closeAbout() {
     showsett = false;
     about->close();
-    filter->setMove(false);
-    wctl->close();
+    filter->setSett(showsett);
+    QTimer::singleShot(500, this, SLOT(hideControls()));
 }
 
 
@@ -894,7 +907,7 @@ void VideoPlayer::resizeEvent(QResizeEvent *event) {
 
 /** Ação ao fechar o programa */
 void VideoPlayer::closeEvent(QCloseEvent *event) {
-    if (isblock) ScreenSaver::instance().enable();
+    ScreenSaver::instance().enable();
     playlist->save();
     qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
     event->accept();

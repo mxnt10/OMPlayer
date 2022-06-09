@@ -16,6 +16,7 @@ public:
     ~EventFilter() override;
     void setMove(bool var);
     void setFixed(bool var);
+    void setSett(bool var);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
@@ -33,10 +34,16 @@ signals:
     void emitEsc();
     void emitLeave();
 
+private slots:
+    void startShow();
 
 private:
-    bool moving{false};
+    bool contextmenu{false};
+    bool first{false};
     bool fixed{false};
+    bool moving{false};
+    bool start{false};
+    bool sett{false};
 };
 
 

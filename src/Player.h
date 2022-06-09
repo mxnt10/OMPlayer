@@ -52,6 +52,7 @@ private Q_SLOTS:
     void setRenderer(const QString &op);
     void playPause();
     void setStop();
+    void hideControls();
     void nextRand();
     void Next();
     void Previous();

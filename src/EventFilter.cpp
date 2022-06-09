@@ -1,6 +1,7 @@
 #include <QContextMenuEvent>
 #include <QDebug>
 #include <QEvent>
+#include <QTimer>
 #include <QWidget>
 
 #include "Defines.h"
@@ -27,15 +28,34 @@ void EventFilter::setMove(bool var) {
     moving = var;
 }
 
-/** Método para alterar o valor da váriável moving */
+
+/** Método para alterar o valor da váriável fixed */
 void EventFilter::setFixed(bool var) {
     fixed = var;
+}
+
+
+/** Método para alterar o valor da váriável sett */
+void EventFilter::setSett(bool var) {
+    sett = var;
+}
+
+
+/** Método auxiliar para o delay para exibição do widget flutuante */
+void EventFilter::startShow(){
+    start = true;
 }
 
 
 /** Filtro de eventos que irá mapear tudo o que tem de direito */
 bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object);
+
+    /** O widget filho abre mais rápido que o pai, por isso esse delay */
+    if (!first) {
+        QTimer::singleShot(1200, this, SLOT(startShow()));
+        first = true;
+    }
 
     /** Método para criar as teclas de atalho */
     if (event->type() == QEvent::KeyPress) {
@@ -72,9 +92,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         return false;
     }
 
-
     /** Mapeando o movimento do mouse */
-    if (event->type() == QEvent::MouseMove && !moving) {
+    if (event->type() == QEvent::MouseMove && !moving && start) {
         qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
         Utils::arrowMouse();
         emit emitMouseMove();
@@ -84,9 +103,18 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     /** Aproveitando o evento do tooltip para usar como mapeamento de mouse parado */
     if (event->type() == QEvent::ToolTip) {
         qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
-        if (!fixed)
-            Utils::blankMouse();
+        if (!fixed) Utils::blankMouse();
         moving = false;
+    }
+
+    /** Ação após a destruição do menu de contexto */
+    if (event->type() == QEvent::ChildRemoved && contextmenu) {
+        qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
+        if (sett)
+            Utils::arrowMouse();
+        else
+            Utils::blankMouse();
+        contextmenu = false;
     }
 
     /** Emissão ao pressionar o mouse */
@@ -101,6 +129,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
     /** Emissão para ativar o menu de contexto */
     if (event->type() == QEvent::ContextMenu) {
+        contextmenu = true;
+        emit emitLeave();
         auto *e = dynamic_cast<QContextMenuEvent*>(event);
         emit customContextMenuRequested(e->pos());
     }

@@ -345,12 +345,12 @@ void PlayList::noHide() {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (event->x() > (this->width() - 300) && event->y() < this->height() - 5 && !isshow) {
+    if (event->x() > (this->width() - 300) && event->y() < this->height() - 8 && !isshow) {
         qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
         emit emitnohide();
         wpls->setVisible(true);
         isshow = true;
-    } else if ((event->x() < (this->width() - 300) || event->y() > this->height() - 5) && isshow) {
+    } else if ((event->x() < (this->width() - 300) || event->y() > this->height() - 8) && isshow) {
         emit emithide();
         wpls->setVisible(false);
         isshow = false;

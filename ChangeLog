@@ -3,14 +3,36 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Released ] - 2022-06-04 #############################################
+## [ 1.4b ] - 2022-06-05 #################################################
+
+### Added / Adicionado
+ - Habilitado todas as opções de renderização.
+ - Adicionado em src, as fontes EventFilter.{cpp/h}.
+###
+
+### Changed / Modificado
+ - Os widgets flutuantes são desconectados do widget pai.
+ - Eventos foram reescritos em EventFilter.
+ - Refatoração de código e ajustes.
+ - Modificação na declaração das variáveis afim de impedir erros
+   de execução, o exit code 139.
+###
+
+### Fixed / Corrigido
+ - Correções no anti-bloqueio de tela.
+###
+
+##########################################################################
+
+
+## [ 1.4a ] - 2022-06-04 #################################################
 
 ### Added / Adicionado
  - Recursos para a janela de configurações.
  - Adicionado em src, as fontes About.{cpp/h}, JsonTools.{cpp/h}
    e Settings.{cpp/h}.
  - Adicionado funções para o status de reprodução dos arquivos
-   multimídia e controle de erro o QtAV.
+   multimídia e controle de erro do QtAV.
  - Aicionado icones para o tema gradient.
 ###
 

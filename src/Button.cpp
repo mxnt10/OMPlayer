@@ -6,7 +6,6 @@
 #include "JsonTools.h"
 #include "Utils.h"
 
-using namespace std;
 
 /**********************************************************************************************************************/
 
@@ -32,8 +31,8 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
 
     /** ToolTip */
     if (tooltip.isEmpty()) {
-        string upper = ico.toStdString();
-        transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
+        std::string upper = ico.toStdString();
+        std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
         upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
         setToolTip(QString::fromStdString(upper));
     } else if (QString::compare(tooltip, NOTOOLTIP, Qt::CaseSensitive) != 0)

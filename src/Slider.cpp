@@ -6,19 +6,14 @@
 #include "Slider.h"
 #include "Utils.h"
 
-using namespace Qt;
-using QStyle::CC_Slider;
-using QStyle::SC_SliderGroove;
-using QStyle::SC_SliderHandle;
-
 
 /**********************************************************************************************************************/
 
 
 /** Construtor principal do Slider. */
 Slider::Slider(QWidget *parent, bool disable, int size, int maximum) : QSlider(parent) {
-    setOrientation(Horizontal);
-    setFocusPolicy(NoFocus);
+    setOrientation(Qt::Horizontal);
+    setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
     setDisabled(disable);
     setStyleSheet(Utils::setStyle("progressbar"));
@@ -40,7 +35,7 @@ Slider::~Slider() = default;
 
 /** Função para retornar um valor de x e y para pixelPosToRangeValue */
 inline int Slider::pick(const QPoint &point) const {
-    return orientation() == Horizontal ? point.x() : point.y();
+    return orientation() == Qt::Horizontal ? point.x() : point.y();
 }
 
 
@@ -48,11 +43,11 @@ inline int Slider::pick(const QPoint &point) const {
 int Slider::pixelPosToRangeValue(int pos) const {
     QStyleOptionSlider opt;
     initStyleOption(&opt);
-    QRect gr = style()->subControlRect(CC_Slider, &opt, SC_SliderGroove, this);
-    QRect sr = style()->subControlRect(CC_Slider, &opt, SC_SliderHandle, this);
+    QRect gr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderGroove, this);
+    QRect sr = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
     int sliderMin, sliderMax, sliderLength;
 
-    if (orientation() == Horizontal) {
+    if (orientation() == Qt::Horizontal) {
         sliderLength = sr.width();
         sliderMin = gr.x();
         sliderMax = gr.right() - sliderLength + 1;
@@ -73,11 +68,11 @@ int Slider::pixelPosToRangeValue(int pos) const {
 /** Evento que possibilita habilitar o recurso no Slider para pular a execução do arquivo
  * multimídia ao clicar no QSlider */
 void Slider::mousePressEvent(QMouseEvent *event) {
-    if (event->button() == LeftButton) { /** Botão esquerdo do Mouse */
+    if (event->button() == Qt::LeftButton) { /** Botão esquerdo do Mouse */
         QStyleOptionSlider opt;
         initStyleOption(&opt);
 
-        const QRect sliderRect = style()->subControlRect(CC_Slider, &opt, SC_SliderHandle, this);
+        const QRect sliderRect = style()->subControlRect(QStyle::CC_Slider, &opt, QStyle::SC_SliderHandle, this);
         const QPoint center = sliderRect.center() - sliderRect.topLeft();
 
         if (!sliderRect.contains(event->pos())) {

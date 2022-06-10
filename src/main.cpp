@@ -33,17 +33,13 @@
 
 #define DEBUG true
 
-using std::filesystem::create_directory;
 
-
-/**
- * Início do Programa.
- **********************************************************************************************************************/
+/**********************************************************************************************************************/
 
 
 int main(int argc, char *argv[]) {
-    SingleApplication OMPlayer(argc, argv, true);
-    create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
+    SingleApplication Player(argc, argv, true, SingleApplication::Mode::SecondaryNotification);
+    std::filesystem::create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
     JsonTools::verifySettings();
 
 
@@ -71,24 +67,27 @@ int main(int argc, char *argv[]) {
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
-    parser.process(OMPlayer);
+    parser.process(Player);
 
     /** Define a interface do programa, envia os argumentos para o reprodutor*/
-    VideoPlayer player;
+    OMPlayer player;
     if (!parser.positionalArguments().isEmpty()) {
         player.openMedia(parser.positionalArguments());
     }
 
     /** Verificando instâncias abertas e impedindo novas instâncias */
-    if( OMPlayer.isSecondary() ) {
-        OMPlayer.sendMessage("OK");
+    if( Player.isSecondary() ) {
+        Player.sendMessage("OK");
         return 0;
     } else {
-        QObject::connect(&OMPlayer, &SingleApplication::receivedMessage, [&player]() {
+        QObject::connect(&Player, &SingleApplication::instanceStarted, [&player]() {
             qDebug("%s(%sDEBUG%s):%s Aberto outra instância ...\033[m", GRE, RED, GRE, BLU);
             player.hide();
             player.show();
             player.activateWindow();
+        });
+        QObject::connect(&Player, &SingleApplication::receivedMessage, [&player]() {
+            qDebug("%s(%sDEBUG%s):%s Recarregando playlist ...\033[m", GRE, RED, GRE, BLU);
             player.onLoad();
         });
     }

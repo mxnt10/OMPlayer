@@ -79,6 +79,7 @@ About::~About() = default;
 void About::onClose() {
     qDebug("%s(%sDEBUG%s):%s Fechando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     emit emitclose();
+    this->close();
 }
 
 

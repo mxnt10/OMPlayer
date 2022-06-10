@@ -19,7 +19,7 @@
 #include "Widget.h"
 
 using namespace QtAV;
-using MediaInfoDLL::MediaInfo;
+using namespace MediaInfoDLL;
 
 
 /**
@@ -27,18 +27,17 @@ using MediaInfoDLL::MediaInfo;
  **********************************************************************************************************************/
 
 
-class VideoPlayer : public QWidget {
+class OMPlayer : public QWidget {
 Q_OBJECT
 public:
-    explicit VideoPlayer(QWidget *parent = nullptr);
-    ~VideoPlayer() override;
+    explicit OMPlayer(QWidget *parent = nullptr);
+    ~OMPlayer() override;
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
     void onLoad();
 
 private Q_SLOTS:
-    void runLoad();
     void setSelect(int item);
     void ajustActualItem(int item);
     void firstPlay(const QString &name, int pos);

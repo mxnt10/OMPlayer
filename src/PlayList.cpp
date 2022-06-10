@@ -11,11 +11,6 @@
 #include "PlayList.h"
 #include "Utils.h"
 
-using namespace Qt;
-using QStandardPaths::MoviesLocation;
-using QSizePolicy::Expanding;
-using std::filesystem::exists;
-
 
 /**********************************************************************************************************************/
 
@@ -81,7 +76,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     /** Layout do painel da playlist */
     auto *gbl = new QGridLayout();
     gbl->setMargin(10);
-    gbl->addItem(new QSpacerItem(0, 0, Expanding, Expanding), 0, 0, 1, 2);
+    gbl->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding), 0, 0, 1, 2);
     gbl->addWidget(bgpls, 0, 1, 1, 3);
     gbl->addWidget(wpls, 0, 1, 1, 3);
     gbl->setAlignment(RIGHT);
@@ -113,7 +108,7 @@ void PlayList::load(bool second) {
     actsum = hash.result().toHex();
     qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, actsum.toStdString().c_str());
 
-    if (QString::compare(sum, actsum, CaseInsensitive)) {
+    if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
         qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
         if (second)
             model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
@@ -123,7 +118,7 @@ void PlayList::load(bool second) {
         ds >> list;
         int add = 0;
         for (const auto & i : list) {
-            if (exists(i.url().toStdString())) {
+            if (std::filesystem::exists(i.url().toStdString())) {
                 insertItemAt(i, add);
                 add++;
             }
@@ -173,7 +168,7 @@ void PlayList::addItems(const QStringList &parms) {
         files = \
         QFileDialog::getOpenFileNames(
             nullptr, tr("Select multimedia files"),
-            QStandardPaths::standardLocations(MoviesLocation).value(0, QDir::homePath()),
+            QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()),
             "Video Files (*.3gp *.3gpp *.m4v *.mp4 *.m2v *.mp2 *.mpeg *.mpg *.vob *.ogg *.ogv *.mov *.rmvb *.webm "
             "*.flv *.mkv *.wmv *.avi *.divx);;"
             "Audio Files (*.ac3 *.flac *.mid *.midi *.m4a *.mp3 *.opus *.mka *.wma *.wav);;"
@@ -252,7 +247,7 @@ void PlayList::insertItemAt(const PlayListItem &item, int row) {
 
 /** Localiza um item para exibir na playlist */
 void PlayList::setItemAt(const PlayListItem &item, int row) {
-    model->setData(model->index(row), QVariant::fromValue(item), DisplayRole);
+    model->setData(model->index(row), QVariant::fromValue(item), Qt::DisplayRole);
 }
 
 
@@ -280,7 +275,7 @@ void PlayList::selectClean() {
 /** Retorna uma url de um arquivo multimídia usando um valor inteiro especificado */
 QString PlayList::getItems(int s) {
     QModelIndex index = model->index(s);
-    auto pli = qvariant_cast<PlayListItem>(index.data(DisplayRole));
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
     return pli.url();
 }
 
@@ -317,14 +312,14 @@ void PlayList::clearItems() {
 /** Setando a duração do item atual */
 qint64 PlayList::setDuration() {
     QModelIndex index = listView->currentIndex();
-    auto pli = qvariant_cast<PlayListItem>(index.data(DisplayRole));
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
     return pli.duration();
 }
 
 
 /** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
-    emit aboutToPlay(index.data(DisplayRole).value<PlayListItem>().url());
+    emit aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
 }
 
 

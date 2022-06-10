@@ -13,14 +13,12 @@
 #include "Player.h"
 #include "Utils.h"
 
-using namespace MediaInfoDLL;
-
 
 /**********************************************************************************************************************/
 
 
 /** Construtor que define a interface do programa */
-VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
+OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
@@ -237,20 +235,20 @@ VideoPlayer::VideoPlayer(QWidget *parent) : QWidget(parent) {
 
 
 /** Destrutor */
-VideoPlayer::~VideoPlayer() = default;
+OMPlayer::~OMPlayer() = default;
 
 
 /**********************************************************************************************************************/
 
 
 /** Função para abrir arquivos multimídia */
-void VideoPlayer::openMedia(const QStringList &parms) {
+void OMPlayer::openMedia(const QStringList &parms) {
     playlist->addItems(parms);
 }
 
 
 /** Setando opções de Rendenização */
-void VideoPlayer::setRenderer(const QString &op) {
+void OMPlayer::setRenderer(const QString &op) {
     VideoRenderer *vo;
 
     if (QString::compare(op, "openglwidget", Qt::CaseSensitive) == 0)
@@ -290,21 +288,15 @@ void VideoPlayer::setRenderer(const QString &op) {
 
 
 /** Rodando as funções após aberto outras instâncias */
-void VideoPlayer::runLoad() {
+void OMPlayer::onLoad() {
     playlist->load(true);
     playlist->selectCurrent(actualitem);
 }
 
 
-/** Função para acionar a função load() dando um tempo para adicionar os itens */
-void VideoPlayer::onLoad() {
-    QTimer::singleShot(800, this, SLOT(runLoad()));
-}
-
-
 /** Função que possui o propósito de ajustar a ordem de execução ao remover itens da playlist anteriores ao
  * arquivo multimídia sendo reproduzido no momento */
-void VideoPlayer::ajustActualItem(int item) {
+void OMPlayer::ajustActualItem(int item) {
     int actual = nextitem - 1;
     int c = 0;
     if (item < actual) {
@@ -332,7 +324,7 @@ void VideoPlayer::ajustActualItem(int item) {
 
 
 /** Setando o item atualmente selecionado */
-void VideoPlayer::setSelect(int item) {
+void OMPlayer::setSelect(int item) {
     actualitem = item;
     if (!playing) {
         qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
@@ -342,7 +334,7 @@ void VideoPlayer::setSelect(int item) {
 
 
 /** Função geral para execução de arquivos multimídia */
-void VideoPlayer::play(const QString &isplay, int index) {
+void OMPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
         mediaPlayer->stop();
@@ -353,7 +345,7 @@ void VideoPlayer::play(const QString &isplay, int index) {
 
 
 /** Para executar os itens recém adicionados da playlist */
-void VideoPlayer::firstPlay(const QString &isplay, int pos) {
+void OMPlayer::firstPlay(const QString &isplay, int pos) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
         play(isplay, pos);
@@ -370,7 +362,7 @@ void VideoPlayer::firstPlay(const QString &isplay, int pos) {
 
 
 /** Executa um item selecionado da playlist */
-void VideoPlayer::doubleplay(const QString &name) {
+void OMPlayer::doubleplay(const QString &name) {
     qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
     play(name);
 
@@ -398,7 +390,7 @@ void VideoPlayer::doubleplay(const QString &name) {
 
 
 /** Função para selecionar aleatóriamente a próxima mídia */
-void VideoPlayer::nextRand() {
+void OMPlayer::nextRand() {
     qDebug("%s(%sDEBUG%s):%s Reproduzindo uma mídia aleatória ...\033[0m", GRE, RED, GRE, ORA);
     if (listnum.size() < playlist->setListSize() - 1) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
@@ -433,7 +425,7 @@ void VideoPlayer::nextRand() {
 
 
 /** Botão next */
-void VideoPlayer::Next() {
+void OMPlayer::Next() {
     if (mediaPlayer->isPlaying()) {
 
         /** Reprodução aleatória */
@@ -461,7 +453,7 @@ void VideoPlayer::Next() {
 
 
 /** Botão previous */
-void VideoPlayer::Previous() {
+void OMPlayer::Previous() {
     if (mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, ORA);
         play(playlist->getItems(previousitem), previousitem);
@@ -482,7 +474,7 @@ void VideoPlayer::Previous() {
 
 
 /** Função para o botão de play/pause */
-void VideoPlayer::playPause() {
+void OMPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
             qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
@@ -502,7 +494,7 @@ void VideoPlayer::playPause() {
 
 
 /** Função para o botão stop */
-void VideoPlayer::setStop() {
+void OMPlayer::setStop() {
     playing = false;
     actualitem = playlist->selectItems();
     mediaPlayer->stop();
@@ -510,7 +502,7 @@ void VideoPlayer::setStop() {
 
 
 /** Função para alterar o botão play/pause */
-void VideoPlayer::onPaused(bool paused) {
+void OMPlayer::onPaused(bool paused) {
     if (paused) {
         qDebug("%s(%sDEBUG%s):%s Pausando ...\033[0m", GRE, RED, GRE, ORA);
         Utils::changeIcon(playBtn, "play");
@@ -524,7 +516,7 @@ void VideoPlayer::onPaused(bool paused) {
 
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
-void VideoPlayer::onStart() {
+void OMPlayer::onStart() {
     logo->setVisible(false);
     slider->setDisabled(false);
     playing = true;
@@ -573,7 +565,7 @@ void VideoPlayer::onStart() {
 
 
 /** Função que define alguns parâmetros ao parar a reprodução */
-void VideoPlayer::onStop() {
+void OMPlayer::onStop() {
     if (!playing) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, ORA);
         this->setWindowTitle(QString(PRG_NAME));
@@ -598,7 +590,7 @@ void VideoPlayer::onStop() {
 
 
 /** Ativação do modo repetição */
-void VideoPlayer::setReplay() {
+void OMPlayer::setReplay() {
     if (!restart) {
         restart = true;
         Utils::changeIcon(replayBtn, "replay-on");
@@ -610,7 +602,7 @@ void VideoPlayer::setReplay() {
 
 
 /** Ativação do modo aleatório */
-void VideoPlayer::setShuffle() {
+void OMPlayer::setShuffle() {
     if (!randplay) {
         randplay = true;
         Utils::changeIcon(shuffleBtn, "shuffle-on");
@@ -622,13 +614,13 @@ void VideoPlayer::setShuffle() {
 
 
 /** Função para ativar a função pause com um clique */
-void VideoPlayer::enablePause() {
+void OMPlayer::enablePause() {
     pausing = true;
 }
 
 
 /** Contador para mapear o clique único */
-void VideoPlayer::clickCount() {
+void OMPlayer::clickCount() {
     if (!click->isActive())
         click->start();
     count = count + 1; /** Contador de cliques */
@@ -636,7 +628,7 @@ void VideoPlayer::clickCount() {
 
 
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
-void VideoPlayer::detectClick() {
+void OMPlayer::detectClick() {
     if (count == 1 && !enterpos && playing && pausing)
         playPause();
     count = 0;
@@ -647,7 +639,7 @@ void VideoPlayer::detectClick() {
 
 /** Função auxiliar para fechar os controles, a função de pausar não emite outros sinais se estiver parado
  * ao dar um clique na tela, por isso esse recurso. */
-void VideoPlayer::hideControls() {
+void OMPlayer::hideControls() {
     if (!enterpos) {
         setHide();
         Utils::blankMouse();
@@ -656,7 +648,7 @@ void VideoPlayer::hideControls() {
 
 
 /** Gerenciar tela cheia */
-void VideoPlayer::changeFullScreen() {
+void OMPlayer::changeFullScreen() {
     if (this->isFullScreen())
         leaveFullScreen();
     else
@@ -665,7 +657,7 @@ void VideoPlayer::changeFullScreen() {
 
 
 /** Entrar no modo tela cheia */
-void VideoPlayer::enterFullScreen() {
+void OMPlayer::enterFullScreen() {
     qDebug("%s(%sDEBUG%s):%s Entrando no Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
 
     if (this->isMaximized()) /** Mapear interface maximizada */
@@ -679,7 +671,7 @@ void VideoPlayer::enterFullScreen() {
 
 
 /** Sair do modo tela cheia */
-void VideoPlayer::leaveFullScreen() {
+void OMPlayer::leaveFullScreen() {
     qDebug("%s(%sDEBUG%s):%s Saindo do Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
     this->showNormal();
 
@@ -697,7 +689,7 @@ void VideoPlayer::leaveFullScreen() {
 
 
 /** Função auxiliar para fechar os controles e a playlist */
-void VideoPlayer::setHide() {
+void OMPlayer::setHide() {
     wctl->close();
     hideTrue();
     filter->setMove(false);
@@ -705,7 +697,7 @@ void VideoPlayer::setHide() {
 
 
 /** Função auxiliar para abrir os controles e a playlist */
-void VideoPlayer::setShow() {
+void OMPlayer::setShow() {
     if (!showsett) {
         wctl->show();
         wctl->activateWindow();
@@ -713,7 +705,7 @@ void VideoPlayer::setShow() {
 }
 
 /** Função para abrir as configurações */
-void VideoPlayer::setSettings() {
+void OMPlayer::setSettings() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
     filter->setSett(showsett);
@@ -722,16 +714,14 @@ void VideoPlayer::setSettings() {
 
 
 /** Função que fecha as configurações ao receber a emissão */
-void VideoPlayer::closeSettings() {
+void OMPlayer::closeSettings() {
     showsett = false;
-    sett->close();
     filter->setSett(showsett);
-    QTimer::singleShot(500, this, SLOT(hideControls()));
 }
 
 
 /** Função para exibir o sobre */
-void VideoPlayer::setAbout() {
+void OMPlayer::setAbout() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
     filter->setSett(showsett);
@@ -740,16 +730,14 @@ void VideoPlayer::setAbout() {
 
 
 /** Função que fecha o sobre ao receber a emissão */
-void VideoPlayer::closeAbout() {
+void OMPlayer::closeAbout() {
     showsett = false;
-    about->close();
     filter->setSett(showsett);
-    QTimer::singleShot(500, this, SLOT(hideControls()));
 }
 
 
 /** Ativar ocultação  */
-void VideoPlayer::hideTrue() {
+void OMPlayer::hideTrue() {
     if (enterpos) {
         qDebug("%s(%sDEBUG%s):%s Ocultação liberada ...\033[0m", GRE, RED, GRE, SHW);
         enterpos = false;
@@ -759,7 +747,7 @@ void VideoPlayer::hideTrue() {
 
 
 /** Desativar ocultação */
-void VideoPlayer::hideFalse() {
+void OMPlayer::hideFalse() {
     if (!enterpos) {
         qDebug("%s(%sDEBUG%s):%s Ocultação impedida ...\033[0m", GRE, RED, GRE, HID);
         enterpos = true;
@@ -769,7 +757,7 @@ void VideoPlayer::hideFalse() {
 
 
 /** Pré-visualização ao posicionar o mouse no slider */
-void VideoPlayer::onTimeSliderHover(int pos, int value) {
+void OMPlayer::onTimeSliderHover(int pos, int value) {
     int fixV = 72;
     QPoint gpos = slider->pos();
 
@@ -793,7 +781,7 @@ void VideoPlayer::onTimeSliderHover(int pos, int value) {
 
 
 /** Apenas para exibição do debug */
-void VideoPlayer::onTimeSliderEnter() {
+void OMPlayer::onTimeSliderEnter() {
     if (playing && !Width.isEmpty() && !Height.isEmpty())
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
     hideFalse();
@@ -801,7 +789,7 @@ void VideoPlayer::onTimeSliderEnter() {
 
 
 /** Saindo da pré-visualização */
-void VideoPlayer::onTimeSliderLeave() {
+void OMPlayer::onTimeSliderLeave() {
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
@@ -811,7 +799,7 @@ void VideoPlayer::onTimeSliderLeave() {
 
 
 /** Altera o tempo de execução ao pressionar ou mover a barra de progresso de execução */
-void VideoPlayer::seekBySlider(int value) {
+void OMPlayer::seekBySlider(int value) {
     if (!mediaPlayer->isPlaying()) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
     mediaPlayer->seek(qint64(qint64(value) * unit));
@@ -819,13 +807,13 @@ void VideoPlayer::seekBySlider(int value) {
 
 
 /** Altera o tempo de execução ao pressionar a barra de progresso de execução */
-void VideoPlayer::seekBySlider() {
+void OMPlayer::seekBySlider() {
     seekBySlider(slider->value());
 }
 
 
 /** Função para atualizar a barra de progresso de execução */
-void VideoPlayer::updateSlider(qint64 value) {
+void OMPlayer::updateSlider(qint64 value) {
     if (mediaPlayer->isSeekable())
         slider->setValue(int(value / unit));
     current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
@@ -846,7 +834,7 @@ void VideoPlayer::updateSlider(qint64 value) {
 
 
 /** Função para atualizar a barra de progresso de execução */
-void VideoPlayer::updateSliderUnit() {
+void OMPlayer::updateSliderUnit() {
     unit = mediaPlayer->notifyInterval();
     slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
     updateSlider(mediaPlayer->position());
@@ -854,7 +842,7 @@ void VideoPlayer::updateSliderUnit() {
 
 
 /** Função para mapear o status de um arquivo multimídia */
-void VideoPlayer::onMediaStatusChanged() {
+void OMPlayer::onMediaStatusChanged() {
     QString status;
     auto *player = reinterpret_cast<AVPlayer*>(sender());
     if (!player) return;
@@ -883,7 +871,7 @@ void VideoPlayer::onMediaStatusChanged() {
 
 
 /** Debug em caso de eventuais erros */
-void VideoPlayer::handleError(const AVError &error) {
+void OMPlayer::handleError(const AVError &error) {
     qDebug("%s(%sAVError%s):%s %s", GRE, RED, GRE, ERR, qUtf8Printable(error.string()));
 }
 
@@ -892,21 +880,21 @@ void VideoPlayer::handleError(const AVError &error) {
 
 
 /** Evento que fornece a posição da interface pai para posicionar corretamente os controles */
-void VideoPlayer::moveEvent(QMoveEvent *event) {
+void OMPlayer::moveEvent(QMoveEvent *event) {
     wctl->move(event->pos());
     QWidget::moveEvent(event);
 }
 
 
 /** Evento que mapeia o redirecionamento da interface para o ajuste dos controles */
-void VideoPlayer::resizeEvent(QResizeEvent *event) {
+void OMPlayer::resizeEvent(QResizeEvent *event) {
     wctl->setFixedSize(event->size());
     QWidget::resizeEvent(event);
 }
 
 
 /** Ação ao fechar o programa */
-void VideoPlayer::closeEvent(QCloseEvent *event) {
+void OMPlayer::closeEvent(QCloseEvent *event) {
     ScreenSaver::instance().enable();
     playlist->save();
     qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
@@ -918,7 +906,7 @@ void VideoPlayer::closeEvent(QCloseEvent *event) {
 
 
 /** Função para o menu de contexto do programa */
-void VideoPlayer::ShowContextMenu(const QPoint &pos) {
+void OMPlayer::ShowContextMenu(const QPoint &pos) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
     auto *effect = new QGraphicsOpacityEffect();
     effect->setOpacity(0.8);

@@ -114,6 +114,7 @@ Settings::~Settings() = default;
 void Settings::onClose() {
     qDebug("%s(%sDEBUG%s):%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     emit emitclose();
+    this->close();
 }
 
 

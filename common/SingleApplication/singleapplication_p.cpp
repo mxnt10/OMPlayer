@@ -156,7 +156,7 @@ void SingleApplicationPrivate::genBlockServerName()
             appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
         } else { // Running as AppImage: Use absolute path to AppImage file
             appData.addData( appImagePath );
-        }
+        };
 #else
         appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
 #endif
@@ -397,7 +397,7 @@ void SingleApplicationPrivate::slotConnectionEstablished()
                 break;
             default:
                 break;
-            }
+            };
         }
     );
 }

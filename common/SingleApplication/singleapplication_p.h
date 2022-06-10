@@ -83,7 +83,7 @@ public:
     bool isFrameComplete(QLocalSocket *sock);
     void readMessageHeader(QLocalSocket *socket, ConnectionStage nextStage);
     void readInitMessageBody(QLocalSocket *socket);
-    static  void writeAck(QLocalSocket *sock);
+    static void writeAck(QLocalSocket *sock);
     [[nodiscard]] bool writeConfirmedFrame(int msecs, const QByteArray &msg) const;
     [[nodiscard]] bool writeConfirmedMessage(int msecs, const QByteArray &msg, SingleApplication::SendMode sendMode = SingleApplication::NonBlocking) const;
     static void randomSleep();

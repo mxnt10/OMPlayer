@@ -41,6 +41,13 @@ SingleApplication::SingleApplication( int &argc, char *argv[], bool allowSeconda
 {
     Q_D( SingleApplication );
 
+#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+    // On Android and iOS since the library is not supported fallback to
+    // standard QApplication behaviour by simply returning at this point.
+    qWarning() << "SingleApplication is not supported on Android and iOS systems.";
+    return;
+#endif
+
     // Store the current mode of the program
     d->options = options;
 
@@ -121,7 +128,7 @@ SingleApplication::SingleApplication( int &argc, char *argv[], bool allowSeconda
       }
     }
 
-    if(!inst->primary){
+    if( inst->primary == false ){
         d->startPrimary();
         if( ! d->memory->unlock() ){
           qDebug() << "SingleApplication: Unable to unlock memory after primary start.";

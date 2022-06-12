@@ -4,11 +4,7 @@
 #include <QAbstractListModel>
 #include "PlayListItem.h"
 
-
-/**
- * Classe para o modelo da playlist.
- ***********************************************************************************************************************/
-
+/***********************************************************************************************************************/
 
 class PlayListModel : public QAbstractListModel {
 Q_OBJECT

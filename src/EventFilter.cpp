@@ -106,7 +106,10 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Aproveitando o evento do tooltip para usar como mapeamento de mouse parado */
         if (event->type() == QEvent::ToolTip) {
             qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
-            if (!fixed) Utils::blankMouse();
+            if (!fixed) {
+                Utils::blankMouse();
+                emit emitLeave();
+            }
             moving = false;
         }
 

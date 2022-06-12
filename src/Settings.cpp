@@ -1,7 +1,6 @@
 #include <QLayout>
 #include <QTabWidget>
 #include <QStyle>
-#include <QWidget>
 
 #include "Defines.h"
 #include "JsonTools.h"
@@ -29,8 +28,8 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
     setStyleSheet(Utils::setStyle("global")); // ToolTip
-    setMaximumWidth(400);
-    setModal(false);
+    setFixedSize(200, 0);
+    setModal(true);
 
 
     /** Opções para Renderização */

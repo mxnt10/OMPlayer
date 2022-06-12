@@ -17,7 +17,7 @@ About::About(QWidget *parent) : QDialog(parent) {
     setAttribute(Qt::WA_TranslucentBackground, true);
     setStyleSheet(Utils::setStyle("global")); // ToolTip
     setMaximumSize(0, 0);
-    setModal(false);
+    setModal(true);
 
 
     /** Nome do programa e descrição */

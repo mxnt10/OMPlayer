@@ -24,9 +24,7 @@ using namespace QtAV;
 using namespace MediaInfoDLL;
 
 
-/**
- * Classe da interface principal.
- **********************************************************************************************************************/
+/**********************************************************************************************************************/
 
 
 class OMPlayer : public QWidget {
@@ -53,7 +51,6 @@ private Q_SLOTS:
     void setRenderer(const QString &op);
     void playPause();
     void setStop();
-    void hideControls();
     void nextRand();
     void Next();
     void Previous();
@@ -80,7 +77,7 @@ private Q_SLOTS:
     void clickCount();
     void detectClick();
     void onMediaStatusChanged();
-    static void handleError(const QtAV::AVError &error);
+    void handleError(const QtAV::AVError &error);
 
 protected:
     bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
@@ -123,6 +120,7 @@ private:
     bool randplay{false};
     bool enterpos{false};
     bool isblock{false};
+    bool invalid{false};
     bool maximize{false};
     bool showsett{false};
     bool prevent{false};

@@ -12,7 +12,7 @@
 class EventFilter : public QObject{
 Q_OBJECT
 public:
-    explicit EventFilter(QWidget *parent);
+    explicit EventFilter(QWidget *parent, int i);
     ~EventFilter() override;
     void setMove(bool var);
     void setFixed(bool var);
@@ -44,25 +44,7 @@ private:
     bool moving{false};
     bool start{false};
     bool sett{false};
-};
-
-
-/**
- * Classe de eventos auxiliar para os controles.
- **********************************************************************************************************************/
-
-
-class cEventFilter : public QObject{
-Q_OBJECT
-public:
-    explicit cEventFilter(QWidget *parent);
-    ~cEventFilter() override;
-
-protected:
-    bool eventFilter(QObject *object, QEvent *event) override;
-
-signals:
-    void emitLeave();
+    int num{0};
 };
 
 #endif // OMPLAYER_EVENTFILTER_H

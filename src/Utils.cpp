@@ -167,3 +167,10 @@ void Utils::changeMenuIcon(QAction &btn, const QString &thm) {
         btn.setIcon(QIcon::fromTheme(defaultIcon(thm)));
     else btn.setIcon(QIcon(Utils::setIconTheme(theme, thm)));
 }
+
+
+/** Usado para tirar o "\n" dos debugs */
+void Utils::rm_nl(string &s) {
+    for (uint p = s.find('\n'); p != (uint) string::npos; p = s.find('\n'))
+        s.erase(p, 1);
+}

@@ -10,6 +10,7 @@
  *      - QtAV
  *      - libmediainfo
  *      - libzen
+ *      - xdotool
  *
  * Licença: GNU General Public License Version 3 (GLPv3)
  *
@@ -42,7 +43,6 @@ int main(int argc, char *argv[]) {
     std::filesystem::create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
     JsonTools::verifySettings();
 
-
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "Simplify"
     #pragma ide diagnostic ignored "UnreachableCode"
@@ -54,7 +54,6 @@ int main(int argc, char *argv[]) {
         QLoggingCategory::setFilterRules("*=false");
 
     #pragma clang diagnostic pop
-
 
     /** Propriedades do Programa */
     QCoreApplication::setApplicationName("OMPlayer");

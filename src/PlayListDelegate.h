@@ -3,11 +3,7 @@
 
 #include <QStyledItemDelegate>
 
-
-/**
- * Classe para manipular o estilo dos itens selecionados da playlist.
- **********************************************************************************************************************/
-
+/**********************************************************************************************************************/
 
 class PlayListDelegate : public QStyledItemDelegate {
 Q_OBJECT

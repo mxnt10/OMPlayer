@@ -4,7 +4,9 @@
 #include <QtAV>
 #include <QtAVWidgets>
 
+#include <QGuiApplication>
 #include <QLayout>
+#include <QScreen>
 #include <QTimer>
 
 #include <MediaInfoDLL.h>
@@ -81,8 +83,10 @@ private Q_SLOTS:
     static void handleError(const QtAV::AVError &error);
 
 protected:
+    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
+    void changeEvent(QEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 
 private:
@@ -101,6 +105,9 @@ private:
     Label *current{};
     Label *end{};
     QGridLayout *layout{};
+    QSize min{906, 510};
+    QSize size{};
+    QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QString Width{"192"};
     QString Height{"108"};
     QStringList listnum{};
@@ -118,6 +125,7 @@ private:
     bool isblock{false};
     bool maximize{false};
     bool showsett{false};
+    bool prevent{false};
     int previousitem{0};
     int actualitem{0};
     int nextitem{0};

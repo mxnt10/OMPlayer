@@ -1,12 +1,11 @@
 #include <QGraphicsOpacityEffect>
-#include <QGuiApplication>
 #include <QMenu>
 #include <QRandomGenerator>
-#include <QScreen>
 #include <QToolTip>
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
+#include <xcb/xcb.h>
 
 #include "Defines.h"
 #include "JsonTools.h"
@@ -22,7 +21,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
-    this->setMinimumSize(906, 510);
+    this->setMinimumSize(min);
     this->setMouseTracking(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     this->setStyleSheet(Utils::setStyle("global"));
@@ -34,14 +33,11 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
 
 
-    /** Janela de configurações */
-    sett = new Settings(this);
-    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
-    connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
-
-
-    /** Janela sobre */
+    /** Janela de configurações e sobre */
     about = new About(this);
+    sett = new Settings(this);
+    connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
+    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
     connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
 
 
@@ -207,8 +203,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Filtro de eventos */
-    filter = new EventFilter(this);
-    auto *cfilter = new cEventFilter(this);
+    filter = new EventFilter(this, 1);
+    auto *cfilter = new EventFilter(this, 2);
     this->installEventFilter(filter);
     wctl->installEventFilter(filter);
     wctl->installEventFilter(cfilter);
@@ -629,10 +625,11 @@ void OMPlayer::clickCount() {
 
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void OMPlayer::detectClick() {
+    if (prevent) count = 0;
     if (count == 1 && !enterpos && playing && pausing)
         playPause();
     count = 0;
-    pausing = false;
+    pausing = prevent = false;
     QTimer::singleShot(500, this, SLOT(hideControls()));
 }
 
@@ -709,6 +706,8 @@ void OMPlayer::setSettings() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
     filter->setSett(showsett);
+    this->setMaximumSize(size);
+    this->setMinimumSize(size);
     sett->show();
 }
 
@@ -716,6 +715,9 @@ void OMPlayer::setSettings() {
 /** Função que fecha as configurações ao receber a emissão */
 void OMPlayer::closeSettings() {
     showsett = false;
+    prevent = true;
+    this->setMaximumSize(screen);
+    this->setMinimumSize(min);
     filter->setSett(showsett);
 }
 
@@ -725,6 +727,8 @@ void OMPlayer::setAbout() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
     showsett = true;
     filter->setSett(showsett);
+    this->setMaximumSize(size);
+    this->setMinimumSize(size);
     about->show();
 }
 
@@ -732,6 +736,9 @@ void OMPlayer::setAbout() {
 /** Função que fecha o sobre ao receber a emissão */
 void OMPlayer::closeAbout() {
     showsett = false;
+    prevent = true;
+    this->setMaximumSize(screen);
+    this->setMinimumSize(min);
     filter->setSett(showsett);
 }
 
@@ -888,8 +895,42 @@ void OMPlayer::moveEvent(QMoveEvent *event) {
 
 /** Evento que mapeia o redirecionamento da interface para o ajuste dos controles */
 void OMPlayer::resizeEvent(QResizeEvent *event) {
+    size = event->size();
     wctl->setFixedSize(event->size());
     QWidget::resizeEvent(event);
+}
+
+
+/** Mapeamento de eventos apenas para executar um ação após fechar os diálogos */
+bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *result) {
+    Q_UNUSED(result);
+    if (eventType == "xcb_generic_event_t") {
+        auto* event = static_cast<xcb_generic_event_t *>(message);
+        if (event->response_type == 35)
+            if (prevent) system("xdotool click 1");
+    }
+    return false;
+}
+
+
+/** Mapeamento dos eventos de maximizar, minimizar e restaurar */
+void OMPlayer::changeEvent(QEvent *event) {
+    if(event->type() == QEvent::WindowStateChange) {
+        if (int(this->windowState()) == 0) {      // Restaurar
+            qDebug("%s(%sDEBUG%s):%s Restaurando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+        }
+        else if (int(this->windowState()) == 1) { // Minimização
+            qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            if (showsett) this->showNormal();
+        }
+        else if (int(this->windowState()) == 2) { // Maximização
+            qDebug("%s(%sDEBUG%s):%s Maximizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+        }
+        else if (int(this->windowState()) == 3) { // Minimização direta
+            qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            if (showsett) this->showNormal();
+        }
+    }
 }
 
 

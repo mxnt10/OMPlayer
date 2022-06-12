@@ -23,9 +23,7 @@
 using namespace QtAV;
 using namespace MediaInfoDLL;
 
-
 /**********************************************************************************************************************/
-
 
 class OMPlayer : public QWidget {
 Q_OBJECT

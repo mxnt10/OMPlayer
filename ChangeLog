@@ -3,6 +3,37 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.4 ] - 2022-06-10 #############################################
+
+### Added / Adicionado
+ - Emissão de instanceStarted() para exibição imediata da primeira
+   instância ao abrir uma segunda.
+###
+
+### Upgraded / Atualizado
+ - Atualizado o SingleApplication.
+###
+
+### Changed / Modificado
+ - Modificação do código para a atualização da playlist ao passar
+   argumentos pela segunda instância.
+ - Alterações para redução de código em EventFilter.
+ - Refatoração de código.
+###
+
+### Fixed / Corrigido
+ - Bloqueio do widget pai ao abrir os diálogos Settings e About.
+ - Impedir maximização de Settings.
+ - Corrigido probremas com emissões ao fechar os diálogos com o mouse
+   posicionado fora do widget pai.
+ - Pequenas correções na exibição dos controles.
+ - Arquivos inválidos e inexistentes não são executados e não trancam
+   mais a reprodução.
+###
+
+##########################################################################
+
+
 ## [ 1.4b ] - 2022-06-05 #################################################
 
 ### Added / Adicionado

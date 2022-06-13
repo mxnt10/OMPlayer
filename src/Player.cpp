@@ -708,7 +708,8 @@ void OMPlayer::setSettings() {
 /** Função que fecha as configurações ao receber a emissão */
 void OMPlayer::closeSettings() {
     showsett = false;
-    prevent = true;
+    if (!this->isFullScreen())
+        prevent = true;
     this->setMaximumSize(screen);
     this->setMinimumSize(min);
     filter->setSett(showsett);
@@ -729,7 +730,8 @@ void OMPlayer::setAbout() {
 /** Função que fecha o sobre ao receber a emissão */
 void OMPlayer::closeAbout() {
     showsett = false;
-    prevent = true;
+    if (!this->isFullScreen())
+        prevent = true;
     this->setMaximumSize(screen);
     this->setMinimumSize(min);
     filter->setSett(showsett);

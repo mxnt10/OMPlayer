@@ -7,6 +7,7 @@
 
 /** Contrutor para o Label */
 Label::Label(const QFlag& align, int w, const QString& tooltip, const QString& text) {
+    setMouseTracking(true);
     setAlignment(align);
     txt = tooltip;
 

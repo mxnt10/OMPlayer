@@ -25,6 +25,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setWindowIcon(QIcon(Utils::setIcon()));
     this->setMinimumSize(min);
     this->setMouseTracking(true);
+    this->setAutoFillBackground(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     this->setStyleSheet(Utils::setStyle("global"));
     ScreenSaver::instance().disable();
@@ -33,7 +34,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Fundo preto */
     QPalette pal = QPalette();
     pal.setColor(QPalette::Window, Qt::black);
-    this->setAutoFillBackground(true);
     this->setPalette(pal);
 
 
@@ -114,12 +114,12 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
     qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
-    auto *nohide1 = new Widget();
-    connect(nohide1, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(nohide1, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    auto *nohide2 = new Widget();
-    connect(nohide2, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(nohide2, SIGNAL(emitLeave()), SLOT(hideTrue()));
+    auto *enterfilter = new EventFilter(this, 3);
+    auto *nohideleft = new QWidget();
+    auto *nohideright = new QWidget();
+    nohideleft->installEventFilter(enterfilter);
+    nohideright->installEventFilter(enterfilter);
+    connect(enterfilter, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
 
     /** Plano de fundo semitransparente dos controles de reprodução */
@@ -145,7 +145,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Layout dos botões */
     auto *buttons = new QHBoxLayout();
     buttons->setSpacing(5);
-    buttons->addWidget(nohide1);
+    buttons->addWidget(nohideleft);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
     buttons->addSpacing(5);
@@ -155,7 +155,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     buttons->addWidget(playBtn);
     buttons->addWidget(stopBtn);
     buttons->addWidget(nextBtn);
-    buttons->addWidget(nohide2);
+    buttons->addWidget(nohideright);
 
 
     /** Ajustes na barra de execução para inserir o tempo de execução e a duração */
@@ -193,7 +193,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Definição da logo */
     logo = new Label(CENTER);
     logo->setPixmap(QPixmap(Utils::setIcon(true)));
-    logo->setMouseTracking(true);
 
 
     /** Layout principal criado usando sobreposição de widgets */
@@ -639,6 +638,7 @@ void OMPlayer::detectClick() {
 
 /** Gerenciar tela cheia */
 void OMPlayer::changeFullScreen() {
+    if (prevent) return;
     if (this->isFullScreen())
         leaveFullScreen();
     else

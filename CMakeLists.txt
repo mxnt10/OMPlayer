@@ -42,7 +42,6 @@ add_executable(
         src/Settings.cpp    src/Settings.h
         src/Slider.cpp      src/Slider.h
         src/Utils.cpp       src/Utils.h
-        src/Widget.cpp      src/Widget.h
 
         src/PlayList.cpp         src/PlayList.h
         src/PlayListDelegate.cpp src/PlayListDelegate.h

@@ -21,6 +21,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Refatoração de código.
 ###
 
+### Removed / Removido
+ - Removido fontes Widget.{cpp/h} desnescessários.
+###
+
 ### Fixed / Corrigido
  - Bloqueio do widget pai ao abrir os diálogos Settings e About.
  - Impedir maximização de Settings.

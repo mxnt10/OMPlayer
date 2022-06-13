@@ -18,7 +18,6 @@
 #include "PlayList.h"
 #include "Settings.h"
 #include "Slider.h"
-#include "Widget.h"
 
 using namespace QtAV;
 using namespace MediaInfoDLL;

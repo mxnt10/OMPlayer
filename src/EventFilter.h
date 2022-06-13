@@ -28,6 +28,7 @@ signals:
     void emitReplay();
     void emitSettings();
     void emitEsc();
+    void emitEnter();
     void emitLeave();
 
 private slots:

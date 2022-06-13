@@ -147,6 +147,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         }
     }
 
+    /** Emissão para os controles */
     if (num == 2) {
         if (event->type() == QEvent::Enter)
             qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Sobre a Interface Flutuante ...\033[0m", GRE, RED, GRE, DGR);
@@ -156,6 +157,12 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
             qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Fora da Interface Flutuante ...\033[0m", GRE, RED, GRE, YEL);
             emit emitLeave();
         }
+    }
+
+    /** Emissão para QWidget */
+    if (num == 3) {
+        if (event->type() == QEvent::Enter)
+            emit emitEnter();
     }
 
     return false;

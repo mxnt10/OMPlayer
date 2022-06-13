@@ -5,6 +5,8 @@
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
+
+#include <filesystem>
 #include <xcb/xcb.h>
 
 #include "Defines.h"
@@ -28,14 +30,18 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     ScreenSaver::instance().disable();
 
 
-    /** Pré-visualização */
-    preview = new VideoPreviewWidget(this);
-    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
+    /** Fundo preto */
+    QPalette pal = QPalette();
+    pal.setColor(QPalette::Window, Qt::black);
+    this->setAutoFillBackground(true);
+    this->setPalette(pal);
 
 
-    /** Janela de configurações e sobre */
+    /** Janelas de configurações do programa e preview */
     about = new About(this);
     sett = new Settings(this);
+    preview = new VideoPreviewWidget(this);
+    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
     connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
     connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
@@ -114,9 +120,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *nohide2 = new Widget();
     connect(nohide2, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(nohide2, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    auto *nohide3 = new Widget();
-    connect(nohide3, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(nohide3, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Plano de fundo semitransparente dos controles de reprodução */
@@ -129,7 +132,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *bgctl = new QGridLayout();
     bgctl->setMargin(10);
     bgctl->addWidget(bgcontrol, 0, 0);
-    bgctl->addWidget(nohide3, 0, 0);
 
 
     /** Gerando uma linha */
@@ -422,7 +424,7 @@ void OMPlayer::nextRand() {
 
 /** Botão next */
 void OMPlayer::Next() {
-    if (mediaPlayer->isPlaying()) {
+    if (mediaPlayer->isPlaying() || playing) {
 
         /** Reprodução aleatória */
         if (randplay) {
@@ -630,17 +632,8 @@ void OMPlayer::detectClick() {
         playPause();
     count = 0;
     pausing = prevent = false;
-    QTimer::singleShot(500, this, SLOT(hideControls()));
-}
-
-
-/** Função auxiliar para fechar os controles, a função de pausar não emite outros sinais se estiver parado
- * ao dar um clique na tela, por isso esse recurso. */
-void OMPlayer::hideControls() {
-    if (!enterpos) {
-        setHide();
-        Utils::blankMouse();
-    }
+    if (wctl->isActiveWindow())
+        QCursor::setPos(QCursor::pos() + QPoint(1, 1));
 }
 
 
@@ -828,8 +821,8 @@ void OMPlayer::updateSlider(qint64 value) {
     /** Próxima mídia */
     if (int(value) > mediaPlayer->duration() - Utils::setDifere(unit)) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
-            mediaPlayer->stop();
             playing = false;
+            mediaPlayer->stop();
             playlist->selectClean();
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
@@ -856,7 +849,7 @@ void OMPlayer::onMediaStatusChanged() {
 
     switch (player->mediaStatus()) {
         case InvalidMedia:
-            status = "Invalid media !";
+            invalid = true;
             break;
         case BufferedMedia:
             status = "Buffered !";
@@ -864,11 +857,7 @@ void OMPlayer::onMediaStatusChanged() {
         case LoadedMedia:
             status = "Loaded !";
             break;
-        case StalledMedia:
-            status = "Stalled !";
-            break;
         default:
-            status = QString();
             break;
     }
 
@@ -879,7 +868,21 @@ void OMPlayer::onMediaStatusChanged() {
 
 /** Debug em caso de eventuais erros */
 void OMPlayer::handleError(const AVError &error) {
-    qDebug("%s(%sAVError%s):%s %s", GRE, RED, GRE, ERR, qUtf8Printable(error.string()));
+    string tr = error.string().toStdString();
+    Utils::rm_nl(tr);
+    qDebug("%s(%sAVError%s)%s::%s %s", GRE, RED, GRE, RED, ERR, tr.c_str());
+
+    if (!std::filesystem::exists(mediaPlayer->file().toStdString()) || invalid) {
+        if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
+            playing = false;
+            onStop();
+            playlist->selectClean();
+            previousitem = playlist->setListSize() - 1;
+            actualitem = 0;
+            nextitem = 1;
+        } else
+            Next();
+    }
 }
 
 
@@ -906,8 +909,12 @@ bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *res
     Q_UNUSED(result);
     if (eventType == "xcb_generic_event_t") {
         auto* event = static_cast<xcb_generic_event_t *>(message);
-        if (event->response_type == 35)
-            if (prevent) system("xdotool click 1");
+        if (event->response_type == 35) {
+            if (prevent) {
+                qDebug("%s(%sDEBUG%s):%s Gerando click fake ...\033[0m", GRE, RED, GRE, RED);
+                system("xdotool click 1");
+            }
+        }
     }
     return false;
 }

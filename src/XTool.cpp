@@ -30,7 +30,7 @@ void XTool::mouseClick() {
 void XTool::eventMouse(int x, int y) {
     Display *display = XOpenDisplay(nullptr);
     Window root = DefaultRootWindow(display);
-    XTestFakeMotionEvent(display, int(root), x, y, 0);
+    XTestFakeMotionEvent(display, root, x, y, 0);
     XFlush(display);
     mouseClick();
     XFlush(display);

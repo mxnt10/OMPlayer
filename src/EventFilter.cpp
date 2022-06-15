@@ -4,7 +4,6 @@
 #include <QTimer>
 #include <QWidget>
 
-#include "Defines.h"
 #include "EventFilter.h"
 #include "Utils.h"
 
@@ -47,6 +46,9 @@ void EventFilter::setSett(bool var) {
 void EventFilter::startShow(){
     start = true;
 }
+
+
+/**********************************************************************************************************************/
 
 
 /** Filtro de eventos que irá mapear tudo o que tem de direito */

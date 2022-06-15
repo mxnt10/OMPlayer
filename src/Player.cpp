@@ -9,10 +9,10 @@
 #include <filesystem>
 #include <xcb/xcb.h>
 
-#include "Defines.h"
 #include "JsonTools.h"
 #include "Player.h"
 #include "Utils.h"
+#include "XTool.h"
 
 
 /**********************************************************************************************************************/
@@ -914,7 +914,8 @@ bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *res
         if (event->response_type == 35) {
             if (prevent) {
                 qDebug("%s(%sDEBUG%s):%s Gerando click fake ...\033[0m", GRE, RED, GRE, RED);
-                system("xdotool click 1");
+                QPoint pos = QCursor::pos();
+                XTool::eventMouse(pos.x(), pos.y());
             }
         }
     }

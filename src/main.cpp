@@ -10,7 +10,6 @@
  *      - QtAV
  *      - libmediainfo
  *      - libzen
- *      - xdotool
  *
  * Licença: GNU General Public License Version 3 (GLPv3)
  *
@@ -28,9 +27,9 @@
 #include <filesystem>
 #include <SingleApplication>
 
-#include "Defines.h"
 #include "JsonTools.h"
 #include "Player.h"
+#include "Utils.h"
 
 #define DEBUG false
 

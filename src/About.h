@@ -9,7 +9,6 @@
 #define EMAIL "m10ferrari1200@gmail.com"
 #define LICENSE "GNU General Public License Version 3 (GLPv3)"
 
-/**********************************************************************************************************************/
 
 class About : public QDialog {
 Q_OBJECT

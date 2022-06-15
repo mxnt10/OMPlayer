@@ -3,7 +3,6 @@
 
 #include "About.h"
 #include "Button.h"
-#include "Defines.h"
 #include "Label.h"
 #include "Utils.h"
 

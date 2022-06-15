@@ -6,9 +6,6 @@
 #include "PlayListItem.h"
 
 
-/**********************************************************************************************************************/
-
-
 /** Definição de constantes */
 static const int margin = 5;
 static const int width = 320;

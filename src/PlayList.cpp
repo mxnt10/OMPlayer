@@ -7,8 +7,9 @@
 
 #include <filesystem>
 
-#include "Defines.h"
+#include "EventFilter.h"
 #include "PlayList.h"
+#include "PlayListDelegate.h"
 #include "Utils.h"
 
 
@@ -23,11 +24,18 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Lista para visualização da playlist */
-    listView = new ListView();
+    auto *filter = new EventFilter(this, 3);
+    listView = new QListView();
     listView->setModel(model);
+    listView->setItemDelegate(new PlayListDelegate(this));
+    listView->setSelectionMode(QAbstractItemView::ExtendedSelection); /** Uso com CTRL/SHIF */
+    listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    listView->setStyleSheet(Utils::setStyle("playlist"));
+    listView->setFixedWidth(280);
+    listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
     connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
-    connect(listView, SIGNAL(emitEnter()), SLOT(noHide()));
+    connect(filter, SIGNAL(emitEnter()), SLOT(noHide()));
 
 
     /** Botões para o painel da playlist */
@@ -106,7 +114,7 @@ void PlayList::load(bool second) {
     }
     f.close();
     actsum = hash.result().toHex();
-    qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, actsum.toStdString().c_str());
+    qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(actsum));
 
     if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
         qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
@@ -125,9 +133,8 @@ void PlayList::load(bool second) {
         }
         f.close();
         sum = actsum;
-    } else {
+    } else
         qDebug("%s(%sDEBUG%s):%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, BLU);
-    }
     save();
 }
 
@@ -207,9 +214,9 @@ void PlayList::addItems(const QStringList &parms) {
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
     if (duration == 0)
-        qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, ADD, url.toStdString().c_str());
+        qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, ADD, qUtf8Printable(url));
     else
-        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, url.toStdString().c_str());
+        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);

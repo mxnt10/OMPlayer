@@ -3,11 +3,12 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.4 ] - 2022-06-10 #############################################
+## [ 1.4 ] - 2022-06-14 #############################################
 
 ### Added / Adicionado
  - Emissão de instanceStarted() para exibição imediata da primeira
    instância ao abrir uma segunda.
+ - Adicionado em src, as fontes XTool.{cpp/h}.
 ###
 
 ### Upgraded / Atualizado
@@ -22,7 +23,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ###
 
 ### Removed / Removido
- - Removido fontes Widget.{cpp/h} desnescessários.
+ - Removido fontes ListView/Widget.{cpp/h} desnescessários.
+ - Removido também a fontes Defines.h sendo tudo reescrito em Utils.
 ###
 
 ### Fixed / Corrigido

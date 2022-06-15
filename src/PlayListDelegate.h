@@ -3,7 +3,6 @@
 
 #include <QStyledItemDelegate>
 
-/**********************************************************************************************************************/
 
 class PlayListDelegate : public QStyledItemDelegate {
 Q_OBJECT

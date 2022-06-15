@@ -1,14 +1,13 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
+#include <QListView>
 #include <QModelIndex>
 
 #include "Button.h"
-#include "ListView.h"
 #include "PlayListItem.h"
 #include "PlayListModel.h"
 
-/**********************************************************************************************************************/
 
 class PlayList : public QWidget {
 Q_OBJECT
@@ -55,8 +54,8 @@ private:
     Button *clearBtn{};
     Button *removeBtn{};
     Button *addBtn{};
-    ListView *listView{};
     PlayListModel *model{};
+    QListView *listView{};
     QString mfile{};
     QString sum{};
     QString actsum{};

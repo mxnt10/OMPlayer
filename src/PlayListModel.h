@@ -4,7 +4,6 @@
 #include <QAbstractListModel>
 #include "PlayListItem.h"
 
-/***********************************************************************************************************************/
 
 class PlayListModel : public QAbstractListModel {
 Q_OBJECT

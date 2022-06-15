@@ -2,7 +2,6 @@
 #include <QTabWidget>
 #include <QStyle>
 
-#include "Defines.h"
 #include "JsonTools.h"
 #include "Settings.h"
 #include "Utils.h"

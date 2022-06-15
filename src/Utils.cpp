@@ -3,7 +3,6 @@
 #include <QFile>
 #include <filesystem>
 
-#include "Defines.h"
 #include "JsonTools.h"
 #include "Utils.h"
 

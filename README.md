@@ -28,6 +28,7 @@
 - Ctrl+H: Shuffle mode.
 - Ctrl+T: Repeat mode.
 - Alt+Enter: Show/Exit fullscreen.
+- Alt+S: Show Settings.
 - Esc: Exit fullscreen.
 
 ## Installation instructions

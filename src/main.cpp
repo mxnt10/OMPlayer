@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
     parser.process(Player);
 
-    /** Define a interface do programa, envia os argumentos para o reprodutor*/
+    /** Define a interface do programa, envia os argumentos para o reprodutor */
     OMPlayer player;
     if (!parser.positionalArguments().isEmpty()) {
         player.openMedia(parser.positionalArguments());

@@ -3,7 +3,30 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.4 ] - 2022-06-14 #############################################
+## [ 1.4.1 ] - 2022-06-16 ################################################
+
+### Changed / Modificado
+ - Simplificação no código do clique fake.
+ - Alterações no debug.
+ - Desativação trmporária da logo inicial, a ser verificado nas
+   próximas atualizações.
+ - Desativando ativação do menu de contexto sobre os controles e
+   playlist totalmente desnecessário.
+###
+
+### Removed / Removido
+ - Remoção do fonte XTool.cpp desnecessário.
+###
+
+### Fixed / Corrigido
+ - Pequenas correções no fullscreen.
+ - Correção no clique fake ao sair das janelas de diálogo.
+###
+
+##########################################################################
+
+
+## [ 1.4 ] - 2022-06-14 ##################################################
 
 ### Added / Adicionado
  - Emissão de instanceStarted() para exibição imediata da primeira
@@ -24,7 +47,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Removed / Removido
  - Removido fontes ListView/Widget.{cpp/h} desnescessários.
- - Removido também a fontes Defines.h sendo tudo reescrito em Utils.
+ - Removido também a fonte Defines.h sendo tudo reescrito em Utils.
 ###
 
 ### Fixed / Corrigido

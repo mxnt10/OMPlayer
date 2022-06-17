@@ -131,17 +131,15 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Emissão ao soltar o botão do mouse */
         if (event->type() == QEvent::MouseButtonRelease) emit emitMouseRelease();
 
+        /** Mapeando duplo clique para o fullscreen */
+        if (event->type() == QEvent::MouseButtonDblClick) emit emitDoubleClick();
+
         /** Emissão para ativar o menu de contexto */
-        if (event->type() == QEvent::ContextMenu) {
+        if (event->type() == QEvent::ContextMenu && !fixed) {
             contextmenu = true;
             emit emitLeave();
             auto *e = dynamic_cast<QContextMenuEvent *>(event);
             emit customContextMenuRequested(e->pos());
-        }
-
-        /** Mapeando duplo clique para o fullscreen */
-        if (event->type() == QEvent::MouseButtonDblClick) {
-            emit emitDoubleClick();
         }
     }
 

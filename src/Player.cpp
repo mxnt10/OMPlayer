@@ -199,7 +199,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     layout = new QGridLayout();
     layout->setMargin(0);
     layout->addWidget(video->widget(), 0, 0);
-    layout->addWidget(logo, 0, 0);
     this->setLayout(layout);
 
 
@@ -514,7 +513,6 @@ void OMPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void OMPlayer::onStart() {
-    logo->setVisible(false);
     slider->setDisabled(false);
     playing = true;
 
@@ -572,7 +570,6 @@ void OMPlayer::onStop() {
 
         slider->setMaximum(0);
         slider->setDisabled(true);
-        logo->setVisible(true);
         current->setText(QString::fromLatin1("-- -- : -- --"));
         end->setText(QString::fromLatin1("-- -- : -- --"));
         onTimeSliderLeave();
@@ -655,6 +652,7 @@ void OMPlayer::enterFullScreen() {
 
     this->showFullScreen();
     wctl->close();
+    Utils::blankMouse();
     filter->setMove(false);
     enterpos = false;
 }
@@ -673,6 +671,7 @@ void OMPlayer::leaveFullScreen() {
         this->showMaximized();
 
     wctl->close();
+    Utils::blankMouse();
     filter->setMove(false);
     enterpos = maximize = false;
 }
@@ -910,14 +909,11 @@ void OMPlayer::resizeEvent(QResizeEvent *event) {
 bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *result) {
     Q_UNUSED(result);
     if (eventType == "xcb_generic_event_t") {
-        auto* event = static_cast<xcb_generic_event_t *>(message);
-        if (event->response_type == 35) {
-            if (prevent) {
-                qDebug("%s(%sDEBUG%s):%s Gerando click fake ...\033[0m", GRE, RED, GRE, RED);
-                QPoint pos = QCursor::pos();
-                XTool::eventMouse(pos.x(), pos.y());
-            }
-        }
+        auto *event = static_cast<xcb_generic_event_t *>(message);
+        if (event->response_type == 35 && prevent && !wctl->isActiveWindow()) {
+            qDebug("%s(%sDEBUG%s):%s Gerando click fake ...\033[0m", GRE, RED, GRE, RED);
+            mouseClick();
+        } else if (wctl->isActiveWindow()) prevent = false;
     }
     return false;
 }

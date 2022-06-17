@@ -107,8 +107,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
         /** Aproveitando o evento do tooltip para usar como mapeamento de mouse parado */
         if (event->type() == QEvent::ToolTip) {
-            qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
             if (!fixed) {
+                qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
                 Utils::blankMouse();
                 emit emitLeave();
             }
@@ -126,14 +126,10 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         }
 
         /** Emissão ao pressionar o mouse */
-        if (event->type() == QEvent::MouseButtonPress) {
-            emit emitMousePress();
-        }
+        if (event->type() == QEvent::MouseButtonPress) emit emitMousePress();
 
         /** Emissão ao soltar o botão do mouse */
-        if (event->type() == QEvent::MouseButtonRelease) {
-            emit emitMouseRelease();
-        }
+        if (event->type() == QEvent::MouseButtonRelease) emit emitMouseRelease();
 
         /** Emissão para ativar o menu de contexto */
         if (event->type() == QEvent::ContextMenu) {
@@ -151,20 +147,14 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
     /** Emissão para os controles */
     if (num == 2) {
-        if (event->type() == QEvent::Enter)
-            qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Sobre a Interface Flutuante ...\033[0m", GRE, RED, GRE, DGR);
-
         /** Mapeador para executar ações quando o ponteiro do mouse se encontra fora da interface */
-        if (event->type() == QEvent::Leave) {
-            qDebug("%s(%sDEBUG%s):%s Ponteito do Mouse Fora da Interface Flutuante ...\033[0m", GRE, RED, GRE, YEL);
-            emit emitLeave();
-        }
+        if (event->type() == QEvent::Leave) emit emitLeave();
     }
 
     /** Emissão para QWidget */
     if (num == 3) {
-        if (event->type() == QEvent::Enter)
-            emit emitEnter();
+        /** Mapeador para executar ações quando o ponteiro do mouse se encontra sobre a interface */
+        if (event->type() == QEvent::Enter) emit emitEnter();
     }
 
     return false;

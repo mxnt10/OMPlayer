@@ -30,7 +30,7 @@ add_subdirectory(
 
 add_executable(
         OMPlayer
-        src/main.cpp
+        src/main.cpp        src/XTool.h
         src/About.cpp       src/About.h
         src/Button.cpp      src/Button.h
         src/EventFilter.cpp src/EventFilter.h
@@ -40,7 +40,6 @@ add_executable(
         src/Settings.cpp    src/Settings.h
         src/Slider.cpp      src/Slider.h
         src/Utils.cpp       src/Utils.h
-        src/XTool.cpp       src/XTool.h
 
         src/PlayList.cpp         src/PlayList.h
         src/PlayListDelegate.cpp src/PlayListDelegate.h

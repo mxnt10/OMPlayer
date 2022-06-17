@@ -30,7 +30,8 @@ Label::~Label() = default;
 
 /** Ação ao posicionar o mouse sobre o label */
 void Label::enterEvent(QEvent *event) {
-    qDebug("%s(%sDEBUG%s):%s Mouse posicionado no label %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
+    if (!txt.isEmpty())
+        qDebug("%s(%sDEBUG%s):%s Mouse posicionado no label %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
     emit emitEnter();
     QWidget::enterEvent(event);
 }

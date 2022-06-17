@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkgver='1.4'
+pkgver='1.4.1'
 install_root=${install_root:-""}
 
 set -e

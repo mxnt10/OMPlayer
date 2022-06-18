@@ -48,7 +48,7 @@ public:
     static void blankMouse();
     static int calcX(int z, int x, int y);
     static int setDifere(int unit);
-    static void changeIcon(Button *btn, const QString &thm);
+    static void changeIcon(Button *btn, const QString &thm, const QString &ttp = nullptr);
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void rm_nl(string &s);
 };

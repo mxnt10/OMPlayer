@@ -39,13 +39,13 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button("add", 32, "Add items");
+    addBtn = new Button("add", 32, tr("Add items"));
     connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
 
-    removeBtn = new Button("remove", 32, "Remove items");
+    removeBtn = new Button("remove", 32, tr("Remove items"));
     connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
 
-    clearBtn = new Button("clean", 32, "Clear playlist");
+    clearBtn = new Button("clean", 32, tr("Clear playlist"));
     connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
 
 
@@ -168,11 +168,9 @@ void PlayList::addItems(const QStringList &parms) {
     QStringList files;
 
     /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-    for (int i = 0; i < 1000; i++)
-        Utils::arrowMouse();
+    for (int i = 0; i < 1000; i++) Utils::arrowMouse();
 
-    if (parms.isEmpty())
-        files = \
+    if (parms.isEmpty()) files = \
         QFileDialog::getOpenFileNames(
             nullptr, tr("Select multimedia files"),
             QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()),
@@ -229,8 +227,7 @@ void PlayList::insert(const QString &url, int row, qint64 duration, const QStrin
     insertItemAt(item, row);
 
     /** Se a duração é diferente de zero, é porque algum item foi atualizado */
-    if (duration != 0)
-        listView->setCurrentIndex(model->index(row));
+    if (duration != 0) listView->setCurrentIndex(model->index(row));
 }
 
 
@@ -300,8 +297,7 @@ void PlayList::removeSelectedItems(bool update) {
         return;
     QModelIndexList s = selection->selectedIndexes();
     for (int i = s.size() - 1; i >= 0; --i) {
-        if (!update)
-            emit emitremove(s.at(i).row());
+        if (!update) emit emitremove(s.at(i).row());
         model->removeRow(s.at(i).row());
     }
     save();
@@ -363,7 +359,6 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
 
 /** Emissão que serve como assistência para ocultar os controles */
 bool PlayList::event(QEvent *event) {
-    if (int(event->type()) == 110 && !isshow)
-        emit emithiden();
+    if (int(event->type()) == 110 && !isshow) emit emithiden();
     return QWidget::event(event);
 }

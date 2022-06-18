@@ -31,14 +31,14 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Versão do programa e demais informações*/
-    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, nullptr, "Version " + QString::fromStdString(VERSION));
+    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, nullptr, tr("Version") + " " + QString::fromStdString(VERSION));
     auto *maintainer = new Label(BOTTON, 0, nullptr, getTextMaintainer());
     version->setStyleSheet("font-size: 11pt");
     maintainer->setStyleSheet("font-size: 11pt");
 
 
     /** Botão para fechar a janela */
-    auto *closebtn = new Button("apply", 32, "Close");
+    auto *closebtn = new Button("apply", 32, tr("Close"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 
@@ -92,7 +92,7 @@ QString About::getTextMaintainer() {
 
 /** Descrição do programa */
 QString About::getDescription() {
-    return "\n" + tr("Multimedia player developed in C++ using Qt5 as an interface. ") + \
-    tr("To play multimedia files, the program uses the ") + "\n" + \
+    return "\n" + tr("Multimedia player developed in C++ using Qt5 as an interface.") + " " + \
+    tr("To play multimedia files, the program uses the") + " \n" + \
     tr("QtAV framework, which uses ffmpeg for handling multimedia files.");
 }

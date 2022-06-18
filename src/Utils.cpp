@@ -84,9 +84,8 @@ QString Utils::mediaTitle(const QString &mediafile){
     QString mediatitle = mediafile;
 
     /** Condição para definir o título na interface */
-    if (!mediafile.contains(QLatin1String("://")) || mediafile.startsWith(QLatin1String("file://"))) {
+    if (!mediafile.contains(QLatin1String("://")) || mediafile.startsWith(QLatin1String("file://")))
         mediatitle = QFileInfo(mediafile).fileName();
-    }
     return mediatitle;
 }
 
@@ -151,11 +150,12 @@ void Utils::blankMouse() {
 
 
 /** Alteração dos botões */
-void Utils::changeIcon(Button *btn, const QString &thm) {
+void Utils::changeIcon(Button *btn, const QString &thm, const QString &ttp) {
     QString theme = JsonTools::readJson("theme");
     if (Utils::setIconTheme(theme, thm) == nullptr)
         btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
     else btn->setIcon(QIcon(Utils::setIconTheme(theme, thm)));
+    if (!ttp.isNull()) btn->setToolTip(ttp);
 }
 
 
@@ -170,6 +170,5 @@ void Utils::changeMenuIcon(QAction &btn, const QString &thm) {
 
 /** Usado para tirar o "\n" dos debugs */
 void Utils::rm_nl(string &s) {
-    for (uint p = s.find('\n'); p != (uint) string::npos; p = s.find('\n'))
-        s.erase(p, 1);
+    for (uint p = s.find('\n'); p != (uint) string::npos; p = s.find('\n')) s.erase(p, 1);
 }

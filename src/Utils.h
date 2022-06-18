@@ -21,6 +21,7 @@
 #define SHW "\x1b[38;2;085;255;050m" //Ocultação
 #define ADD "\x1b[38;2;255;100;100m" //Adicionar
 #define UPD "\x1b[38;2;100;100;255m" //Atualizar
+#define RDL "\x1b[38;2;255;100;100m" //XTool
 
 #define CENTER Qt::AlignCenter
 #define TOP    Qt::AlignTop

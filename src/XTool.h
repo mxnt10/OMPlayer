@@ -8,6 +8,7 @@
 
 /** Função que vai efetuar o clique */
 void mouseClick() {
+    qDebug("%s(%sXTool%s)%s::%sGerando click fake ...\033[0m", GRE, RED, GRE, RED, RDL);
     Display *display = XOpenDisplay(nullptr);
 
     /** Pressionando o mouse */

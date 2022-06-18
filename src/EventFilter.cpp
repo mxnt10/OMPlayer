@@ -64,9 +64,9 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {
-            auto *key_event = dynamic_cast<QKeyEvent *>(event);
-            int key = key_event->key();
-            Qt::KeyboardModifiers modifiers = key_event->modifiers();
+            auto *ke = dynamic_cast<QKeyEvent *>(event);
+            int key = ke->key();
+            Qt::KeyboardModifiers modifiers = ke->modifiers();
 
             switch (key) {
                 case Qt::Key_A:
@@ -126,7 +126,11 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         }
 
         /** Emissão ao pressionar o mouse */
-        if (event->type() == QEvent::MouseButtonPress) emit emitMousePress();
+        if (event->type() == QEvent::MouseButtonPress) {
+            auto *me = dynamic_cast<QMouseEvent*>(event);
+            Qt::MouseButton bt = me->button();
+            if (bt == Qt::LeftButton) emit emitMousePress();
+        }
 
         /** Emissão ao soltar o botão do mouse */
         if (event->type() == QEvent::MouseButtonRelease) emit emitMouseRelease();

@@ -566,14 +566,13 @@ void OMPlayer::setShuffle() {
 
 /** Função para ativar a função pause com um clique */
 void OMPlayer::enablePause() {
-    pausing = true;
+    if (!enterpos) pausing = true;
 }
 
 
 /** Contador para mapear o clique único */
 void OMPlayer::clickCount() {
-    if (!click->isActive())
-        click->start();
+    if (!click->isActive()) click->start();
     count = count + 1; /** Contador de cliques */
 }
 
@@ -581,12 +580,10 @@ void OMPlayer::clickCount() {
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void OMPlayer::detectClick() {
     if (prevent) count = 0;
-    if (count == 1 && !enterpos && playing && pausing)
-        playPause();
-    count = 0;
+    if (count == 1 && !enterpos && playing && pausing) playPause();
+    if (wctl->isActiveWindow()) QCursor::setPos(QCursor::pos() + QPoint(1, 1));
     pausing = prevent = false;
-    if (wctl->isActiveWindow())
-        QCursor::setPos(QCursor::pos() + QPoint(1, 1));
+    count = 0;
 }
 
 
@@ -855,10 +852,7 @@ bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *res
     Q_UNUSED(result);
     if (eventType == "xcb_generic_event_t") {
         auto *event = static_cast<xcb_generic_event_t *>(message);
-        if (event->response_type == 35 && prevent && !wctl->isActiveWindow()) {
-            qDebug("%s(%sDEBUG%s):%s Gerando click fake ...\033[0m", GRE, RED, GRE, RED);
-            mouseClick();
-        } else if (wctl->isActiveWindow()) prevent = false;
+        if (event->response_type == 35 && prevent && !wctl->isActiveWindow()) mouseClick();
     }
     return false;
 }
@@ -900,6 +894,7 @@ void OMPlayer::closeEvent(QCloseEvent *event) {
 /** Função para o menu de contexto do programa */
 void OMPlayer::ShowContextMenu(const QPoint &pos) {
     qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
+    if (prevent) prevent = false;
     auto *effect = new QGraphicsOpacityEffect();
     effect->setOpacity(0.8);
     Utils::arrowMouse();

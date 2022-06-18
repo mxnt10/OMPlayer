@@ -58,9 +58,8 @@ private Q_SLOTS:
     void hideTrue();
     void hideFalse();
     void setSettings();
-    void closeSettings();
     void setAbout();
-    void closeAbout();
+    void closeDialog();
     void changeFullScreen();
     void enterFullScreen();
     void leaveFullScreen();

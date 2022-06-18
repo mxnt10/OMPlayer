@@ -43,8 +43,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     preview = new VideoPreviewWidget(this);
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
-    connect(sett, SIGNAL(emitclose()), this, SLOT(closeSettings()));
-    connect(about, SIGNAL(emitclose()), this, SLOT(closeAbout()));
+    connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));
+    connect(about, SIGNAL(emitclose()), this, SLOT(closeDialog()));
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
@@ -83,31 +83,31 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Labels para mostrar o tempo de execução e a duração */
-    current = new Label(CENTER, 70, "Current time", "-- -- : -- --");
+    current = new Label(CENTER, 70, tr("Current time"), "-- -- : -- --");
     connect(current, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(current, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    end = new Label(CENTER, 70, "Duration", "-- -- : -- --");
+    end = new Label(CENTER, 70, tr("Duration"), "-- -- : -- --");
     connect(end, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(end, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
 
     /** Botões para os controles de reprodução */
-    playBtn = new Button("play", 48);
+    playBtn = new Button("play", 48, tr("Play"));
     connect(playBtn, SIGNAL(clicked()), SLOT(playPause()));
     connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    stopBtn = new Button("stop", 32);
+    stopBtn = new Button("stop", 32, tr("Stop"));
     connect(stopBtn, SIGNAL(clicked()), SLOT(setStop()));
     connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    nextBtn = new Button("next", 32);
+    nextBtn = new Button("next", 32, tr("Next"));
     connect(nextBtn, SIGNAL(clicked()), SLOT(Next()));
     connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    previousBtn = new Button("previous", 32);
+    previousBtn = new Button("previous", 32, tr("Previous"));
     connect(previousBtn, SIGNAL(clicked()), SLOT(Previous()));
     connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    replayBtn = new Button("replay", 32);
+    replayBtn = new Button("replay", 32, tr("Replay"));
     connect(replayBtn, SIGNAL(clicked()), SLOT(setReplay()));
     connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    shuffleBtn = new Button("shuffle", 32);
+    shuffleBtn = new Button("shuffle", 32, tr("Shuffle"));
     connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
@@ -293,36 +293,46 @@ void OMPlayer::onLoad() {
 /** Função que possui o propósito de ajustar a ordem de execução ao remover itens da playlist anteriores ao
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
-    int actual = nextitem - 1;
-    int c = 0;
-    if (item < actual) {
-        c++;
-        playlist->selectCurrent(nextitem - c);
-        nextitem--;
-        actualitem--;
-        previousitem--;
-        if (previousitem == -1)
-            previousitem = playlist->setListSize() - 1;
-        if (actualitem == -1)
-            actualitem = playlist->setListSize() - 1;
-        if (nextitem == -1)
-            nextitem = playlist->setListSize() - 1;
+    listnum.clear();  /** É preferível redefinir a contagem aleatória */
+    if (!playing) return;
+
+    if (item < actualitem) {
+        playlist->selectCurrent(actualitem--);
+        actualitem = actualitem--;
+        nextitem = actualitem + 1;
+        previousitem = actualitem - 1;
+        if (actualitem == 0) previousitem = playlist->setListSize() - 1;
+        if (actualitem == playlist->setListSize() - 1) nextitem = 0;
+        return;
     }
 
-    if (item > actual)
-        playlist->selectCurrent(actual);
+    if (item == actualitem) {
+        if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
+            playing = false;
+            mediaPlayer->stop();
+            playlist->selectClean();
+            previousitem = playlist->setListSize() - 1;
+            actualitem = 0;
+            nextitem = 1;
+        } else {
+            play(playlist->getItems(nextitem), nextitem);
+            actualitem = previousitem;
+            nextitem = actualitem + 1;
+            previousitem = actualitem - 1;
+            if (actualitem == 0) previousitem = playlist->setListSize() - 1;
+            if (actualitem == playlist->setListSize() - 1) nextitem = 0;
+        }
+        return;
+    }
 
-    if (item == actual)
-        play(playlist->getItems(nextitem), nextitem);
-
-    listnum.clear();
+    if (item > actualitem) playlist->selectCurrent(actualitem);
 }
 
 
 /** Setando o item atualmente selecionado */
 void OMPlayer::setSelect(int item) {
-    actualitem = item;
     if (!playing) {
+        actualitem = item;
         qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
                qUtf8Printable(Utils::mediaTitle(playlist->getItems(item))));
     }
@@ -335,8 +345,28 @@ void OMPlayer::play(const QString &isplay, int index) {
     if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
         mediaPlayer->stop();
     mediaPlayer->play(isplay);
-    if (index > (-1))
+    if (index > (-1)) {
         playlist->selectCurrent(index);
+
+         /**
+         * Cálculo dos próximos itens a serem executados. O cálculo foi baseado na seguinte forma, uma lista começa
+         * do 0. Portanto, uma lista de 10 itens vai vai de 0 a 9.
+         *
+         * O primeiro item selecionado da playlist vai ser 0, e o item anterior vai ser contabilizado como -1, que não
+         * existe na lista. Por isso, é necessário o ajuste.
+         *
+         * A função setListSize() retorna o número de itens e não a posição, necessário subtrair 1.
+         *
+         * Já ao selecionar o último número da playlist, o próximo item vai exceder o número de posições e como a ideia
+         * é que a função Next() ao chegar ao último item retorne para o ínicio, então o valor é corrigido para 0.
+         */
+
+        actualitem = index;
+        nextitem = actualitem + 1;
+        previousitem = actualitem - 1;
+        if (actualitem == 0) previousitem = playlist->setListSize() - 1;
+        if (actualitem == playlist->setListSize() - 1) nextitem = 0;
+    }
 }
 
 
@@ -345,14 +375,6 @@ void OMPlayer::firstPlay(const QString &isplay, int pos) {
     if (!mediaPlayer->isPlaying()) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
         play(isplay, pos);
-
-        actualitem = pos;
-        nextitem = actualitem + 1;
-        previousitem = actualitem - 1;
-        if (actualitem == 0)
-            previousitem = playlist->setListSize() - 1;
-        if (actualitem == playlist->setListSize() - 1)
-            nextitem = 0;
     }
 }
 
@@ -360,28 +382,7 @@ void OMPlayer::firstPlay(const QString &isplay, int pos) {
 /** Executa um item selecionado da playlist */
 void OMPlayer::doubleplay(const QString &name) {
     qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
-    play(name);
-
-    /**
-     * Cálculo dos próximos itens a serem executados. O cálculo foi baseado na seguinte forma, uma lista começa
-     * do 0. Portanto, uma lista de 10 itens vai vai de 0 a 9.
-     *
-     * O primeiro item selecionado da playlist vai ser 0, e o item anterior vai ser contabilizado como -1, que não
-     * existe na lista. Por isso, é necessário o ajuste.
-     *
-     * A função setListSize() retorna o número de itens e não a posição, necessário subtrair 1.
-     *
-     * Já ao selecionar o último número da playlist, o próximo item vai exceder o número de posições e como a ideia
-     * é que a função Next() ao chegar ao último item retorne para o ínicio, então o valor é corrigido para 0.
-     */
-
-    actualitem = playlist->selectItems();
-    nextitem = actualitem + 1;
-    previousitem = actualitem - 1;
-    if (actualitem == 0)
-        previousitem = playlist->setListSize() - 1;
-    if (actualitem == playlist->setListSize() - 1)
-        nextitem = 0;
+    play(name, playlist->selectItems());
 }
 
 
@@ -409,14 +410,6 @@ void OMPlayer::nextRand() {
     }
 
     play(playlist->getItems(actualitem), actualitem);
-
-    /** Cálculo dos próximos itens a serem executados */
-    nextitem = actualitem + 1;
-    previousitem = actualitem - 1;
-    if (actualitem == 0)
-        previousitem = playlist->setListSize() - 1;
-    if (actualitem == playlist->setListSize() - 1)
-        nextitem = 0;
 }
 
 
@@ -432,39 +425,15 @@ void OMPlayer::Next() {
 
         qDebug("%s(%sDEBUG%s):%s Reproduzindo o próximo item ...\033[0m", GRE, RED, GRE, ORA);
         play(playlist->getItems(nextitem), nextitem);
-
-        /** Cálculo dos próximos itens a serem executados */
-        nextitem++;
-        actualitem++;
-        previousitem++;
-        /** O valor dos índices é sempre o número de itens - 1, se igualar tem que zerar */
-        if (previousitem == playlist->setListSize())
-            previousitem = 0;
-        if (actualitem == playlist->setListSize())
-            actualitem = 0;
-        if (nextitem == playlist->setListSize())
-            nextitem = 0;
     }
 }
 
 
 /** Botão previous */
 void OMPlayer::Previous() {
-    if (mediaPlayer->isPlaying()) {
+    if (mediaPlayer->isPlaying() || playing) {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, ORA);
         play(playlist->getItems(previousitem), previousitem);
-
-        /** Cálculo dos próximos itens a serem executados */
-        nextitem--;
-        actualitem--;
-        previousitem--;
-        /** Dispensa comentários, o valor dos índices é sempre o número de itens - 1 */
-        if (previousitem == -1)
-            previousitem = playlist->setListSize() - 1;
-        if (actualitem == -1)
-            actualitem = playlist->setListSize() - 1;
-        if (nextitem == -1)
-            nextitem = playlist->setListSize() - 1;
     }
 }
 
@@ -477,12 +446,6 @@ void OMPlayer::playPause() {
             if (playlist->getItems(actualitem).isEmpty()) actualitem = 0;
             play(playlist->getItems(actualitem), actualitem);
         }
-        nextitem = actualitem + 1;
-        previousitem = actualitem - 1;
-        if (actualitem == 0)
-            previousitem = playlist->setListSize() - 1;
-        if (actualitem == playlist->setListSize() - 1)
-            nextitem = 0;
         return;
     }
     mediaPlayer->pause(!mediaPlayer->isPaused());
@@ -501,23 +464,19 @@ void OMPlayer::setStop() {
 void OMPlayer::onPaused(bool paused) {
     if (paused) {
         qDebug("%s(%sDEBUG%s):%s Pausando ...\033[0m", GRE, RED, GRE, ORA);
-        Utils::changeIcon(playBtn, "play");
-        playBtn->setToolTip("Play");
+        Utils::changeIcon(playBtn, "play", tr("Play"));
     } else {
         qDebug("%s(%sDEBUG%s):%s Reproduzindo ...\033[0m", GRE, RED, GRE, ORA);
-        Utils::changeIcon(playBtn, "pause");
-        playBtn->setToolTip("Pause");
+        Utils::changeIcon(playBtn, "pause", tr("Pause"));
     }
 }
 
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void OMPlayer::onStart() {
+    Utils::changeIcon(playBtn, "pause", tr("Pause"));
     slider->setDisabled(false);
     playing = true;
-
-    Utils::changeIcon(playBtn, "pause");
-    playBtn->setToolTip("Pause");
 
     /** Definindo dimensões para o preview */
     MI.Open(mediaPlayer->file().toStdString());
@@ -563,10 +522,8 @@ void OMPlayer::onStart() {
 void OMPlayer::onStop() {
     if (!playing) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, ORA);
+        Utils::changeIcon(playBtn, "play", tr("Play"));
         this->setWindowTitle(QString(PRG_NAME));
-
-        Utils::changeIcon(playBtn, "play");
-        playBtn->setToolTip("Play");
 
         slider->setMaximum(0);
         slider->setDisabled(true);
@@ -704,17 +661,6 @@ void OMPlayer::setSettings() {
 }
 
 
-/** Função que fecha as configurações ao receber a emissão */
-void OMPlayer::closeSettings() {
-    showsett = false;
-    if (!this->isFullScreen())
-        prevent = true;
-    this->setMaximumSize(screen);
-    this->setMinimumSize(min);
-    filter->setSett(showsett);
-}
-
-
 /** Função para exibir o sobre */
 void OMPlayer::setAbout() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
@@ -727,12 +673,11 @@ void OMPlayer::setAbout() {
 
 
 /** Função que fecha o sobre ao receber a emissão */
-void OMPlayer::closeAbout() {
-    showsett = false;
-    if (!this->isFullScreen())
-        prevent = true;
+void OMPlayer::closeDialog() {
+    if (!this->isFullScreen()) prevent = true;
     this->setMaximumSize(screen);
     this->setMinimumSize(min);
+    showsett = false;
     filter->setSett(showsett);
 }
 
@@ -964,39 +909,39 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     contextMenu.setStyleSheet(Utils::setStyle("contextmenu"));
 
     /** Menu de abrir */
-    QAction open("Open Files", this);
+    QAction open(tr("Open Files"), this);
     open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
     Utils::changeMenuIcon(open, "folder");
     connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
 
     /** Menu tela cheia */
-    QAction fullscreen("Show Fullscreen", this);
+    QAction fullscreen(tr("Show Fullscreen"), this);
     if (this->isFullScreen())
-        fullscreen.setText("Exit Fullscreen");
+        fullscreen.setText(tr("Exit Fullscreen"));
     fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
     Utils::changeMenuIcon(fullscreen, "fullscreen");
     connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
     /** Menu aleatório */
-    QAction shuffle("Shuffle", this);
+    QAction shuffle(tr("Shuffle"), this);
     shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
     Utils::changeMenuIcon(shuffle, "shuffle-menu");
     connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
 
     /** Menu repetir */
-    QAction replay("Replay", this);
+    QAction replay(tr("Replay"), this);
     replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
     Utils::changeMenuIcon(replay, "replay-menu");
     connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
 
     /** Menu de configuração */
-    QAction settings("Settings", this);
+    QAction settings(tr("Settings"), this);
     settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
     Utils::changeMenuIcon(settings, "settings");
     connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
 
     /** Menu sobre */
-    QAction mabout("About", this);
+    QAction mabout(tr("About"), this);
     Utils::changeMenuIcon(mabout, "about");
     connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
 

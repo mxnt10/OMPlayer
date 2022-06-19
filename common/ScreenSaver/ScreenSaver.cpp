@@ -187,7 +187,7 @@ bool ScreenSaver::enable(bool yes) {
             ret = XResetScreenSaver(display);
             XCloseDisplay(display);
             rv = ret==Success;
-            qDebug("%s(%sScreenSaver%s)%s::%senable %d, ret %d timeout origin: %d ...\033[0m",
+            qDebug("%s(%sScreenSaver%s)%s::%sEnable %d, ret %d timeout origin: %d ...\033[0m",
                    GRE, RED, GRE, RED, CYA, yes, ret, timeout);
         }
         modified = true;
@@ -243,7 +243,7 @@ bool ScreenSaver::retrieveState() {
                 Display *display = XOpenDisplay(nullptr);
                 XGetScreenSaver(display, &timeout, &interval, &preferBlanking, &allowExposures);
                 XCloseDisplay(display);
-                qDebug("%s(%sScreenSaver%s)%s::%sretrieveState timeout: %d, interval: %d, preferBlanking: %d, allowExposures: %d ...\033[0m",
+                qDebug("%s(%sScreenSaver%s)%s::%sRetrieveState timeout: %d, interval: %d, preferBlanking: %d, allowExposures: %d ...\033[0m",
                        GRE, RED, GRE, RED, CYA, timeout, interval, preferBlanking, allowExposures);
                 state_saved = rv = true;
             }

@@ -111,6 +111,7 @@ private:
     VideoPreviewWidget *preview{};
     bool playing{false};
     bool pausing{false};
+    bool nopause{false};
     bool restart{false};
     bool randplay{false};
     bool enterpos{false};

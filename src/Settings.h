@@ -17,16 +17,25 @@ signals:
 
 private slots:
     void onClose();
-    void rendererReset();
-    void setOpenglwidget();
-    void setWidgetrend();
+    void rendererSelect(Button *btn, const QString &name, const QString &desc);
+    void setOpenglWidget();
     void setQGLWidget2();
-    void setX11rend();
-    void setXVideorend();
+    void setDirect2D();
+    void setGDI();
+    void setXVideo();
+    void setX11renderer();
+    void setQGLWidget();
+    void setWidget();
 
 private:
-    Button *openglwidget, *qglwidget2, *widgetrend, *xvideorend, *x11rend;
+    Button *openglwidget{};
+    Button *qglwidget2{};
+    Button *x11renderer{};
+    Button *xvideo{};
+    Button *direct2d{};
+    Button *gdi{};
+    Button *qglwidget{};
+    Button *widget{};
 };
-
 
 #endif //OMPLAYER_SETTINGS_H

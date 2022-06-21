@@ -8,19 +8,28 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### Changed / Modificado
  - Simplificação no código do clique fake.
  - Alterações no debug.
- - Desativação trmporária da logo inicial, a ser verificado nas
+ - Desativação temporária da logo inicial, a ser verificado nas
    próximas atualizações.
  - Desativando ativação do menu de contexto sobre os controles e
    playlist totalmente desnecessário.
+ - Preparando o reprodutor para o suporte a tradução.
+ - Simplificação no código ao fechar os diálogos.
+ - Modificação no método para mapear os itens a serem reproduzidos.
+ - Widgets dos controles e diálogos filhos conectados ao pai.
+ - Refatoração de código para settings.
 ###
 
 ### Removed / Removido
  - Remoção do fonte XTool.cpp desnecessário.
+ - Remoção de código desnecessário.
 ###
 
 ### Fixed / Corrigido
  - Pequenas correções no fullscreen.
  - Correção no clique fake ao sair das janelas de diálogo.
+ - Correções nos ajustes na playlist ao remover itens.
+ - Correção ao selecionar o item atual antes da reprodução.
+ - Correções no recurso de play/pause com um clique.
 ###
 
 ##########################################################################

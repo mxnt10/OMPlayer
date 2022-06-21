@@ -245,28 +245,39 @@ void OMPlayer::openMedia(const QStringList &parms) {
 
 /** Setando opções de Rendenização */
 void OMPlayer::setRenderer(const QString &op) {
-    VideoRenderer *vo;
+    VideoRenderer *vo{};
 
-    if (QString::compare(op, "openglwidget", Qt::CaseSensitive) == 0)
+    if (QString::compare(op, "opengl", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_OpenGLWidget);
 
-    if (QString::compare(op, "qglwidget2", Qt::CaseSensitive) == 0)
+    if (QString::compare(op, "gl2", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_GLWidget2);
 
-    if (QString::compare(op, "widget", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_Widget);
+    if (QString::compare(op, "d2d", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_Direct2D);
 
-    if (QString::compare(op, "xvideo", Qt::CaseSensitive) == 0)
+    if (QString::compare(op, "gdi", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_GDI);
+
+    if (QString::compare(op, "xv", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_XV);
 
     if (QString::compare(op, "x11", Qt::CaseSensitive) == 0)
         vo = VideoRenderer::create(VideoRendererId_X11);
 
+    if (QString::compare(op, "gl", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_GLWidget);
+
+    if (QString::compare(op, "qt", Qt::CaseSensitive) == 0)
+        vo = VideoRenderer::create(VideoRendererId_Widget);
+
 
     /** Verificando se o layout já foi criado. É necessário readicionar o widget ao mudar a renderização. */
     if (layout) layout->removeWidget(video->widget());
 
-    video = new VideoOutput(vo->id(), this);
+    if (vo && vo->isAvailable())
+        video = new VideoOutput(vo->id(), this);
+    else video = new VideoOutput(this);
     video->widget()->setMouseTracking(true);
     mediaPlayer->setRenderer(video);
 
@@ -279,7 +290,7 @@ void OMPlayer::setRenderer(const QString &op) {
     else
         mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
-    qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(op), vo->id());
+    if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(op), vo->id());
 }
 
 

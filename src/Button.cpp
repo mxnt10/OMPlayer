@@ -37,8 +37,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     } else if (QString::compare(tooltip, NOTOOLTIP, Qt::CaseSensitive) != 0)
         setToolTip(tooltip);
 
-    if (fixed)
-        connect(this, SIGNAL(pressed()), SLOT(onEffect()));
+    if (fixed) connect(this, SIGNAL(pressed()), SLOT(onEffect()));
 }
 
 
@@ -83,9 +82,7 @@ void Button::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    if (fix)
-        setIconSize(QSize(num, num));
-    else
-        setText(txt);
+    if (fix) setIconSize(QSize(num, num));
+    else setText(txt);
     QPushButton::leaveEvent(event);
 }

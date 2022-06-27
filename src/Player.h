@@ -40,8 +40,6 @@ private Q_SLOTS:
     void doubleplay(const QString &name);
     void setReplay();
     void setShuffle();
-    void seekBySlider();
-    void seekBySlider(int value);
     void ShowContextMenu(const QPoint &pos);
     void play(const QString &isplay, int index = (-1));
     void setRenderer(const QString &op);
@@ -71,6 +69,13 @@ private Q_SLOTS:
     void enablePause();
     void clickCount();
     void detectClick();
+    void seekBySlider();
+    void seekBySlider(int value);
+    void seekFinished(qint64 pos);
+    void setMute();
+    void setVolume();
+    void setVolume(int value);
+    void volumeFinished(qreal pos);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
 
@@ -90,6 +95,7 @@ private:
     Button *previousBtn{};
     Button *replayBtn{};
     Button *shuffleBtn{};
+    Button *volumeBtn{};
     EventFilter *filter{};
     MediaInfo MI{};
     PlayList *playlist{};
@@ -107,10 +113,12 @@ private:
     QWidget *wctl{};
     Settings *sett{};
     Slider *slider{};
+    Slider *volume{};
     VideoOutput *video{};
     VideoPreviewWidget *preview{};
     bool playing{false};
     bool pausing{false};
+    bool muted{false};
     bool nopause{false};
     bool restart{false};
     bool randplay{false};

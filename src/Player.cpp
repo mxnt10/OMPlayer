@@ -50,6 +50,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new AVPlayer(this);
     setRenderer(JsonTools::readJson("renderer"));
+    connect(mediaPlayer->audio(), SIGNAL(volumeChanged(qreal)), SLOT(volumeFinished(qreal)));
+    connect(mediaPlayer, SIGNAL(seekFinished(qint64)), SLOT(seekFinished(qint64)));
     connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
     connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
     connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
@@ -73,13 +75,22 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Barra de progresso de execução */
-    slider = new Slider(this, true, 28, 0);
+    slider = new Slider(this, true, (-1), 28, 0);
     slider->setTracking(true);
     connect(slider, SIGNAL(onHover(int,int)), SLOT(onTimeSliderHover(int,int)));
     connect(slider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
     connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
     connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
     connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
+
+
+    /** Controle do volume */
+    volume = new Slider(this, false, 90, (-1), 100);
+    volume->setValue(int(mediaPlayer->audio()->volume() * 100));
+    volume->setTracking(true);
+    connect(volume, SIGNAL(sliderMoved(int)), SLOT(setVolume(int)));
+    connect(volume, SIGNAL(sliderPressed()), SLOT(setVolume()));
+    connect(volume, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
 
     /** Labels para mostrar o tempo de execução e a duração */
@@ -110,7 +121,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     shuffleBtn = new Button("shuffle", 32, tr("Shuffle"));
     connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-
+    volumeBtn = new Button("volume_high", 32, tr("Volume"));
+    connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
+    connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
     qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
@@ -146,15 +159,18 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *buttons = new QHBoxLayout();
     buttons->setSpacing(5);
     buttons->addWidget(nohideleft);
+    buttons->addSpacing(50);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
     buttons->addSpacing(5);
     buttons->addWidget(line);
     buttons->addSpacing(5);
+    buttons->addWidget(stopBtn);
     buttons->addWidget(previousBtn);
     buttons->addWidget(playBtn);
-    buttons->addWidget(stopBtn);
     buttons->addWidget(nextBtn);
+    buttons->addWidget(volumeBtn);
+    buttons->addWidget(volume);
     buttons->addWidget(nohideright);
 
 
@@ -247,30 +263,22 @@ void OMPlayer::openMedia(const QStringList &parms) {
 void OMPlayer::setRenderer(const QString &op) {
     VideoRenderer *vo{};
 
-    if (QString::compare(op, "opengl", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_OpenGLWidget);
+    struct {
+        const char* name;
+        VideoRendererId id;
+    } rend[] = {{"OpenGL",     VideoRendererId_OpenGLWidget },
+                {"QGLWidget2", VideoRendererId_GLWidget2    },
+                {"Direct2D",   VideoRendererId_Direct2D     },
+                {"GDI",        VideoRendererId_GDI          },
+                {"XVideo",     VideoRendererId_XV           },
+                {"X11",        VideoRendererId_X11          },
+                {"QGLWidget",  VideoRendererId_GLWidget     },
+                {"Widget",     VideoRendererId_Widget       }, {nullptr, 0}};
 
-    if (QString::compare(op, "gl2", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_GLWidget2);
-
-    if (QString::compare(op, "d2d", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_Direct2D);
-
-    if (QString::compare(op, "gdi", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_GDI);
-
-    if (QString::compare(op, "xv", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_XV);
-
-    if (QString::compare(op, "x11", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_X11);
-
-    if (QString::compare(op, "gl", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_GLWidget);
-
-    if (QString::compare(op, "qt", Qt::CaseSensitive) == 0)
-        vo = VideoRenderer::create(VideoRendererId_Widget);
-
+    for (int i = 0; rend[i].name; ++i) {
+        if (QString::compare(op, rend[i].name, Qt::CaseSensitive) == 0)
+            vo = VideoRenderer::create(rend[i].id);
+    }
 
     /** Verificando se o layout já foi criado. É necessário readicionar o widget ao mudar a renderização. */
     if (layout) layout->removeWidget(video->widget());
@@ -290,7 +298,8 @@ void OMPlayer::setRenderer(const QString &op) {
     else
         mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
-    if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(op), vo->id());
+    if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
+                   qUtf8Printable(op), vo->id());
 }
 
 
@@ -359,8 +368,7 @@ void OMPlayer::play(const QString &isplay, int index) {
     if (index > (-1)) {
         playlist->selectCurrent(index);
 
-         /**
-         * Cálculo dos próximos itens a serem executados. O cálculo foi baseado na seguinte forma, uma lista começa
+        /** Cálculo dos próximos itens a serem executados. O cálculo foi baseado na seguinte forma, uma lista começa
          * do 0. Portanto, uma lista de 10 itens vai vai de 0 a 9.
          *
          * O primeiro item selecionado da playlist vai ser 0, e o item anterior vai ser contabilizado como -1, que não
@@ -369,8 +377,7 @@ void OMPlayer::play(const QString &isplay, int index) {
          * A função setListSize() retorna o número de itens e não a posição, necessário subtrair 1.
          *
          * Já ao selecionar o último número da playlist, o próximo item vai exceder o número de posições e como a ideia
-         * é que a função Next() ao chegar ao último item retorne para o ínicio, então o valor é corrigido para 0.
-         */
+         * é que a função Next() ao chegar ao último item retorne para o ínicio, então o valor é corrigido para 0. */
 
         actualitem = index;
         nextitem = actualitem + 1;
@@ -403,12 +410,10 @@ void OMPlayer::nextRand() {
     if (listnum.size() < playlist->setListSize() - 1) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
-        /**
-         * No método aleatório convencional, alguns itens são reproduzidos mais vezes que os outros. Portanto,
+        /** No método aleatório convencional, alguns itens são reproduzidos mais vezes que os outros. Portanto,
          * criei esse método para executar os itens aleatoriamente só que um de cada vez. Assim, quando todos os
          * arquivos multimídia forem reproduzidos aleatoriamente, aí sim é zerado o contador para recameçar a
-         * execução aleatória dos itens denovo.
-         */
+         * execução aleatória dos itens denovo. */
 
         while (!listnum.filter(QRegExp("^(" + QString::number(actualitem) + ")$")).isEmpty())
             actualitem = QRandomGenerator::global()->bounded(playlist->setListSize());
@@ -592,7 +597,7 @@ void OMPlayer::clickCount() {
 void OMPlayer::detectClick() {
     if (nopause) count = 0;
     if (count == 1 && !enterpos && playing && pausing) playPause();
-    if (wctl->isActiveWindow()) QCursor::setPos(QCursor::pos() + QPoint(1, 1));
+    if (wctl->isActiveWindow()) QCursor::setPos(QCursor::pos() + QPoint(1, 0));
     pausing = nopause = false;
     count = 0;
 }
@@ -612,9 +617,7 @@ void OMPlayer::changeFullScreen() {
 void OMPlayer::enterFullScreen() {
     qDebug("%s(%sDEBUG%s):%s Entrando no Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
 
-    if (this->isMaximized()) /** Mapear interface maximizada */
-        maximize = true;
-
+    if (this->isMaximized()) maximize = true; /** Mapear interface maximizada */
     this->showFullScreen();
     wctl->close();
     Utils::blankMouse();
@@ -628,12 +631,9 @@ void OMPlayer::leaveFullScreen() {
     qDebug("%s(%sDEBUG%s):%s Saindo do Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
     this->showNormal();
 
-    /**
-     * Precisa caso a interface já estava maximizada antes. Note que showMaximized() só funciona após a execução
-     * de showNormal(), a tela não pula direto de fulscreen para maximizado.
-     */
-    if (maximize)
-        this->showMaximized();
+    /** Precisa caso a interface já estava maximizada antes. Note que showMaximized() só funciona após a execução
+     * de showNormal(), a tela não pula direto de fulscreen para maximizado. */
+    if (maximize) this->showMaximized();
 
     wctl->close();
     Utils::blankMouse();
@@ -754,7 +754,6 @@ void OMPlayer::onTimeSliderLeave() {
 
 /** Altera o tempo de execução ao pressionar ou mover a barra de progresso de execução */
 void OMPlayer::seekBySlider(int value) {
-    if (!mediaPlayer->isPlaying()) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
     mediaPlayer->seek(qint64(qint64(value) * unit));
 }
@@ -763,6 +762,58 @@ void OMPlayer::seekBySlider(int value) {
 /** Altera o tempo de execução ao pressionar a barra de progresso de execução */
 void OMPlayer::seekBySlider() {
     seekBySlider(slider->value());
+}
+
+
+/** Ação ao terminar a atualização do slider */
+void OMPlayer::seekFinished(qint64 pos) {
+    qDebug("%s(%sDEBUG%s):%s Atualizando posição de execução %lld / %lld ...\033[0m", GRE, RED, GRE, ORA,
+           pos, mediaPlayer->position());
+}
+
+
+/** Função para deixar o reprodutor no mudo */
+void OMPlayer::setMute() {
+    if (muted) {
+        muted = false;
+        setVolume();
+    } else {
+        setVolume(0);
+        muted = true;
+    }
+}
+
+
+/** Altera o volume do reprodutor ao pressionar ou mover a barra de volume */
+void OMPlayer::setVolume(int value) {
+    /** O volume do reprodutor é definido com um valor do tipo double que vai de 0.0 a 1.0, portanto o valor
+     * do tipo int a ser recebido, precisa ser reajustado e convertido. */
+    mediaPlayer->audio()->setVolume((double)value / 100);
+}
+
+
+/** Altera o volume do reprodutor ao pressionar a barra de volume */
+void OMPlayer::setVolume() {
+    setVolume(volume->value());
+}
+
+
+/** Ação ao terminar a atualização do volume */
+void OMPlayer::volumeFinished(qreal pos) {
+    int value = int(pos * 100);
+    qDebug("%s(%sDEBUG%s):%s Alterando o volume para %i ...\033[0m", GRE, RED, GRE, ORA, value);
+
+    if (value > 0 && value <= 25)
+        Utils::changeIcon(volumeBtn, "volume_low");
+    else if (value > 25 && value <= 75)
+        Utils::changeIcon(volumeBtn, "volume_medium");
+    else if (value > 75)
+        Utils::changeIcon(volumeBtn, "volume_high");
+
+    if (value == 0) {
+        Utils::changeIcon(volumeBtn, "mute");
+        muted = true;
+    } else muted = false;
 }
 
 
@@ -810,6 +861,9 @@ void OMPlayer::onMediaStatusChanged() {
             break;
         case LoadedMedia:
             status = "Loaded !";
+            break;
+        case 7:
+            mediaPlayer->play();
             break;
         default:
             break;

@@ -1,7 +1,10 @@
 #ifndef OMPLAYER_SETTINGS_H
 #define OMPLAYER_SETTINGS_H
 
+#include <QtAV>
+#include <QtAVWidgets>
 #include <QDialog>
+
 #include "Button.h"
 
 
@@ -11,13 +14,19 @@ public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings() override;
 
+    struct Render {
+        const char* name;
+        QtAV::VideoRendererId id;
+        Button *btn;
+    };
+
 signals:
     void emitclose();
     void emitvalue(const QString &value);
 
 private slots:
     void onClose();
-    void rendererSelect(Button *btn, const QString &name, const QString &desc);
+    void rendererSelect(Button *btn, const QString &name);
     void setOpenglWidget();
     void setQGLWidget2();
     void setDirect2D();
@@ -28,7 +37,7 @@ private slots:
     void setWidget();
 
 private:
-    Button *openglwidget{};
+    Button *opengl{};
     Button *qglwidget2{};
     Button *x11renderer{};
     Button *xvideo{};
@@ -36,6 +45,8 @@ private:
     Button *gdi{};
     Button *qglwidget{};
     Button *widget{};
+    QtAV::VideoRenderer *vo{};
+    struct Render *vid_map{};
 };
 
 #endif //OMPLAYER_SETTINGS_H

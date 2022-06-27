@@ -1,8 +1,6 @@
 #include <QLayout>
 #include <QTabWidget>
 #include <QStyle>
-#include <QtAV>
-#include <QtAVWidgets>
 
 #include "JsonTools.h"
 #include "Settings.h"
@@ -25,67 +23,36 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Estrutura das renderizações */
-    struct {
-        const char* name;
-        VideoRendererId id;
-        Button *btn;
-        const char* desc;
-    } vid_map[] = {
-            { "opengl",  VideoRendererId_OpenGLWidget, openglwidget, "OpenGLWidget" },
-            { "gl2",     VideoRendererId_GLWidget2,    qglwidget2,   "QGLWidget2"   },
-            { "d2d",     VideoRendererId_Direct2D,     direct2d,     "Direct2D"     },
-            { "gdi",     VideoRendererId_GDI,          gdi,          "GDI"          },
-            { "xv",      VideoRendererId_XV,           xvideo,       "XVideo"       },
-            { "x11",     VideoRendererId_X11,          x11renderer,  "X11"          },
-            { "gl",      VideoRendererId_GLWidget,     qglwidget,    "QGLWidget"    },
-            { "qt",      VideoRendererId_Widget,       widget,       "Widget"       }
-    };
+    vid_map = new Render[8];
+    vid_map[0] = {"OpenGL",     VideoRendererId_OpenGLWidget, opengl      };
+    vid_map[1] = {"QGLWidget2", VideoRendererId_GLWidget2,    qglwidget2  };
+    vid_map[2] = {"Direct2D",   VideoRendererId_Direct2D,     direct2d    };
+    vid_map[3] = {"GDI",        VideoRendererId_GDI,          gdi         };
+    vid_map[4] = {"XVideo",     VideoRendererId_XV,           xvideo      };
+    vid_map[5] = {"X11",        VideoRendererId_X11,          x11renderer };
+    vid_map[6] = {"QGLWidget",  VideoRendererId_GLWidget,     qglwidget   };
+    vid_map[7] = {"Widget",     VideoRendererId_Widget,       widget      };
 
 
     /** Layout da renderização */
     auto *renderer = new QWidget();
     auto *oprenderer = new QGridLayout(renderer);
-    VideoRenderer *vo;
 
 
     /** Selecionar renderizações existentes */
-    for (int i = 0; vid_map[i].name; ++i) {
+    for (int i = 0; i < 8; ++i) {
         vo = VideoRenderer::create(vid_map[i].id);
         if (vo && vo->isAvailable()) {
-            vid_map[i].btn = new Button("radio-unselect", 24, NOTOOLTIP, vid_map[i].desc, false);
+            vid_map[i].btn = new Button("radio-unselect", 24, NOTOOLTIP, vid_map[i].name, false);
 
-            if (i == 0) {
-                connect(vid_map[0].btn, SIGNAL(pressed()), SLOT(setOpenglWidget()));
-                openglwidget = vid_map[0].btn;
-            }
-            if (i == 1) {
-                connect(vid_map[1].btn, SIGNAL(pressed()), SLOT(setQGLWidget2()));
-                qglwidget2 = vid_map[1].btn;
-            }
-            if (i == 2) {
-                connect(vid_map[2].btn, SIGNAL(pressed()), SLOT(setDirect2D()));
-                direct2d = vid_map[2].btn;
-            }
-            if (i == 3) {
-                connect(vid_map[3].btn, SIGNAL(pressed()), SLOT(setGDI()));
-                gdi = vid_map[3].btn;
-            }
-            if (i == 4) {
-                connect(vid_map[4].btn, SIGNAL(pressed()), SLOT(setXVideo()));
-                xvideo = vid_map[4].btn;
-            }
-            if (i == 5) {
-                connect(vid_map[5].btn, SIGNAL(pressed()), SLOT(setX11renderer()));
-                x11renderer = vid_map[5].btn;
-            }
-            if (i == 6) {
-                connect(vid_map[6].btn, SIGNAL(pressed()), SLOT(setQGLWidget()));
-                qglwidget = vid_map[6].btn;
-            }
-            if (i == 7) {
-                connect(vid_map[7].btn, SIGNAL(pressed()), SLOT(setWidget()));
-                widget = vid_map[7].btn;
-            }
+            if (i == 0) connect(vid_map[0].btn, SIGNAL(pressed()), SLOT(setOpenglWidget()));
+            if (i == 1) connect(vid_map[1].btn, SIGNAL(pressed()), SLOT(setQGLWidget2()));
+            if (i == 2) connect(vid_map[2].btn, SIGNAL(pressed()), SLOT(setDirect2D()));
+            if (i == 3) connect(vid_map[3].btn, SIGNAL(pressed()), SLOT(setGDI()));
+            if (i == 4) connect(vid_map[4].btn, SIGNAL(pressed()), SLOT(setXVideo()));
+            if (i == 5) connect(vid_map[5].btn, SIGNAL(pressed()), SLOT(setX11renderer()));
+            if (i == 6) connect(vid_map[6].btn, SIGNAL(pressed()), SLOT(setQGLWidget()));
+            if (i == 7) connect(vid_map[7].btn, SIGNAL(pressed()), SLOT(setWidget()));
 
             if (QString::compare(JsonTools::readJson("renderer"), vid_map[i].name) == 0)
                 Utils::changeIcon(vid_map[i].btn, "radio-select");
@@ -142,15 +109,9 @@ void Settings::onClose() {
 
 
 /** Resetando os botões */
-void Settings::rendererSelect(Button *btn, const QString &name, const QString &desc) {
-    if (openglwidget) Utils::changeIcon(openglwidget, "radio-unselect");
-    if (qglwidget2) Utils::changeIcon(qglwidget2, "radio-unselect");
-    if (direct2d) Utils::changeIcon(direct2d, "radio-unselect");
-    if (gdi) Utils::changeIcon(gdi, "radio-unselect");
-    if (xvideo) Utils::changeIcon(xvideo, "radio-unselect");
-    if (x11renderer) Utils::changeIcon(x11renderer, "radio-unselect");
-    if (qglwidget) Utils::changeIcon(qglwidget, "radio-unselect");
-    if (widget) Utils::changeIcon(widget, "radio-unselect");
+void Settings::rendererSelect(Button *btn, const QString &name) {
+    for (int i = 0; i < 8; ++i)
+        if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");;
 
     Utils::changeIcon(btn, "radio-select");
     JsonTools::writeJson("renderer", name);
@@ -160,55 +121,55 @@ void Settings::rendererSelect(Button *btn, const QString &name, const QString &d
 
 /** Setando a renderização OpenGLWidget */
 void Settings::setOpenglWidget() {
-    if (QString::compare(JsonTools::readJson("renderer"), "opengl") != 0)
-        rendererSelect(openglwidget, "opengl", "OpenGLWidget");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[0].name) != 0)
+        rendererSelect(vid_map[0].btn, vid_map[0].name);
 }
 
 
 /** Setando a renderização por QGLWidget2 */
 void Settings::setQGLWidget2() {
-    if (QString::compare(JsonTools::readJson("renderer"), "qglwidget2") != 0)
-        rendererSelect(qglwidget2, "gl2", "QGLWidget2");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[1].name) != 0)
+        rendererSelect(vid_map[1].btn, vid_map[1].name);
 }
 
 
 /** Setando a renderização por Direct2D */
 void Settings::setDirect2D() {
-    if (QString::compare(JsonTools::readJson("renderer"), "d2d") != 0)
-        rendererSelect(direct2d, "d2d", "Direct2D");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[2].name) != 0)
+        rendererSelect(vid_map[2].btn, vid_map[2].name);
 }
 
 
 /** Setando a renderização por GDI */
 void Settings::setGDI() {
-    if (QString::compare(JsonTools::readJson("renderer"), "gdi") != 0)
-        rendererSelect(gdi, "gdi", "GDI");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[3].name) != 0)
+        rendererSelect(vid_map[3].btn, vid_map[3].name);
 }
 
 
 /** Setando a renderização por xvideo */
 void Settings::setXVideo() {
-    if (QString::compare(JsonTools::readJson("renderer"), "xvideo") != 0)
-        rendererSelect(xvideo, "xv", "XVideo");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[4].name) != 0)
+        rendererSelect(vid_map[4].btn, vid_map[4].name);
 }
 
 
 /** Setando a renderização por x11 */
 void Settings::setX11renderer() {
-    if (QString::compare(JsonTools::readJson("renderer"), "x11") != 0)
-        rendererSelect(x11renderer, "x11", "X11");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[5].name) != 0)
+        rendererSelect(vid_map[5].btn, vid_map[5].name);
 }
 
 
 /** Setando a renderização por QGLWidget */
 void Settings::setQGLWidget() {
-    if (QString::compare(JsonTools::readJson("renderer"), "qglwidget") != 0)
-        rendererSelect(qglwidget, "gl", "QGLWidget");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[6].name) != 0)
+        rendererSelect(vid_map[6].btn, vid_map[6].name);
 }
 
 
 /** Setando a renderização por widget */
 void Settings::setWidget() {
-    if (QString::compare(JsonTools::readJson("renderer"), "widget") != 0)
-        rendererSelect(widget, "qt", "Widget");
+    if (QString::compare(JsonTools::readJson("renderer"), vid_map[7].name) != 0)
+        rendererSelect(vid_map[7].btn, vid_map[7].name);
 }

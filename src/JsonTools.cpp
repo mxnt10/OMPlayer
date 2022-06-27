@@ -13,7 +13,7 @@
 QString JsonTools::defaultJson() {
     return "{"
            "    \"theme\": \"circle\","
-           "    \"renderer\": \"opengl\""
+           "    \"renderer\": \"OpenGL\""
            "}";
 }
 

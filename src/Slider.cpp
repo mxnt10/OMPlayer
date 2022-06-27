@@ -10,18 +10,16 @@
 
 
 /** Construtor principal do Slider. */
-Slider::Slider(QWidget *parent, bool disable, int size, int maximum) : QSlider(parent) {
+Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum) : QSlider(parent) {
     setOrientation(Qt::Horizontal);
     setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
     setDisabled(disable);
     setStyleSheet(Utils::setStyle("progressbar"));
 
-    if (size > (-1))
-        setFixedHeight(size);
-
-    if (maximum > (-1))
-        setMaximum(maximum);
+    if (wsize > (-1)) setFixedWidth(wsize);
+    if (hsize > (-1)) setFixedHeight(hsize);
+    if (maximum > (-1)) setMaximum(maximum);
 }
 
 

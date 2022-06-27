@@ -7,7 +7,7 @@
 class Slider : public QSlider {
 Q_OBJECT
 public:
-    explicit Slider(QWidget *parent = nullptr, bool disable = false, int size = (-1), int maximum = (-1));
+    explicit Slider(QWidget *parent = nullptr, bool disable = false, int wsize = (-1), int hsize = (-1), int maximum = (-1));
     ~Slider() override;
 
 protected:

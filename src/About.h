@@ -22,6 +22,7 @@ signals:
 private slots:
     static QString getTextMaintainer();
     static QString getDescription();
+    static void setAboutQtAV();
     void onClose();
 };
 

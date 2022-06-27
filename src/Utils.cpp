@@ -132,8 +132,7 @@ int Utils::calcX(int z, int x, int y) {
 int Utils::setDifere(int unit) {
     if (unit == 500) return unit;
     if (unit == 250) return unit * 2;
-    if (unit <= 47)  return unit * 4;
-    return unit * 3;
+    return unit * 4;
 }
 
 

@@ -3,6 +3,28 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.4.2 ] - 2022-06-29 ################################################
+
+### Added / Adicionado
+ - Recursos:
+    - Função de modo mudo.
+    - Controle de volume.
+ - Adicionado o "sobre o QtAV" em About.
+###
+
+### Upgraded / Atualizado
+ - Atualização do ícone apply no tema circle.
+###
+
+### Changed / Modificado
+ - Simplificação da função setDifere() em Utils.
+ - Refatoração de código em Settings.
+ - Refatoração da função setRenderer() em Player.
+###
+
+##########################################################################
+
+
 ## [ 1.4.1 ] - 2022-06-16 ################################################
 
 ### Changed / Modificado

@@ -362,8 +362,6 @@ void OMPlayer::setSelect(int item) {
 /** Função geral para execução de arquivos multimídia */
 void OMPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
-    if (mediaPlayer->isPlaying() || mediaPlayer->isPaused())
-        mediaPlayer->stop();
     mediaPlayer->play(isplay);
     if (index > (-1)) {
         playlist->selectCurrent(index);
@@ -832,8 +830,7 @@ void OMPlayer::updateSlider(qint64 value) {
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;
-        } else
-            Next();
+        } else Next();
     }
 }
 
@@ -862,10 +859,8 @@ void OMPlayer::onMediaStatusChanged() {
         case LoadedMedia:
             status = "Loaded !";
             break;
-        case 7:
-            mediaPlayer->play();
-            break;
         default:
+            qDebug("%s(%sDEBUG%s):%s Status não mapeado:%s %i\033[0m", GRE, RED, GRE, RDL, ERR, player->mediaStatus());
             break;
     }
 

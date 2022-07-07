@@ -17,7 +17,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
-    setStyleSheet("QPushButton { border: 0; }");
+    setStyleSheet(Utils::setStyle("global"));
 
     if (fixed) setFixedSize(num, num);
     if (!text.isEmpty()) setText(txt);

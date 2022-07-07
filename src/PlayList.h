@@ -39,6 +39,8 @@ signals:
     void emithide();
     void emithiden();
     void emitnohide();
+    void enterListView();
+    void leaveListView();
 
 public slots:
     void addItems(const QStringList &parms = QStringList());
@@ -48,7 +50,8 @@ private slots:
     void clearItems();
     void onSelect(const QModelIndex &index);
     void onAboutToPlay(const QModelIndex &index);
-    void noHide();
+    void enterList();
+    void leaveList();
 
 private:
     Button *clearBtn{};

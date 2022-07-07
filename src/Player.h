@@ -17,6 +17,7 @@
 #include "Label.h"
 #include "PlayList.h"
 #include "Settings.h"
+#include "StatisticsView.h"
 #include "Slider.h"
 
 using namespace QtAV;
@@ -40,7 +41,6 @@ private Q_SLOTS:
     void doubleplay(const QString &name);
     void setReplay();
     void setShuffle();
-    void ShowContextMenu(const QPoint &pos);
     void play(const QString &isplay, int index = (-1));
     void setRenderer(const QString &op);
     void playPause();
@@ -57,6 +57,7 @@ private Q_SLOTS:
     void hideFalse();
     void setSettings();
     void setAbout();
+    void showInfo();
     void closeDialog();
     void changeFullScreen();
     void enterFullScreen();
@@ -78,9 +79,11 @@ private Q_SLOTS:
     void volumeFinished(qreal pos);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
+    void enterList();
+    void leaveList();
+    void ShowContextMenu(const QPoint &pos);
 
 protected:
-    bool nativeEvent(const QByteArray &eventType, void *message, long *result) override;
     void moveEvent(QMoveEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
     void changeEvent(QEvent *event) override;
@@ -100,37 +103,33 @@ private:
     MediaInfo MI{};
     PlayList *playlist{};
     Label *logo{};
-    Label *current{};
-    Label *end{};
+    Label *current{}, *end{};
     QGridLayout *layout{};
     QSize min{906, 510};
     QSize size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
-    QString Width{"192"};
-    QString Height{"108"};
     QStringList listnum{};
     QTimer *click{};
     QWidget *wctl{};
     Settings *sett{};
-    Slider *slider{};
-    Slider *volume{};
+    StatisticsView *infoview{};
+    Slider *slider{}, *volume{};
     VideoOutput *video{};
     VideoPreviewWidget *preview{};
+    bool control{false};
     bool playing{false};
     bool pausing{false};
     bool muted{false};
-    bool nopause{false};
     bool restart{false};
     bool randplay{false};
     bool enterpos{false};
+    bool listmenu{false};
     bool isblock{false};
     bool invalid{false};
     bool maximize{false};
     bool showsett{false};
-    bool prevent{false};
-    int previousitem{0};
-    int actualitem{0};
-    int nextitem{0};
+    int Width{192}, Height{108};
+    int previousitem{0}, actualitem{0}, nextitem{0};
     int count{0};
     int unit{500};
 };

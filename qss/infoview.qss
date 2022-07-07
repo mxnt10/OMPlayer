@@ -1,0 +1,28 @@
+/* Definição para layout do info view */
+QWidget {
+    background-color: rgba(0, 0, 0, 200);
+    border: 2px ridge #cccccc;
+    border-radius: 10px;
+    color: white;
+}
+
+/* Definição para o visualizador das informações */
+QTreeWidget {
+    background-color: transparent;
+    border: 0;
+}
+
+/* Definição dos itens do info view */
+QTreeWidget::item {
+    border-radius: 7px;
+}
+
+/* Definição dos itens selecionados */
+QTreeWidget::item:selected {
+    background-color: rgba(0, 100, 200, 50);
+}
+
+/* Definição do scroolbar */
+QScrollBar {
+    width: 2px;
+}

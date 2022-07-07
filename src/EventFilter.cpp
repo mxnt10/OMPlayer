@@ -118,7 +118,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Ação após a destruição do menu de contexto */
         if (event->type() == QEvent::ChildRemoved && contextmenu) {
             qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-            if (sett)
+            if (sett || fixed)
                 Utils::arrowMouse();
             else
                 Utils::blankMouse();
@@ -139,9 +139,9 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::MouseButtonDblClick) emit emitDoubleClick();
 
         /** Emissão para ativar o menu de contexto */
-        if (event->type() == QEvent::ContextMenu && !fixed) {
+        if (event->type() == QEvent::ContextMenu) {
             contextmenu = true;
-            emit emitLeave();
+            if (!fixed) emit emitLeave();
             auto *e = dynamic_cast<QContextMenuEvent *>(event);
             emit customContextMenuRequested(e->pos());
         }
@@ -157,6 +157,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     if (num == 3) {
         /** Mapeador para executar ações quando o ponteiro do mouse se encontra sobre a interface */
         if (event->type() == QEvent::Enter) emit emitEnter();
+        if (event->type() == QEvent::Leave) emit emitLeave();
     }
 
     return false;

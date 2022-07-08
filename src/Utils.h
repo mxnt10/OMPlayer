@@ -4,7 +4,7 @@
 #include <QAction>
 #include "Button.h"
 
-#define VERSION "1.4.1"
+#define VERSION "1.4.2"
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug
 #define RED "\x1b[38;2;255;050;050m" //Debug
@@ -21,7 +21,7 @@
 #define SHW "\x1b[38;2;085;255;050m" //Ocultação
 #define ADD "\x1b[38;2;255;100;100m" //Adicionar
 #define UPD "\x1b[38;2;100;100;255m" //Atualizar
-#define RDL "\x1b[38;2;255;100;100m" //XTool
+#define RDL "\x1b[38;2;255;100;100m" //Status
 
 #define CENTER Qt::AlignCenter
 #define TOP    Qt::AlignTop

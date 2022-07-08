@@ -5,14 +5,11 @@
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
-
 #include <filesystem>
-#include <xcb/xcb.h>
 
 #include "JsonTools.h"
 #include "Player.h"
 #include "Utils.h"
-#include "XTool.h"
 
 
 /**********************************************************************************************************************/
@@ -37,13 +34,15 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setPalette(pal);
 
 
-    /** Janelas de configurações do programa e preview */
+    /** Janelas de configurações do programa, preview e demais */
     about = new About(this);
     sett = new Settings(this);
+    infoview = new StatisticsView(this);
     preview = new VideoPreviewWidget(this);
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
     connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));
+    connect(infoview, SIGNAL(emitclose()), this, SLOT(closeDialog()));
     connect(about, SIGNAL(emitclose()), this, SLOT(closeDialog()));
 
 
@@ -67,11 +66,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
+    connect(playlist, SIGNAL(emitremove(int)), SLOT(ajustActualItem(int)));
     connect(playlist, SIGNAL(emithiden()), SLOT(setHide()));
     connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
     connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
+    connect(playlist, SIGNAL(enterListView()), SLOT(enterList()));
+    connect(playlist, SIGNAL(leaveListView()), SLOT(leaveList()));
     connect(playlist, SIGNAL(emitstop()), SLOT(setStop()));
-    connect(playlist, SIGNAL(emitremove(int)), SLOT(ajustActualItem(int)));
 
 
     /** Barra de progresso de execução */
@@ -493,10 +494,8 @@ void OMPlayer::onStart() {
     playing = true;
 
     /** Definindo dimensões para o preview */
-    MI.Open(mediaPlayer->file().toStdString());
-    Width = MI.Get(Stream_Video, 0, "Width", Info_Text, Info_Name).c_str();
-    Height = MI.Get(Stream_Video, 0, "Height", Info_Text, Info_Name).c_str();
-    MI.Close();
+    Width = mediaPlayer->statistics().video_only.width;
+    Height = mediaPlayer->statistics().video_only.height;
 
     /** Atualizando o status do item da playlist se necessário */
     if (playlist->setDuration() == 0) {
@@ -517,10 +516,6 @@ void OMPlayer::onStart() {
     slider->setMinimum(int(mediaPlayer->mediaStartPosition()));
     slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
     end->setText(QTime(0, 0, 0).addMSecs(int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
-
-    /** Correção dos itens adicionados */
-    if (playlist->setListSize() == 1)
-        previousitem = nextitem = 0;
 
     /** Desativando Bloqueio de tela */
     if (!isblock) {
@@ -593,17 +588,16 @@ void OMPlayer::clickCount() {
 
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void OMPlayer::detectClick() {
-    if (nopause) count = 0;
     if (count == 1 && !enterpos && playing && pausing) playPause();
     if (wctl->isActiveWindow()) QCursor::setPos(QCursor::pos() + QPoint(1, 0));
-    pausing = nopause = false;
+    pausing = false;
     count = 0;
 }
 
 
 /** Gerenciar tela cheia */
 void OMPlayer::changeFullScreen() {
-    if (prevent) return;
+    if (enterpos) return;
     if (this->isFullScreen())
         leaveFullScreen();
     else
@@ -642,6 +636,11 @@ void OMPlayer::leaveFullScreen() {
 
 /** Função auxiliar para fechar os controles e a playlist */
 void OMPlayer::setHide() {
+    /** Prevenindo a ocultação dos controles ao abrir o menu na playlist */
+    if (control) {
+        control = false;
+        return;
+    }
     wctl->close();
     hideTrue();
     filter->setMove(false);
@@ -650,10 +649,9 @@ void OMPlayer::setHide() {
 
 /** Função auxiliar para abrir os controles e a playlist */
 void OMPlayer::setShow() {
-    if (!showsett) {
-        wctl->show();
-        wctl->activateWindow();
-    }
+    if (showsett) return;
+    wctl->show();
+    wctl->activateWindow();
 }
 
 /** Função para abrir as configurações */
@@ -678,9 +676,20 @@ void OMPlayer::setAbout() {
 }
 
 
-/** Função que fecha o sobre ao receber a emissão */
+/** Função para exibir a janela de informações de mídia atual */
+void OMPlayer::showInfo() {
+    showsett = true;
+    filter->setSett(showsett);
+    setHide();
+    this->setMaximumSize(size);
+    this->setMinimumSize(size);
+    infoview->setStatistics(mediaPlayer->statistics());
+    infoview->show();
+}
+
+
+/** Função para executar operações ao fachar os diálogos */
 void OMPlayer::closeDialog() {
-    if (!this->isFullScreen()) prevent = true;
     this->setMaximumSize(screen);
     this->setMinimumSize(min);
     showsett = false;
@@ -708,6 +717,19 @@ void OMPlayer::hideFalse() {
 }
 
 
+/** Mouse sobre os itens da playlist */
+void OMPlayer::enterList() {
+    hideFalse();
+    listmenu = true;
+}
+
+
+/** Mouse fora dos itens da playlist */
+void OMPlayer::leaveList() {
+    listmenu = false;
+}
+
+
 /** Pré-visualização ao posicionar o mouse no slider */
 void OMPlayer::onTimeSliderHover(int pos, int value) {
     int fixV = 72;
@@ -719,8 +741,8 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
     QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * unit).toString(QString::fromLatin1("HH:mm:ss")), this);
 
     /** Arquivos de áudio não são vídeos */
-    if (mediaPlayer->currentVideoStream() == (-1) || Width.isEmpty() || Height.isEmpty()) return;
-    int setX = Utils::calcX(fixV, Width.toInt(), Height.toInt());
+    if (mediaPlayer->currentVideoStream() == (-1) || mediaPlayer->statistics().video.frame_rate == 0) return;
+    int setX = Utils::calcX(fixV, Width, Height);
 
     /** Exibição da pré-visualização */
     preview->setFile(mediaPlayer->file());
@@ -734,7 +756,7 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
 
 /** Apenas para exibição do debug */
 void OMPlayer::onTimeSliderEnter() {
-    if (playing && !Width.isEmpty() && !Height.isEmpty())
+    if (playing && mediaPlayer->statistics().video.frame_rate == 0)
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
     hideFalse();
 }
@@ -752,6 +774,8 @@ void OMPlayer::onTimeSliderLeave() {
 
 /** Altera o tempo de execução ao pressionar ou mover a barra de progresso de execução */
 void OMPlayer::seekBySlider(int value) {
+    if (mediaPlayer->isPaused() && mediaPlayer->currentVideoStream() > (-1) &&
+        mediaPlayer->statistics().video.frame_rate == 0) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
     mediaPlayer->seek(qint64(qint64(value) * unit));
 }
@@ -907,21 +931,6 @@ void OMPlayer::resizeEvent(QResizeEvent *event) {
 }
 
 
-/** Mapeamento de eventos apenas para executar um ação após fechar os diálogos */
-bool OMPlayer::nativeEvent(const QByteArray &eventType, void *message, long *result) {
-    Q_UNUSED(result);
-    if (eventType == "xcb_generic_event_t") {
-        auto *event = static_cast<xcb_generic_event_t *>(message);
-        if (event->response_type == 35 && prevent && !wctl->isActiveWindow()) {
-            mouseClick();
-            nopause = true;
-            prevent = false;
-        }
-    }
-    return false;
-}
-
-
 /** Mapeamento dos eventos de maximizar, minimizar e restaurar */
 void OMPlayer::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange) {
@@ -957,7 +966,7 @@ void OMPlayer::closeEvent(QCloseEvent *event) {
 
 /** Função para o menu de contexto do programa */
 void OMPlayer::ShowContextMenu(const QPoint &pos) {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
+    if (listmenu || !enterpos) qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
     auto *effect = new QGraphicsOpacityEffect();
     effect->setOpacity(0.8);
     Utils::arrowMouse();
@@ -966,52 +975,67 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     contextMenu.setGraphicsEffect(effect);
     contextMenu.setStyleSheet(Utils::setStyle("contextmenu"));
 
-    /** Menu de abrir */
-    QAction open(tr("Open Files"), this);
-    open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
-    Utils::changeMenuIcon(open, "folder");
-    connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
+    if (listmenu) {
+        control = true;
 
-    /** Menu tela cheia */
-    QAction fullscreen(tr("Show Fullscreen"), this);
-    if (this->isFullScreen())
-        fullscreen.setText(tr("Exit Fullscreen"));
-    fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
-    Utils::changeMenuIcon(fullscreen, "fullscreen");
-    connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
+        /** Menu de informação de mídia */
+        QAction mediainfo(tr("Current Media Info"), this);
+        Utils::changeMenuIcon(mediainfo, "about");
+        connect(&mediainfo, SIGNAL(triggered()), SLOT(showInfo()));
 
-    /** Menu aleatório */
-    QAction shuffle(tr("Shuffle"), this);
-    shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
-    Utils::changeMenuIcon(shuffle, "shuffle-menu");
-    connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
+        contextMenu.addAction(&mediainfo);
+        contextMenu.exec(mapToGlobal(pos));
+        return;
+    }
 
-    /** Menu repetir */
-    QAction replay(tr("Replay"), this);
-    replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
-    Utils::changeMenuIcon(replay, "replay-menu");
-    connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
+    if (!enterpos) {
+        /** Menu de abrir */
+        QAction open(tr("Open Files"), this);
+        open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
+        Utils::changeMenuIcon(open, "folder");
+        connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
 
-    /** Menu de configuração */
-    QAction settings(tr("Settings"), this);
-    settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
-    Utils::changeMenuIcon(settings, "settings");
-    connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
+        /** Menu tela cheia */
+        QAction fullscreen(tr("Show Fullscreen"), this);
+        if (this->isFullScreen())
+            fullscreen.setText(tr("Exit Fullscreen"));
+        fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
+        Utils::changeMenuIcon(fullscreen, "fullscreen");
+        connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
-    /** Menu sobre */
-    QAction mabout(tr("About"), this);
-    Utils::changeMenuIcon(mabout, "about");
-    connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
+        /** Menu aleatório */
+        QAction shuffle(tr("Shuffle"), this);
+        shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
+        Utils::changeMenuIcon(shuffle, "shuffle-menu");
+        connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
 
-    /** Montagem do menu */
-    contextMenu.addAction(&open);
-    contextMenu.addSeparator();
-    contextMenu.addAction(&fullscreen);
-    contextMenu.addSeparator();
-    contextMenu.addAction(&shuffle);
-    contextMenu.addAction(&replay);
-    contextMenu.addSeparator();
-    contextMenu.addAction(&settings);
-    contextMenu.addAction(&mabout);
-    contextMenu.exec(mapToGlobal(pos));
+        /** Menu repetir */
+        QAction replay(tr("Replay"), this);
+        replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
+        Utils::changeMenuIcon(replay, "replay-menu");
+        connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
+
+        /** Menu de configuração */
+        QAction settings(tr("Settings"), this);
+        settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
+        Utils::changeMenuIcon(settings, "settings");
+        connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
+
+        /** Menu sobre */
+        QAction mabout(tr("About"), this);
+        Utils::changeMenuIcon(mabout, "about");
+        connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
+
+        /** Montagem do menu */
+        contextMenu.addAction(&open);
+        contextMenu.addSeparator();
+        contextMenu.addAction(&fullscreen);
+        contextMenu.addSeparator();
+        contextMenu.addAction(&shuffle);
+        contextMenu.addAction(&replay);
+        contextMenu.addSeparator();
+        contextMenu.addAction(&settings);
+        contextMenu.addAction(&mabout);
+        contextMenu.exec(mapToGlobal(pos));
+    }
 }

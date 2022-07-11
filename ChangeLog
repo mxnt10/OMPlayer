@@ -3,23 +3,41 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.4.2 ] - 2022-06-29 ################################################
+## [ 1.4.2 ] - 2022-07-11 ################################################
 
 ### Added / Adicionado
  - Recursos:
     - Função de modo mudo.
     - Controle de volume.
- - Adicionado o "sobre o QtAV" em About.
+    - Visualização de informações.
+ - Código:
+    - Adicionado o "sobre o QtAV" em About.
+    - Adicionado um menu de contexto separado para a playlist.
+ - Fontes:
+    - Adicionado o estilo infoview.qss em qss.
+    - Adicionado o fonte StatisticsView.{cpp/h} em src.
+
 ###
 
 ### Upgraded / Atualizado
  - Atualização do ícone apply no tema circle.
 ###
 
+### Removed / Removido
+ - Remoção do fonte XTool.h desnecessário.
+ - Remoção de ajustes não estáveis.
+###
+
 ### Changed / Modificado
  - Simplificação da função setDifere() em Utils.
  - Refatoração de código em Settings.
  - Refatoração da função setRenderer() em Player.
+ - Melhorias no código para mapear as dimensões da mídia para o preview.
+###
+
+### Fixed / Corrigido
+ - Ajustes na emissão de eventos da playlist.
+ - Ajustes na opção do modo FullScreen.
 ###
 
 ##########################################################################

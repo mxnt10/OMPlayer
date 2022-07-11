@@ -126,6 +126,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
     connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
+
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
     qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
     auto *enterfilter = new EventFilter(this, 3);
@@ -160,7 +161,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *buttons = new QHBoxLayout();
     buttons->setSpacing(5);
     buttons->addWidget(nohideleft);
-    buttons->addSpacing(50);
+    buttons->addSpacing(30);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
     buttons->addSpacing(5);
@@ -491,6 +492,7 @@ void OMPlayer::onPaused(bool paused) {
 void OMPlayer::onStart() {
     Utils::changeIcon(playBtn, "pause", tr("Pause"));
     slider->setDisabled(false);
+    infoview->setStatistics(mediaPlayer->statistics());
     playing = true;
 
     /** Definindo dimensões para o preview */
@@ -589,7 +591,6 @@ void OMPlayer::clickCount() {
 /** Função que mapeia um único clique e executa as ações de pausar e executar */
 void OMPlayer::detectClick() {
     if (count == 1 && !enterpos && playing && pausing) playPause();
-    if (wctl->isActiveWindow()) QCursor::setPos(QCursor::pos() + QPoint(1, 0));
     pausing = false;
     count = 0;
 }
@@ -683,7 +684,6 @@ void OMPlayer::showInfo() {
     setHide();
     this->setMaximumSize(size);
     this->setMinimumSize(size);
-    infoview->setStatistics(mediaPlayer->statistics());
     infoview->show();
 }
 
@@ -777,7 +777,7 @@ void OMPlayer::seekBySlider(int value) {
     if (mediaPlayer->isPaused() && mediaPlayer->currentVideoStream() > (-1) &&
         mediaPlayer->statistics().video.frame_rate == 0) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
-    mediaPlayer->seek(qint64(qint64(value) * unit));
+    mediaPlayer->seek(qint64(value) * unit);
 }
 
 
@@ -844,6 +844,7 @@ void OMPlayer::updateSlider(qint64 value) {
     if (mediaPlayer->isSeekable())
         slider->setValue(int(value / unit));
     current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
+    infoview->setCurrentTime(int(value));
 
     /** Próxima mídia */
     if (int(value) > mediaPlayer->duration() - Utils::setDifere(unit)) {

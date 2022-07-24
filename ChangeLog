@@ -19,6 +19,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ###
 
 ### Upgraded / Atualizado
+ - Atualização do SingleApplication em common.
  - Atualização de ícones em icons, sendo adicionado ícones para
    o menu em circle.
 ###

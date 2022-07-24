@@ -226,7 +226,7 @@ QString SingleApplication::primaryUser() const
  * Returns the username the current instance is running as.
  * @return Returns the username the current instance is running as.
  */
-QString SingleApplication::currentUser() const
+QString SingleApplication::currentUser()
 {
     return SingleApplicationPrivate::getUsername();
 }

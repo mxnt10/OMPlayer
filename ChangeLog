@@ -1,0 +1,463 @@
+# ChangeLog
+All notable changes to this project will be documented in this file.
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+
+## [ Released ] - 2022-07-17 #############################################
+
+### Added / Adicionado
+ - Arquivos e fontes:
+    - Adicionado action.qss em qss.
+    - Adicionado os fontes ClickableMenu.{cpp/h} em src.
+    - Adicionado os fontes TreeView.{cpp/h} em src.
+ - Recursos:
+    - Adicionado seleção de canais de áudio.
+    - Adicionado modo de repetição único de mídia.
+ - Teclas de atalho:
+    - Ctrl+Alt+H: Repetição de mídia atual.
+    - Suporte a teclas de multimídia (Play,Next,Previous).
+###
+
+### Upgraded / Atualizado
+ - Atualização de ícones em icons, sendo adicionado ícones para
+   o menu em circle.
+###
+
+### Changed / Modificado
+ - Revisão geral na organização das funções nas classes.
+ - Profundas modificações em JsonTools para possibilitas modificações
+   e leitura de diferentes valores e não só string.
+ - Otimização de código em StatisticsView.
+ - Playlist deixa de ser estática e se ajusta conforme o nome da mídia.
+ - Ajuste no tamanho dos ícones dos botão da opção de renderização
+   em Settings.
+ - Modificações no menu de contesto.
+ - Adição e ajustes de tooltips nos controles de volume.
+###
+
+### Fixed / Corrigido
+ - Correção feita no comportamento dos botões, substituindo o
+   temporizador e o connect() para os efeitos por eventos de mouse.
+ - Menu da playlist abrindo no lugar do menu principal ao iniciar o
+   reprodutor.
+ - Correção na verificação do md5sum do arquivo da playlist e
+   conversão para função em Utils.
+ - Pequenas correções na função setStyle em Utils.
+ - Corrigido problemas com adição de arquivos duplicados à playlist,
+   usando para isso uma verificação por hash md5 gerado por uma string
+   contendo a localização do arquivo.
+ - Problemas de emissão de sinal ao usar a rolagem do mouse no Slider.
+###
+
+##########################################################################
+
+
+## [ 1.4.2 ] - 2022-07-11 ################################################
+
+### Added / Adicionado
+ - Recursos:
+    - Função de modo mudo.
+    - Controle de volume.
+    - Visualização de informações.
+ - Código:
+    - Adicionado o "sobre o QtAV" em About.
+    - Adicionado um menu de contexto separado para a playlist.
+ - Fontes:
+    - Adicionado o estilo infoview.qss em qss.
+    - Adicionado o fonte StatisticsView.{cpp/h} em src.
+
+###
+
+### Upgraded / Atualizado
+ - Atualização do ícone apply no tema circle.
+###
+
+### Removed / Removido
+ - Remoção do fonte XTool.h desnecessário.
+ - Remoção de ajustes não estáveis.
+###
+
+### Changed / Modificado
+ - Simplificação da função setDifere() em Utils.
+ - Refatoração de código em Settings.
+ - Refatoração da função setRenderer() em Player.
+ - Melhorias no código para mapear as dimensões da mídia para o preview.
+###
+
+### Fixed / Corrigido
+ - Ajustes na emissão de eventos da playlist.
+ - Ajustes na opção do modo FullScreen.
+###
+
+##########################################################################
+
+
+## [ 1.4.1 ] - 2022-06-16 ################################################
+
+### Changed / Modificado
+ - Simplificação no código do clique fake.
+ - Alterações no debug.
+ - Desativação temporária da logo inicial, a ser verificado nas
+   próximas atualizações.
+ - Desativando ativação do menu de contexto sobre os controles e
+   playlist totalmente desnecessário.
+ - Preparando o reprodutor para o suporte a tradução.
+ - Simplificação no código ao fechar os diálogos.
+ - Modificação no método para mapear os itens a serem reproduzidos.
+ - Widgets dos controles e diálogos filhos conectados ao pai.
+ - Refatoração de código para settings.
+###
+
+### Removed / Removido
+ - Remoção do fonte XTool.cpp desnecessário.
+ - Remoção de código desnecessário.
+###
+
+### Fixed / Corrigido
+ - Pequenas correções no fullscreen.
+ - Correção no clique fake ao sair das janelas de diálogo.
+ - Correções nos ajustes na playlist ao remover itens.
+ - Correção ao selecionar o item atual antes da reprodução.
+ - Correções no recurso de play/pause com um clique.
+###
+
+##########################################################################
+
+
+## [ 1.4 ] - 2022-06-14 ##################################################
+
+### Added / Adicionado
+ - Emissão de instanceStarted() para exibição imediata da primeira
+   instância ao abrir uma segunda.
+ - Adicionado em src, as fontes XTool.{cpp/h}.
+###
+
+### Upgraded / Atualizado
+ - Atualizado o SingleApplication.
+###
+
+### Changed / Modificado
+ - Modificação do código para a atualização da playlist ao passar
+   argumentos pela segunda instância.
+ - Alterações para redução de código em EventFilter.
+ - Refatoração de código.
+###
+
+### Removed / Removido
+ - Removido fontes ListView/Widget.{cpp/h} desnescessários.
+ - Removido também a fonte Defines.h sendo tudo reescrito em Utils.
+###
+
+### Fixed / Corrigido
+ - Bloqueio do widget pai ao abrir os diálogos Settings e About.
+ - Impedir maximização de Settings.
+ - Corrigido probremas com emissões ao fechar os diálogos com o mouse
+   posicionado fora do widget pai.
+ - Pequenas correções na exibição dos controles.
+ - Arquivos inválidos e inexistentes não são executados e não trancam
+   mais a reprodução.
+###
+
+##########################################################################
+
+
+## [ 1.4b ] - 2022-06-05 #################################################
+
+### Added / Adicionado
+ - Habilitado todas as opções de renderização.
+ - Adicionado em src, as fontes EventFilter.{cpp/h}.
+###
+
+### Changed / Modificado
+ - Os widgets flutuantes são desconectados do widget pai.
+ - Eventos foram reescritos em EventFilter.
+ - Refatoração de código e ajustes.
+ - Modificação na declaração das variáveis afim de impedir erros
+   de execução, o exit code 139.
+###
+
+### Fixed / Corrigido
+ - Correções no anti-bloqueio de tela.
+###
+
+##########################################################################
+
+
+## [ 1.4a ] - 2022-06-04 #################################################
+
+### Added / Adicionado
+ - Recursos para a janela de configurações.
+ - Adicionado em src, as fontes About.{cpp/h}, JsonTools.{cpp/h}
+   e Settings.{cpp/h}.
+ - Adicionado funções para o status de reprodução dos arquivos
+   multimídia e controle de erro do QtAV.
+ - Aicionado icones para o tema gradient.
+###
+
+### Upgraded / Atualizado
+ - Atualizado configurações dos arquivos qss.
+###
+
+### Changed / Modificado
+ - Modificado o diálogo sobre.
+ - Pequenas modificações em preview.
+ - Limpeza de código desnecessário.
+ - Alterações na classe Button para servir também como RadioButton.
+ - Refatoração de código em Utils.{cpp/h}.
+###
+
+### Removed / Removido
+ - Removido defines.cpp desnescessário.
+###
+
+### Fixed / Corrigido
+ - Correções no recurso de executar itens recém-adicionados caso o
+   reprodutor não estiver em execução.
+ - Correção do recurso que ajusta a posição dos itens após a exclusão
+   de itens da playlist.
+ - Correção no recurso que detecta arquivos de áudio para a não
+   exibição do preview.
+###
+
+##########################################################################
+
+
+## [ 1.3.2 ] - 2022-05-14 ################################################
+
+### Added / Adicionado
+ - Adicionado diretório ScreenSaver em common como recurso de
+   anti-bloqueio.
+###
+
+### Changed / Modificado
+ - Modificado método anti-bloqueio de tela.
+###
+
+### Removed / Removido
+ - Removido funções em thread de simulação de pressionamento de tecla
+   como método anti-bloqueio de tela.
+###
+
+### Fixed / Corrigido
+ - Corrigido atualização do tempo de duração do arquivo multimídia na
+   barra de reprodução.
+###
+
+##########################################################################
+
+
+## [ 1.3.1 ] - 2022-05-13 ################################################
+
+### Added / Adicionado
+ - Adicionado Label.{cpp/h} para refatoração.
+ - Incluído instruções para corrigir o andamento da playlist ao remover
+   itens anteriores a mídia sendo reproduzida no momento.
+###
+
+### Changed / Modificado
+ - A reprodução deve parar imediatamente ao limpar a playlist.
+ - Código refatorado.
+###
+
+### Removed / Removido
+ - Removido funções selectNext(), SelectPrevious(), selectPlay() e
+   setIndex() em playlist desnecessárias.
+ - Removido sources Receiver.{cpp/h} desnecessários.
+###
+
+### Fixed / Corrigido
+ - O programa não carrega mais arquivos multimídias inexistentes ao
+   iniciar o programa.
+ - Corrigido fechamento inesperado com arquivos de áudio ao passar o
+   mouse na barra de progresso de execução.
+ - Corrigido problemas com o preenchimento da playlist.
+ - Correções no recurso para remover itens.
+ - Corrigido recurso de pausar com um clique.
+ - Correção ao pressionar play após excluir um item antes de qualquer
+   reprodução.
+###
+
+##########################################################################
+
+
+## [ 1.3 ] - 2022-05-07 ##################################################
+
+### Added / Adicionado
+ - Recursos:
+    - Pausar e reproduzir com um clique. Uma observação, há um atraso na
+      pausa e reprodução devido ao recurso de mapeamento de um clique.
+    - Janela abre no centro.
+    - Usando SingleApplication para tornar o reprodutor de instância
+      única, impedindo abrir a aplicação em várias janelas.
+ - Sources:
+    - Adicionado recurso de SingleAplication em common.
+    - Adicionado Receiver.{cpp/h} em src.
+###
+
+### Upgraded / Atualizado
+ - Atualizado o sistema de depuração do programa.
+###
+
+### Changed / Modificado
+ - Modificado funções load() e save(), adicionando suporte a
+   verificação de alterações na playlist por hash md5.
+ - Funções foram modificados para salvar a playlist imediatamente em
+   cada alteração feita na mesma.
+###
+
+### Fixed / Corrigido
+ - Correções para evitar problemas no recurso de pausa e reprodução com
+   um clique.
+ - Novos itens agora são adicionados no final da lista.
+###
+
+##########################################################################
+
+
+## [ 1.2 ] - 2022-05-01 ##################################################
+
+### Added / Adicionado
+ - Exibição de tempo de execução e duração da mídia.
+###
+
+### Changed / Modificado
+ - Ajustes no recurso para avançar para a próxima mídia.
+###
+
+### Removed / Removido
+ - Temporizador para o anti-bloqueio de tela.
+###
+
+### Fixed / Corrigido
+ - Otimização de performance:
+    - Anti-bloqueio em loop infinito em um processo separado.
+    - Otimização de performance em preview.
+###
+
+##########################################################################
+
+
+## [ 1.1 rev2 ] - 2022-04-30 #############################################
+
+### Added / Adicionado
+ - Arquivos:
+    - Adicionado script clean_conf em common para limpar as configurações.
+ - Recursos:
+    - Adicioando recurso onHover para o preview em slider.
+    - Adicionado a função de preview no slider.
+###
+
+### Upgraded / Atualizado
+ - Atualizado a função para adicionar arquivos multimídia addItems().
+###
+
+### Changed / Modificado
+ - Arquivos:
+    - Reajuste em CMakeLists.txt
+ - Sources:
+    - Modificado o sistema anti-bloqueio de tela.
+    - Funções para reprodução refatoradas.
+    - Refatorada a função getItems().
+###
+
+### Removed / Removido
+ - Removido instruções temporárias de incorporação do python no código.
+###
+
+### Fixed / Corrigido
+ - Recursos:
+    - Correção no modo aleatório.
+ - Sources:
+    - Pequenas correções na listview.
+    - Vários ajustes nos eventos de mouse.
+    - Corrigido problemas de travamento no slider.
+###
+
+##########################################################################
+
+
+## [ 1.1 ] - 2022-04-24 ##################################################
+
+### Added / Adicionado
+ - Estilos:
+    - Adicionado o global.qss para definição global do QToolTip.
+ - Controles:
+    - Adicionado botões Repetir e Aleatório juntamente com as opções
+      no menu de contexto.
+ - Teclas de atalho:
+    - Ctrl+H: Alterar modo aleatório.
+    - Ctrl+T: Alterar modo de repetição.
+###
+
+### Upgraded / Atualizado
+ - Código-Fonte:
+    - Atualizado a função defaultIcon().
+###
+
+### Changed / Modificado
+ - Código-Fonte:
+    - Mínimas alterações em alguns sources para melhor organização.
+###
+
+### Fixed / Corrigido
+ - Código-Fonte:
+    - Corrigido a detecção do ícone do programa em setIcon().
+    - Corrigido busca por arquivos png em setIconTheme().
+    - Corrigido o estilo dos botões para não agir no setToolTip().
+ - Recursos:
+    - Pequenas correções no estilo da playlist.
+ - Pequenas correções no script "install.sh".
+###
+
+##########################################################################
+
+
+## [ 1.0 rev2 ] - 2022-04-20 #############################################
+
+### Changed / Modificado
+ - Modificado o estilo da playlist.
+###
+
+### Fixed / Corrigido
+ - Otimização de performance:
+    - Adiciona informações na playlist apenas ao executar os
+      arquivos multimídia.
+    - Não adicionar as informações aos arquivos multimídia enquanto
+      estão sendo adicionado na playlist.
+###
+
+##########################################################################
+
+
+## [ 1.0 ] - 2022-04-18 ##################################################
+
+### Added / Adicionado
+ - Arquivos:
+    - Arquivo .desktop, ícone e logo em appdata.
+    - Imagens inseridas em Common, diretório criado para futuras
+      ferramentas extras.
+    - Temas de ícones em icons.
+ - Código-fonte:
+    - Código-fonte inserido em src.
+    - Estilos para o reprodutor inseridos em qss.
+ - Recursos:
+    - Compilação usando cmake.
+    - Playlist:
+        - Adicionar itens.
+        - Remover itens.
+        - Limpar lista.
+    - Controles de reprodução:
+        - Barra de reprodução.
+        - Play/pause.
+        - Stop.
+        - Next.
+        - Previous.
+    - Fullscreen.
+ - Teclas de atalho:
+    - Ctrl+A: Abrir arquivos.
+    - Ctrl+O: Abrir arquivos.
+    - Alt+Enter: Fullscreen.
+    - Esc: Sair do modo Fullscreen.
+###
+
+##########################################################################

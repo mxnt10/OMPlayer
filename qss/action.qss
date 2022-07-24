@@ -1,0 +1,34 @@
+/* Definição geral do menu */
+QMenu {
+    background-color: black;
+    color: white;
+    border: 2px ridge #cccccc;
+    border-radius: 10px;
+}
+
+/* Definição dos itens do menu */
+QMenu::item {
+    border: 6px solid black;
+    border-radius: 8px;
+}
+
+/* Definição dos itens selecionados */
+QMenu::item:selected {
+    background-color: #0064c8;
+    border: 6px solid #0064c8;
+}
+
+QMenu::indicator {
+    border: 8px solid transparent;
+    border-radius: 11px;
+    width: 6px;
+    height: 6px;
+}
+
+QMenu::indicator:exclusive:unchecked {
+    background-color: #202020;
+}
+
+QMenu::indicator:exclusive:checked {
+    background-color: white;
+}

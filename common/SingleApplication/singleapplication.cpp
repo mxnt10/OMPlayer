@@ -128,7 +128,7 @@ SingleApplication::SingleApplication( int &argc, char *argv[], bool allowSeconda
       }
     }
 
-    if( inst->primary == false ){
+    if(!inst->primary){
         d->startPrimary();
         if( ! d->memory->unlock() ){
           qDebug() << "SingleApplication: Unable to unlock memory after primary start.";

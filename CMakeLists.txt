@@ -21,6 +21,7 @@ include_directories(
         /usr/include/qt5/QtAVWidgets
         /usr/include/MediaInfoDLL
         common/ScreenSaver
+        src/PlayListUtils
 )
 
 add_subdirectory(
@@ -30,22 +31,26 @@ add_subdirectory(
 add_executable(
         OMPlayer
         src/main.cpp
-        src/About.cpp            src/About.h
-        src/Button.cpp           src/Button.h
-        src/ClickableMenu.cpp    src/ClickableMenu.h
-        src/EventFilter.cpp      src/EventFilter.h
-        src/JsonTools.cpp        src/JsonTools.h
-        src/Label.cpp            src/Label.h
-        src/Player.cpp           src/Player.h
-        src/PlayList.cpp         src/PlayList.h
-        src/PlayListDelegate.cpp src/PlayListDelegate.h
-        src/PlayListItem.cpp     src/PlayListItem.h
-        src/PlayListModel.cpp    src/PlayListModel.h
-        src/Settings.cpp         src/Settings.h
-        src/Slider.cpp           src/Slider.h
-        src/StatisticsView.cpp   src/StatisticsView.h
-        src/TreeView.cpp         src/TreeView.h
-        src/Utils.cpp            src/Utils.h
+        src/About.cpp          src/About.h
+        src/Button.cpp         src/Button.h
+        src/ClickableMenu.cpp  src/ClickableMenu.h
+        src/EventFilter.cpp    src/EventFilter.h
+        src/JsonTools.cpp      src/JsonTools.h
+        src/Label.cpp          src/Label.h
+        src/Player.cpp         src/Player.h
+        src/PlayList.cpp       src/PlayList.h
+        src/Settings.cpp       src/Settings.h
+        src/Slider.cpp         src/Slider.h
+        src/StatisticsView.cpp src/StatisticsView.h
+        src/TreeView.cpp       src/TreeView.h
+        src/Utils.cpp          src/Utils.h
+
+        src/PlayListUtils/PlayListDelegate.cpp
+        src/PlayListUtils/PlayListDelegate.h
+        src/PlayListUtils/PlayListItem.cpp
+        src/PlayListUtils/PlayListItem.h
+        src/PlayListUtils/PlayListModel.cpp
+        src/PlayListUtils/PlayListModel.h
 
         common/ScreenSaver/ScreenSaver.cpp
         common/ScreenSaver/ScreenSaver.h

@@ -3,11 +3,9 @@
 
 #include <QListView>
 #include <QModelIndex>
+#include <PlayListUtils>
 
 #include "Button.h"
-#include "PlayListDelegate.h"
-#include "PlayListItem.h"
-#include "PlayListModel.h"
 
 class PlayList : public QWidget {
 Q_OBJECT

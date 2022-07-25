@@ -156,7 +156,7 @@ void SingleApplicationPrivate::genBlockServerName()
             appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
         } else { // Running as AppImage: Use absolute path to AppImage file
             appData.addData( appImagePath );
-        };
+        }
 #else
         appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
 #endif
@@ -397,7 +397,7 @@ void SingleApplicationPrivate::slotConnectionEstablished()
                 break;
             default:
                 break;
-            };
+            }
         }
     );
 }
@@ -462,7 +462,7 @@ void SingleApplicationPrivate::readInitMessageBody( QLocalSocket *sock )
     readStream >> latin1Name;
 
     // connection type
-    ConnectionType connectionType = InvalidConnection;
+    ConnectionType connectionType;
     quint8 connTypeVal = InvalidConnection;
     readStream >> connTypeVal;
     connectionType = static_cast <ConnectionType>( connTypeVal );

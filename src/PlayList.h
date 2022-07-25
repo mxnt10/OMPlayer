@@ -41,6 +41,7 @@ signals:
     void emitnohide();
     void enterListView();
     void leaveListView();
+    void emitItems();
 
 public Q_SLOTS:
     void addItems(const QStringList &parms = QStringList());

@@ -46,6 +46,7 @@ private:
     void updateChannelMenu();
 
 private Q_SLOTS:
+    void setTotalItems(int fix = 0);
     void setSelect(int item);
     void ajustActualItem(int item);
     void firstPlay(const QString &name, int pos);
@@ -127,7 +128,7 @@ private:
     bool maximize{false};
     int Width{192}, Height{108};
     int previousitem{0}, actualitem{0}, nextitem{0};
-    int count{0}, unit{500};
+    int count{0}, unit{500}, totalitems{0};
 };
 
 #endif //OMPLAYER_PLAYER_H

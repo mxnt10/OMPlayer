@@ -66,6 +66,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Playlist do reprodutor */
     playlist = new PlayList();
     playlist->load();
+    setTotalItems();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
     connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
@@ -76,6 +77,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(playlist, SIGNAL(enterListView()), SLOT(enterList()));
     connect(playlist, SIGNAL(leaveListView()), SLOT(leaveList()));
     connect(playlist, SIGNAL(emitstop()), SLOT(setStop()));
+    connect(playlist, SIGNAL(emitItems()), SLOT(setTotalItems()));
 
 
     /** Barra de progresso de execução */
@@ -295,8 +297,11 @@ void OMPlayer::openMedia(const QStringList &parms) {
 /** Rodando as funções após aberto outras instâncias */
 void OMPlayer::onLoad() {
     playlist->load(true);
-    playlist->selectCurrent(actualitem);
-//    play(playlist->getItems(nextitem), nextitem);
+    if (totalitems < playlist->setListSize()) {
+        if (!playing) play(playlist->getItems(totalitems), totalitems);
+        else playlist->selectCurrent(actualitem);
+        setTotalItems();
+    }
 }
 
 
@@ -348,6 +353,7 @@ void OMPlayer::setRenderer(const QString &op) {
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
     listnum.clear();  /** É preferível redefinir a contagem aleatória */
+    setTotalItems(1);
     if (!playing) return;
 
     if (item < actualitem) {
@@ -380,6 +386,13 @@ void OMPlayer::ajustActualItem(int item) {
     }
 
     if (item > actualitem) playlist->selectCurrent(actualitem);
+}
+
+
+/** Calculando o total de itens */
+void OMPlayer::setTotalItems(int fix) {
+    totalitems = playlist->setListSize() - fix;
+    qDebug("%s(%sDEBUG%s):%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, BLU, totalitems);
 }
 
 
@@ -439,7 +452,7 @@ void OMPlayer::doubleplay(const QString &name) {
 /** Função para selecionar aleatóriamente a próxima mídia */
 void OMPlayer::nextRand() {
     qDebug("%s(%sDEBUG%s):%s Reproduzindo uma mídia aleatória ...\033[0m", GRE, RED, GRE, ORA);
-    if (listnum.size() < playlist->setListSize() - 1) {
+    if (listnum.size() < playlist->setListSize()) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
         /** No método aleatório convencional, alguns itens são reproduzidos mais vezes que os outros. Portanto,
@@ -457,6 +470,8 @@ void OMPlayer::nextRand() {
         listnum.append(QString::number(actualitem));
     }
 
+    qDebug("%s(%sDEBUG%s):%s Número de itens reproduzidos aleatoriamente: %i ...\033[0m",
+           GRE, RED, GRE, BLU, listnum.size());
     play(playlist->getItems(actualitem), actualitem);
 }
 
@@ -505,6 +520,7 @@ void OMPlayer::setStop() {
     playing = false;
     actualitem = playlist->selectItems();
     mediaPlayer->stop();
+    if (playlist->setListSize() == 0) listnum.clear();
 }
 
 

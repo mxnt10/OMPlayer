@@ -202,6 +202,7 @@ void PlayList::addItems(const QStringList &parms) {
     save();
     if (total == 0) return;
     emit firstPlay(isplay, t);
+    emit emitItems();
 }
 
 
@@ -307,6 +308,7 @@ void PlayList::clearItems() {
     delegate->resetWith();
     hashlist.clear();
     emit emitstop();
+    emit emitItems();
     save();
 }
 

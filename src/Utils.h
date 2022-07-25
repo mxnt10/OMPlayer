@@ -5,7 +5,7 @@
 
 #include "Button.h"
 
-#define VERSION "1.4.2"
+#define VERSION "1.4.3"
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug
 #define RED "\x1b[38;2;255;050;050m" //Debug

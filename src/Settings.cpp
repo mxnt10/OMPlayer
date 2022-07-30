@@ -1,7 +1,9 @@
+#include <QComboBox>
+#include <QGroupBox>
 #include <QLayout>
 #include <QTabWidget>
-#include <QStyle>
 
+#include "Label.h"
 #include "JsonTools.h"
 #include "Settings.h"
 #include "Utils.h"
@@ -18,7 +20,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
     setStyleSheet(Utils::setStyle("global")); // ToolTip
-    setFixedSize(300, 0);
+    setFixedSize(0, 0);
     setModal(true);
 
 
@@ -61,8 +63,27 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     }
 
 
+    /** Configurações de tema */
+    auto *combotheme = new QComboBox();
+    combotheme->addItems(Utils::subdirIcons());
+    combotheme->setCurrentText(JsonTools::stringJson("theme"));
+    connect(combotheme, SIGNAL(currentTextChanged(QString)), SLOT(setIcon(QString)));
+
+    auto *labeltheme = new Label(RIGHT, 0, nullptr, tr("Icon Themes") + ": ");
+    auto *themes = new QGridLayout();
+    themes->addWidget(labeltheme, 0, 0);
+    themes->addWidget(combotheme, 0, 1);
+
+
+    /** Definição dos grupos */
+    auto *themebox = new QGroupBox(tr("Themes"));
+    themebox->setLayout(themes);
+
+
     /** Itens gerais */
     auto *general = new QWidget();
+    auto *opgeneral = new QGridLayout(general);
+    opgeneral->addWidget(themebox);
 
 
    /** Organização por abas */
@@ -73,7 +94,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    auto *closebtn = new Button("apply", 32, tr("Apply and Close"));
+    closebtn = new Button("apply", 32, tr("Apply and Close"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 
@@ -116,7 +137,7 @@ void Settings::onClose() {
 /** Resetando os botões */
 void Settings::rendererSelect(Button *btn, const QString &name) {
     for (int i = 0; i < 8; ++i)
-        if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");;
+        if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
 
     Utils::changeIcon(btn, "radio-select");
     JsonTools::writeJson("renderer", name);
@@ -177,4 +198,22 @@ void Settings::setQGLWidget() {
 void Settings::setWidget() {
     if (QString::compare(JsonTools::stringJson("renderer"), vid_map[7].name) != 0)
         rendererSelect(vid_map[7].btn, vid_map[7].name);
+}
+
+
+/** Modificando as configurações de temas */
+void Settings::setIcon(const QString &index) {
+    JsonTools::writeJson("theme", index);
+
+    for (int i = 0; i < 8; ++i) {
+        if (vid_map[i].btn) {
+            if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
+                Utils::changeIcon(vid_map[i].btn, "radio-select");
+            else
+                Utils::changeIcon(vid_map[i].btn, "radio-unselect");
+        }
+    }
+    Utils::changeIcon(closebtn, "apply");
+
+    emit changethemeicon();
 }

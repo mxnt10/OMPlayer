@@ -22,6 +22,7 @@ public:
 signals:
     void emitclose();
     void emitvalue(const QString &value);
+    void changethemeicon();
 
 private Q_SLOTS:
     void onClose();
@@ -34,6 +35,7 @@ private Q_SLOTS:
     void setX11renderer();
     void setQGLWidget();
     void setWidget();
+    void setIcon(const QString &index);
 
 private:
     Button *opengl{}, *qglwidget2{};

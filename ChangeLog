@@ -3,16 +3,19 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Released ] - 2022-07-17 #############################################
+## [ 1.4.3 ] - 2022-07-29 ################################################
 
 ### Added / Adicionado
  - Arquivos e fontes:
     - Adicionado action.qss em qss.
     - Adicionado os fontes ClickableMenu.{cpp/h} em src.
     - Adicionado os fontes TreeView.{cpp/h} em src.
+    - Adicionado tema de ícones dreamstale.
+    - Adicionado ícones ao tema circle.
  - Recursos:
     - Adicionado seleção de canais de áudio.
     - Adicionado modo de repetição único de mídia.
+    - Adicionado configurações de tema.
  - Teclas de atalho:
     - Ctrl+Alt+H: Repetição de mídia atual.
     - Suporte a teclas de multimídia (Play,Next,Previous).
@@ -34,6 +37,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    em Settings.
  - Modificações no menu de contesto.
  - Adição e ajustes de tooltips nos controles de volume.
+ - Fontes de uso da playlist separados no diretório PlayListUtils em src.
+ - Alteracões do debug no fonte main.cpp em src.
+ - Lista de ícones com numeração.
+ - Modificações na visualização das informações de mídia.
 ###
 
 ### Fixed / Corrigido
@@ -48,6 +55,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    usando para isso uma verificação por hash md5 gerado por uma string
    contendo a localização do arquivo.
  - Problemas de emissão de sinal ao usar a rolagem do mouse no Slider.
+ - Correções ao inserir e reproduzir itens na playlist a partir
+   de uma nova instância.
+ - Pequena correção na redefinição da reprodução de itens aleatórios.
+ - Corrigida a função de reprodução aleatória reproduzindo um item
+   aleatório a menos.
+ - Ajustes em Button.cpp para botões decorativos ao exibir informações.
 ###
 
 ##########################################################################
@@ -66,7 +79,6 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Fontes:
     - Adicionado o estilo infoview.qss em qss.
     - Adicionado o fonte StatisticsView.{cpp/h} em src.
-
 ###
 
 ### Upgraded / Atualizado
@@ -105,7 +117,6 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Preparando o reprodutor para o suporte a tradução.
  - Simplificação no código ao fechar os diálogos.
  - Modificação no método para mapear os itens a serem reproduzidos.
- - Widgets dos controles e diálogos filhos conectados ao pai.
  - Refatoração de código para settings.
 ###
 
@@ -391,13 +402,11 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ###
 
 ### Upgraded / Atualizado
- - Código-Fonte:
-    - Atualizado a função defaultIcon().
+ - Atualizado a função defaultIcon().
 ###
 
 ### Changed / Modificado
- - Código-Fonte:
-    - Mínimas alterações em alguns sources para melhor organização.
+ - Mínimas alterações em alguns sources para melhor organização.
 ###
 
 ### Fixed / Corrigido
@@ -405,8 +414,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Corrigido a detecção do ícone do programa em setIcon().
     - Corrigido busca por arquivos png em setIconTheme().
     - Corrigido o estilo dos botões para não agir no setToolTip().
- - Recursos:
-    - Pequenas correções no estilo da playlist.
+ - Pequenas correções no estilo da playlist.
  - Pequenas correções no script "install.sh".
 ###
 

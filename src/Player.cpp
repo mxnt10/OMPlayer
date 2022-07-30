@@ -43,6 +43,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     preview = new VideoPreviewWidget(this);
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
+    connect(sett, SIGNAL(changethemeicon()), this, SLOT(changeIcons()));
     connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));
     connect(infoview, SIGNAL(emitclose()), this, SLOT(closeDialog()));
     connect(about, SIGNAL(emitclose()), this, SLOT(closeDialog()));
@@ -713,6 +714,7 @@ void OMPlayer::setShow() {
     wctl->activateWindow();
 }
 
+
 /** Função para abrir as configurações */
 void OMPlayer::setSettings() {
     qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
@@ -994,6 +996,31 @@ void OMPlayer::updateSliderUnit() {
     unit = mediaPlayer->notifyInterval();
     slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
     updateSlider(mediaPlayer->position());
+}
+
+
+/** Função para recarregar os ícones do programa */
+void OMPlayer::changeIcons() {
+    if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause", tr("Pause"));
+    else Utils::changeIcon(playBtn, "play", tr("Play"));
+
+    if (restart) Utils::changeIcon(replayBtn, "replay-on");
+    else Utils::changeIcon(replayBtn, "replay");
+
+    if (randplay) Utils::changeIcon(shuffleBtn, "shuffle-on");
+    else Utils::changeIcon(shuffleBtn, "shuffle");
+
+    int value = int(mediaPlayer->audio()->volume() * 100);
+    if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low");
+    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium");
+    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high");
+    else if (value == 0) Utils::changeIcon(volumeBtn, "mute");
+
+    Utils::changeIcon(stopBtn, "stop");
+    Utils::changeIcon(nextBtn, "next");
+    Utils::changeIcon(previousBtn, "previous");
+
+    playlist->changeIcons();
 }
 
 

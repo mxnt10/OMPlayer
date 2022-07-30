@@ -45,7 +45,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->translate(option.rect.topLeft());
     painter->setRenderHint(QPainter::Antialiasing, true);
     auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
-    if (pli.title().size() * 7 > width) width = pli.title().size() * 7;
+    if (pli.title().size() * 7 + 20 > width) width = pli.title().size() * 7 + 20;
     bool detail = false;
 
 
@@ -81,7 +81,8 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     ft.setPixelSize(11);
     painter->setFont(ft);
     painter->translate(margin, margin);
-    painter->drawText(QRect(0, -5, width - 2 * margin, height - 2 * margin), pli.title());
+    painter->drawText(QRect(0, -5, width - 2 * margin, height - 2 * margin),
+                      QString::number(index.row() + 1) + ". " + pli.title());
     painter->translate(0, height + margin - 1);
 
 

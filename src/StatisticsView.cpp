@@ -30,7 +30,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    auto *closebtn = new Button("apply", 32, tr("Close"));
+    closebtn = new Button("apply", 32, tr("Close"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 
@@ -54,11 +54,25 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     tab->setStyleSheet(Utils::setStyle("tab"));
 
 
+    /** Botões que servirão de tag info */
+    screen = new Button("", 36, nullptr, nullptr, false);
+    screen->setFixedSize(36, 36);
+    ratio = new Button("", 36, nullptr, nullptr, false);
+    ratio->setFixedSize(36, 36);
+
+
+    /** Layout para as tag infos */
+    auto *tags = new QGridLayout();
+    tags->addWidget(screen, 0, 0);
+    tags->addWidget(ratio, 0, 1);
+
+
     /** Layout para organização das configurações */
     auto *fore = new QGridLayout();
     fore->setMargin(10);
-    fore->addWidget(tab, 0, 0);
-    fore->addWidget(closebtn, 1, 0, RIGHT);
+    fore->addWidget(tab, 0, 0, 1, 2);
+    fore->addLayout(tags, 1, 0, LEFT);
+    fore->addWidget(closebtn, 1, 1, RIGHT);
 
 
     /** Fundo do diálogo de informações */
@@ -126,7 +140,6 @@ QStringList StatisticsView::getAudioInfoKeys() {
         << tr("Sample Rate")
         << tr("Sample Format")
         << tr("Channels")
-        << tr("Channel Layout")
         << tr("Frames")
         << tr("Frame Size")
         << tr("Frame Rate");
@@ -138,7 +151,7 @@ QVariantList StatisticsView::getBaseInfoValues(const Statistics& s) {
     QString rate, duration;
     if (!s.url.isEmpty()) {
         rate = QString::number(s.bit_rate/1000).append(QString::fromLatin1(" Kb/s"));
-        duration = QString::fromLatin1("%1 / %2").arg(ctime).arg(s.duration.toString(QString::fromLatin1("HH:mm:ss")));
+        duration = QString::fromLatin1("%1 / %2").arg(ctime, s.duration.toString(QString::fromLatin1("HH:mm:ss")));
     }
 
     return QVariantList()
@@ -153,19 +166,18 @@ QVariantList StatisticsView::getBaseInfoValues(const Statistics& s) {
 
 /** Informações de vídeo */
 QVariantList StatisticsView::getVideoInfoValues(const Statistics& s) {
-    QString ratio = QString::number(((double)s.video_only.width / s.video_only.height));
     QString sizev = QString::fromLatin1("%1x%2").arg(s.video_only.width).arg(s.video_only.height);
     QString sizec = QString::fromLatin1("%1x%2").arg(s.video_only.coded_width).arg(s.video_only.coded_height);
 
     return QVariantList()
-        << QString::fromLatin1("%1 (%2)").arg(s.video.codec).arg(s.video.codec_long)
-        << QString::fromLatin1("%1 (%2)").arg(s.video.decoder).arg(s.video.decoder_detail)
+        << QString::fromLatin1("%1 (%2)").arg(s.video.codec, s.video.codec_long)
+        << QString::fromLatin1("%1 (%2)").arg(s.video.decoder, s.video.decoder_detail)
         << QString::number(s.video.bit_rate/1000).append(QString::fromLatin1(" Kb/s"))
-        << ratio
-        << QString::fromLatin1("%1 (Codec: %2)").arg(sizev).arg(sizec)
+        << QString::number(((double)s.video_only.width / s.video_only.height))
+        << QString::fromLatin1("%1 (Codec: %2)").arg(sizev, sizec)
         << s.video.frames
-        << QString::fromLatin1("%1 / %2").arg(QString::number(
-                s.video.frame_rate, 'f', 2)).arg(QString::number(s.video.frame_rate, 'f', 2))
+        << QString::fromLatin1("%1 / %2").arg(QString::number(s.video.frame_rate, 'f', 2),
+                                              QString::number(s.video.frame_rate, 'f', 2))
         << s.video_only.pix_fmt
         << s.video_only.gop_size;
 }
@@ -174,13 +186,12 @@ QVariantList StatisticsView::getVideoInfoValues(const Statistics& s) {
 /** Informações de áudio */
 QVariantList StatisticsView::getAudioInfoValues(const Statistics& s) {
     return QVariantList()
-        << QString::fromLatin1("%1 (%2)").arg(s.audio.codec).arg(s.audio.codec_long)
-        << QString::fromLatin1("%1 (%2)").arg(s.audio.decoder).arg(s.audio.decoder_detail)
+        << QString::fromLatin1("%1 (%2)").arg(s.audio.codec, s.audio.codec_long)
+        << QString::fromLatin1("%1 (%2)").arg(s.audio.decoder, s.audio.decoder_detail)
         << QString::number(s.audio.bit_rate/1000).append(QString::fromLatin1(" Kb/s"))
         << QString::number(s.audio_only.sample_rate).append(QString::fromLatin1(" Hz"))
         << s.audio_only.sample_fmt
-        << s.audio_only.channels
-        << s.audio_only.channel_layout
+        << QString::fromLatin1("%1 (%2)").arg(QString::number(s.audio_only.channels), s.audio_only.channel_layout)
         << s.audio.frames
         << s.audio_only.frame_size
         << s.audio.frame_rate;
@@ -219,7 +230,7 @@ void StatisticsView::setStatistics(const Statistics& s) {
     if (i == 1) byte = "KiB";
     else if (i == 2) byte = "MiB";
     else if (i == 3) byte = "GiB";
-    fsize = QString::fromLatin1("%1 %2 (%3)").arg(QString::number(size, 'f', 2)).arg(byte).arg(file.size());
+    fsize = QString::fromLatin1("%1 %2 (%3)").arg(QString::number(size, 'f', 2), byte).arg(file.size());
 
     QVariantList v = getBaseInfoValues(s);
     i = 0;
@@ -249,6 +260,7 @@ void StatisticsView::setStatistics(const Statistics& s) {
     }
 
     /** Buscando o maior comprimento para a janela */
+    settaginfos();
     visibility();
     int csize = view1->size();
     if (csize < view2->size()) csize = view2->size();
@@ -256,7 +268,7 @@ void StatisticsView::setStatistics(const Statistics& s) {
     csize = csize + 40;
     qDebug("%s(%sDEBUG%s):%s Ajustando comprimento de infoview em %i ...\033[0m", GRE, RED, GRE, BLU, csize);
 
-    this->setMinimumSize(csize, 350);
+    this->setMinimumSize(csize, 340);
     this->resize(csize, this->height());
 }
 
@@ -285,10 +297,89 @@ void StatisticsView::visibility(){
     if (!statistics.audio.available) tab->setTabVisible(2, false);
     else {
         if (statistics.audio.bit_rate == 0) view3->topLevelItem(2)->setHidden(true);
-        if (statistics.audio.frames == 0) view3->topLevelItem(7)->setHidden(true);
-        if (statistics.audio_only.frame_size == 0) view3->topLevelItem(8)->setHidden(true);
-        if (statistics.audio.frame_rate == 0) view3->topLevelItem(9)->setHidden(true);
+        if (statistics.audio.frames == 0) view3->topLevelItem(6)->setHidden(true);
+        if (statistics.audio_only.frame_size == 0) view3->topLevelItem(7)->setHidden(true);
+        if (statistics.audio.frame_rate == 0) view3->topLevelItem(8)->setHidden(true);
     }
+}
+
+
+/**
+ * Resoluções de tela:
+ *
+ * FUHD|8k : 7680x4320 : 4320p
+ *
+ *  8192x4320 : 17:9
+ *  8192x5120 : 16:10
+ * 10080x4320 : 21:9
+ *
+ * UHD+|5k : 5120x2880 : 2880p
+ *
+ * 5120x1440 : 32∶9
+ * 5120x2160 : 64:27
+ * 5120x2560 : 18∶9
+ * 4800x2700 : 16∶9
+ * 5120x2700 : 17∶9
+ * 5120x3200 : 16∶10
+ * 5120x3840 : 4∶3
+ * 5120x4096 : 5∶4
+ *
+ * UHD|4k : 3840x2160 : 2160p
+ *
+ * 4096x2160 : 21:9
+ * 4096x1714
+ * 3996x2160
+ * 3656x2664
+ *
+ * 2K : 2048x1080 : 2048x858 : 1998x1080
+ *
+ * QHD : 2560x1440 : 1440p
+ * FHD : 1920x1080 : 1080p
+ * HD  : 1280x720  : 720p
+ *
+ * Função que seta as informações de mídia em ícones */
+void StatisticsView::settaginfos() {
+    ratio->setVisible(true);
+    if (videoItems[3]->data(1, Qt::DisplayRole) == 1.77778) Utils::changeIcon(ratio, "ratio169");
+    else if (videoItems[3]->data(1, Qt::DisplayRole) == 1.33333) Utils::changeIcon(ratio, "ratio43");
+    else ratio->setVisible(false);
+
+    int w = statistics.video_only.width;
+    int h = statistics.video_only.height;
+    screen->setVisible(true);
+    bool change = false;
+
+    for (int i : fuhdw) if (i == w) for (int j : fuhdh) if (j == h) {
+        Utils::changeIcon(screen, "screen8k");
+        change = true;
+    }
+
+    if (!change) for (int i : uhdpw) if (i == w) for (int j : uhdph) if (j == h) {
+        Utils::changeIcon(screen, "screen5k");
+        change = true;
+    }
+
+    if (!change) for (int i : uhdw) if (i == w) for (int j : uhdh) if (j == h) {
+        Utils::changeIcon(screen, "screen4k");
+        change = true;
+    }
+
+    if (!change && w == 2560 && h == 1440) {
+        Utils::changeIcon(screen, "screenqhd");
+        change = true;
+    }
+
+    if (!change && w == 1920 && h == 1080) {
+        Utils::changeIcon(screen, "screenfhd");
+        change = true;
+    }
+
+    if (!change && w == 1280 && h == 720) {
+        Utils::changeIcon(screen, "screenhd");
+        change = true;
+    }
+
+    if (!change) screen->setVisible(false);
 }
 
 
@@ -297,16 +388,18 @@ void StatisticsView::visibility(){
 
 /** Evento para finalizar o temporizador */
 void StatisticsView::hideEvent(QHideEvent *event) {
-    QDialog::hideEvent(event);
     killTimer(timer);
+    QDialog::hideEvent(event);
 }
 
 
 /** Evento para iniciar o temporizador */
 void StatisticsView::showEvent(QShowEvent *event) {
+    Utils::changeIcon(closebtn, "apply");
     visibility();
-    QDialog::showEvent(event);
+    settaginfos();
     timer = startTimer(1000);
+    QDialog::showEvent(event);
 }
 
 
@@ -315,11 +408,11 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
     if (event->timerId() != timer) return;
 
     if (FPS && statistics.video.frame_rate != 0)
-        FPS->setData(1, Qt::DisplayRole,
-                     QString::fromLatin1("%1 / %2").arg(QString::number(statistics.video.frame_rate, 'f', 2)).arg(
-                             QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
+        FPS->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
+                QString::number(statistics.video.frame_rate, 'f', 2),
+                QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
 
     if (CTIME && !statistics.url.isEmpty())
-        CTIME->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(ctime).arg(
-                statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
+        CTIME->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
+                ctime, statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
 }

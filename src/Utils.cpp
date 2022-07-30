@@ -139,16 +139,9 @@ int Utils::setDifere(int unit) {
 }
 
 
-/** Desocultar mouse */
-void Utils::arrowMouse() {
-    QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
-}
-
-
-/** Ocultar mouse */
-void Utils::blankMouse() {
-    QApplication::setOverrideCursor(QCursor(Qt::BlankCursor));
-}
+/** Funções para ocultar e desocultar mouse */
+void Utils::arrowMouse() { QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor)); }
+void Utils::blankMouse() { QApplication::setOverrideCursor(QCursor(Qt::BlankCursor)); }
 
 
 /** Alteração dos botões */

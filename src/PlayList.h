@@ -21,6 +21,7 @@ public:
     void selectClean();
     void selectCurrent(int indx);
     void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
+    void changeIcons();
 
 protected:
     bool event(QEvent *event) override;

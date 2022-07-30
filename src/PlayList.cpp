@@ -345,6 +345,14 @@ void PlayList::leaveList() {
 }
 
 
+/** Função para recarregar os ícones da playlist */
+void PlayList::changeIcons() {
+    Utils::changeIcon(addBtn, "add");
+    Utils::changeIcon(removeBtn, "remove");
+    Utils::changeIcon(clearBtn, "clean");
+}
+
+
 /**********************************************************************************************************************/
 
 

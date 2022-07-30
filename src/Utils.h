@@ -53,6 +53,7 @@ public:
     static void rm_nl(string &s);
     static int calcX(int z, int x, int y);
     static int setDifere(int unit);
+    static QStringList subdirIcons();
 };
 
 #endif //OMPLAYER_UTILS_H

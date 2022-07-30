@@ -36,14 +36,11 @@ private Q_SLOTS:
     void setWidget();
 
 private:
-    Button *opengl{};
-    Button *qglwidget2{};
-    Button *x11renderer{};
-    Button *xvideo{};
-    Button *direct2d{};
-    Button *gdi{};
-    Button *qglwidget{};
-    Button *widget{};
+    Button *opengl{}, *qglwidget2{};
+    Button *x11renderer{}, *xvideo{};
+    Button *direct2d{}, *gdi{};
+    Button *qglwidget{}, *widget{};
+    Button *closebtn{};
     QtAV::VideoRenderer *vo{};
     struct Render *vid_map{};
 };

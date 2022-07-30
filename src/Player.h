@@ -88,11 +88,12 @@ private Q_SLOTS:
     void setVolume(int value);
     void volumeFinished(qreal pos);
     void onTimeVolume(int pos, int value);
-    void onMediaStatusChanged();
     void changeChannel(QAction *action);
-    void handleError(const QtAV::AVError &error);
     void enterList();
     void leaveList();
+    void changeIcons();
+    void onMediaStatusChanged();
+    void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);
 
 private:

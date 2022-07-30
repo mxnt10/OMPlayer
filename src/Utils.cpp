@@ -95,19 +95,16 @@ QString Utils::mediaTitle(const QString &mediafile){
 QString Utils::defaultIcon(const QString &icon) {
     qDebug("%s(%sDEBUG%s):%s Usando ícone do sistema para %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(icon));
 
-    if (icon == "play")     return "media-playback-start";
-    if (icon == "pause")    return "media-playback-pause";
-    if (icon == "stop")     return "media-playback-stop";
-    if (icon == "next")     return "media-skip-forward";
-    if (icon == "previous") return "media-skip-backward";
-
+    if (icon == "play")      return "media-playback-start";
+    if (icon == "pause")     return "media-playback-pause";
+    if (icon == "stop")      return "media-playback-stop";
+    if (icon == "next")      return "media-skip-forward";
+    if (icon == "previous")  return "media-skip-backward";
     if (icon == "repeat-on") return "media-repeat-single";
     if (icon == "repeat")    return "media-repeat-none";
 
-    if (icon == "replay" || icon == "replay-menu")
-        return "media-playlist-repeat";
-    if (icon == "shuffle" || icon == "shuffle-menu")
-        return "media-playlist-shuffle";
+    if (icon == "replay"  || icon == "replay-on"  || icon == "replay-menu" ) return "media-playlist-repeat";
+    if (icon == "shuffle" || icon == "shuffle-on" || icon == "shuffle-menu") return "media-playlist-shuffle";
 
     if (icon == "add")    return "list-add";
     if (icon == "remove") return "list-remove";
@@ -120,7 +117,7 @@ QString Utils::defaultIcon(const QString &icon) {
     if (icon == "folder")     return "document-open-folder";
     if (icon == "fullscreen") return "view-fullscreen";
     if (icon == "settings")   return "configure";
-    if (icon == "about")      return "help-about";
+    if (icon == "about" || icon == "info") return "help-about";
 
     return {}; /** Se não estiver disponível, vai sem mesmo */
 }
@@ -199,4 +196,19 @@ QString Utils::setHash(const QString &url) {
 /** Capturando o hash MD5 de uma string */
 QString Utils::stringHash(const QString &url) {
     return QCryptographicHash::hash(url.toLocal8Bit(), QCryptographicHash::Md5).toHex();
+}
+
+
+/** Função que retorna os subdiretórios presente em icons */
+QStringList Utils::subdirIcons() {
+    QDir dir("/usr/share/OMPlayer/icons/");
+    QDir ldir = getLocal().append("/icons/");
+    QStringList dirs;
+
+    if (dir.exists()) dirs = dir.entryList(QDir::Dirs);
+    else if (ldir.exists()) dirs = ldir.entryList(QDir::Dirs);
+    else return {};
+
+    for (int i = 0; i < 2; i++) dirs.removeAt(0); /** Removendo os itens "." e ".." indesejáveis */
+    return dirs;
 }

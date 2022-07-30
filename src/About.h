@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+#include "Button.h"
+
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"
 #define MAINTAINER "Mauricio Ferrari"
@@ -15,6 +17,9 @@ public:
     explicit About(QWidget *parent = nullptr);
     ~About() override;
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 signals:
     void emitclose();
 
@@ -25,6 +30,8 @@ private Q_SLOTS:
 private:
     static QString getTextMaintainer();
     static QString getDescription();
+
+    Button *closebtn{}, *qtavbtn{};
 };
 
 #endif //OMPLAYER_ABOUT_H

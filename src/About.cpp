@@ -2,7 +2,6 @@
 #include <QtAVWidgets>
 
 #include "About.h"
-#include "Button.h"
 #include "Label.h"
 #include "Utils.h"
 
@@ -38,13 +37,10 @@ About::About(QWidget *parent) : QDialog(parent) {
     maintainer->setStyleSheet("font-size: 11pt");
 
 
-    /** Botão para fechar a janela */
-    auto *closebtn = new Button("apply", 32, tr("Close"));
+    /** Botão para fechar a janela e para o sobre do QtAV */
+    closebtn = new Button("apply", 32, tr("Close"));
+    qtavbtn = new Button("info", 32, tr("About QtAV"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
-
-
-    /** Botão para o sobre do QtAV */
-    auto *qtavbtn = new Button("about", 32, tr("About QtAV"));
     connect(qtavbtn, SIGNAL(pressed()), SLOT(setAboutQtAV()));
 
 
@@ -114,4 +110,15 @@ QString About::getDescription() {
 /** Sobre o QtAV */
 void About::setAboutQtAV() {
     QtAV::about();
+}
+
+
+/**********************************************************************************************************************/
+
+
+/** Ajustes após a exibição das configurações */
+void About::showEvent(QShowEvent *event) {
+    Utils::changeIcon(closebtn, "apply");
+    Utils::changeIcon(qtavbtn, "info");
+    QDialog::showEvent(event);
 }

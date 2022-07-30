@@ -56,7 +56,7 @@ void Button::enterEvent(QEvent *event) {
     if (fix) {
         qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
         setIconSize(QSize(num + 2, num + 2));
-    } else {
+    } else if (!txt.isEmpty()) {
         qDebug("%s(%sDEBUG%s):%s Mouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
         setText(" " + txt);
     }
@@ -67,7 +67,7 @@ void Button::enterEvent(QEvent *event) {
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
     if (fix) setIconSize(QSize(num, num));
-    else setText(txt);
+    else if (!txt.isEmpty()) setText(txt);
     QPushButton::leaveEvent(event);
 }
 

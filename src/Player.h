@@ -91,7 +91,7 @@ private Q_SLOTS:
     void changeChannel(QAction *action);
     void enterList();
     void leaveList();
-    void changeIcons();
+    void changeIcons(bool play = false);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);

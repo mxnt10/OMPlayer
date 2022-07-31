@@ -51,7 +51,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new AVPlayer(this);
-    mediaPlayer->audio()->setVolume(vol);
     setRenderer(JsonTools::stringJson("renderer"));
     connect(mediaPlayer->audio(), SIGNAL(volumeChanged(qreal)), SLOT(volumeFinished(qreal)));
     connect(mediaPlayer, SIGNAL(seekFinished(qint64)), SLOT(seekFinished(qint64)));
@@ -126,6 +125,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Controle do volume */
     volume = new Slider(this, false, 90, (-1), 100);
     volume->setValue(int(vol * 100));
+    mediaPlayer->audio()->setVolume(vol);
     connect(volume, SIGNAL(onHover(int,int)), SLOT(onTimeVolume(int,int)));
     connect(volume, SIGNAL(sliderMoved(int)), SLOT(setVolume(int)));
     connect(volume, SIGNAL(sliderPressed()), SLOT(setVolume()));

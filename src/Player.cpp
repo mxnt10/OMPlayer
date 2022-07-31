@@ -575,7 +575,9 @@ void OMPlayer::onStart() {
         isblock = true;
     }
 
+    changeIcons(true);
     updateChannelMenu();
+    onTimeSliderLeave();
     updateSlider(mediaPlayer->position());
 }
 
@@ -589,16 +591,18 @@ void OMPlayer::onStop() {
 
         slider->setMaximum(0);
         slider->setDisabled(true);
-        current->setText(QString::fromLatin1("-- -- : -- --"));
-        end->setText(QString::fromLatin1("-- -- : -- --"));
-        onTimeSliderLeave();
+        current->setText("-- -- : -- --");
+        end->setText("-- -- : -- --");
 
         /** Reativando Bloqueio de tela */
         if (isblock) {
             ScreenSaver::instance().deactive();
             isblock = false;
         }
+
+        changeIcons(true);
         updateChannelMenu();
+        onTimeSliderLeave();
     }
 }
 
@@ -643,7 +647,7 @@ void OMPlayer::enablePause() {
 /** Contador para mapear o clique único */
 void OMPlayer::clickCount() {
     if (!click->isActive()) click->start();
-    count = count + 1; /** Contador de cliques */
+    count++; /** Contador de cliques */
 }
 
 
@@ -856,6 +860,7 @@ void OMPlayer::seekFinished(qint64 pos) {
 
 /** Função para deixar o reprodutor no mudo */
 void OMPlayer::setMute() {
+    if (playing && !mediaPlayer->statistics().audio.available) return;
     if (muted) {
         muted = false;
         setVolume();
@@ -885,21 +890,21 @@ void OMPlayer::volumeFinished(qreal pos) {
     int value = int(pos * 100);
     qDebug("%s(%sDEBUG%s):%s Alterando o volume para %i ...\033[0m", GRE, RED, GRE, ORA, value);
     QString tooltip = tr("Volume") + ": " + QString::number(value);
+    muted = false;
 
-    if (JsonTools::floatJson("volume") != pos)
-        JsonTools::writeJson("volume", nullptr, NONE, pos);
+    if (JsonTools::floatJson("volume") != pos) JsonTools::writeJson("volume", nullptr, NONE, pos);
 
-    if (value > 0 && value <= 25)
-        Utils::changeIcon(volumeBtn, "volume_low", tooltip);
-    else if (value > 25 && value <= 75)
-        Utils::changeIcon(volumeBtn, "volume_medium", tooltip);
-    else if (value > 75)
-        Utils::changeIcon(volumeBtn, "volume_high", tooltip);
+    if (playing && !mediaPlayer->statistics().audio.available) {
+        Utils::changeIcon(volumeBtn, "nosound", tr("No Video Sound"));
+        return;
+    }
 
     if (value == 0) {
         Utils::changeIcon(volumeBtn, "mute", tr("Muted"));
         muted = true;
-    } else muted = false;
+    } else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low", tooltip);
+    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium", tooltip);
+    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high", tooltip);
 }
 
 
@@ -909,8 +914,10 @@ void OMPlayer::onTimeVolume(int pos, int value) {
     if (value < 10 ) str = "0";
 
     /** Definição da posição na tela e exibição do tooltip */
-    QPoint gpos = mapToGlobal(volume->pos() + QPoint(pos + 12, 5));
-    QToolTip::showText(gpos, QString::asprintf(" %s%i ", str.c_str(), value), this);
+    if (value > 0) {
+        QPoint gpos = mapToGlobal(volume->pos() + QPoint(pos + 12, 5));
+        QToolTip::showText(gpos, QString::asprintf(" %s%i ", str.c_str(), value), this);
+    } else QToolTip::hideText();
 }
 
 
@@ -971,8 +978,7 @@ void OMPlayer::changeChannel(QAction *action) {
 
 /** Função para atualizar a barra de progresso de execução */
 void OMPlayer::updateSlider(qint64 value) {
-    if (mediaPlayer->isSeekable())
-        slider->setValue(int(value / unit));
+    if (mediaPlayer->isSeekable()) slider->setValue(int(value / unit));
     current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
     infoview->setCurrentTime(int(value));
 
@@ -1000,27 +1006,32 @@ void OMPlayer::updateSliderUnit() {
 
 
 /** Função para recarregar os ícones do programa */
-void OMPlayer::changeIcons() {
-    if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause", tr("Pause"));
-    else Utils::changeIcon(playBtn, "play", tr("Play"));
-
-    if (restart) Utils::changeIcon(replayBtn, "replay-on");
-    else Utils::changeIcon(replayBtn, "replay");
-
-    if (randplay) Utils::changeIcon(shuffleBtn, "shuffle-on");
-    else Utils::changeIcon(shuffleBtn, "shuffle");
-
+void OMPlayer::changeIcons(bool play) {
+    QToolTip::hideText();
     int value = int(mediaPlayer->audio()->volume() * 100);
-    if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low");
-    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium");
-    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high");
-    else if (value == 0) Utils::changeIcon(volumeBtn, "mute");
+    QString tooltip = tr("Volume") + ": " + QString::number(value);
 
-    Utils::changeIcon(stopBtn, "stop");
-    Utils::changeIcon(nextBtn, "next");
-    Utils::changeIcon(previousBtn, "previous");
+    if (playing && !mediaPlayer->statistics().audio.available)
+        Utils::changeIcon(volumeBtn, "nosound", tr("No Video Sound"));
+    else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low", tooltip);
+    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium", tooltip);
+    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high", tooltip);
+    else if (value == 0) Utils::changeIcon(volumeBtn, "mute", tr("Muted"));
 
-    playlist->changeIcons();
+    if (!play) {
+        if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause", tr("Pause"));
+        else Utils::changeIcon(playBtn, "play", tr("Play"));
+
+        if (restart) Utils::changeIcon(replayBtn, "replay-on");
+        else Utils::changeIcon(replayBtn, "replay");
+        if (randplay) Utils::changeIcon(shuffleBtn, "shuffle-on");
+        else Utils::changeIcon(shuffleBtn, "shuffle");
+
+        Utils::changeIcon(stopBtn, "stop");
+        Utils::changeIcon(nextBtn, "next");
+        Utils::changeIcon(previousBtn, "previous");
+        playlist->changeIcons();
+    }
 }
 
 

@@ -42,6 +42,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Lista de ícones com numeração.
  - Modificações na visualização das informações de mídia.
  - Ajustes no estilo do slider.
+ - Redefinição do preview ao executar próxima mídia.
+ - Função de atraso de exibição dos controles convertido em lambda.
 ###
 
 ### Fixed / Corrigido

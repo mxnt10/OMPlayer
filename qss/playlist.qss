@@ -2,7 +2,7 @@
 QListView {
     background-color: transparent;
     color: white;
-    border: 0px solid transparent;
+    border: 0;
 }
 
 /* Definição do scroolbar */

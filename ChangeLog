@@ -41,6 +41,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Alteracões do debug no fonte main.cpp em src.
  - Lista de ícones com numeração.
  - Modificações na visualização das informações de mídia.
+ - Ajustes no estilo do slider.
 ###
 
 ### Fixed / Corrigido
@@ -52,7 +53,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    conversão para função em Utils.
  - Pequenas correções na função setStyle em Utils.
  - Corrigido problemas com adição de arquivos duplicados à playlist,
-   usando para isso uma verificação por hash md5 gerado por uma string
+   usando para isso uma verificação por hash md5 gerado de uma string
    contendo a localização do arquivo.
  - Problemas de emissão de sinal ao usar a rolagem do mouse no Slider.
  - Correções ao inserir e reproduzir itens na playlist a partir
@@ -61,6 +62,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Corrigida a função de reprodução aleatória reproduzindo um item
    aleatório a menos.
  - Ajustes em Button.cpp para botões decorativos ao exibir informações.
+ - Precisou mais um ajuste para o next automático.
+ - Correções no volume.
 ###
 
 ##########################################################################

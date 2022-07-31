@@ -12,7 +12,7 @@ QSlider::handle {
     border: 1px solid #444444;
     border-radius: 3px;
     margin: -2px -1;
-    width: 15px;
+    width: 12px;
 }
 
 /* Passando o mouse encima do seletor */

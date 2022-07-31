@@ -131,8 +131,8 @@ int Utils::calcX(int z, int x, int y) {
 
 /** Cálculo do diferença do intervalo de tempo */
 int Utils::setDifere(int unit) {
-    if (unit >= 250) return 500;
-    return unit * 4;
+    if (unit >= 100) return 500;
+    return unit * 6;
 }
 
 

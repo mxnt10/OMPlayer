@@ -9,16 +9,16 @@ QSlider::groove {
 /* Definição do seletor */
 QSlider::handle {
     background-color: transparent;
-    border: 1px solid transparent;
+    border: 2px solid transparent;
     border-radius: 3px;
     margin: -2 -1;
-    width: 12px;
+    width: 10px;
 }
 
 /* Passando o mouse encima do seletor */
 QSlider::handle:hover {
     background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
-    border: 1px solid #444444;
+    border: 2px solid #444444;
 }
 
 /* Caso esteja desativado */

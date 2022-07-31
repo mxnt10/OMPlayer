@@ -10,13 +10,13 @@
 
 
 /** Construtor principal do Slider. */
-Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum) : QSlider(parent) {
+Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum, const QString &style) : QSlider(parent) {
     setOrientation(Qt::Horizontal);
     setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
     setTracking(true);
     setDisabled(disable);
-    setStyleSheet(Utils::setStyle("progressbar"));
+    setStyleSheet(Utils::setStyle(style));
     connect(this, SIGNAL(valueChanged(int)), SLOT(getValue(int)));
 
     if (wsize > (-1)) setFixedWidth(wsize);

@@ -15,6 +15,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
+    setStyleSheet("border: 0; background-color: transparent;");
 
 
     /** Para botões que agem feito radio buttons */

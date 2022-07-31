@@ -123,7 +123,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Controle do volume */
-    volume = new Slider(this, false, 90, (-1), 100);
+    volume = new Slider(this, false, 90, (-1), 100, "volume");
     volume->setValue(int(vol * 100));
     mediaPlayer->audio()->setVolume(vol);
     connect(volume, SIGNAL(onHover(int,int)), SLOT(onTimeVolume(int,int)));

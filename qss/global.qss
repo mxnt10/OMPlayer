@@ -5,9 +5,3 @@ QToolTip {
     border: 2px ridge #cccccc;
     border-radius: 10px;
 }
-
-/* Definição para os botões */
-QPushButton {
-    border: 0;
-    background-color: transparent;
-}

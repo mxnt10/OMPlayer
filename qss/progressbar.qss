@@ -22,7 +22,8 @@ QSlider::handle:hover {
 
 /* Caso esteja desativado */
 QSlider::handle:disabled {
-    background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #444444, stop: 1.0 #ffffff);
+    background-color: transparent;
+    border: transparent;
 }
 
 /* Definição do progresso */
@@ -30,4 +31,10 @@ QSlider::sub-page {
     background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
     border: 1px solid #444444;
     border-radius: 2px;
+}
+
+/* Caso esteja desativado */
+QSlider::sub-page:disabled {
+    background-color: transparent;
+    border: transparent;
 }

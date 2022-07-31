@@ -42,23 +42,17 @@ void EventFilter::setSett(bool var) {
 }
 
 
-/** Método auxiliar para o delay para exibição do widget flutuante */
-void EventFilter::startShow(){
-    start = true;
-}
-
-
 /**********************************************************************************************************************/
 
 
 /** Filtro de eventos que irá mapear tudo o que tem de direito */
 bool EventFilter::eventFilter(QObject *object, QEvent *event) {
-    Q_UNUSED(object);
+    Q_UNUSED(object)
 
     if (num == 1) {
         /** O widget filho abre mais rápido que o pai, por isso esse delay */
         if (!first) {
-            QTimer::singleShot(1000, this, SLOT(startShow()));
+            QTimer::singleShot(1200, [this](){start = true;});
             first = true;
         }
 

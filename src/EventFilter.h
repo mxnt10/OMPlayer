@@ -33,9 +33,6 @@ signals:
     void emitNext();
     void emitPrevious();
 
-private Q_SLOTS:
-    void startShow();
-
 private:
     bool contextmenu{false};
     bool first{false};

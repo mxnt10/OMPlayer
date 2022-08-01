@@ -27,9 +27,11 @@
 - Ctrl+O: Open files.
 - Ctrl+H: Shuffle mode.
 - Ctrl+T: Repeat mode.
+- Ctrl+Alt+T: Repeat current media (repeat one).
 - Alt+Enter: Show/Exit fullscreen.
 - Alt+S: Show Settings.
 - Esc: Exit fullscreen.
+- Multimedia Keys: Play/Pause, Next, Previous.
 
 ## Installation instructions
 

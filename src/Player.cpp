@@ -1156,7 +1156,6 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     auto *contextMenu = new QMenu(tr("Context menu"), this);
     contextMenu->setGraphicsEffect(effect1);
     contextMenu->setStyleSheet(Utils::setStyle("contextmenu"));
-    qDebug() << listmenu << enterpos;
 
     if (listmenu && enterpos) {
         control = true;

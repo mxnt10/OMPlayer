@@ -575,9 +575,14 @@ void OMPlayer::onStart() {
         isblock = true;
     }
 
+    /** Finalizando qualquer prévisualização anterior */
+    if (preview->isVisible()) {
+        qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+        preview->close();
+    }
+
     changeIcons(true);
     updateChannelMenu();
-    onTimeSliderLeave();
     updateSlider(mediaPlayer->position());
 }
 
@@ -1151,6 +1156,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     auto *contextMenu = new QMenu(tr("Context menu"), this);
     contextMenu->setGraphicsEffect(effect1);
     contextMenu->setStyleSheet(Utils::setStyle("contextmenu"));
+    qDebug() << listmenu << enterpos;
 
     if (listmenu && enterpos) {
         control = true;

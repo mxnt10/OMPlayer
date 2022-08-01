@@ -1,3 +1,5 @@
+#include <QPainter>
+
 #include <string>
 
 #include "Button.h"
@@ -15,7 +17,7 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
-    setStyleSheet("border: 0; background-color: transparent;");
+    setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
 
 
     /** Para botões que agem feito radio buttons */
@@ -27,7 +29,20 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     QString theme = JsonTools::stringJson("theme");
     if (Utils::setIconTheme(theme, icon) == nullptr)
         setIcon(QIcon::fromTheme(Utils::defaultIcon(icon)));
-    else setIcon(QIcon(Utils::setIconTheme(theme, icon)));
+    else {
+        QPixmap pixmap{Utils::setIconTheme(theme, icon)};
+
+        QPainter p;
+        p.setRenderHint(QPainter::Antialiasing,true);
+        p.setRenderHint(QPainter::SmoothPixmapTransform,true);
+        p.setRenderHint(QPainter::LosslessImageRendering,true);
+        p.drawPixmap(QRect(100, 100, num, num), pixmap, pixmap.rect());
+
+        QIcon img;
+        img.addPixmap(pixmap);
+        img.paint(&p, QRect(100, 100, num, num));
+        setIcon(img);
+    }
 
 
     /** Apenas para o Debug */

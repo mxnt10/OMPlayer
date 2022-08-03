@@ -10,7 +10,8 @@
 
 
 /** Construtor principal do Slider. */
-Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum, const QString &style) : QSlider(parent) {
+Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum, const QString &style) :
+    QSlider(parent) {
     setOrientation(Qt::Horizontal);
     setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
@@ -18,6 +19,7 @@ Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum,
     setDisabled(disable);
     setStyleSheet(Utils::setStyle(style));
     connect(this, SIGNAL(valueChanged(int)), SLOT(getValue(int)));
+    stl = style;
 
     if (wsize > (-1)) setFixedWidth(wsize);
     if (hsize > (-1)) setFixedHeight(hsize);
@@ -109,7 +111,7 @@ void Slider::mouseMoveEvent(QMouseEvent *event) {
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Slider::enterEvent(QEvent *event) {
-    qDebug("%s(%sDEBUG%s):%s Mouse posicionado na barra de progresso/volume ...\033[0m", GRE, RED, GRE, VIO);
+    qDebug("%s(%sDEBUG%s):%s Mouse posicionado no %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(stl));
     emit emitEnter();
     QSlider::enterEvent(event);
 }

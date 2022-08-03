@@ -14,7 +14,7 @@ QString JsonTools::defaultJson() {
     return "{"
            "    \"renderer\": \"OpenGL\","
            "    \"theme\": \"circle\","
-           "    \"volume\": 1.0"
+           "    \"volume\": 1"
            "}";
 }
 

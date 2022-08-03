@@ -12,12 +12,8 @@ Label::Label(const QFlag& align, int w, const QString& tooltip, const QString& t
     txt = tooltip;
 
     if (w > 0) setFixedWidth(w);
-
-    if (!tooltip.isEmpty())
-        setToolTip(tooltip);
-
-    if (!text.isEmpty())
-        setText(text);
+    if (!tooltip.isEmpty()) setToolTip(tooltip);
+    if (!text.isEmpty()) setText(text);
 }
 
 

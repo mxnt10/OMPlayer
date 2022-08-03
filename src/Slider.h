@@ -34,6 +34,7 @@ private:
     [[nodiscard]] int pixelPosToRangeValue(int pos) const;
 
     int val{0};
+    QString stl{};
 };
 
 #endif //OMPLAYER_SLIDER_H

@@ -23,11 +23,14 @@ public:
     void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
     void changeIcons();
 
+    enum M3UFormat { M3U = 0, M3U8 = 1, DetectFormat = 2 };
+
 protected:
     bool event(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
+    void load_m3u(const QString& file, M3UFormat format);
     void insertItemAt(const PlayListItem &item, int row = 0);
     void setItemAt(const PlayListItem &item, int row = 0);
 

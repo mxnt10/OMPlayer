@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QMoveEvent>
 #include <QStandardPaths>
+#include <QTextCodec>
 
 #include <filesystem>
 
@@ -182,27 +183,97 @@ void PlayList::addItems(const QStringList &parms) {
     if (files.isEmpty()) return;
     for (int i = 0; i < files.size(); ++i) {
 
-        const QString& file = files.at(i);
+        const QString &file = files.at(i);
+        QString suffix = QFileInfo(file).suffix().toLower();
+
         if (!QFileInfo(file).isFile()) continue;
-
-        if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
-            hashlist.append(Utils::stringHash(file));
-            insert(file, a + t);
-            a++;
-        } else {
-            total--;
-            continue;
+        else if (suffix == "m3u8" || suffix == "m3u") {
+            load_m3u(file, DetectFormat);
+            return;
         }
+        else {
+            if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
+                hashlist.append(Utils::stringHash(file));
+                insert(file, a + t);
+                a++;
+            } else {
+                total--;
+                continue;
+            }
 
-        if (!select) {
-            isplay = file;
-            select = true;
+            if (!select) {
+                isplay = file;
+                select = true;
+            }
         }
     }
+
     save();
     if (total == 0) return;
     emit firstPlay(isplay, t);
     emit emitItems();
+}
+
+
+/** Função para carregar uma playlist no formato m3u/m3u8 */
+void PlayList::load_m3u(const QString& file, M3UFormat format) {
+    int i = 0;
+    bool utf8;
+    double duration;
+    QString line, name, filename;
+
+    /** Verificando codificação */
+    if (format == DetectFormat) utf8 = (QFileInfo(file).suffix().toLower() == "m3u8");
+    else utf8 = (format == M3U8);
+
+    QRegExp m3u_id("^#EXTM3U|^#M3U");
+    QRegExp rx_info("^#EXTINF:([.\\d]+).*tvg-logo=\"(.*)\",(.*)");
+
+    QFile f(file);
+    if (f.open(QIODevice::ReadOnly)) {
+        clearItems();
+        QString playlist_path = QFileInfo(file).path();
+
+        QTextStream stream( &f );
+        if (utf8) stream.setCodec("UTF-8");
+        else stream.setCodec(QTextCodec::codecForLocale());
+
+        while ( !stream.atEnd() ) {
+            line = stream.readLine().trimmed();
+            if (line.isEmpty()) continue;
+
+            if (m3u_id.indexIn(line) != -1 || line.startsWith("#EXTVLCOPT:") || line.startsWith("#")) continue;
+            else if (rx_info.indexIn(line) != -1) {
+                duration = rx_info.cap(1).toDouble();
+                name = rx_info.cap(3);
+            }
+            else if (line.startsWith("#EXTINF:")) {
+                QStringList fields = line.mid(8).split(",");
+                if (fields.count() >= 1) duration = fields[0].toDouble();
+                if (fields.count() >= 2) name = fields[1];
+            } else {
+                filename = line;
+                QFileInfo fi(filename);
+
+                if (fi.exists()) {
+                    filename = fi.absoluteFilePath();
+                } else if (QFileInfo::exists(playlist_path + "/" + filename)) {
+                    filename = playlist_path + "/" + filename;
+                }
+
+                name.replace("&#44;", ",");
+
+                if (QFileInfo::exists(filename)) {
+                    insert(filename, i, qint64(duration));
+                    i++;
+                }
+            }
+        }
+        f.close();
+        save();
+        emit firstPlay(getItems(0), 0);
+        emit emitItems();
+    }
 }
 
 

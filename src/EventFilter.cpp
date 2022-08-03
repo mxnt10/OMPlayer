@@ -122,10 +122,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Ação após a destruição do menu de contexto */
         if (event->type() == QEvent::ChildRemoved && contextmenu) {
             qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-            if (sett || fixed)
-                Utils::arrowMouse();
-            else
-                Utils::blankMouse();
+            if (sett || fixed) Utils::arrowMouse();
+            else Utils::blankMouse();
             contextmenu = false;
         }
 

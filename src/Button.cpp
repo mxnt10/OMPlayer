@@ -11,19 +11,13 @@
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(const QString &icon, int size, const QString &tooltip, const QString &text, bool fixed) {
+Button::Button(ButtonType btn, const QString &icon, int size, const QString &tooltip, const QString &text) {
     num = size;
-    fix = fixed;
+    type = btn;
     txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
     setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
-
-
-    /** Para botões que agem feito radio buttons */
-    if (fix) setFixedSize(num, num);
-    if (!text.isEmpty()) setText(txt);
-
 
     /** Definindo ícone */
     QString theme = JsonTools::stringJson("theme");
@@ -45,6 +39,11 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
     }
 
 
+    /** Para botões que agem feito radio buttons */
+    if (btn != radio) setFixedSize(num, num);
+    if (btn == radio) setText(txt);
+
+
     /** Apenas para o Debug */
     std::string upper = icon.toStdString();
     std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
@@ -53,8 +52,10 @@ Button::Button(const QString &icon, int size, const QString &tooltip, const QStr
 
 
     /** ToolTip */
-    if (tooltip.isEmpty()) setToolTip(ico);
-    else if (QString::compare(tooltip, NOTOOLTIP, Qt::CaseSensitive) != 0) setToolTip(tooltip);
+    if (type == button) {
+        if (tooltip.isEmpty()) setToolTip(ico);
+        else setToolTip(tooltip);
+    }
 }
 
 
@@ -69,10 +70,10 @@ Button::~Button() = default;
 void Button::enterEvent(QEvent *event) {
     emit emitEnter();
 
-    if (fix) {
+    if (type == button) {
         qDebug("%s(%sDEBUG%s):%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
         setIconSize(QSize(num + 2, num + 2));
-    } else if (!txt.isEmpty()) {
+    } else if (type == radio) {
         qDebug("%s(%sDEBUG%s):%s Mouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
         setText(" " + txt);
     }
@@ -82,15 +83,15 @@ void Button::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    if (fix) setIconSize(QSize(num, num));
-    else if (!txt.isEmpty()) setText(txt);
+    if (type == button) setIconSize(QSize(num, num));
+    else if (type == radio) setText(txt);
     QPushButton::leaveEvent(event);
 }
 
 
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
-    if (fix) {
+    if (type == button) {
         qDebug("%s(%sDEBUG%s):%s Pressioando o botão %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(ico));
         setIconSize(QSize(num - 2, num - 2));
     }
@@ -100,6 +101,6 @@ void Button::mousePressEvent(QMouseEvent *event) {
 
 /** Finalizando o efeito do botão */
 void Button::mouseReleaseEvent(QMouseEvent *event) {
-    if (fix) setIconSize(QSize(num + 2, num + 2));
+    if (type == button) setIconSize(QSize(num + 2, num + 2));
     QPushButton::mouseReleaseEvent(event);
 }

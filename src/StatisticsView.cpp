@@ -30,7 +30,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button("apply", 32, tr("Close"));
+    closebtn = new Button(Button::button, "apply", 32, tr("Close"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 
@@ -55,10 +55,8 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botões que servirão de tag info */
-    screen = new Button("", 36, nullptr, nullptr, false);
-    screen->setFixedSize(36, 36);
-    ratio = new Button("", 36, nullptr, nullptr, false);
-    ratio->setFixedSize(36, 36);
+    screen = new Button(Button::tag, nullptr, 36);
+    ratio = new Button(Button::tag, nullptr, 36);
 
 
     /** Layout para as tag infos */
@@ -218,20 +216,18 @@ void StatisticsView::setStatistics(const Statistics& s) {
     ctime = "00:00:00";
     statistics = s;
     QString byte{"B"};
+    QStringList byteit{"KiB", "MiB", "GiB"};
     QFileInfo file{s.url};
     auto size = (double)file.size();
 
     /** Definindo o tamanho do arquivo de mídia */
     while (size > 1024) {
         size = size / 1024;
+        byte = byteit[i];
         i++;
     }
 
-    if (i == 1) byte = "KiB";
-    else if (i == 2) byte = "MiB";
-    else if (i == 3) byte = "GiB";
     fsize = QString::fromLatin1("%1 %2 (%3)").arg(QString::number(size, 'f', 2), byte).arg(file.size());
-
     QVariantList v = getBaseInfoValues(s);
     i = 0;
 

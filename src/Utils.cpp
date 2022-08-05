@@ -3,12 +3,8 @@
 #include <QDir>
 #include <QFile>
 
-#include <filesystem>
-
 #include "JsonTools.h"
 #include "Utils.h"
-
-using std::filesystem::exists;
 
 
 /**********************************************************************************************************************/
@@ -18,76 +14,92 @@ using std::filesystem::exists;
  * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é conveniente. Por isso, é usado
  * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível apenas à caráter
  * de testes de execução e depuração do reprodutor. */
-QString Utils::getLocal() {
+QString Utils::getLocal(ST option) {
+    if (option == Current) return QDir::currentPath();
     return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));
 }
 
 
 /** Retorna o ícone do programa */
-QString Utils::setIcon(bool logo) {
-    QString icon = "/usr/share/pixmaps/OMPlayer.png";
-    QString lIcon = getLocal() + "/appdata/OMPlayer.png";
-
-    if (logo) {
+QString Utils::setIcon(ST logo) {
+    QString icon, lIcon;
+    if (logo == Logo) {
         qDebug("%s(%sDEBUG%s):%s Setando uma logo ...\033[0m", GRE, RED, GRE, BLU);
         icon = "/usr/share/OMPlayer/logo/logo.png";
         lIcon = getLocal() + "/appdata/logo.png";
-    } else
+    } else {
         qDebug("%s(%sDEBUG%s):%s Setando o ícone do programa ...\033[0m", GRE, RED, GRE, BLU);
+        icon = "/usr/share/pixmaps/OMPlayer.png";
+        lIcon = getLocal() + "/appdata/OMPlayer.png";
+    }
 
-    if (exists(icon.toStdString())) return icon;
-    else if (exists(lIcon.toStdString())) return lIcon;
+    if (QFileInfo::exists(icon)) return icon;
+    else if (QFileInfo::exists(lIcon)) return lIcon;
+    else {
+        if (logo == Logo) lIcon = getLocal(Current) + "/appdata/logo.png";
+        else lIcon = getLocal(Current) + "/appdata/OMPlayer.png";
+        if (QFileInfo::exists(lIcon)) return lIcon;
+    }
     return {};
 }
 
 
 /** Função que vai selecionar o tema dos ícones */
 QString Utils::setIconTheme(const QString &theme, const QString &icon) {
-    QString fileTheme = theme + "/" + icon;
-    QString iconFile = "/usr/share/OMPlayer/icons/" + fileTheme;
-    QString lIconFile = getLocal() + "/icons/" + fileTheme;
+    QString fileTheme{theme + "/" + icon};
+    QString iconFile{"/usr/share/OMPlayer/icons/" + fileTheme};
+    QString lIconFile{getLocal() + "/icons/" + fileTheme};
 
     /** Compatibilidade com formatos svg e png */
-    QString iconFileSVG = iconFile + ".svg";
-    QString iconFilePNG = iconFile + ".png";
-    QString lIconFileSVG = lIconFile + ".svg";
-    QString lIconFilePNG = lIconFile + ".png";
+    QString iconFileSVG{iconFile + ".svg"};
+    QString iconFilePNG{iconFile + ".png"};
+    QString lIconFileSVG{lIconFile + ".svg"};
+    QString lIconFilePNG{lIconFile + ".png"};
 
-    /** A função sempre vai dar prioridade aos arquivos svg */
-    if (exists(iconFileSVG.toStdString())) return iconFileSVG;
-    else if (exists(iconFilePNG.toStdString())) return iconFilePNG;
-    else if (exists(lIconFileSVG.toStdString())) return lIconFileSVG;
-    else if (exists(lIconFilePNG.toStdString())) return lIconFilePNG;
-    else return {};
+    /** Prioridade aos arquivos svg */
+    if (QFileInfo::exists(iconFileSVG)) return iconFileSVG;
+    else if (QFileInfo::exists(iconFilePNG)) return iconFilePNG;
+    else if (QFileInfo::exists(lIconFileSVG)) return lIconFileSVG;
+    else if (QFileInfo::exists(lIconFilePNG)) return lIconFilePNG;
+    else {
+        lIconFile = getLocal(Current) + "/icons/" + fileTheme;
+        lIconFileSVG = lIconFile + ".svg";
+        lIconFilePNG = lIconFile + ".png";
+        if (QFileInfo::exists(lIconFileSVG)) return lIconFileSVG;
+        if (QFileInfo::exists(lIconFilePNG)) return lIconFilePNG;
+    }
+    return {};
 }
 
 
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const QString &style) {
     qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, qUtf8Printable(style));
+    QString qss{"/usr/share/OMPlayer/qss/" + style + ".qss"};
+    QString lQss{getLocal() + "/qss/" + style + ".qss"};
 
     QString qst;
-    QString qss = "/usr/share/OMPlayer/qss/" + style + ".qss";
-    QString lQss = getLocal() + "/qss/" + style + ".qss";
-
-    if (exists(qss.toStdString())) qst = qss;
-    else if (exists(lQss.toStdString())) qst = lQss;
+    if (QFileInfo::exists(qss)) qst = qss;
+    else if (QFileInfo::exists(lQss)) qst = lQss;
+    else {
+        lQss = getLocal(Current) + "/qss/" + style + ".qss";
+        if (QFileInfo::exists(lQss)) qst = lQss;
+    }
+    if (qst.isEmpty()) return {};
 
     QFile file(qst);
     if (!file.open(QFile::ReadOnly)) return {};
     QString styleSheet{QLatin1String(file.readAll())};
+    file.close();
     return styleSheet;
 }
 
 
 /** Definindo título do arquivo multimídia */
 QString Utils::mediaTitle(const QString &mediafile){
-    QString mediatitle = mediafile;
-
-    /** Condição para definir o título na interface */
     if (!mediafile.contains(QLatin1String("://")) || mediafile.startsWith(QLatin1String("file://")))
-        mediatitle = QFileInfo(mediafile).fileName();
-    return mediatitle;
+        return QFileInfo(mediafile).fileName();
+    return mediafile;
 }
 
 
@@ -103,8 +115,9 @@ QString Utils::defaultIcon(const QString &icon) {
     if (icon == "repeat-on") return "media-repeat-single";
     if (icon == "repeat")    return "media-repeat-none";
 
-    if (icon == "replay"  || icon == "replay-on"  || icon == "replay-menu" ) return "media-playlist-repeat";
-    if (icon == "shuffle" || icon == "shuffle-on" || icon == "shuffle-menu") return "media-playlist-shuffle";
+    if (QRegExp("replay($|-(on|menu))").indexIn(icon) != -1)  return "media-playlist-repeat";
+    if (QRegExp("shuffle($|-(on|menu))").indexIn(icon) != -1) return "media-playlist-shuffle";
+    if (QRegExp("about|info").indexIn(icon) != -1)            return "help-about";
 
     if (icon == "add")    return "list-add";
     if (icon == "remove") return "list-remove";
@@ -117,7 +130,6 @@ QString Utils::defaultIcon(const QString &icon) {
     if (icon == "folder")     return "document-open-folder";
     if (icon == "fullscreen") return "view-fullscreen";
     if (icon == "settings")   return "configure";
-    if (icon == "about" || icon == "info") return "help-about";
 
     return {}; /** Se não estiver disponível, vai sem mesmo */
 }
@@ -125,7 +137,7 @@ QString Utils::defaultIcon(const QString &icon) {
 
 /** Cálculo somente da largura do quadro uma vez que a altura vem pré-estabelecida */
 int Utils::calcX(int z, int x, int y) {
-    return x / (y / z);
+    return int(x / ((double)y / z));
 }
 
 
@@ -173,7 +185,7 @@ QString Utils::setHash(const QString &url) {
     QFileInfo fi(url);
 
     int fsize = int(fi.size());
-    int bsize = 1048576; //1MiB
+    int bsize = 8192; //8KiB
 
     if (f.open(QIODevice::ReadOnly)) {
         char buf[bsize];
@@ -202,12 +214,16 @@ QString Utils::stringHash(const QString &url) {
 /** Função que retorna os subdiretórios presente em icons */
 QStringList Utils::subdirIcons() {
     QDir dir("/usr/share/OMPlayer/icons/");
-    QDir ldir = getLocal().append("/icons/");
+    QDir ldir(getLocal().append("/icons/"));
     QStringList dirs;
 
     if (dir.exists()) dirs = dir.entryList(QDir::Dirs);
     else if (ldir.exists()) dirs = ldir.entryList(QDir::Dirs);
-    else return {};
+    else {
+        ldir.setPath(getLocal(Current).append("/icons/"));
+        if (ldir.exists()) dirs = ldir.entryList(QDir::Dirs);
+        else return {};
+    }
 
     for (int i = 0; i < 2; i++) dirs.removeAt(0); /** Removendo os itens "." e ".." indesejáveis */
     return dirs;

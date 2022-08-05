@@ -2,10 +2,9 @@
 #define OMPLAYER_UTILS_H
 
 #include <QAction>
-
 #include "Button.h"
 
-#define VERSION "1.4.3.1"
+#define VERSION "1.5"
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug
 #define RED "\x1b[38;2;255;050;050m" //Debug
@@ -38,8 +37,9 @@ using namespace std;
 
 class Utils {
 public:
-    static QString getLocal();
-    static QString setIcon(bool logo = false);
+    enum ST {Default = 0, Logo = 1, Current = 2};
+    static QString getLocal(ST option = Default);
+    static QString setIcon(ST logo = Default);
     static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
     static QString mediaTitle(const QString &mediafile);

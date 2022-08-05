@@ -45,7 +45,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     for (int i = 0; i < 8; ++i) {
         vo = VideoRenderer::create(vid_map[i].id);
         if (vo && vo->isAvailable()) {
-            vid_map[i].btn = new Button("radio-unselect", 18, NOTOOLTIP, vid_map[i].name, false);
+            vid_map[i].btn = new Button(Button::radio, "radio-unselect", 18, nullptr, vid_map[i].name);
 
             if (i == 0) connect(vid_map[0].btn, SIGNAL(pressed()), SLOT(setOpenglWidget()));
             if (i == 1) connect(vid_map[1].btn, SIGNAL(pressed()), SLOT(setQGLWidget2()));
@@ -94,7 +94,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button("apply", 32, tr("Apply and Close"));
+    closebtn = new Button(Button::button, "apply", 32, tr("Apply and Close"));
     connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
 
 
@@ -209,8 +209,7 @@ void Settings::setIcon(const QString &index) {
         if (vid_map[i].btn) {
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
                 Utils::changeIcon(vid_map[i].btn, "radio-select");
-            else
-                Utils::changeIcon(vid_map[i].btn, "radio-unselect");
+            else Utils::changeIcon(vid_map[i].btn, "radio-unselect");
         }
     }
     Utils::changeIcon(closebtn, "apply");

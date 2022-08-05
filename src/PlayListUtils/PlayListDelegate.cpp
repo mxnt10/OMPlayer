@@ -100,8 +100,6 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 /** Mapeador de eventos para o redirecionamento das linhas dos itens da playlist */
 QSize PlayListDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    if (!index.data().canConvert<PlayListItem>()) {
-        return QStyledItemDelegate::sizeHint(option, index);
-    }
+    if (!index.data().canConvert<PlayListItem>()) return QStyledItemDelegate::sizeHint(option, index);
     return {width, height};
 }

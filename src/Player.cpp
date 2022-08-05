@@ -99,25 +99,25 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para os controles de reprodução */
-    playBtn = new Button("play", 48, tr("Play"));
+    playBtn = new Button(Button::button, "play", 48, tr("Play"));
     connect(playBtn, SIGNAL(clicked()), SLOT(playPause()));
     connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    stopBtn = new Button("stop", 32, tr("Stop"));
+    stopBtn = new Button(Button::button, "stop", 32, tr("Stop"));
     connect(stopBtn, SIGNAL(clicked()), SLOT(setStop()));
     connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    nextBtn = new Button("next", 32, tr("Next"));
+    nextBtn = new Button(Button::button, "next", 32, tr("Next"));
     connect(nextBtn, SIGNAL(clicked()), SLOT(Next()));
     connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    previousBtn = new Button("previous", 32, tr("Previous"));
+    previousBtn = new Button(Button::button, "previous", 32, tr("Previous"));
     connect(previousBtn, SIGNAL(clicked()), SLOT(Previous()));
     connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    replayBtn = new Button("replay", 32, tr("Replay"));
+    replayBtn = new Button(Button::button, "replay", 32, tr("Replay"));
     connect(replayBtn, SIGNAL(clicked()), SLOT(setReplay()));
     connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    shuffleBtn = new Button("shuffle", 32, tr("Shuffle"));
+    shuffleBtn = new Button(Button::button, "shuffle", 32, tr("Shuffle"));
     connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
     connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    volumeBtn = new Button("volume_high", 32, tr("Volume") + ": " + QString::number(vol * 100));
+    volumeBtn = new Button(Button::button, "volume_high", 32, tr("Volume") + ": " + QString::number(vol * 100));
     connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
     connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
@@ -134,7 +134,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
     qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
-    auto *enterfilter = new EventFilter(this, 3);
+    auto *enterfilter = new EventFilter(this, EventFilter::Other);
     auto *nohideleft = new QWidget();
     auto *nohideright = new QWidget();
     nohideleft->installEventFilter(enterfilter);
@@ -215,7 +215,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Definição da logo */
     logo = new Label(CENTER);
-    logo->setPixmap(QPixmap(Utils::setIcon(true)));
+    logo->setPixmap(QPixmap(Utils::setIcon(Utils::Logo)));
 
 
     /** Layout principal criado usando sobreposição de widgets */
@@ -226,8 +226,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Filtro de eventos */
-    filter = new EventFilter(this, 1);
-    auto *cfilter = new EventFilter(this, 2);
+    filter = new EventFilter(this, EventFilter::General);
+    auto *cfilter = new EventFilter(this, EventFilter::Control);
     this->installEventFilter(filter);
     wctl->installEventFilter(filter);
     wctl->installEventFilter(cfilter);
@@ -297,7 +297,7 @@ void OMPlayer::openMedia(const QStringList &parms) {
 
 /** Rodando as funções após aberto outras instâncias */
 void OMPlayer::onLoad() {
-    playlist->load(true);
+    playlist->load(PlayList::Second);
     if (totalitems < playlist->setListSize()) {
         if (!playing) play(playlist->getItems(totalitems), totalitems);
         else playlist->selectCurrent(actualitem);
@@ -354,7 +354,7 @@ void OMPlayer::setRenderer(const QString &op) {
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
     listnum.clear();  /** É preferível redefinir a contagem aleatória */
-    setTotalItems(1);
+    setTotalItems(FixTotal);
     if (!playing) return;
 
     if (item < actualitem) {
@@ -391,8 +391,9 @@ void OMPlayer::ajustActualItem(int item) {
 
 
 /** Calculando o total de itens */
-void OMPlayer::setTotalItems(int fix) {
-    totalitems = playlist->setListSize() - fix;
+void OMPlayer::setTotalItems(OMPlayer::ST fix) {
+    if (fix == FixTotal) totalitems = playlist->setListSize() - 1;
+    else totalitems = playlist->setListSize();
     qDebug("%s(%sDEBUG%s):%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, BLU, totalitems);
 }
 
@@ -558,6 +559,7 @@ void OMPlayer::onStart() {
         QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
         MI.Close();
 
+        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
         playlist->removeSelectedItems(true);
         playlist->insert(url, row, duration, format);
         playlist->save();
@@ -575,13 +577,13 @@ void OMPlayer::onStart() {
         isblock = true;
     }
 
-    /** Finalizando qualquer prévisualização anterior */
+    /** Finalizando qualquer pré-visualização anterior */
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
     }
 
-    changeIcons(true);
+    changeIcons(IsPlay);
     updateChannelMenu();
     updateSlider(mediaPlayer->position());
 }
@@ -605,7 +607,7 @@ void OMPlayer::onStop() {
             isblock = false;
         }
 
-        changeIcons(true);
+        changeIcons(IsPlay);
         updateChannelMenu();
         onTimeSliderLeave();
     }
@@ -1011,7 +1013,7 @@ void OMPlayer::updateSliderUnit() {
 
 
 /** Função para recarregar os ícones do programa */
-void OMPlayer::changeIcons(bool play) {
+void OMPlayer::changeIcons(OMPlayer::ST change) {
     QToolTip::hideText();
     int value = int(mediaPlayer->audio()->volume() * 100);
     QString tooltip = tr("Volume") + ": " + QString::number(value);
@@ -1023,7 +1025,7 @@ void OMPlayer::changeIcons(bool play) {
     else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high", tooltip);
     else if (value == 0) Utils::changeIcon(volumeBtn, "mute", tr("Muted"));
 
-    if (!play) {
+    if (change != IsPlay) {
         if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause", tr("Pause"));
         else Utils::changeIcon(playBtn, "play", tr("Play"));
 

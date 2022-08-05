@@ -28,6 +28,7 @@ Q_OBJECT
 public:
     explicit OMPlayer(QWidget *parent = nullptr);
     ~OMPlayer() override;
+    enum ST {Default = 0, IsPlay = 1, FixTotal = 2};
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
@@ -46,7 +47,7 @@ private:
     void updateChannelMenu();
 
 private Q_SLOTS:
-    void setTotalItems(int fix = 0);
+    void setTotalItems(OMPlayer::ST fix = Default);
     void setSelect(int item);
     void ajustActualItem(int item);
     void firstPlay(const QString &name, int pos);
@@ -91,7 +92,7 @@ private Q_SLOTS:
     void changeChannel(QAction *action);
     void enterList();
     void leaveList();
-    void changeIcons(bool play = false);
+    void changeIcons(OMPlayer::ST change = Default);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);

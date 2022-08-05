@@ -6,7 +6,8 @@
 class EventFilter : public QObject{
 Q_OBJECT
 public:
-    explicit EventFilter(QWidget *parent, int i);
+    enum UITYPE { General = 1, Control = 2, Other = 3};
+    explicit EventFilter(QWidget *parent, UITYPE i);
     ~EventFilter() override;
     void setMove(bool var);
     void setFixed(bool var);
@@ -40,7 +41,7 @@ private:
     bool moving{false};
     bool start{false};
     bool sett{false};
-    int num{0};
+    UITYPE option{};
 };
 
 #endif // OMPLAYER_EVENTFILTER_H

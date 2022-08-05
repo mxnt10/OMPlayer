@@ -25,7 +25,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Lista para visualização da playlist */
-    auto *filter = new EventFilter(this, 3);
+    auto *filter = new EventFilter(this, EventFilter::Other);
     listView = new QListView();
     listView->setModel(model);
     listView->setItemDelegate(delegate);
@@ -41,13 +41,13 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button("add", 32, tr("Add items"));
+    addBtn = new Button(Button::button, "add", 32, tr("Add items"));
     connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
 
-    removeBtn = new Button("remove", 32, tr("Remove items"));
+    removeBtn = new Button(Button::button, "remove", 32, tr("Remove items"));
     connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
 
-    clearBtn = new Button("clean", 32, tr("Clear playlist"));
+    clearBtn = new Button(Button::button, "clean", 32, tr("Clear playlist"));
     connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
 
 
@@ -103,7 +103,7 @@ PlayList::~PlayList() = default;
 
 
 /** Função para carregar a playlist ao abrir */
-void PlayList::load(bool second) {
+void PlayList::load(ST load, const QString &url) {
     QFile f(mfile);
     if (!f.exists()) save();
     if (!f.open(QIODevice::ReadOnly)) return;
@@ -113,7 +113,7 @@ void PlayList::load(bool second) {
 
     if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
         qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
-        if (second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+        if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
         QDataStream ds(&f);
         QList<PlayListItem> list;
         ds >> list;
@@ -173,8 +173,7 @@ void PlayList::addItems(const QStringList &parms) {
             "MP3 Audio (*.mp3 *.mpga);;OGG Audio (*.oga *.opus *.spx);;Windows Media Audio (*.wma);;"
             "WAV Audio (*.wav);;WavPack Audio (*.wp *.wvp);;Media Playlist (*.m3u *.m3u8);;All Files (*);;"
         );
-    else
-        files = parms;
+    else files = parms;
 
     int a = 0;
     int t = model->rowCount(QModelIndex());
@@ -194,6 +193,7 @@ void PlayList::addItems(const QStringList &parms) {
         else {
             if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
                 hashlist.append(Utils::stringHash(file));
+                qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(file));
                 insert(file, a + t);
                 a++;
             } else {
@@ -220,7 +220,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
     int i = 0;
     bool utf8;
     double duration;
-    QString line, name, filename;
+    QString line, name, url;
 
     /** Verificando codificação */
     if (format == DetectFormat) utf8 = (QFileInfo(file).suffix().toLower() == "m3u8");
@@ -252,19 +252,20 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
                 if (fields.count() >= 1) duration = fields[0].toDouble();
                 if (fields.count() >= 2) name = fields[1];
             } else {
-                filename = line;
-                QFileInfo fi(filename);
+                url = line;
+                QFileInfo fi(url);
 
                 if (fi.exists()) {
-                    filename = fi.absoluteFilePath();
-                } else if (QFileInfo::exists(playlist_path + "/" + filename)) {
-                    filename = playlist_path + "/" + filename;
+                    url = fi.absoluteFilePath();
+                } else if (QFileInfo::exists(playlist_path + "/" + url)) {
+                    url = playlist_path + "/" + url;
                 }
 
                 name.replace("&#44;", ",");
 
-                if (QFileInfo::exists(filename)) {
-                    insert(filename, i, qint64(duration));
+                if (QFileInfo::exists(url)) {
+                    qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(url));
+                    insert(url, i, qint64(duration));
                     i++;
                 }
             }
@@ -279,10 +280,6 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
-    if (duration == 0)
-        qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(url));
-    else
-        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);

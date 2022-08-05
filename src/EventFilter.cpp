@@ -12,8 +12,8 @@
 
 
 /** Construtor do filtro de eventos */
-EventFilter::EventFilter(QWidget *parent, int i) : QObject(parent) {
-    num = i;
+EventFilter::EventFilter(QWidget *parent, UITYPE i) : QObject(parent) {
+    option = i;
 }
 
 
@@ -49,7 +49,7 @@ void EventFilter::setSett(bool var) {
 bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object)
 
-    if (num == 1) {
+    if (option == General) {
         /** O widget filho abre mais rápido que o pai, por isso esse delay */
         if (!first) {
             QTimer::singleShot(1200, [this](){start = true;});
@@ -150,14 +150,10 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     }
 
     /** Emissão para os controles */
-    if (num == 2) {
-        /** Mapeador para executar ações quando o ponteiro do mouse se encontra fora da interface */
-        if (event->type() == QEvent::Leave) emit emitLeave();
-    }
+    if (option == Control && event->type() == QEvent::Leave) emit emitLeave();
 
-    /** Emissão para QWidget */
-    if (num == 3) {
-        /** Mapeador para executar ações quando o ponteiro do mouse se encontra sobre a interface */
+    /** Emissão para outros widgets */
+    if (option == Other) {
         if (event->type() == QEvent::Enter) emit emitEnter();
         if (event->type() == QEvent::Leave) emit emitLeave();
     }

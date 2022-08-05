@@ -12,24 +12,25 @@ Q_OBJECT
 public:
     explicit PlayList(QWidget *parent = nullptr);
     ~PlayList() override;
+
+    enum ST {Default = 0, Second = 1};
+    void load(ST load = Default, const QString &url = nullptr);
     QString getItems(int s);
     qint64 setDuration();
     int setListSize();
     int selectItems();
-    void load(bool second = false);
     void save();
     void selectClean();
     void selectCurrent(int indx);
-    void insert(const QString &url, int row = 0, qint64 duration = 0, const QString &format = nullptr);
+    void insert(const QString &url, int row, qint64 duration = 0, const QString &format = nullptr);
     void changeIcons();
-
-    enum M3UFormat { M3U = 0, M3U8 = 1, DetectFormat = 2 };
 
 protected:
     bool event(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
 
 private:
+    enum M3UFormat {M3U8 = 0, DetectFormat = 1};
     void load_m3u(const QString& file, M3UFormat format);
     void insertItemAt(const PlayListItem &item, int row = 0);
     void setItemAt(const PlayListItem &item, int row = 0);

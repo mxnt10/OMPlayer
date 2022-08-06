@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
@@ -5,8 +6,6 @@
 #include <QMoveEvent>
 #include <QStandardPaths>
 #include <QTextCodec>
-
-#include <filesystem>
 
 #include "EventFilter.h"
 #include "PlayList.h"
@@ -32,6 +31,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->setSelectionMode(QAbstractItemView::ExtendedSelection); /** Uso com CTRL/SHIF */
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listView->setStyleSheet(Utils::setStyle("playlist"));
+    listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listView->setFixedWidth(280);
     listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
@@ -57,11 +57,11 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Organização dos botões */
-    auto *hbl = new QHBoxLayout();
-    hbl->addWidget(addBtn);
-    hbl->addWidget(removeBtn);
-    hbl->addStretch(1);
-    hbl->addWidget(clearBtn);
+    auto *hbtn = new QHBoxLayout();
+    hbtn->addWidget(addBtn);
+    hbtn->addWidget(removeBtn);
+    hbtn->addStretch(1);
+    hbtn->addWidget(clearBtn);
 
 
     /** Gerando uma linha */
@@ -71,16 +71,33 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     line->setStyleSheet("background: #cccccc");
 
 
+    /** Gerando uma linha vertical transparente */
+    auto *filter2 = new EventFilter(this, EventFilter::Other);
+    auto size = new QFrame();
+    size->setFixedWidth(10);
+    size->installEventFilter(filter2);
+    connect(filter2, &EventFilter::emitEnter, [](){Utils::resizeMouse();});
+    connect(filter2, &EventFilter::emitLeave, [](){Utils::arrowMouse(); });
+
+
     /** Layout da playlist */
     wpls = new QWidget();
-    auto *vbl = new QVBoxLayout(wpls);
-    vbl->setMargin(10);
+    wpls->setMouseTracking(true);
+    auto *vbl = new QVBoxLayout();
     vbl->addSpacing(3);
-    vbl->addLayout(hbl);
+    vbl->addLayout(hbtn);
     vbl->addSpacing(3);
     vbl->addWidget(line);
     vbl->addSpacing(5);
     vbl->addWidget(listView);
+
+
+    /** Layout com a barra de redirecionamento */
+    auto *hbl = new QHBoxLayout(wpls);
+    hbl->setContentsMargins(0, 10, 10, 10);
+    hbl->setSpacing(0);
+    hbl->addWidget(size);
+    hbl->addLayout(vbl);
 
 
     /** Layout do painel da playlist */

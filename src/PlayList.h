@@ -34,8 +34,8 @@ protected:
 private:
     enum M3UFormat {M3U8 = 0, DetectFormat = 1};
     void load_m3u(const QString& file, M3UFormat format);
-    void insertItemAt(const PlayListItem &item, int row = 0);
-    void setItemAt(const PlayListItem &item, int row = 0);
+    void insertItemAt(const PlayListItem &item, int row);
+    void setItemAt(const PlayListItem &item, int row);
 
 signals:
     void aboutToPlay(const QString &url);

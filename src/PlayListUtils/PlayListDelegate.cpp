@@ -29,6 +29,12 @@ void PlayListDelegate::resetWith() {
 }
 
 
+/** Definindo um tamanho específico */
+void PlayListDelegate::setWith(int w) {
+    width = w;
+}
+
+
 /**********************************************************************************************************************/
 
 
@@ -45,7 +51,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->translate(option.rect.topLeft());
     painter->setRenderHint(QPainter::Antialiasing, true);
     auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
-    if (pli.title().size() * 7 + 20 > width) width = pli.title().size() * 7 + 20;
+    if (pli.title().size() * 8 > width) width = pli.title().size() * 8;
     bool detail = false;
 
 
@@ -67,6 +73,9 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             m->updateLayout();
         }
         if (option.state & (QStyle::State_MouseOver)) {
+            if (*QApplication::overrideCursor() != QCursor(Qt::ArrowCursor))
+                QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));
+
             detail = true;
             painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 100));
         }

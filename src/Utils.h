@@ -48,6 +48,7 @@ public:
     static QString stringHash(const QString &url);
     static void arrowMouse();
     static void blankMouse();
+    static void resizeMouse();
     static void changeIcon(Button *btn, const QString &thm, const QString &ttp = nullptr);
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void rm_nl(string &s);

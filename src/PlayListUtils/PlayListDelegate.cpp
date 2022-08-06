@@ -1,5 +1,5 @@
-#include <QPainter>
 #include <QApplication>
+#include <QPainter>
 
 #include "PlayListModel.h"
 #include "PlayListDelegate.h"

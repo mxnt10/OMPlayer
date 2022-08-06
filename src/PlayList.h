@@ -28,6 +28,8 @@ public:
 protected:
     bool event(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     enum M3UFormat {M3U8 = 0, DetectFormat = 1};
@@ -70,7 +72,8 @@ private:
     QStringList hashlist{};
     QWidget *wpls{};
     int maxRows{-1};
-    bool isshow{false};
+    int startsize{0}, startlistsize{0}, startpos{0};
+    bool isshow{false}, resize{false};
 };
 
 #endif // PLAYLIST_H

@@ -20,6 +20,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     model = new PlayListModel(this);
     delegate = new PlayListDelegate(this);
+    load();
 
 
     /** Lista para visualização da playlist */
@@ -42,10 +43,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     /** Botões para o painel da playlist */
     addBtn = new Button(Button::button, "add", 32, tr("Add items"));
     connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
-
     removeBtn = new Button(Button::button, "remove", 32, tr("Remove items"));
     connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
-
     clearBtn = new Button(Button::button, "clean", 32, tr("Clear playlist"));
     connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
 
@@ -134,7 +133,7 @@ void PlayList::load(ST load, const QString &url) {
         QList<PlayListItem> list;
         ds >> list;
         int add = 0;
-        for (const auto & i : list) {
+        for (const auto &i : list) {
             if (QFileInfo::exists(i.url())) {
                 hashlist.append(Utils::stringHash(i.url()));
                 insertItemAt(i, add);
@@ -433,7 +432,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
         if (resize) {
             int subsize = startpos - event->x();
             int size = startsize + subsize;
-            if (size >= 300 && size < 876) {
+            if (size >= 295 && size < 876) {
                 wpls->setFixedWidth(size);
                 listView->setFixedWidth(startlistsize + subsize);
                 delegate->setWith(size);
@@ -465,7 +464,7 @@ bool PlayList::event(QEvent *event) {
 /** Emissão ao pressionar um botão do mouse */
 void PlayList::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor) &&
-        event->x() < this->width() - wpls->width() + 5) {
+        event->x() < this->width() - wpls->width()) {
         startpos = event->x();
         startsize = wpls->width();
         startlistsize = listView->width();
@@ -473,6 +472,7 @@ void PlayList::mousePressEvent(QMouseEvent *event) {
     }
     QWidget::mousePressEvent(event);
 }
+
 
 /** Emissão ao soltar um botão do mouse */
 void PlayList::mouseReleaseEvent(QMouseEvent *event) {

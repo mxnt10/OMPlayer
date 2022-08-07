@@ -36,12 +36,24 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setPalette(pal);
 
 
-    /** Janelas de configurações do programa, preview e demais */
+    /** Preview do reprodutor */
+    prev = new QWidget();
+    prev->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    prev->setAttribute(Qt::WA_NoSystemBackground, true);
+    prev->setAttribute(Qt::WA_TranslucentBackground, true);
+    pv = new QWidget(prev);
+    pv->setStyleSheet(Utils::setStyle("widget"));
+    preview = new VideoPreviewWidget(pv);
+    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    ltime = new QLabel(pv);
+    ltime->setAttribute(Qt::WA_NoSystemBackground, true);
+    ltime->setAttribute(Qt::WA_TranslucentBackground, true);
+
+
+    /** Janelas de configurações do programa, informações e demais */
     about = new About(this);
     sett = new Settings(this);
     infoview = new StatisticsView(this);
-    preview = new VideoPreviewWidget(this);
-    preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
     connect(sett, SIGNAL(changethemeicon()), this, SLOT(changeIcons()));
     connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));
@@ -65,7 +77,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Playlist do reprodutor */
     playlist = new PlayList();
-    playlist->load();
     setTotalItems();
     connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
     connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
@@ -667,6 +678,7 @@ void OMPlayer::detectClick() {
 
 /** Gerenciar tela cheia */
 void OMPlayer::changeFullScreen() {
+    count = 2;
     if (enterpos) return;
     if (this->isFullScreen()) leaveFullScreen();
     else enterFullScreen();
@@ -804,9 +816,9 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
     QPoint gpos = slider->pos();
 
     /** Definição da posição na tela e exibição do tooltip */
-    QPoint gpos1 = mapToGlobal(gpos + QPoint(pos + 12, 5));
-    QPoint gpos2 = mapToGlobal(gpos + QPoint(pos, -7));
-    QToolTip::showText(gpos1, QTime(0, 0, 0).addMSecs(value * unit).toString(QString::fromLatin1("HH:mm:ss")), this);
+    QPoint gpos1 = mapToGlobal(gpos + QPoint(pos, -30));
+    QPoint gpos2 = mapToGlobal(gpos + QPoint(pos, -5));
+
 
     /** Arquivos de áudio não são vídeos */
     if (mediaPlayer->currentVideoStream() == (-1) || mediaPlayer->statistics().video.frame_rate == 0) return;
@@ -817,8 +829,21 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
     preview->setTimestamp(value * unit);
     preview->preview();
     preview->resize(setX, fixV);
-    preview->move(gpos2 - QPoint(setX/2, fixV));
-    preview->show();
+    preview->move(gpos1 - QPoint(setX/2, fixV));
+    pv->resize(setX + 20, fixV + 35);
+    prev->resize(setX + 20, fixV + 35);
+    prev->move(gpos2 - QPoint((setX + 20)/2, fixV + 35));
+    ltime->setText(QTime(0, 0, 0).addMSecs(value * unit).toString(QString::fromLatin1("HH:mm:ss")));
+    ltime->move(QPoint(setX/2 - 20, fixV + 10));
+
+    if (!preview->isVisible()) QTimer::singleShot(500, this, [this](){ if (ispreview) {
+        prev->show();
+        preview->show();
+    } });
+    else if (ispreview) {
+        prev->show();
+        preview->show();
+    }
 }
 
 
@@ -826,6 +851,7 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
 void OMPlayer::onTimeSliderEnter() {
     if (playing && mediaPlayer->statistics().video.frame_rate == 0)
         qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+    ispreview = true;
     hideFalse();
 }
 
@@ -835,7 +861,9 @@ void OMPlayer::onTimeSliderLeave() {
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
+        prev->close();
     }
+    ispreview = false;
     hideTrue();
 }
 

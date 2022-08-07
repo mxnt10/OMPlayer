@@ -109,13 +109,14 @@ private:
     MediaInfo MI{};
     PlayList *playlist{};
     QAction *channelAction{};
+    QLabel *ltime{};
     QMenu *channel{};
     QGridLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QStringList listnum{};
     QTimer *click{};
-    QWidget *wctl{};
+    QWidget *wctl{}, *prev{}, *pv{};
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};
@@ -125,7 +126,7 @@ private:
     bool playing{false}, pausing{false}, muted{false};
     bool restart{false}, randplay{false};
     bool enterpos{false}, showsett{false};
-    bool isblock{false};
+    bool isblock{false}, ispreview{false};
     bool invalid{false};
     bool maximize{false};
     int Width{192}, Height{108};

@@ -32,6 +32,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Ajustes na visualização da playlist.
  - Corrigido atualização das informações de mídia salvando a playlist
    repetidamente sem necessidade.
+ - Corrigido problemas com o modo fullscreen pausando em algumas
+   situações específicas.
+ - Layout do preview corrigido e renovado. O layout exibido enquanto o
+   mouse passava sem necessidade, agora tem um tempo de 500ms.
 ###
 
 ##########################################################################

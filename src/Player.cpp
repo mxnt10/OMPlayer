@@ -924,7 +924,7 @@ void OMPlayer::volumeFinished(qreal pos) {
     QString tooltip = tr("Volume") + ": " + QString::number(value);
     muted = false;
 
-    if (JsonTools::floatJson("volume") != pos) JsonTools::writeJson("volume", nullptr, NONE, pos);
+    if (JsonTools::floatJson("volume") != pos) JsonTools::floatJson("volume", (float)pos);
 
     if (playing && !mediaPlayer->statistics().audio.available) {
         Utils::changeIcon(volumeBtn, "nosound", tr("No Video Sound"));
@@ -1134,17 +1134,19 @@ void OMPlayer::resizeEvent(QResizeEvent *event) {
 /** Mapeamento dos eventos de maximizar, minimizar e restaurar */
 void OMPlayer::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange) {
-        if (int(this->windowState()) == 0) {      // Restaurar
+        if (this->windowState() == Qt::WindowNoState) {
             qDebug("%s(%sDEBUG%s):%s Restaurando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            JsonTools::boolJson("maximized", false);
         }
-        else if (int(this->windowState()) == 1) { // Minimização
+        else if (this->windowState() == Qt::WindowMinimized) {
             qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
             if (showsett) this->showNormal();
         }
-        else if (int(this->windowState()) == 2) { // Maximização
+        else if (this->windowState() == Qt::WindowMaximized) {
             qDebug("%s(%sDEBUG%s):%s Maximizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            JsonTools::boolJson("maximized", true);
         }
-        else if (int(this->windowState()) == 3) { // Minimização direta
+        else if (this->windowState() == (Qt::WindowMinimized|Qt::WindowMaximized)) {
             qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
             if (showsett) this->showNormal();
         }

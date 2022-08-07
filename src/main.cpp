@@ -39,7 +39,7 @@
 int main(int argc, char *argv[]) {
     SingleApplication Player(argc, argv, true, SingleApplication::Mode::SecondaryNotification);
     std::filesystem::create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
-    JsonTools::verifySettings();
+    JsonTools::settingsJson();
 
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "Simplify"
@@ -101,6 +101,7 @@ int main(int argc, char *argv[]) {
         });
     }
 
-    player.show();
+    if (JsonTools::boolJson("maximized")) player.showMaximized();
+    else player.show();
     return QApplication::exec();
 }

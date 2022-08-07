@@ -21,6 +21,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Ajustes nas funções setTotalItems() e changeIcons().
  - Modificações nas funções load() e save() da Playlist para
    possibilitar a opção de salvar e carregar playlists qds.
+ - Ajustes no evento de modificação da interface.
+ - Refatoração de código no fonte JsonTools.{cpp/h} em src.
 ###
 
 ### Removed / Removido
@@ -36,6 +38,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    situações específicas.
  - Layout do preview corrigido e renovado. O layout exibido enquanto o
    mouse passava sem necessidade, agora tem um tempo de 500ms.
+ - Interface permanece maximizada na próxima inicialização ao fechar.
 ###
 
 ##########################################################################

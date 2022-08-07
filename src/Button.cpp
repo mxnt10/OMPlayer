@@ -17,6 +17,7 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &too
     txt = text;
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
+    setMouseTracking(true);
     setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
 
     /** Definindo ícone */

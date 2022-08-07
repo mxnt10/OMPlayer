@@ -20,7 +20,6 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     model = new PlayListModel(this);
     delegate = new PlayListDelegate(this);
-    mfile = QDir::homePath() + "/.config/OMPlayer/playlist.qds";
 
 
     /** Lista para visualização da playlist */
@@ -121,11 +120,11 @@ PlayList::~PlayList() = default;
 
 /** Função para carregar a playlist ao abrir */
 void PlayList::load(ST load, const QString &url) {
-    QFile f(mfile);
+    QFile f(url);
     if (!f.exists()) save();
     if (!f.open(QIODevice::ReadOnly)) return;
 
-    actsum = Utils::setHash(mfile);
+    actsum = Utils::setHash(url);
     qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(actsum));
 
     if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
@@ -136,7 +135,7 @@ void PlayList::load(ST load, const QString &url) {
         ds >> list;
         int add = 0;
         for (const auto & i : list) {
-            if (std::filesystem::exists(i.url().toStdString())) {
+            if (QFileInfo::exists(i.url())) {
                 hashlist.append(Utils::stringHash(i.url()));
                 insertItemAt(i, add);
                 add++;
@@ -151,14 +150,14 @@ void PlayList::load(ST load, const QString &url) {
 
 
 /** Função para salvar a playlist ao fechar */
-void PlayList::save() {
+void PlayList::save(const QString &url) {
     qDebug("%s(%sDEBUG%s):%s Salvando a playlist ...\033[0m", GRE, RED, GRE, ORA);
-    QFile f(mfile);
+    QFile f(url);
     if (!f.open(QIODevice::WriteOnly)) return;
     QDataStream ds(&f);
     ds << model->items();
     f.close();
-    actsum = Utils::setHash(mfile);
+    actsum = Utils::setHash(url);
     sum = actsum;
 }
 
@@ -237,7 +236,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
     int i = 0;
     bool utf8;
     double duration;
-    QString line, name, url;
+    QString line, url;
 
     /** Verificando codificação */
     if (format == DetectFormat) utf8 = (QFileInfo(file).suffix().toLower() == "m3u8");
@@ -251,34 +250,24 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
         clearItems();
         QString playlist_path = QFileInfo(file).path();
 
-        QTextStream stream( &f );
+        QTextStream stream(&f);
         if (utf8) stream.setCodec("UTF-8");
         else stream.setCodec(QTextCodec::codecForLocale());
 
         while ( !stream.atEnd() ) {
             line = stream.readLine().trimmed();
-            if (line.isEmpty()) continue;
-
-            if (m3u_id.indexIn(line) != -1 || line.startsWith("#EXTVLCOPT:") || line.startsWith("#")) continue;
-            else if (rx_info.indexIn(line) != -1) {
-                duration = rx_info.cap(1).toDouble();
-                name = rx_info.cap(3);
-            }
+            if (line.isEmpty() || m3u_id.indexIn(line) != -1 || line.startsWith("#EXTVLCOPT:") || line.startsWith("#"))
+                continue;
+            else if (rx_info.indexIn(line) != -1) duration = rx_info.cap(1).toDouble();
             else if (line.startsWith("#EXTINF:")) {
                 QStringList fields = line.mid(8).split(",");
                 if (fields.count() >= 1) duration = fields[0].toDouble();
-                if (fields.count() >= 2) name = fields[1];
             } else {
                 url = line;
                 QFileInfo fi(url);
 
-                if (fi.exists()) {
-                    url = fi.absoluteFilePath();
-                } else if (QFileInfo::exists(playlist_path + "/" + url)) {
-                    url = playlist_path + "/" + url;
-                }
-
-                name.replace("&#44;", ",");
+                if (fi.exists()) url = fi.absoluteFilePath();
+                else if (QFileInfo::exists(playlist_path + "/" + url)) url = playlist_path + "/" + url;
 
                 if (QFileInfo::exists(url)) {
                     qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(url));
@@ -296,20 +285,19 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
 
 /** Adiciona os itens para salvar na playlist */
-void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format) {
+void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format, ST status) {
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);
     item.setFormat(format);
 
-    QString title = url;
+    /** Definindo o título */
     if (!url.contains(QLatin1String("://")) || url.startsWith(QLatin1String("file://")))
-        title = QFileInfo(url).fileName();
-    item.setTitle(title);
-    insertItemAt(item, row);
+        item.setTitle(QFileInfo(url).fileName());
+    else item.setTitle(url);
 
-    /** Se a duração é diferente de zero, é porque algum item foi atualizado */
-    if (duration != 0) listView->setCurrentIndex(model->index(row));
+    insertItemAt(item, row);
+    if (status == Update) listView->setCurrentIndex(model->index(row));
 }
 
 
@@ -372,17 +360,16 @@ int PlayList::setListSize() {
 
 
 /** Função para remover apenas os itens selecionados */
-void PlayList::removeSelectedItems(bool update) {
+void PlayList::removeSelectedItems(PlayList::ST status) {
     QItemSelectionModel *selection = listView->selectionModel();
     if (!selection->hasSelection()) return;
 
     QModelIndexList s = selection->selectedIndexes();
     for (int i = s.size() - 1; i >= 0; --i) {
-        if (!update) emit emitremove(s.at(i).row());
+        if (status == Default) emit emitremove(s.at(i).row());
         hashlist.removeOne(Utils::stringHash(getItems(s.at(i).row())));
         model->removeRow(s.at(i).row());
     }
-    delegate->resetWith();
     save();
 }
 
@@ -390,7 +377,6 @@ void PlayList::removeSelectedItems(bool update) {
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
-    delegate->resetWith();
     hashlist.clear();
     emit emitstop();
     emit emitItems();
@@ -443,15 +429,27 @@ void PlayList::changeIcons() {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (event->x() > (this->width() - 300) && event->y() < this->height() - 8 && !isshow) {
-        qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
-        emit emitnohide();
-        wpls->setVisible(true);
-        isshow = true;
-    } else if ((event->x() < (this->width() - 300) || event->y() > this->height() - 8) && isshow) {
-        emit emithide();
-        wpls->setVisible(false);
-        isshow = false;
+    if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
+        if (resize) {
+            int subsize = startpos - event->x();
+            int size = startsize + subsize;
+            if (size >= 300 && size < 876) {
+                wpls->setFixedWidth(size);
+                listView->setFixedWidth(startlistsize + subsize);
+                delegate->setWith(size);
+            }
+        } else Utils::arrowMouse();
+    } else {
+        if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
+            qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
+            emit emitnohide();
+            wpls->setVisible(true);
+            isshow = true;
+        } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
+            emit emithide();
+            wpls->setVisible(false);
+            isshow = false;
+        }
     }
     QWidget::mouseMoveEvent(event);
 }
@@ -461,4 +459,23 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
 bool PlayList::event(QEvent *event) {
     if (int(event->type()) == 110 && !isshow) emit emithiden();
     return QWidget::event(event);
+}
+
+
+/** Emissão ao pressionar um botão do mouse */
+void PlayList::mousePressEvent(QMouseEvent *event) {
+    if (event->button() == Qt::LeftButton && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor) &&
+        event->x() < this->width() - wpls->width() + 5) {
+        startpos = event->x();
+        startsize = wpls->width();
+        startlistsize = listView->width();
+        resize = true;
+    }
+    QWidget::mousePressEvent(event);
+}
+
+/** Emissão ao soltar um botão do mouse */
+void PlayList::mouseReleaseEvent(QMouseEvent *event) {
+    if (resize) resize = false;
+    QWidget::mouseReleaseEvent(event);
 }

@@ -1,11 +1,14 @@
 #ifndef PLAYLIST_H
 #define PLAYLIST_H
 
+#include <QDir>
 #include <QListView>
 #include <QModelIndex>
 #include <PlayListUtils>
 
 #include "Button.h"
+
+#define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 
 class PlayList : public QWidget {
 Q_OBJECT
@@ -13,16 +16,16 @@ public:
     explicit PlayList(QWidget *parent = nullptr);
     ~PlayList() override;
 
-    enum ST {Default = 0, Second = 1};
-    void load(ST load = Default, const QString &url = nullptr);
+    enum ST {Default = 0, Second = 1, Update = 2};
+    void load(ST load = Default, const QString &url = DefDIR);
+    void save(const QString &url = DefDIR);
     QString getItems(int s);
     qint64 setDuration();
     int setListSize();
     int selectItems();
-    void save();
     void selectClean();
     void selectCurrent(int indx);
-    void insert(const QString &url, int row, qint64 duration = 0, const QString &format = nullptr);
+    void insert(const QString &url, int row, qint64 duration = 0, const QString &format = nullptr, ST status = Default);
     void changeIcons();
 
 protected:
@@ -52,7 +55,7 @@ signals:
 
 public Q_SLOTS:
     void addItems(const QStringList &parms = QStringList());
-    void removeSelectedItems(bool update = false);
+    void removeSelectedItems(PlayList::ST status = Default);
 
 private Q_SLOTS:
     void clearItems();
@@ -67,7 +70,6 @@ private:
     PlayListDelegate *delegate{};
     PlayListModel *model{};
     QListView *listView{};
-    QString mfile{};
     QString sum{}, actsum{};
     QStringList hashlist{};
     QWidget *wpls{};

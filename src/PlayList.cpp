@@ -428,16 +428,14 @@ void PlayList::changeIcons() {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
-        if (resize) {
-            int subsize = startpos - event->x();
-            int size = startsize + subsize;
-            if (size >= 295 && size < 876) {
-                wpls->setFixedWidth(size);
-                listView->setFixedWidth(startlistsize + subsize);
-                delegate->setWith(size);
-            }
-        } else Utils::arrowMouse();
+    if (resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
+        int subsize = startpos - event->x();
+        int size = startsize + subsize;
+        if (size >= 295 && size < 876) {
+            wpls->setFixedWidth(size);
+            listView->setFixedWidth(startlistsize + subsize);
+            delegate->setWith(size);
+        }
     } else {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
             qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
@@ -450,6 +448,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
             isshow = false;
         }
     }
+    if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) Utils::arrowMouse();
     QWidget::mouseMoveEvent(event);
 }
 
@@ -465,10 +464,10 @@ bool PlayList::event(QEvent *event) {
 void PlayList::mousePressEvent(QMouseEvent *event) {
     if (event->button() == Qt::LeftButton && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor) &&
         event->x() < this->width() - wpls->width()) {
+        resize = true;
         startpos = event->x();
         startsize = wpls->width();
         startlistsize = listView->width();
-        resize = true;
     }
     QWidget::mousePressEvent(event);
 }

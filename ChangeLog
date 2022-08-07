@@ -3,6 +3,40 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.5 ] - 2022-08-04 ##################################################
+
+### Added / Adicionado
+ - Adicionado suporte ao redirecionamento da playlist.
+###
+
+### Upgraded / Atualizado
+ -
+###
+
+### Changed / Modificado
+ - Refatoração de código no fonte Utils.{cpp/h} em src.
+ - Método para cálculo do tamanho do arquivo de mídia simplificado.
+ - Modificações e aprimoramentos no fonte Button.{cpp/h} em src.
+ - Ajustes no código da playlist e no filtro de eventos.
+ - Ajustes nas funções setTotalItems() e changeIcons().
+ - Modificações nas funções load() e save() da Playlist para
+   possibilitar a opção de salvar e carregar playlists qds.
+###
+
+### Removed / Removido
+ - Função resetWidth() em PlaylistDelegate sendo desnecessário com o
+   de redirecionamento.
+###
+
+### Fixed / Corrigido
+ - Ajustes na visualização da playlist.
+ - Corrigido atualização das informações de mídia salvando a playlist
+   repetidamente sem necessidade.
+###
+
+##########################################################################
+
+
 ## [ 1.4.3.1 ] - 2022-08-03 ##############################################
 
 - Ajustes no tema dreamstale.

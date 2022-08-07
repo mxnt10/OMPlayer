@@ -668,10 +668,8 @@ void OMPlayer::detectClick() {
 /** Gerenciar tela cheia */
 void OMPlayer::changeFullScreen() {
     if (enterpos) return;
-    if (this->isFullScreen())
-        leaveFullScreen();
-    else
-        enterFullScreen();
+    if (this->isFullScreen()) leaveFullScreen();
+    else enterFullScreen();
 }
 
 

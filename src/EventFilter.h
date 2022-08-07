@@ -6,7 +6,7 @@
 class EventFilter : public QObject{
 Q_OBJECT
 public:
-    enum UITYPE { General = 1, Control = 2, Other = 3};
+    enum UITYPE {General = 1, Control = 2, Other = 3};
     explicit EventFilter(QWidget *parent, UITYPE i);
     ~EventFilter() override;
     void setMove(bool var);

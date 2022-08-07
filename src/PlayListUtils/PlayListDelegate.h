@@ -8,7 +8,6 @@ Q_OBJECT
 public:
     explicit PlayListDelegate(QObject *parent = nullptr);
     ~PlayListDelegate() override;
-    void resetWith();
     void setWith(int w);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;

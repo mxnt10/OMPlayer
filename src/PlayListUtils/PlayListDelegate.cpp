@@ -23,12 +23,6 @@ PlayListDelegate::~PlayListDelegate() = default;
 /**********************************************************************************************************************/
 
 
-/** Redefinindo tamanho */
-void PlayListDelegate::resetWith() {
-    width = 260;
-}
-
-
 /** Definindo um tamanho específico */
 void PlayListDelegate::setWith(int w) {
     width = w;

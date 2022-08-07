@@ -140,7 +140,7 @@ void Settings::rendererSelect(Button *btn, const QString &name) {
         if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
 
     Utils::changeIcon(btn, "radio-select");
-    JsonTools::writeJson("renderer", name);
+    JsonTools::stringJson("renderer", name);
     emit emitvalue(name);
 }
 
@@ -203,7 +203,7 @@ void Settings::setWidget() {
 
 /** Modificando as configurações de temas */
 void Settings::setIcon(const QString &index) {
-    JsonTools::writeJson("theme", index);
+    JsonTools::stringJson("theme", index);
 
     for (int i = 0; i < 8; ++i) {
         if (vid_map[i].btn) {

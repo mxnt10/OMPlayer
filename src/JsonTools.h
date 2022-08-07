@@ -1,24 +1,23 @@
 #ifndef OMPLAYER_JSONTOOLS_H
 #define OMPLAYER_JSONTOOLS_H
 
-#define NONE  (-9999999)
-#define TRUE  "00000000"
-#define FALSE "00000001"
-
 class JsonTools {
 public:
-    static void verifySettings();
-    static QString stringJson(const QString &text);
-    static int intJson(const QString &text);
-    static double floatJson(const QString &text);
-    static bool boolJson(const QString &text);
-    static void writeJson(const QString &key, const QString &value = nullptr,
-                          int valuei = NONE, double valuef = NONE);
+    static void settingsJson();
+    static QString stringJson(const QString &key);
+    static void stringJson(const QString &key, const QString &value);
+    static int intJson(const QString &key);
+    static void intJson(const QString &key, int value);
+    static double floatJson(const QString &key);
+    static void floatJson(const QString &key, float value);
+    static bool boolJson(const QString &key);
+    static void boolJson(const QString &key, bool value);
 
 private:
-    static QJsonValue returnJson(const QString &text);
-    static QString defaultJson();
     static QString localJson();
+    static QString defaultJson();
+    static QJsonValue valueJson(const QString &key);
+    static void valueJson(const QString &key, const QJsonValue &value);
 };
 
 #endif //OMPLAYER_JSONTOOLS_H

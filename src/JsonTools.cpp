@@ -13,6 +13,10 @@
 QString JsonTools::defaultJson() {
     return "{"
            "    \"maximized\": false,"
+           "    \"on_replay\": false,"
+           "    \"on_shuffle\": false,"
+           "    \"pls_listsize\": 280,"
+           "    \"pls_size\": 295,"
            "    \"renderer\": \"OpenGL\","
            "    \"theme\": \"circle\","
            "    \"volume\": 1"

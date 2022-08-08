@@ -61,8 +61,6 @@ private Q_SLOTS:
     void clearItems();
     void onSelect(const QModelIndex &index);
     void onAboutToPlay(const QModelIndex &index);
-    void enterList();
-    void leaveList();
 
 private:
     Button *clearBtn{};

@@ -36,8 +36,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
     connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
-    connect(filter, SIGNAL(emitEnter()), SLOT(enterList()));
-    connect(filter, SIGNAL(emitLeave()), SLOT(leaveList()));
+    connect(filter, &EventFilter::emitEnter, [this](){emit enterListView();});
+    connect(filter, &EventFilter::emitLeave, [this](){emit leaveListView();});
 
 
     /** Botões para o painel da playlist */
@@ -408,18 +408,6 @@ void PlayList::onAboutToPlay(const QModelIndex &index) {
 /** Função para emitir o intem selecionado na playlist */
 void PlayList::onSelect(const QModelIndex &index) {
     emit selected(int(index.row()));
-}
-
-
-/** Emissão de sinal ao posicionar o mouse nos itens da playlist */
-void PlayList::enterList() {
-    emit enterListView();
-}
-
-
-/** Emissão de sinal ao posicionar o mouse fora dos itens da playlist */
-void PlayList::leaveList() {
-    emit leaveListView();
 }
 
 

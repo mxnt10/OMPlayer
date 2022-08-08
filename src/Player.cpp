@@ -1173,22 +1173,13 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         Utils::arrowMouse();
     }
 
-    auto *effect1 = new QGraphicsOpacityEffect();
-    effect1->setOpacity(0.8);
-    auto *effect2 = new QGraphicsOpacityEffect();
-    effect2->setOpacity(0.8);
-    auto *effect3 = new QGraphicsOpacityEffect();
-    effect3->setOpacity(0.8);
-    auto *effect4 = new QGraphicsOpacityEffect();
-    effect4->setOpacity(0.8);
-
     auto *contextMenu = new QMenu(tr("Context menu"), this);
-    contextMenu->setGraphicsEffect(effect1);
+    contextMenu->setWindowOpacity(0.8);
     contextMenu->setStyleSheet(Utils::setStyle("contextmenu"));
 
     if (listmenu && enterpos) {
         control = true;
-        effect1->setOpacity(0.9);
+        contextMenu->setWindowOpacity(0.9);
 
         /** Menu de informação de mídia */
         QAction mediainfo(tr("Current Media Info"), this);
@@ -1204,20 +1195,19 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     }
 
     if (!enterpos) {
-
         /** Outras opções */
-        QMenu other(tr("Other Options"), this);
-        other.setGraphicsEffect(effect2);
-        other.setStyleSheet(Utils::setStyle("contextmenu"));
+        auto *other = new QMenu(tr("Other Options"), this);
+        other->setWindowOpacity(0.8);
+        other->setStyleSheet(Utils::setStyle("contextmenu"));
 
         /** Visualização */
         QMenu visualization(tr("Visualizations"), this);
-        visualization.setGraphicsEffect(effect3);
+//        visualization.setGraphicsEffect(effect3);
         visualization.setStyleSheet(Utils::setStyle("contextmenu"));
 
         /** Opções de vídeo */
         QMenu optionVideo(tr("Video Options"), this);
-        optionVideo.setGraphicsEffect(effect4);
+//        optionVideo.setGraphicsEffect(effect4);
         optionVideo.setStyleSheet(Utils::setStyle("contextmenu"));
 
         /** Modo repetição */
@@ -1274,9 +1264,9 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         optionVideo.addAction(&aspectratio);
 
         /** Montagem do menu para outras opções */
-        other.addMenu(channel);
-//        other.addAction(&speed);
-        other.addAction(&repeat);
+        other->addMenu(channel);
+//        other->addAction(&speed);
+        other->addAction(&repeat);
 
         /** Montagem do menu principal */
         contextMenu->addAction(&open);
@@ -1288,7 +1278,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         contextMenu->addSeparator();
 //        contextMenu->addMenu(&visualization);
 //        contextMenu->addMenu(&optionVideo);
-        contextMenu->addMenu(&other);
+        contextMenu->addMenu(other);
         contextMenu->addSeparator();
         contextMenu->addAction(&settings);
         contextMenu->addAction(&mabout);

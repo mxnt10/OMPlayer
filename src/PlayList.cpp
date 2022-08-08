@@ -8,6 +8,7 @@
 #include <QTextCodec>
 
 #include "EventFilter.h"
+#include "JsonTools.h"
 #include "PlayList.h"
 #include "Utils.h"
 
@@ -32,7 +33,6 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     listView->setStyleSheet(Utils::setStyle("playlist"));
     listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    listView->setFixedWidth(280);
     listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
     connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
@@ -107,6 +107,14 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     gbl->setAlignment(RIGHT);
     wpls->setVisible(false);
     setLayout(gbl);
+
+
+    /** Definindo o tamanho da playlist */
+    if (JsonTools::intJson("pls_size") > 0) {
+        wpls->setFixedWidth(JsonTools::intJson("pls_size"));
+        listView->setFixedWidth(JsonTools::intJson("pls_listsize"));
+        delegate->setWith(JsonTools::intJson("pls_size"));
+    } else listView->setFixedWidth(280);
 }
 
 
@@ -428,10 +436,10 @@ void PlayList::changeIcons() {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
+    if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
         int subsize = startpos - event->x();
         int size = startsize + subsize;
-        if (size >= 295 && size < 876) {
+        if (size >= 300 && size < 876 && resize) {
             wpls->setFixedWidth(size);
             listView->setFixedWidth(startlistsize + subsize);
             delegate->setWith(size);
@@ -443,12 +451,14 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
             wpls->setVisible(true);
             isshow = true;
         } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
+            Utils::arrowMouse();
             emit emithide();
             wpls->setVisible(false);
             isshow = false;
         }
+        if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor) &&
+            event->x() > this->width() - wpls->width() + 10) Utils::arrowMouse();
     }
-    if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) Utils::arrowMouse();
     QWidget::mouseMoveEvent(event);
 }
 
@@ -475,6 +485,10 @@ void PlayList::mousePressEvent(QMouseEvent *event) {
 
 /** Emissão ao soltar um botão do mouse */
 void PlayList::mouseReleaseEvent(QMouseEvent *event) {
-    if (resize) resize = false;
+    if (resize) {
+        resize = false;
+        JsonTools::intJson("pls_size", wpls->width());
+        JsonTools::intJson("pls_listsize", listView->width());
+    }
     QWidget::mouseReleaseEvent(event);
 }

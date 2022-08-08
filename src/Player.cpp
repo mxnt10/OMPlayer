@@ -132,6 +132,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
     connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
+    if (JsonTools::boolJson("on_replay")) setReplay();
+    if (JsonTools::boolJson("on_shuffle")) setShuffle();
+
 
     /** Controle do volume */
     volume = new Slider(this, false, 90, (-1), 100, "volume");
@@ -353,8 +356,7 @@ void OMPlayer::setRenderer(const QString &op) {
     const VideoRendererId vid = mediaPlayer->renderer()->id();
     if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
-    else
-        mediaPlayer->renderer()->forcePreferredPixelFormat(false);
+    else mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
     if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
                    qUtf8Printable(op), vo->id());
@@ -587,12 +589,7 @@ void OMPlayer::onStart() {
         isblock = true;
     }
 
-    /** Finalizando qualquer pré-visualização anterior */
-    if (preview->isVisible()) {
-        qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
-        preview->close();
-    }
-
+    onTimeSliderLeave(IsPlay);
     changeIcons(IsPlay);
     updateChannelMenu();
     updateSlider(mediaPlayer->position());
@@ -611,12 +608,7 @@ void OMPlayer::onStop() {
         current->setText("-- -- : -- --");
         end->setText("-- -- : -- --");
 
-        /** Reativando Bloqueio de tela */
-        if (isblock) {
-            ScreenSaver::instance().deactive();
-            isblock = false;
-        }
-
+        onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
         updateChannelMenu();
         onTimeSliderLeave();
@@ -636,9 +628,11 @@ void OMPlayer::setReplay() {
     if (!restart) {
         restart = true;
         Utils::changeIcon(replayBtn, "replay-on");
+        if (!JsonTools::boolJson("on_replay")) JsonTools::boolJson("on_replay", true);
     } else {
         restart = false;
         Utils::changeIcon(replayBtn, "replay");
+        JsonTools::boolJson("on_replay", false);
     }
 }
 
@@ -648,9 +642,11 @@ void OMPlayer::setShuffle() {
     if (!randplay) {
         randplay = true;
         Utils::changeIcon(shuffleBtn, "shuffle-on");
+        if (!JsonTools::boolJson("on_shuffle")) JsonTools::boolJson("on_shuffle", true);
     } else {
         randplay = false;
         Utils::changeIcon(shuffleBtn, "shuffle");
+        JsonTools::boolJson("on_shuffle", false);
     }
 }
 
@@ -857,14 +853,16 @@ void OMPlayer::onTimeSliderEnter() {
 
 
 /** Saindo da pré-visualização */
-void OMPlayer::onTimeSliderLeave() {
+void OMPlayer::onTimeSliderLeave(OMPlayer::ST status) {
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
         prev->close();
     }
-    ispreview = false;
-    hideTrue();
+    if (status == Default) {
+        ispreview = false;
+        hideTrue();
+    }
 }
 
 

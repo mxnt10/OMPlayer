@@ -7,6 +7,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Added / Adicionado
  - Adicionado suporte ao redirecionamento da playlist.
+ - Adicionado recursos para salvar as alterações no reprodutor.
 ###
 
 ### Upgraded / Atualizado
@@ -23,6 +24,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    possibilitar a opção de salvar e carregar playlists qds.
  - Ajustes no evento de modificação da interface.
  - Refatoração de código no fonte JsonTools.{cpp/h} em src.
+ - Simplificação de código para a semi-transparência do menu
+   de contexto.
 ###
 
 ### Removed / Removido

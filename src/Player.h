@@ -75,7 +75,7 @@ private Q_SLOTS:
     void leaveFullScreen();
     void onTimeSliderHover(int pos, int value);
     void onTimeSliderEnter();
-    void onTimeSliderLeave();
+    void onTimeSliderLeave(OMPlayer::ST status = Default);
     void updateSlider(qint64 value);
     void updateSliderUnit();
     void enablePause();

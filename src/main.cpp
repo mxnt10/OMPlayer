@@ -20,14 +20,14 @@
  **********************************************************************************************************************/
 
 #include <QDir>
-#include <QLoggingCategory>
 #include <QCommandLineParser>
+#include <QLoggingCategory>
 
-#include <filesystem>
 #include <SingleApplication>
 
 #include "JsonTools.h"
 #include "Player.h"
+#include "Translator.h"
 #include "Utils.h"
 
 #define DEBUG true
@@ -38,8 +38,13 @@
 
 int main(int argc, char *argv[]) {
     SingleApplication Player(argc, argv, true, SingleApplication::Mode::SecondaryNotification);
-    std::filesystem::create_directory(QDir::homePath().toStdString() + "/.config/OMPlayer");
+
+    QDir dir(QDir::homePath() + "/.config/OMPlayer");
+    if (!dir.exists()) dir.mkpath(".");
     JsonTools::settingsJson();
+
+    Translator translator;
+    if (translator.load()) translator.installTranslator();
 
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "Simplify"

@@ -42,6 +42,7 @@ add_executable(
         src/Settings.cpp       src/Settings.h
         src/Slider.cpp         src/Slider.h
         src/StatisticsView.cpp src/StatisticsView.h
+        src/Translator.cpp     src/Translator.h
         src/TreeView.cpp       src/TreeView.h
         src/Utils.cpp          src/Utils.h
 

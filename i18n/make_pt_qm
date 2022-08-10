@@ -1,0 +1,3 @@
+#!/bin/bash
+
+lrelease-qt5 OMPlayer_pt.ts

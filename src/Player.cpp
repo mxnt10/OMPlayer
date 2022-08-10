@@ -101,10 +101,10 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Labels para mostrar o tempo de execução e a duração */
-    current = new Label(CENTER, 70, tr("Current time"), "-- -- : -- --");
+    current = new Label(CENTER, 70, "Current time", "-- -- : -- --");
     connect(current, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(current, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    end = new Label(CENTER, 70, tr("Duration"), "-- -- : -- --");
+    end = new Label(CENTER, 70, "Duration", "-- -- : -- --");
     connect(end, SIGNAL(emitEnter()), SLOT(hideFalse()));
     connect(end, SIGNAL(emitLeave()), SLOT(hideTrue()));
 
@@ -1171,7 +1171,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         Utils::arrowMouse();
     }
 
-    auto *contextMenu = new QMenu(tr("Context menu"), this);
+    auto *contextMenu = new QMenu(this);
     contextMenu->setWindowOpacity(0.8);
     contextMenu->setStyleSheet(Utils::setStyle("contextmenu"));
 

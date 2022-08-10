@@ -1,0 +1,3 @@
+#!/bin/bash
+
+lupdate-qt5 -verbose OMPlayer.pro

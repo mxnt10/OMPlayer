@@ -2,6 +2,7 @@
 #define PLAYLIST_H
 
 #include <QDir>
+#include <QLabel>
 #include <QListView>
 #include <QModelIndex>
 #include <PlayListUtils>
@@ -16,7 +17,7 @@ public:
     explicit PlayList(QWidget *parent = nullptr);
     ~PlayList() override;
 
-    enum ST {Default = 0, Second = 1, Update = 2};
+    enum ST {Default = 0, First = 1, Second = 2, Update = 3};
     void load(ST load = Default, const QString &url = DefDIR);
     void save(const QString &url = DefDIR);
     QString getItems(int s);
@@ -65,6 +66,7 @@ private Q_SLOTS:
 private:
     Button *clearBtn{};
     Button *addBtn{}, *removeBtn{};
+    QLabel *cleanlist{};
     PlayListDelegate *delegate{};
     PlayListModel *model{};
     QListView *listView{};

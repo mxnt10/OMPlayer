@@ -47,7 +47,7 @@ private:
     void updateChannelMenu();
 
 private Q_SLOTS:
-    void setTotalItems(OMPlayer::ST fix = Default);
+    void setTotalItems();
     void setSelect(int item);
     void ajustActualItem(int item);
     void firstPlay(const QString &name, int pos);

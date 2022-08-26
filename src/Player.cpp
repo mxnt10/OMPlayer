@@ -367,12 +367,12 @@ void OMPlayer::setRenderer(const QString &op) {
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
     listnum.clear();  /** É preferível redefinir a contagem aleatória */
-    setTotalItems(FixTotal);
+    setTotalItems();
     if (!playing) return;
 
     if (item < actualitem) {
-        playlist->selectCurrent(actualitem--);
-        actualitem = actualitem--;
+        playlist->selectCurrent(previousitem);
+        actualitem = previousitem;
         nextitem = actualitem + 1;
         previousitem = actualitem - 1;
         if (actualitem == 0) previousitem = playlist->setListSize() - 1;
@@ -388,14 +388,7 @@ void OMPlayer::ajustActualItem(int item) {
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;
-        } else {
-            play(playlist->getItems(nextitem), nextitem);
-            actualitem = previousitem;
-            nextitem = actualitem + 1;
-            previousitem = actualitem - 1;
-            if (actualitem == 0) previousitem = playlist->setListSize() - 1;
-            if (actualitem == playlist->setListSize() - 1) nextitem = 0;
-        }
+        } else play(playlist->getItems(actualitem), actualitem);
         return;
     }
 
@@ -404,9 +397,8 @@ void OMPlayer::ajustActualItem(int item) {
 
 
 /** Calculando o total de itens */
-void OMPlayer::setTotalItems(OMPlayer::ST fix) {
-    if (fix == FixTotal) totalitems = playlist->setListSize() - 1;
-    else totalitems = playlist->setListSize();
+void OMPlayer::setTotalItems() {
+    totalitems = playlist->setListSize();
     qDebug("%s(%sDEBUG%s):%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, BLU, totalitems);
 }
 

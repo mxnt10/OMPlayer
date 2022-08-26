@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
-#include <QSettings>
 
 #include "Translator.h"
 #include "Utils.h"
@@ -14,9 +13,9 @@
 /** Construtor para o tradutor */
 Translator::Translator(QObject *parent) : QObject(parent) {
     translator = new QTranslator(this);
-    QString lang = QSettings().value("Language/current", QLocale::system().bcp47Name()).toString();
+    QString lang = QLocale::system().bcp47Name();
 
-    QString tr{QString("/usr/share/OMPlayer/i18n/OMPlayer_") + lang + ".qm"};
+    QString tr{QString(Utils::defaultDir() + "/i18n/OMPlayer_") + lang + ".qm"};
     QString ltr{Utils::getLocal() + "/i18n/OMPlayer_" + lang + ".qm"};
 
     if (QFileInfo::exists(tr)) local = tr;

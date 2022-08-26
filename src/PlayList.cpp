@@ -21,7 +21,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     model = new PlayListModel(this);
     delegate = new PlayListDelegate(this);
-    load();
+    load(First);
 
 
     /** Lista para visualização da playlist */
@@ -82,12 +82,22 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     wpls = new QWidget();
     wpls->setMouseTracking(true);
     auto *vbl = new QVBoxLayout();
-    vbl->addSpacing(3);
     vbl->addLayout(hbtn);
-    vbl->addSpacing(3);
+    vbl->addSpacing(5);
     vbl->addWidget(line);
     vbl->addSpacing(5);
     vbl->addWidget(listView);
+
+
+    /** Mensagem para a playlist vazia */
+    QPalette palete;
+    palete.setColor(QPalette::WindowText, QColor(150, 150, 150));
+    QFont font;
+    font.setItalic(true);
+    font.setPixelSize(16);
+    cleanlist = new QLabel(tr("Empty List"), wpls);
+    cleanlist->setFont(font);
+    cleanlist->setPalette(palete);
 
 
     /** Layout com a barra de redirecionamento */
@@ -152,7 +162,7 @@ void PlayList::load(ST load, const QString &url) {
     } else
         qDebug("%s(%sDEBUG%s):%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, BLU);
     f.close();
-    save();
+    if (load != First) save();
 }
 
 
@@ -231,6 +241,10 @@ void PlayList::addItems(const QStringList &parms) {
         }
     }
 
+    /** Verificando visibilidade de lista vazia */
+    if (setListSize() == 0) cleanlist->setVisible(true);
+    else cleanlist->setVisible(false);
+
     save();
     if (total == 0) return;
     emit firstPlay(isplay, t);
@@ -284,6 +298,11 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
             }
         }
         f.close();
+
+        /** Verificando visibilidade de lista vazia */
+        if (setListSize() == 0) cleanlist->setVisible(true);
+        else cleanlist->setVisible(false);
+
         save();
         emit firstPlay(getItems(0), 0);
         emit emitItems();
@@ -373,9 +392,10 @@ void PlayList::removeSelectedItems(PlayList::ST status) {
 
     QModelIndexList s = selection->selectedIndexes();
     for (int i = s.size() - 1; i >= 0; --i) {
-        if (status == Default) emit emitremove(s.at(i).row());
         hashlist.removeOne(Utils::stringHash(getItems(s.at(i).row())));
         model->removeRow(s.at(i).row());
+        if (setListSize() == 0) cleanlist->setVisible(true);
+        if (status == Default) emit emitremove(s.at(i).row());
     }
     save();
 }
@@ -384,6 +404,7 @@ void PlayList::removeSelectedItems(PlayList::ST status) {
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+    cleanlist->setVisible(true);
     hashlist.clear();
     emit emitstop();
     emit emitItems();
@@ -431,6 +452,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
             wpls->setFixedWidth(size);
             listView->setFixedWidth(startlistsize + subsize);
             delegate->setWith(size);
+            cleanlist->move(size/2 - cleanlist->width()/2 + 10, 60);
         }
     } else {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
@@ -438,15 +460,20 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
             emit emitnohide();
             wpls->setVisible(true);
             isshow = true;
+
+            /** Verificando visibilidade de lista vazia */
+            cleanlist->move(wpls->width()/2 - cleanlist->width()/2 + 10, 60);
+            if (setListSize() == 0) cleanlist->setVisible(true);
+            else cleanlist->setVisible(false);
+
         } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
             Utils::arrowMouse();
             emit emithide();
             wpls->setVisible(false);
             isshow = false;
         }
-        if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor) &&
-            event->x() > this->width() - wpls->width() + 10) Utils::arrowMouse();
     }
+    if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) Utils::arrowMouse();
     QWidget::mouseMoveEvent(event);
 }
 

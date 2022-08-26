@@ -39,6 +39,7 @@ class Utils {
 public:
     enum ST {Default = 0, Logo = 1, Current = 2};
     static QString getLocal(ST option = Default);
+    static QString defaultDir();
     static QString setIcon(ST logo = Default);
     static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
@@ -55,6 +56,7 @@ public:
     static int calcX(int z, int x, int y);
     static int setDifere(int unit);
     static QStringList subdirIcons();
+    static QString scanXDGData();
 };
 
 #endif //OMPLAYER_UTILS_H

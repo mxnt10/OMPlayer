@@ -41,21 +41,21 @@
     <message>
         <location filename="../src/About.cpp" line="105"/>
         <source>To play multimedia files, the program uses the</source>
-        <translation>Para reproduzir arquivos multimídia, o programa</translation>
+        <translation>Para reproduzir arquivos multimídia,</translation>
     </message>
     <message>
         <location filename="../src/About.cpp" line="106"/>
         <source>QtAV framework, which uses ffmpeg for handling multimedia files.</source>
-        <translation>usa o framework QtAV, que usa o ffmpeg para a manipulação de arquivos multimídia.</translation>
+        <translation>o programa usa o framework QtAV, que usa o ffmpeg para a manipulação de arquivos multimídia.</translation>
     </message>
 </context>
 <context>
     <name>OMPlayer</name>
     <message>
         <location filename="../src/Player.cpp" line="113"/>
-        <location filename="../src/Player.cpp" line="546"/>
-        <location filename="../src/Player.cpp" line="603"/>
-        <location filename="../src/Player.cpp" line="1053"/>
+        <location filename="../src/Player.cpp" line="538"/>
+        <location filename="../src/Player.cpp" line="595"/>
+        <location filename="../src/Player.cpp" line="1045"/>
         <source>Play</source>
         <translation>Reproduzir</translation>
     </message>
@@ -76,27 +76,27 @@
     </message>
     <message>
         <location filename="../src/Player.cpp" line="125"/>
-        <location filename="../src/Player.cpp" line="1245"/>
+        <location filename="../src/Player.cpp" line="1237"/>
         <source>Replay</source>
         <translation>Repetir</translation>
     </message>
     <message>
         <location filename="../src/Player.cpp" line="128"/>
-        <location filename="../src/Player.cpp" line="1239"/>
+        <location filename="../src/Player.cpp" line="1231"/>
         <source>Shuffle</source>
         <translation>Aleatório</translation>
     </message>
     <message>
         <location filename="../src/Player.cpp" line="131"/>
-        <location filename="../src/Player.cpp" line="922"/>
-        <location filename="../src/Player.cpp" line="1042"/>
+        <location filename="../src/Player.cpp" line="914"/>
+        <location filename="../src/Player.cpp" line="1034"/>
         <source>Volume</source>
         <translation>Volume</translation>
     </message>
     <message>
         <location filename="../src/Player.cpp" line="277"/>
         <source>Channel</source>
-        <translation type="unfinished">Canais de Áudio</translation>
+        <translation>Canais de Áudio</translation>
     </message>
     <message>
         <location filename="../src/Player.cpp" line="282"/>
@@ -124,86 +124,86 @@
         <translation>Direita</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="549"/>
-        <location filename="../src/Player.cpp" line="556"/>
-        <location filename="../src/Player.cpp" line="1052"/>
+        <location filename="../src/Player.cpp" line="541"/>
+        <location filename="../src/Player.cpp" line="548"/>
+        <location filename="../src/Player.cpp" line="1044"/>
         <source>Pause</source>
         <translation>Pausar</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="928"/>
-        <location filename="../src/Player.cpp" line="1045"/>
+        <location filename="../src/Player.cpp" line="920"/>
+        <location filename="../src/Player.cpp" line="1037"/>
         <source>No Video Sound</source>
         <translation>Sem Som</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="933"/>
-        <location filename="../src/Player.cpp" line="1049"/>
+        <location filename="../src/Player.cpp" line="925"/>
+        <location filename="../src/Player.cpp" line="1041"/>
         <source>Muted</source>
         <translation>Mudo</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1183"/>
+        <location filename="../src/Player.cpp" line="1175"/>
         <source>Current Media Info</source>
         <translation>Informações de Mídia Atual</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1187"/>
+        <location filename="../src/Player.cpp" line="1179"/>
         <source>Save Playlist</source>
         <translation>Salvar Playlist</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1197"/>
+        <location filename="../src/Player.cpp" line="1189"/>
         <source>Other Options</source>
         <translation>Outras Opções</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1202"/>
+        <location filename="../src/Player.cpp" line="1194"/>
         <source>Visualizations</source>
         <translation>Visualizações</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1207"/>
+        <location filename="../src/Player.cpp" line="1199"/>
         <source>Video Options</source>
         <translation>Opções de Vídeo</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1212"/>
+        <location filename="../src/Player.cpp" line="1204"/>
         <source>Repeat Mode</source>
         <translation>Modo de Repetição Único</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1219"/>
+        <location filename="../src/Player.cpp" line="1211"/>
         <source>Speed</source>
         <translation>Velocidade</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1222"/>
+        <location filename="../src/Player.cpp" line="1214"/>
         <source>Aspect Ratio</source>
         <translation>Aspect Ratio</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1225"/>
+        <location filename="../src/Player.cpp" line="1217"/>
         <source>Open Files</source>
         <translation>Abrir Arquivos</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1231"/>
+        <location filename="../src/Player.cpp" line="1223"/>
         <source>Show Fullscreen</source>
         <translation>Exibir Tela Cheia</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1233"/>
+        <location filename="../src/Player.cpp" line="1225"/>
         <source>Exit Fullscreen</source>
         <translation>Fechar Tela Cheia</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1251"/>
+        <location filename="../src/Player.cpp" line="1243"/>
         <source>Settings</source>
         <translation>Configurações</translation>
     </message>
     <message>
-        <location filename="../src/Player.cpp" line="1257"/>
+        <location filename="../src/Player.cpp" line="1249"/>
         <source>About</source>
         <translation>Sobre</translation>
     </message>
@@ -226,7 +226,12 @@
         <translation>Limpar lista de reprodução</translation>
     </message>
     <message>
-        <location filename="../src/PlayList.cpp" line="183"/>
+        <location filename="../src/PlayList.cpp" line="99"/>
+        <source>Empty List</source>
+        <translation>Lista Vazia</translation>
+    </message>
+    <message>
+        <location filename="../src/PlayList.cpp" line="194"/>
         <source>Select multimedia files</source>
         <translation>Selecionar arquivos de mídia</translation>
     </message>

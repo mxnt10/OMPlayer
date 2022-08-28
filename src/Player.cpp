@@ -52,6 +52,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     about = new About(this);
     sett = new Settings(this);
     infoview = new StatisticsView(this);
+    screensaver = new ScreenSaver(this);
     connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
     connect(sett, SIGNAL(changethemeicon()), this, SLOT(changeIcons()));
     connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));

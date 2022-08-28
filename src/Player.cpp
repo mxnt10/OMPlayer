@@ -1250,6 +1250,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
         /** Montagem do menu de opções de vídeo */
         optionVideo.addAction(&aspectratio);
+//        optionVideo.addAction(&rotation);
 
         /** Montagem do menu para outras opções */
         other->addMenu(channel);

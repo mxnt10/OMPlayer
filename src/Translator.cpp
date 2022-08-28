@@ -14,12 +14,16 @@
 Translator::Translator(QObject *parent) : QObject(parent) {
     translator = new QTranslator(this);
     QString lang = QLocale::system().bcp47Name();
+    QStringList locals{def.defaultDir, def.localDir, def.currentDir};
+    QString tr;
 
-    QString tr{QString(Utils::defaultDir() + "/i18n/OMPlayer_") + lang + ".qm"};
-    QString ltr{Utils::getLocal() + "/i18n/OMPlayer_" + lang + ".qm"};
-
-    if (QFileInfo::exists(tr)) local = tr;
-    else if (QFileInfo::exists(ltr)) local = ltr;
+    for (int i = 0; i < 3; i++) {
+        tr = locals[i] + "/i18n/OMPlayer_" + lang + ".qm";
+        if (QFileInfo::exists(tr)) {
+            local = tr;
+            i = 3;
+        }
+    }
 }
 
 

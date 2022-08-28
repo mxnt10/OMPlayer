@@ -38,6 +38,7 @@
 
 int main(int argc, char *argv[]) {
     SingleApplication Player(argc, argv, true, SingleApplication::Mode::SecondaryNotification);
+    Utils::initUtils();
 
     QDir dir(QDir::homePath() + "/.config/OMPlayer");
     if (!dir.exists()) dir.mkpath(".");

@@ -28,7 +28,7 @@ Q_OBJECT
 public:
     explicit OMPlayer(QWidget *parent = nullptr);
     ~OMPlayer() override;
-    enum ST {Default = 0, IsPlay = 1, FixTotal = 2};
+    enum ST {Default = 0, IsPlay = 1};
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());

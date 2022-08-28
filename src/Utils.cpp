@@ -1,4 +1,3 @@
-#include <QApplication>
 #include <QCryptographicHash>
 #include <QDebug>
 #include <QDir>
@@ -13,11 +12,22 @@
 /**********************************************************************************************************************/
 
 
+/** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
+void Utils::initUtils(Status option) {
+    if (option == Default) {
+        def.defaultDir = defaultDir();
+        def.localDir = getLocal();
+        def.currentDir = getLocal(Current);
+    }
+    def.definedTheme = JsonTools::stringJson("theme");
+}
+
+
 /**
  * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é conveniente. Por isso, é usado
  * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível apenas à caráter
  * de testes de execução e depuração do reprodutor. */
-QString Utils::getLocal(ST option) {
+QString Utils::getLocal(Status option) {
     if (option == Current) return QDir::currentPath();
     return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));
 }
@@ -27,25 +37,33 @@ QString Utils::getLocal(ST option) {
 QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
 
 
+/** Definindo variáveis para ícone e logo com retorno */
+QString Utils::defIcon(Status logo, const QString &icon) {
+    if (logo == Logo) def.definedLogo = icon; else def.definedIcon = icon;
+    return icon;
+}
+
+
 /** Retorna o ícone do programa */
-QString Utils::setIcon(ST logo) {
-    QString icon, lIcon;
+QString Utils::setIcon(Status logo) {
+    QStringList locals;
+    QString iconfile, icon;
+
     if (logo == Logo) {
-        qDebug("%s(%sDEBUG%s):%s Setando uma logo ...\033[0m", GRE, RED, GRE, BLU);
-        icon = defaultDir() + "/logo/logo.png";
-        lIcon = getLocal() + "/appdata/logo.png";
+        if (!def.definedLogo.isEmpty() && QFileInfo::exists(def.definedLogo)) return def.definedLogo;
+        qDebug("%s(%sUtils%s)%s::%s Setando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
+        locals.append({def.defaultDir + "/logo", def.localDir + "/appdata", def.currentDir + "/appdata"});
+        icon = "/logo.png";
     } else {
-        qDebug("%s(%sDEBUG%s):%s Setando o ícone do programa ...\033[0m", GRE, RED, GRE, BLU);
-        icon = scanXDGData() + "/usr/share/pixmaps/OMPlayer.png";
-        lIcon = getLocal() + "/appdata/OMPlayer.png";
+        if (!def.definedIcon.isEmpty() && QFileInfo::exists(def.definedIcon)) return def.definedIcon;
+        qDebug("%s(%sUtils%s)%s::%s Setando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
+        locals.append({def.definedXDG + "/usr/share/pixmaps", def.localDir + "/appdata", def.currentDir + "/appdata"});
+        icon = "/OMPlayer.png";
     }
 
-    if (QFileInfo::exists(icon)) return icon;
-    else if (QFileInfo::exists(lIcon)) return lIcon;
-    else {
-        if (logo == Logo) lIcon = getLocal(Current) + "/appdata/logo.png";
-        else lIcon = getLocal(Current) + "/appdata/OMPlayer.png";
-        if (QFileInfo::exists(lIcon)) return lIcon;
+    for (int i = 0; i < 3; i++) {
+        iconfile = locals[i] + icon;
+        if (QFileInfo::exists(iconfile)) return defIcon(logo, iconfile);
     }
     return {};
 }
@@ -53,28 +71,20 @@ QString Utils::setIcon(ST logo) {
 
 /** Função que vai selecionar o tema dos ícones */
 QString Utils::setIconTheme(const QString &theme, const QString &icon) {
-    QString fileTheme{theme + "/" + icon};
-    QString iconFile{defaultDir() + "/icons/" + fileTheme};
-    QString lIconFile{getLocal() + "/icons/" + fileTheme};
+    QStringList locals{def.defaultDir, def.localDir, def.currentDir};
+    QStringList files;
+    QString iconDir;
+    QDir dir;
 
-    /** Compatibilidade com formatos svg e png */
-    QString iconFileSVG{iconFile + ".svg"};
-    QString iconFilePNG{iconFile + ".png"};
-    QString lIconFileSVG{lIconFile + ".svg"};
-    QString lIconFilePNG{lIconFile + ".png"};
+    for (int i = 0; i < 3; i++) {
+        iconDir = locals[i] + "/icons/" + theme + "/";
+        dir.setPath(iconDir);
+        files = dir.entryList();
 
-    /** Prioridade aos arquivos svg */
-    if (QFileInfo::exists(iconFileSVG)) return iconFileSVG;
-    else if (QFileInfo::exists(iconFilePNG)) return iconFilePNG;
-    else if (QFileInfo::exists(lIconFileSVG)) return lIconFileSVG;
-    else if (QFileInfo::exists(lIconFilePNG)) return lIconFilePNG;
-    else {
-        lIconFile = getLocal(Current) + "/icons/" + fileTheme;
-        lIconFileSVG = lIconFile + ".svg";
-        lIconFilePNG = lIconFile + ".png";
-        if (QFileInfo::exists(lIconFileSVG)) return lIconFileSVG;
-        if (QFileInfo::exists(lIconFilePNG)) return lIconFilePNG;
+        if (!files.filter(QRegExp("^" + icon + "\\.(pn|sv)g")).isEmpty())
+            return iconDir + files.filter(QRegExp("^" + icon + "\\.(pn|sv)g"))[0];
     }
+
     return {};
 }
 
@@ -82,32 +92,27 @@ QString Utils::setIconTheme(const QString &theme, const QString &icon) {
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const QString &style) {
     qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, qUtf8Printable(style));
-    QString qss{defaultDir() + "/qss/" + style + ".qss"};
-    QString lQss{getLocal() + "/qss/" + style + ".qss"};
+    QStringList locals{def.defaultDir, def.localDir, def.currentDir};
+    QString qss;
 
-    QString qst;
-    if (QFileInfo::exists(qss)) qst = qss;
-    else if (QFileInfo::exists(lQss)) qst = lQss;
-    else {
-        lQss = getLocal(Current) + "/qss/" + style + ".qss";
-        if (QFileInfo::exists(lQss)) qst = lQss;
+    for (int i = 0; i < 3; i++)
+        if (QFileInfo::exists(locals[i] + "/qss/" + style + ".qss")) qss = locals[i] + "/qss/" + style + ".qss";
+
+    if (qss.isEmpty()) {
+        if (style == "widget") {
+            if (QRegExp("dark|-dark").indexIn(QIcon::themeName()) != -1) {
+                return {"background-color: rgba(42, 46, 50, 255);"
+                        "border: 1px ridge #43474c;"
+                        "border-radius: 4px;"};
+            } else {
+                return {"background-color: rgba(239, 240, 241, 255);"
+                        "border: 1px ridge #ebebeb;"
+                        "border-radius: 4px;"};
+            }
+        } else return {};
     }
 
-    if (qst.isEmpty() && style == "widget") {
-        if (QRegExp("dark|-dark").indexIn(QIcon::themeName()) != -1) {
-            return {"background-color: rgba(42, 46, 50, 255);"
-                    "border: 1px ridge #43474c;"
-                    "border-radius: 4px;"};
-        } else {
-            return {"background-color: rgba(239, 240, 241, 255);"
-                    "border: 1px ridge #ebebeb;"
-                    "border-radius: 4px;"};
-        }
-    }
-
-    if (qst.isEmpty()) return {};
-
-    QFile file(qst);
+    QFile file(qss);
     if (!file.open(QFile::ReadOnly)) return {};
     QString styleSheet{QLatin1String(file.readAll())};
     file.close();
@@ -168,28 +173,20 @@ int Utils::calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 void Utils::rm_nl(string &s) { for (uint p = s.find('\n'); p != (uint) string::npos; p = s.find('\n')) s.erase(p, 1); }
 
 
-/** Funções para o cursor do mouse */
-void Utils::arrowMouse()  { QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor));   }
-void Utils::blankMouse()  { QApplication::setOverrideCursor(QCursor(Qt::BlankCursor));   }
-void Utils::resizeMouse() { QApplication::setOverrideCursor(QCursor(Qt::SizeHorCursor)); }
-
-
 /** Alteração dos botões */
 void Utils::changeIcon(Button *btn, const QString &thm, const QString &ttp) {
-    QString theme = JsonTools::stringJson("theme");
-    if (Utils::setIconTheme(theme, thm) == nullptr)
+    if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
         btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
-    else btn->setIcon(QIcon(Utils::setIconTheme(theme, thm)));
+    else btn->setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
     if (!ttp.isNull()) btn->setToolTip(ttp);
 }
 
 
 /** Definição dos ícones do menu */
 void Utils::changeMenuIcon(QAction &btn, const QString &thm) {
-    QString theme = JsonTools::stringJson("theme");
-    if (Utils::setIconTheme(theme, thm) == nullptr)
+    if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
         btn.setIcon(QIcon::fromTheme(defaultIcon(thm)));
-    else btn.setIcon(QIcon(Utils::setIconTheme(theme, thm)));
+    else btn.setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
 }
 
 
@@ -228,16 +225,13 @@ QString Utils::stringHash(const QString &url) {
 
 /** Função que retorna os subdiretórios presente em icons */
 QStringList Utils::subdirIcons() {
-    QDir dir(defaultDir().append("/icons/"));
-    QDir ldir(getLocal().append("/icons/"));
+    QStringList locals{def.defaultDir, def.localDir, def.currentDir};
+    QDir dir;
     QStringList dirs;
 
-    if (dir.exists()) dirs = dir.entryList(QDir::Dirs);
-    else if (ldir.exists()) dirs = ldir.entryList(QDir::Dirs);
-    else {
-        ldir.setPath(getLocal(Current).append("/icons/"));
-        if (ldir.exists()) dirs = ldir.entryList(QDir::Dirs);
-        else return {};
+    for (int i = 0; i < 3; i++) {
+        dir.setPath(locals[i].append("/icons/"));
+        if (dir.exists()) dirs = dir.entryList(QDir::Dirs);
     }
 
     for (int i = 0; i < 2; i++) dirs.removeAt(0); /** Removendo os itens "." e ".." indesejáveis */
@@ -249,10 +243,15 @@ QStringList Utils::subdirIcons() {
 QString Utils::scanXDGData() {
     const char *tmp = getenv("XDG_DATA_DIRS");
     QString env(tmp ? tmp : "");
+    if (env.isEmpty()) return {};
+
     QStringList splitt = env.split(":");
     for (int i = 0; i < splitt.size(); i ++) {
         QDir dir(splitt[i] + "/usr/share/OMPlayer");
-        if (dir.exists()) return splitt[i];
+        if (dir.exists()) {
+            def.definedXDG = splitt[i];
+            return splitt[i];
+        }
     }
     return {};
 }

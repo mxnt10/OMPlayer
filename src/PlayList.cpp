@@ -74,8 +74,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     auto size = new QFrame();
     size->setFixedWidth(10);
     size->installEventFilter(filter2);
-    connect(filter2, &EventFilter::emitEnter, [](){Utils::resizeMouse();});
-    connect(filter2, &EventFilter::emitLeave, [](){Utils::arrowMouse(); });
+    connect(filter2, &EventFilter::emitEnter, [](){resizeMouse();});
+    connect(filter2, &EventFilter::emitLeave, [](){arrowMouse(); });
 
 
     /** Layout da playlist */
@@ -186,7 +186,7 @@ void PlayList::addItems(const QStringList &parms) {
     QStringList files;
 
     /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-    for (int i = 0; i < 1000; i++) Utils::arrowMouse();
+    for (int i = 0; i < 1000; i++) arrowMouse();
 
     if (parms.isEmpty()) files = \
         QFileDialog::getOpenFileNames(
@@ -467,13 +467,13 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
             else cleanlist->setVisible(false);
 
         } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
-            Utils::arrowMouse();
+            arrowMouse();
             emit emithide();
             wpls->setVisible(false);
             isshow = false;
         }
     }
-    if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) Utils::arrowMouse();
+    if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) arrowMouse();
     QWidget::mouseMoveEvent(event);
 }
 

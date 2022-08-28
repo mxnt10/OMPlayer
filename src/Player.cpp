@@ -680,7 +680,7 @@ void OMPlayer::enterFullScreen() {
     if (this->isMaximized()) maximize = true; /** Mapear interface maximizada */
     this->showFullScreen();
     wctl->close();
-    Utils::blankMouse();
+    blankMouse();
     filter->setMove(false);
     enterpos = false;
 }
@@ -696,7 +696,7 @@ void OMPlayer::leaveFullScreen() {
     if (maximize) this->showMaximized();
 
     wctl->close();
-    Utils::blankMouse();
+    blankMouse();
     filter->setMove(false);
     enterpos = maximize = false;
 }
@@ -1160,7 +1160,7 @@ void OMPlayer::closeEvent(QCloseEvent *event) {
 void OMPlayer::ShowContextMenu(const QPoint &pos) {
     if (listmenu || !enterpos) {
         qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-        Utils::arrowMouse();
+        arrowMouse();
     }
 
     auto *contextMenu = new QMenu(this);

@@ -104,7 +104,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Mapeando o movimento do mouse */
         if (event->type() == QEvent::MouseMove && !moving && start) {
             qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
-            Utils::arrowMouse();
+            arrowMouse();
             emit emitMouseMove();
             moving = true;
         }
@@ -113,7 +113,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::ToolTip) {
             if (!fixed) {
                 qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
-                Utils::blankMouse();
+                blankMouse();
                 emit emitLeave();
             }
             moving = false;
@@ -122,8 +122,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Ação após a destruição do menu de contexto */
         if (event->type() == QEvent::ChildRemoved && contextmenu) {
             qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
-            if (sett || fixed) Utils::arrowMouse();
-            else Utils::blankMouse();
+            if (sett || fixed) arrowMouse();
+            else blankMouse();
             contextmenu = false;
         }
 

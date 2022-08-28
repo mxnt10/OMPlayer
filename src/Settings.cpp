@@ -204,6 +204,7 @@ void Settings::setWidget() {
 /** Modificando as configurações de temas */
 void Settings::setIcon(const QString &index) {
     JsonTools::stringJson("theme", index);
+    Utils::initUtils(Utils::Theme);
 
     for (int i = 0; i < 8; ++i) {
         if (vid_map[i].btn) {
@@ -212,7 +213,7 @@ void Settings::setIcon(const QString &index) {
             else Utils::changeIcon(vid_map[i].btn, "radio-unselect");
         }
     }
-    Utils::changeIcon(closebtn, "apply");
 
+    Utils::changeIcon(closebtn, "apply");
     emit changethemeicon();
 }

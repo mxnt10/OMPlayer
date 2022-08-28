@@ -2,6 +2,7 @@
 #define OMPLAYER_UTILS_H
 
 #include <QAction>
+#include <QApplication>
 #include "Button.h"
 
 #define VERSION "1.5"
@@ -33,29 +34,44 @@
 #define ENTER Qt::Key_Return
 #define ESC   Qt::Key_Escape
 
+#define arrowMouse()  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor))
+#define blankMouse()  QApplication::setOverrideCursor(QCursor(Qt::BlankCursor))
+#define resizeMouse() QApplication::setOverrideCursor(QCursor(Qt::SizeHorCursor))
+
 using namespace std;
+
+struct { /** Criado com objetivo de otimização de performance */
+    QString defaultDir;
+    QString localDir;
+    QString currentDir;
+    QString definedXDG;
+    QString definedIcon;
+    QString definedLogo;
+    QString definedTheme;
+} def;
 
 class Utils {
 public:
-    enum ST {Default = 0, Logo = 1, Current = 2};
-    static QString getLocal(ST option = Default);
-    static QString defaultDir();
-    static QString setIcon(ST logo = Default);
+    enum Status {Default = 0, Logo = 1, Current = 2, Theme = 3};
+    static void initUtils(Status option = Default);
+    static QString setIcon(Status logo = Default);
     static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
     static QString mediaTitle(const QString &mediafile);
     static QString defaultIcon(const QString &icon);
     static QString setHash(const QString &url);
     static QString stringHash(const QString &url);
-    static void arrowMouse();
-    static void blankMouse();
-    static void resizeMouse();
     static void changeIcon(Button *btn, const QString &thm, const QString &ttp = nullptr);
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void rm_nl(string &s);
     static int calcX(int z, int x, int y);
     static int setDifere(int unit);
     static QStringList subdirIcons();
+
+private:
+    static QString defIcon(Status logo, const QString &icon);
+    static QString getLocal(Status option = Default);
+    static QString defaultDir();
     static QString scanXDGData();
 };
 

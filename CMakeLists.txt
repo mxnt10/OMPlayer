@@ -11,7 +11,9 @@ set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleAp
 find_package(
         Qt5 COMPONENTS
         Core
+        DBus
         Gui
+        Quick
         Widgets
         REQUIRED
 )
@@ -53,15 +55,19 @@ add_executable(
         src/PlayListUtils/PlayListModel.cpp
         src/PlayListUtils/PlayListModel.h
 
-        common/ScreenSaver/ScreenSaver.cpp
-        common/ScreenSaver/ScreenSaver.h
+        common/ScreenSaver/powersaving.cpp
+        common/ScreenSaver/powersaving.h
+        common/ScreenSaver/screensaver.cpp
+        common/ScreenSaver/screensaver.h
 )
 
 target_link_libraries(
         OMPlayer
         SingleApplication::SingleApplication
         Qt5::Core
+        Qt5::DBus
         Qt5::Gui
+        Qt5::Quick
         Qt5::Widgets
         QtAV
         QtAVWidgets

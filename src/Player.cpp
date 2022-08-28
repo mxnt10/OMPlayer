@@ -4,7 +4,6 @@
 #include <QToolTip>
 
 #include <MediaInfoDLL.h>
-#include <ScreenSaver>
 #include <filesystem>
 
 #include "ClickableMenu.h"
@@ -575,12 +574,7 @@ void OMPlayer::onStart() {
     end->setText(QTime(0, 0, 0).addMSecs(
             int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
 
-    /** Desativando Bloqueio de tela */
-    if (!isblock) {
-        ScreenSaver::instance().active();
-        isblock = true;
-    }
-
+    screensaver->disable();
     onTimeSliderLeave(IsPlay);
     changeIcons(IsPlay);
     updateChannelMenu();
@@ -600,6 +594,7 @@ void OMPlayer::onStop() {
         current->setText("-- -- : -- --");
         end->setText("-- -- : -- --");
 
+        screensaver->enable();
         onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
         updateChannelMenu();
@@ -1146,7 +1141,7 @@ void OMPlayer::changeEvent(QEvent *event) {
 
 /** Ação ao fechar o programa */
 void OMPlayer::closeEvent(QCloseEvent *event) {
-    ScreenSaver::instance().enable();
+    screensaver->enable();
     playlist->save();
     qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
     event->accept();

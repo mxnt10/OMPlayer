@@ -10,6 +10,7 @@
 #include <QTimer>
 
 #include <MediaInfoDLL.h>
+#include <ScreenSaver>
 
 #include "About.h"
 #include "Button.h"
@@ -117,6 +118,7 @@ private:
     QStringList listnum{};
     QTimer *click{};
     QWidget *wctl{}, *prev{}, *pv{};
+    ScreenSaver *screensaver;
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};
@@ -126,8 +128,7 @@ private:
     bool playing{false}, pausing{false}, muted{false};
     bool restart{false}, randplay{false};
     bool enterpos{false}, showsett{false};
-    bool isblock{false}, ispreview{false};
-    bool invalid{false};
+    bool invalid{false}, ispreview{false};
     bool maximize{false};
     int Width{192}, Height{108};
     int previousitem{0}, actualitem{0}, nextitem{0};

@@ -8,10 +8,14 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### Added / Adicionado
  - Adicionado suporte ao redirecionamento da playlist.
  - Adicionado recursos para salvar as alterações no reprodutor.
+ - Adicionado suporte a tradução:
+    - Fontes Translator.{cpp/h} em src.
+    - Diretório i18n.
+ - Adicionado suporte a variável de ambiente XDG_DATA_DIRS.
 ###
 
 ### Upgraded / Atualizado
- -
+ - Usando sources de ScreenSaver do SMPlayer.
 ###
 
 ### Changed / Modificado
@@ -19,13 +23,15 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Método para cálculo do tamanho do arquivo de mídia simplificado.
  - Modificações e aprimoramentos no fonte Button.{cpp/h} em src.
  - Ajustes no código da playlist e no filtro de eventos.
- - Ajustes nas funções setTotalItems() e changeIcons().
  - Modificações nas funções load() e save() da Playlist para
    possibilitar a opção de salvar e carregar playlists qds.
  - Ajustes no evento de modificação da interface.
  - Refatoração de código no fonte JsonTools.{cpp/h} em src.
  - Simplificação de código para a semi-transparência do menu
    de contexto.
+ - Modificações para definição de diretórios do programa.
+ - Exibição de "Lista Vazia" na playlist quando sem itens.
+ - Otimização de performance em Utils.
 ###
 
 ### Removed / Removido
@@ -42,6 +48,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Layout do preview corrigido e renovado. O preview era exibido enquanto
    o mouse passava sem necessidade, agora tem um tempo de 500ms.
  - Interface permanece maximizada na próxima inicialização ao fechar.
+ - Ajustes nas funções setTotalItems() e changeIcons().
+ - Correções na exibição dos QWidgets em caso de failsafe.
 ###
 
 ##########################################################################

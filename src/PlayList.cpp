@@ -181,12 +181,10 @@ void PlayList::save(const QString &url) {
 
 /** Função para adicionar itens a playlist */
 void PlayList::addItems(const QStringList &parms) {
-    bool select = false;
-    QString isplay;
     QStringList files;
 
     /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-    for (int i = 0; i < 1000; i++) arrowMouse();
+    for (int i = 0; i < 500; i++) arrowMouse();
 
     if (parms.isEmpty()) files = \
         QFileDialog::getOpenFileNames(
@@ -207,12 +205,14 @@ void PlayList::addItems(const QStringList &parms) {
             "WAV Audio (*.wav);;WavPack Audio (*.wp *.wvp);;Media Playlist (*.m3u *.m3u8);;All Files (*);;"
         );
     else files = parms;
+    if (files.isEmpty()) return;
 
+    bool select = false;
     int a = 0;
     int t = model->rowCount(QModelIndex());
     int total = files.size();
+    QString isplay;
 
-    if (files.isEmpty()) return;
     for (int i = 0; i < files.size(); ++i) {
 
         const QString &file = files.at(i);

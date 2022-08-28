@@ -128,7 +128,7 @@ Settings::~Settings() = default;
 
 /** Emissão para fechar a janela */
 void Settings::onClose() {
-    qDebug("%s(%sDEBUG%s):%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
+    qDebug("%s(%sSettings%s):%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
     emit emitclose();
     this->close();
 }
@@ -136,6 +136,7 @@ void Settings::onClose() {
 
 /** Resetando os botões */
 void Settings::rendererSelect(Button *btn, const QString &name) {
+    qDebug("%s(%sSettings%s):%s Selecionando renderizador %s ...\033[0m", GRE, RED, GRE, ORA, qUtf8Printable(name));
     for (int i = 0; i < 8; ++i)
         if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
 
@@ -203,6 +204,7 @@ void Settings::setWidget() {
 
 /** Modificando as configurações de temas */
 void Settings::setIcon(const QString &index) {
+    qDebug("%s(%sSettings%s):%s Tema de ícones %s ...\033[0m", GRE, RED, GRE, ORA, qUtf8Printable(index));
     JsonTools::stringJson("theme", index);
     Utils::initUtils(Utils::Theme);
 

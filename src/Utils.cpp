@@ -14,8 +14,8 @@
 
 /** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
 void Utils::initUtils(Status option) {
-    qDebug("%s(%sUtils%s)%s::%sDefinição de locais padrão ...\033[0m", GRE, RED, GRE, RED, ORA);
     if (option == Default) {
+        qDebug("%s(%sUtils%s)%s::%sDefinição de locais padrão ...\033[0m", GRE, RED, GRE, RED, ORA);
         def.defaultDir = defaultDir();
         def.localDir = getLocal();
         def.currentDir = getLocal(Current);

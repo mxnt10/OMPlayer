@@ -17,7 +17,7 @@
 
 /** Construtor que define a interface do programa */
 OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, CYA);
+    qDebug("%s(%sInterface%s)%s::%sIniciando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, RED, CYA);
     this->setWindowTitle(QString(PRG_NAME));
     this->setWindowIcon(QIcon(Utils::setIcon()));
     this->setMinimumSize(min);
@@ -146,7 +146,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
-    qDebug("%s(%sDEBUG%s):%s Preparando o layout da interface ...\033[0m", GRE, RED, GRE, CYA);
+    qDebug("%s(%sInterface%s)%s::%sPreparando o layout da interface ...\033[0m", GRE, RED, GRE, RED, CYA);
     auto *enterfilter = new EventFilter(this, EventFilter::Other);
     auto *nohideleft = new QWidget();
     auto *nohideright = new QWidget();

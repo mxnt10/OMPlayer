@@ -14,6 +14,7 @@
 
 /** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
 void Utils::initUtils(Status option) {
+    qDebug("%s(%sUtils%s)%s::%sDefinição de locais padrão ...\033[0m", GRE, RED, GRE, RED, ORA);
     if (option == Default) {
         def.defaultDir = defaultDir();
         def.localDir = getLocal();
@@ -51,12 +52,12 @@ QString Utils::setIcon(Status logo) {
 
     if (logo == Logo) {
         if (!def.definedLogo.isEmpty() && QFileInfo::exists(def.definedLogo)) return def.definedLogo;
-        qDebug("%s(%sUtils%s)%s::%s Setando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
+        qDebug("%s(%sUtils%s)%s::%sSetando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
         locals.append({def.defaultDir + "/logo", def.localDir + "/appdata", def.currentDir + "/appdata"});
         icon = "/logo.png";
     } else {
         if (!def.definedIcon.isEmpty() && QFileInfo::exists(def.definedIcon)) return def.definedIcon;
-        qDebug("%s(%sUtils%s)%s::%s Setando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
+        qDebug("%s(%sUtils%s)%s::%sSetando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
         locals.append({def.definedXDG + "/usr/share/pixmaps", def.localDir + "/appdata", def.currentDir + "/appdata"});
         icon = "/OMPlayer.png";
     }
@@ -91,7 +92,7 @@ QString Utils::setIconTheme(const QString &theme, const QString &icon) {
 
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const QString &style) {
-    qDebug("%s(%sDEBUG%s):%s Selecionando estilo %s ...\033[0m", GRE, RED, GRE, EST, qUtf8Printable(style));
+    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, qUtf8Printable(style));
     QStringList locals{def.defaultDir, def.localDir, def.currentDir};
     QString qss;
 
@@ -130,8 +131,12 @@ QString Utils::mediaTitle(const QString &mediafile){
 
 /** Função criada para retornar os ícones equivalentes disponíveis no sistema */
 QString Utils::defaultIcon(const QString &icon) {
-    qDebug("%s(%sDEBUG%s):%s Usando ícone do sistema para %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(icon));
+    if (icon.isEmpty() ) {
+        qDebug("%s(%sUtils%s)%s::%sPulando ícones não definidos ...\033[0m", GRE, RED, GRE, RED, BLU);
+        return {};
+    }
 
+    qDebug("%s(%sUtils%s)%s::%sUsando ícone do sistema: %s ...\033[0m", GRE, RED, GRE, RED, BLU, qUtf8Printable(icon));
     if (icon == "play")           return "media-playback-start";
     if (icon == "pause")          return "media-playback-pause";
     if (icon == "stop")           return "media-playback-stop";
@@ -225,6 +230,7 @@ QString Utils::stringHash(const QString &url) {
 
 /** Função que retorna os subdiretórios presente em icons */
 QStringList Utils::subdirIcons() {
+    qDebug("%s(%sUtils%s)%s::%sBuscando temas ...\033[0m", GRE, RED, GRE, RED, HID);
     QStringList locals{def.defaultDir, def.localDir, def.currentDir};
     QDir dir;
     QStringList dirs;
@@ -249,6 +255,7 @@ QString Utils::scanXDGData() {
     for (int i = 0; i < splitt.size(); i ++) {
         QDir dir(splitt[i] + "/usr/share/OMPlayer");
         if (dir.exists()) {
+            qDebug("%s(%sUtils%s)%s::%sUsando XDG_DATA_DIRS ...\033[0m", GRE, RED, GRE, RED, HID);
             def.definedXDG = splitt[i];
             return splitt[i];
         }

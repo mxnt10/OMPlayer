@@ -37,7 +37,7 @@ PowerSaving::PowerSaving(QObject * parent)
 PowerSaving::~PowerSaving() = default;
 
 void PowerSaving::inhibit() {
-	qDebug("PowerSaving::inhibit");
+	//qDebug("PowerSaving::inhibit");
 	QDBusReply<uint> reply = interface->call("Inhibit", "smplayer", "Playing media");
 	if (reply.isValid()) {
 		qDebug("PowerSaving::inhibit: valid reply");
@@ -49,7 +49,7 @@ void PowerSaving::inhibit() {
 }
 
 void PowerSaving::uninhibit() {
-	qDebug("PowerSaving::uninhibit");
+	//qDebug("PowerSaving::uninhibit");
 	foreach(uint cookie, cookies) {
 		qDebug("PowerSaving::uninhibit: cookie: %d", cookie);
 		QDBusReply<void> reply = interface->call("UnInhibit", cookie);

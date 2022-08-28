@@ -32,6 +32,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Modificações para definição de diretórios do programa.
  - Exibição de "Lista Vazia" na playlist quando sem itens.
  - Otimização de performance em Utils.
+ - Refatoração de código no fonte Settings.{cpp/h} em src.
 ###
 
 ### Removed / Removido

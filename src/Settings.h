@@ -27,21 +27,10 @@ signals:
 private Q_SLOTS:
     void onClose();
     void rendererSelect(Button *btn, const QString &name);
-    void setOpenglWidget();
-    void setQGLWidget2();
-    void setDirect2D();
-    void setGDI();
-    void setXVideo();
-    void setX11renderer();
-    void setQGLWidget();
-    void setWidget();
     void setIcon(const QString &index);
 
 private:
-    Button *opengl{}, *qglwidget2{};
-    Button *x11renderer{}, *xvideo{};
-    Button *direct2d{}, *gdi{};
-    Button *qglwidget{}, *widget{};
+    Button *opengl{}, *qglwidget2{}, *x11renderer{}, *xvideo{}, *direct2d{}, *gdi{}, *qglwidget{}, *widget{};
     Button *closebtn{};
     QtAV::VideoRenderer *vo{};
     struct Render *vid_map{};

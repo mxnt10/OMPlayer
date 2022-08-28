@@ -1208,6 +1208,9 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         /** Dimensão de exibição */
         QAction aspectratio(tr("Aspect Ratio"), this);
 
+        /** Dimensão de exibição */
+        QAction rotation(tr("Rotation"), this);
+
         /** Menu de abrir */
         QAction open(tr("Open Files"), this);
         open.setShortcut(QKeySequence(CTRL | Qt::Key_O));

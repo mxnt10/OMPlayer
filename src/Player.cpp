@@ -25,7 +25,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setAutoFillBackground(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     this->setStyleSheet(Utils::setStyle("global"));
-    ScreenSaver::instance().disable();
     double vol = JsonTools::floatJson("volume");
 
 

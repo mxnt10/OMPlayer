@@ -1266,7 +1266,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         contextMenu->addAction(&replay);
         contextMenu->addSeparator();
 //        contextMenu->addMenu(&visualization);
-//        contextMenu->addMenu(&optionVideo);
+        contextMenu->addMenu(&optionVideo);
         contextMenu->addMenu(other);
         contextMenu->addSeparator();
         contextMenu->addAction(&settings);

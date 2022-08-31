@@ -128,7 +128,7 @@ SingleApplication::SingleApplication( int &argc, char *argv[], bool allowSeconda
       }
     }
 
-    if(!inst->primary){
+    if( inst->primary == false ){
         d->startPrimary();
         if( ! d->memory->unlock() ){
           qDebug() << "SingleApplication: Unable to unlock memory after primary start.";
@@ -226,7 +226,7 @@ QString SingleApplication::primaryUser() const
  * Returns the username the current instance is running as.
  * @return Returns the username the current instance is running as.
  */
-QString SingleApplication::currentUser()
+QString SingleApplication::currentUser() const
 {
     return SingleApplicationPrivate::getUsername();
 }
@@ -235,10 +235,9 @@ QString SingleApplication::currentUser()
  * Sends message to the Primary Instance.
  * @param message The message to send.
  * @param timeout the maximum timeout in milliseconds for blocking functions.
- * @param sendMode mode of operation
  * @return true if the message was sent successfuly, false otherwise.
  */
-bool SingleApplication::sendMessage( const QByteArray &message, int timeout, SendMode sendMode )
+bool SingleApplication::sendMessage( const QByteArray &message, int timeout )
 {
     Q_D( SingleApplication );
 
@@ -249,7 +248,7 @@ bool SingleApplication::sendMessage( const QByteArray &message, int timeout, Sen
     if( ! d->connectToPrimary( timeout,  SingleApplicationPrivate::Reconnect ) )
       return false;
 
-    return d->writeConfirmedMessage( timeout, message, sendMode );
+    return d->writeConfirmedMessage( timeout, message );
 }
 
 /**

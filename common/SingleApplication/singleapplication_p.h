@@ -68,7 +68,7 @@ public:
     };
     Q_DECLARE_PUBLIC(SingleApplication)
 
-    explicit SingleApplicationPrivate( SingleApplication *q_ptr );
+    SingleApplicationPrivate( SingleApplication *q_ptr );
     ~SingleApplicationPrivate() override;
 
     static QString getUsername();
@@ -77,18 +77,18 @@ public:
     void startPrimary();
     void startSecondary();
     bool connectToPrimary( int msecs, ConnectionType connectionType );
-    [[nodiscard]] quint16 blockChecksum() const;
-    [[nodiscard]] qint64 primaryPid() const;
-    [[nodiscard]] QString primaryUser() const;
+    quint16 blockChecksum() const;
+    qint64 primaryPid() const;
+    QString primaryUser() const;
     bool isFrameComplete(QLocalSocket *sock);
     void readMessageHeader(QLocalSocket *socket, ConnectionStage nextStage);
     void readInitMessageBody(QLocalSocket *socket);
-    static void writeAck(QLocalSocket *sock);
-    [[nodiscard]] bool writeConfirmedFrame(int msecs, const QByteArray &msg) const;
-    [[nodiscard]] bool writeConfirmedMessage(int msecs, const QByteArray &msg, SingleApplication::SendMode sendMode = SingleApplication::NonBlocking) const;
+    void writeAck(QLocalSocket *sock);
+    bool writeConfirmedFrame(int msecs, const QByteArray &msg);
+    bool writeConfirmedMessage(int msecs, const QByteArray &msg);
     static void randomSleep();
     void addAppData(const QString &data);
-    [[nodiscard]] QStringList appData() const;
+    QStringList appData() const;
 
     SingleApplication *q_ptr;
     QSharedMemory *memory;

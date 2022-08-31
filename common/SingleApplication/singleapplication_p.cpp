@@ -29,8 +29,10 @@
 // version without notice, or may even be removed.
 //
 
+#include <cstdlib>
 #include <cstddef>
 
+#include <QtCore/QDir>
 #include <QtCore/QThread>
 #include <QtCore/QByteArray>
 #include <QtCore/QDataStream>
@@ -156,7 +158,7 @@ void SingleApplicationPrivate::genBlockServerName()
             appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
         } else { // Running as AppImage: Use absolute path to AppImage file
             appData.addData( appImagePath );
-        }
+        };
 #else
         appData.addData( SingleApplication::app_t::applicationFilePath().toUtf8() );
 #endif
@@ -281,7 +283,7 @@ void SingleApplicationPrivate::writeAck( QLocalSocket *sock ) {
     sock->putChar('\n');
 }
 
-bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArray &msg, SingleApplication::SendMode sendMode) const
+bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArray &msg)
 {
     QElapsedTimer time;
     time.start();
@@ -299,16 +301,10 @@ bool SingleApplicationPrivate::writeConfirmedMessage (int msecs, const QByteArra
         return false;
 
     // Frame 2: The message
-    const bool result = writeConfirmedFrame( static_cast<int>(msecs - time.elapsed()), msg );
-
-    // Block if needed
-    if (socket && sendMode == SingleApplication::BlockUntilPrimaryExit)
-        socket->waitForDisconnected(-1);
-
-    return result;
+    return writeConfirmedFrame( static_cast<int>(msecs - time.elapsed()), msg );
 }
 
-bool SingleApplicationPrivate::writeConfirmedFrame( int msecs, const QByteArray &msg ) const
+bool SingleApplicationPrivate::writeConfirmedFrame( int msecs, const QByteArray &msg )
 {
     socket->write( msg );
     socket->flush();
@@ -397,7 +393,7 @@ void SingleApplicationPrivate::slotConnectionEstablished()
                 break;
             default:
                 break;
-            }
+            };
         }
     );
 }
@@ -423,7 +419,7 @@ void SingleApplicationPrivate::readMessageHeader( QLocalSocket *sock, SingleAppl
     headerStream >> msgLen;
     ConnectionInfo &info = connectionMap[sock];
     info.stage = nextStage;
-    info.msgLen = int(msgLen);
+    info.msgLen = msgLen;
 
     writeAck( sock );
 }
@@ -462,7 +458,7 @@ void SingleApplicationPrivate::readInitMessageBody( QLocalSocket *sock )
     readStream >> latin1Name;
 
     // connection type
-    ConnectionType connectionType;
+    ConnectionType connectionType = InvalidConnection;
     quint8 connTypeVal = InvalidConnection;
     readStream >> connTypeVal;
     connectionType = static_cast <ConnectionType>( connTypeVal );

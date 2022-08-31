@@ -1,10 +1,15 @@
 cmake_minimum_required(VERSION 3.21)
 project(OMPlayer)
 
+include(GNUInstallDirs)
+include(InstallRequiredSystemLibraries)
+
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 
@@ -21,14 +26,13 @@ find_package(
 include_directories(
         /usr/include/qt5/QtAV
         /usr/include/qt5/QtAVWidgets
-        /usr/include/MediaInfoDLL
+        common/MediaInfoLib/Source/MediaInfoDLL
         common/ScreenSaver
         src/PlayListUtils
 )
 
-add_subdirectory(
-        common/SingleApplication
-)
+add_subdirectory( common/SingleApplication )
+add_subdirectory( common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL )
 
 add_executable(
         OMPlayer

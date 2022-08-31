@@ -1,36 +1,27 @@
 /* Definição da barra horizontal */
 QSlider::groove {
-    background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #444444, stop: 1 #ffffff);
+    background-color: transparent;
     border: 1px solid #444444;
     border-radius: 2px;
-    height: 3px;
+    height: 2px;
+}
+
+/* Barra horizontal desativada */
+QSlider::groove:disabled {
+    border: 1px solid #444444;
 }
 
 /* Definição do seletor */
 QSlider::handle {
     background-color: transparent;
-    border: 2px solid transparent;
-    border-radius: 3px;
-    margin: -2 -1;
-    width: 10px;
-}
-
-/* Passando o mouse encima do seletor */
-QSlider::handle:hover {
-    background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
-    border: 2px solid #444444;
-}
-
-/* Caso esteja desativado */
-QSlider::handle:disabled {
-    background-color: transparent;
     border: 1px solid transparent;
+    width: 4px;
 }
 
 /* Definição do progresso */
 QSlider::sub-page {
-    background-color: qlineargradient(y1: 0, y2: 1, stop: 0 #5f94ff, stop: 1 #0064c8);
-    border: 1px solid #444444;
+    background-color: rgb(20, 100, 200);
+    border: 1px solid rgb(20, 100, 200);
     border-radius: 2px;
 }
 

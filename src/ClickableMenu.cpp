@@ -1,13 +1,17 @@
 #include <QMouseEvent>
 
 #include "ClickableMenu.h"
+#include "Utils.h"
 
 
 /**********************************************************************************************************************/
 
 
 /** Construtor que possibilita colocar o título do menu */
-ClickableMenu::ClickableMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {}
+ClickableMenu::ClickableMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {
+    setWindowOpacity(0.8);
+    setStyleSheet(Utils::setStyle("action"));
+}
 
 
 /** Destrutor */
@@ -27,3 +31,17 @@ void ClickableMenu::mouseReleaseEvent(QMouseEvent *event) {
 	}
 	QMenu::mouseReleaseEvent(event);
 }
+
+
+/**********************************************************************************************************************/
+
+
+/** Construtor que possibilita colocar o título do menu */
+CMenu::CMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {
+    setWindowOpacity(0.8);
+    setStyleSheet(Utils::setStyle("contextmenu"));
+}
+
+
+/** Destrutor */
+CMenu::~CMenu() = default;

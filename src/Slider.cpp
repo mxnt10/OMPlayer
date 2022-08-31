@@ -112,6 +112,7 @@ void Slider::mouseMoveEvent(QMouseEvent *event) {
 /** Ação ao posicionar o mouse sobre o botão */
 void Slider::enterEvent(QEvent *event) {
     qDebug("%s(%sDEBUG%s):%s Mouse posicionado no %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(stl));
+    if (stl == "slider") setStyleSheet(Utils::setStyle("slider-hover"));
     emit emitEnter();
     QSlider::enterEvent(event);
 }
@@ -119,6 +120,7 @@ void Slider::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Slider::leaveEvent(QEvent *event) {
+    if (stl == "slider") setStyleSheet(Utils::setStyle("slider"));
     emit emitLeave();
     QSlider::leaveEvent(event);
 }

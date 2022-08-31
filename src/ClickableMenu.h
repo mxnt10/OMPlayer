@@ -13,4 +13,11 @@ protected:
 	void mouseReleaseEvent(QMouseEvent *event) override;
 };
 
+class CMenu : public QMenu {
+Q_OBJECT
+public:
+    explicit CMenu(const QString& title, QWidget *parent = nullptr);
+    ~CMenu() override;
+};
+
 #endif // CLICKABLEMENU_H

@@ -34,15 +34,12 @@ QString Utils::getLocal(Status option) {
 }
 
 
+/** Diretório padrão e retorno de definição de locais padrão */
+QStringList Utils::setLocals() { return {def.defaultDir, def.localDir, def.currentDir}; }
+
+
 /** Diretório padrão do programa */
 QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
-
-
-/** Definindo variáveis para ícone e logo com retorno */
-QString Utils::defIcon(Status logo, const QString &icon) {
-    if (logo == Logo) def.definedLogo = icon; else def.definedIcon = icon;
-    return icon;
-}
 
 
 /** Retorna o ícone do programa */
@@ -64,7 +61,10 @@ QString Utils::setIcon(Status logo) {
 
     for (int i = 0; i < 3; i++) {
         iconfile = locals[i] + icon;
-        if (QFileInfo::exists(iconfile)) return defIcon(logo, iconfile);
+        if (QFileInfo::exists(iconfile)) {
+            if (logo == Logo) def.definedLogo = iconfile; else def.definedIcon = iconfile;
+            return iconfile;
+        }
     }
     return {};
 }
@@ -261,4 +261,48 @@ QString Utils::scanXDGData() {
         }
     }
     return {};
+}
+
+
+/** Retorno das dimensões de tela */
+double Utils::aspectNum(Aspect aspect) {
+    switch (aspect) {
+        case Utils::AspectVideo:  return 0;
+        case Utils::Aspect21:     return (double) 2 / 1;
+        case Utils::Aspect43:     return (double) 4 / 3;
+        case Utils::Aspect169:    return (double) 16 / 9;
+        case Utils::Aspect149:    return (double) 14 / 9;
+        case Utils::Aspect1610:   return (double) 16 / 10;
+        case Utils::Aspect54:     return (double) 5 / 4;
+        case Utils::Aspect235:    return 2.35;
+        case Utils::Aspect11:     return 1;
+        case Utils::Aspect32:     return (double) 3 / 2;
+        case Utils::Aspect1410:   return (double) 14 / 10;
+        case Utils::Aspect118:    return (double) 11 / 8;
+        case Utils::AspectAuto:   return (-1);
+        case Utils::AspectCustom: return (-2);
+        default: return 0;
+    }
+}
+
+
+/** Retorna o texto das dimensões de tela */
+QString Utils::aspectStr(Aspect aspect) {
+    switch (aspect) {
+        case Utils::AspectVideo:  return QApplication::tr("Video");
+        case Utils::Aspect21:     return "2:1";
+        case Utils::Aspect43:     return "4:3";
+        case Utils::Aspect169:    return "16:9";
+        case Utils::Aspect149:    return "14:9";
+        case Utils::Aspect1610:   return "16:10";
+        case Utils::Aspect54:     return "5:4";
+        case Utils::Aspect235:    return "2.35:1";
+        case Utils::Aspect11:     return "1:1";
+        case Utils::Aspect32:     return "3:2";
+        case Utils::Aspect1410:   return "14:10";
+        case Utils::Aspect118:    return "11:8";
+        case Utils::AspectAuto:   return QObject::tr("Window");
+        case Utils::AspectCustom: return QObject::tr("Custom");
+        default: return QApplication::tr("Unknown");
+    }
 }

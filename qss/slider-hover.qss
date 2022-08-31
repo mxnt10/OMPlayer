@@ -1,14 +1,14 @@
 /* Definição da barra horizontal */
 QSlider::groove {
-    background-color: transparent;
+    background-color: rgba(20, 100, 200, 50);
     border: 1px solid #444444;
     border-radius: 2px;
     height: 2px;
 }
 
-/* Mouse sobre a barra horizontal */
-QSlider::groove:hover {
-    background-color: rgba(20, 100, 200, 50);
+/* Barra horizontal desativada */
+QSlider::groove:disabled {
+    background-color: transparent;
 }
 
 /* Definição do seletor */
@@ -20,9 +20,21 @@ QSlider::handle {
     width: 10px;
 }
 
+/* Caso esteja desativado */
+QSlider::handle:disabled {
+    background-color: transparent;
+    border: 0;
+}
+
 /* Definição do progresso */
 QSlider::sub-page {
     background-color: rgb(20, 100, 200);
     border: 1px solid rgb(20, 100, 200);
     border-radius: 2px;
+}
+
+/* Caso esteja desativado */
+QSlider::sub-page:disabled {
+    background-color: transparent;
+    border: 0;
 }

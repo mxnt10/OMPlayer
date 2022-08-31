@@ -11,6 +11,10 @@
 #include "Player.h"
 #include "Utils.h"
 
+#define ClickableMenu(x) ClickableMenu(x + "\t\t")
+#define _tr(x) "  " + tr(x)
+#define _addAction(x) addAction("  " + x)
+
 
 /**********************************************************************************************************************/
 

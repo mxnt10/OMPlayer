@@ -52,6 +52,10 @@ struct { /** Criado com objetivo de otimização de performance */
 
 class Utils {
 public:
+    enum Aspect {
+        AspectAuto = 1, Aspect43 = 2, Aspect54 = 3, Aspect149 = 4, Aspect169 = 5, Aspect1610 = 6, Aspect235 = 7,
+        Aspect11 = 8, Aspect32 = 9, Aspect1410 = 10, Aspect118 = 11, AspectCustom = 12, Aspect21 = 13, AspectVideo = 0
+    };
     enum Status {Default = 0, Logo = 1, Current = 2, Theme = 3};
     static void initUtils(Status option = Default);
     static QString setIcon(Status logo = Default);
@@ -67,9 +71,11 @@ public:
     static int calcX(int z, int x, int y);
     static int setDifere(int unit);
     static QStringList subdirIcons();
+    static double aspectNum(Aspect aspect);
+    static QString aspectStr(Aspect aspect);
+    static QStringList setLocals();
 
 private:
-    static QString defIcon(Status logo, const QString &icon);
     static QString getLocal(Status option = Default);
     static QString defaultDir();
     static QString scanXDGData();

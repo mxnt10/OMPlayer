@@ -21,6 +21,7 @@ Translator::Translator(QObject *parent) : QObject(parent) {
         tr = locals[i] + "/i18n/OMPlayer_" + lang + ".qm";
         if (QFileInfo::exists(tr)) {
             local = tr;
+            break;
         }
     }
 }

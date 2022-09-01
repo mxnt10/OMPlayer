@@ -57,6 +57,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     /** Organização dos botões */
     auto *hbtn = new QHBoxLayout();
     hbtn->addWidget(addBtn);
+    hbtn->addSpacing(2);
     hbtn->addWidget(removeBtn);
     hbtn->addStretch(1);
     hbtn->addWidget(clearBtn);

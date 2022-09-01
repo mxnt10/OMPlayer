@@ -96,8 +96,12 @@ QString Utils::setStyle(const QString &style) {
     QStringList locals{def.defaultDir, def.localDir, def.currentDir};
     QString qss;
 
-    for (int i = 0; i < 3; i++)
-        if (QFileInfo::exists(locals[i] + "/qss/" + style + ".qss")) qss = locals[i] + "/qss/" + style + ".qss";
+    for (int i = 0; i < 3; i++) {
+        if (QFileInfo::exists(locals[i] + "/qss/" + style + ".qss")) {
+            qss = locals[i] + "/qss/" + style + ".qss";
+            break;
+        }
+    }
 
     if (qss.isEmpty()) {
         if (style == "widget") {

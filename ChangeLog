@@ -12,6 +12,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Fontes Translator.{cpp/h} em src.
     - Diretório i18n.
  - Adicionado suporte a variável de ambiente XDG_DATA_DIRS.
+ - Incluído no projeto dependências MediaInfoLib e ZenLib em common.
+ - Adicionado o estilo slider-hover em qss.
+ - Adicionado recursos no menu de contexto:
+    - AspectRatio.
 ###
 
 ### Upgraded / Atualizado
@@ -27,12 +31,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    possibilitar a opção de salvar e carregar playlists qds.
  - Ajustes no evento de modificação da interface.
  - Refatoração de código no fonte JsonTools.{cpp/h} em src.
- - Simplificação de código para a semi-transparência do menu
-   de contexto.
+ - Simplificação de código para semi-transparência e ajustes do
+   menu de contexto.
  - Modificações para definição de diretórios do programa.
  - Exibição de "Lista Vazia" na playlist quando sem itens.
  - Otimização de performance em Utils.
  - Refatoração de código no fonte Settings.{cpp/h} em src.
+ - Modificado o estilo do slider do progresso de reprodução e volume.
 ###
 
 ### Removed / Removido

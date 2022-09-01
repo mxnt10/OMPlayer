@@ -111,7 +111,7 @@ private:
     PlayList *playlist{};
     QAction *channelAction{};
     QLabel *ltime{};
-    QMenu *channel{};
+    QMenu *channel{}, *aspectratio{};
     QGridLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};

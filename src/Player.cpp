@@ -274,20 +274,46 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Menu dos canais de áudio para o menu de contexto */
-    auto *effect = new QGraphicsOpacityEffect();
-    effect->setOpacity(0.8);
+    auto *subMenu = new ClickableMenu(_tr("Channel"));
     channel = new QMenu(this);
-    auto *subMenu = new ClickableMenu(tr("Channel"));
-    subMenu->setGraphicsEffect(effect);
-    subMenu->setStyleSheet(Utils::setStyle("action"));
     channel = subMenu;
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeChannel(QAction*)));
-    subMenu->addAction(tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
-    subMenu->addAction(tr("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
-    subMenu->addAction(tr("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
-    subMenu->addAction(tr("Left"))->setData(AudioFormat::ChannelLayout_Left);
-    subMenu->addAction(tr("Right"))->setData(AudioFormat::ChannelLayout_Right);
+    subMenu->addAction(_tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
+    subMenu->addAction(_tr("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
+    subMenu->addAction(_tr("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
+    subMenu->addAction(_tr("Left"))->setData(AudioFormat::ChannelLayout_Left);
+    subMenu->addAction(_tr("Right"))->setData(AudioFormat::ChannelLayout_Right);
     auto *ag = new QActionGroup(subMenu);
+    ag->setExclusive(true);
+
+
+    /** Verificando o que foi clicado */
+    foreach(QAction* action, subMenu->actions()) {
+        ag->addAction(action);
+        action->setCheckable(true);
+    }
+
+
+    /** Menu dos dimensões de tela para o menu de contexto */
+    subMenu = new ClickableMenu(_tr("AspectRatio"));
+    aspectratio = new QMenu(this);
+    aspectratio = subMenu;
+    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT());
+    subMenu->_addAction(Utils::aspectStr(Utils::AspectVideo ))->setData(Utils::AspectVideo);
+    subMenu->_addAction(Utils::aspectStr(Utils::AspectAuto  ))->setData(Utils::AspectAuto);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect11    ))->setData(Utils::Aspect11);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect21    ))->setData(Utils::Aspect21);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect32    ))->setData(Utils::Aspect32);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect43    ))->setData(Utils::Aspect43);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect54    ))->setData(Utils::Aspect54);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect118   ))->setData(Utils::Aspect118);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect149   ))->setData(Utils::Aspect149);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1410  ))->setData(Utils::Aspect1410);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect169   ))->setData(Utils::Aspect169);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1610  ))->setData(Utils::Aspect1610);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect235   ))->setData(Utils::Aspect235);
+    subMenu->_addAction(Utils::aspectStr(Utils::AspectCustom))->setData(Utils::AspectCustom);
+    ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
 
@@ -563,8 +589,8 @@ void OMPlayer::onStart() {
         QString url = mediaPlayer->file();
         qint64 duration = mediaPlayer->mediaStopPosition();
 
-        MI.Open(url.toStdString());
-        QString format = MI.Get(Stream_General, 0, "Format", Info_Text, Info_Name).c_str();
+        MI.Open(url.toStdWString());
+        QString format = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Format"), Info_Text, Info_Name));
         MI.Close();
 
         qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
@@ -1162,103 +1188,88 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         arrowMouse();
     }
 
-    auto *contextMenu = new QMenu(this);
-    contextMenu->setWindowOpacity(0.8);
-    contextMenu->setStyleSheet(Utils::setStyle("contextmenu"));
+    auto *contextMenu = new CMenu(nullptr, this);
 
     if (listmenu && enterpos) {
         control = true;
         contextMenu->setWindowOpacity(0.9);
 
         /** Menu de informação de mídia */
-        QAction mediainfo(tr("Current Media Info"), this);
+        QAction mediainfo(_tr("Current Media Info"), this);
         Utils::changeMenuIcon(mediainfo, "about");
         connect(&mediainfo, SIGNAL(triggered()), SLOT(showInfo()));
 
-        QAction saveplaylist(tr("Save Playlist"), this);
+        QAction saveplaylist(_tr("Save Playlist"), this);
 
-//        contextMenu->addAction(&saveplaylist);
+        contextMenu->addAction(&saveplaylist);
         contextMenu->addAction(&mediainfo);
         contextMenu->exec(mapToGlobal(pos));
         return;
     }
 
     if (!enterpos) {
-        /** Outras opções */
-        auto *other = new QMenu(tr("Other Options"), this);
-        other->setWindowOpacity(0.8);
-        other->setStyleSheet(Utils::setStyle("contextmenu"));
-
-        /** Visualização */
-        QMenu visualization(tr("Visualizations"), this);
-//        visualization.setGraphicsEffect(effect3);
-        visualization.setStyleSheet(Utils::setStyle("contextmenu"));
-
-        /** Opções de vídeo */
-        QMenu optionVideo(tr("Video Options"), this);
-//        optionVideo.setGraphicsEffect(effect4);
-        optionVideo.setStyleSheet(Utils::setStyle("contextmenu"));
+        /** Opções de menu*/
+        auto *other = new CMenu(_tr("Other Options"), this);
+        auto *visualization = new CMenu(_tr("Visualizations"), this);
+        auto *optionVideo = new CMenu(_tr("Video Options"), this);
 
         /** Modo repetição */
-        QAction repeat(tr("Repeat Mode"), this);
+        QAction repeat(_tr("Repeat Mode"), this);
         repeat.setShortcut(QKeySequence(CTRL | ALT | Qt::Key_T));
         if (mediaPlayer->repeat() == 0) Utils::changeMenuIcon(repeat, "repeat");
         else Utils::changeMenuIcon(repeat, "repeat-on");
         connect(&repeat, SIGNAL(triggered()), SLOT(setRepeat()));
 
         /** Velocidade de execução */
-        QAction speed(tr("Speed"), this);
+        QAction speed(_tr("Speed"), this);
 
         /** Dimensão de exibição */
-        QAction aspectratio(tr("Aspect Ratio"), this);
-
-        /** Dimensão de exibição */
-        QAction rotation(tr("Rotation"), this);
+        QAction rotation(_tr("Rotation"), this);
 
         /** Menu de abrir */
-        QAction open(tr("Open Files"), this);
+        QAction open(_tr("Open Files"), this);
         open.setShortcut(QKeySequence(CTRL | Qt::Key_O));
         Utils::changeMenuIcon(open, "folder");
         connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
 
         /** Menu tela cheia */
-        QAction fullscreen(tr("Show Fullscreen"), this);
+        QAction fullscreen(_tr("Show Fullscreen"), this);
         if (this->isFullScreen())
-            fullscreen.setText(tr("Exit Fullscreen"));
+            fullscreen.setText(_tr("Exit Fullscreen"));
         fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
         Utils::changeMenuIcon(fullscreen, "fullscreen");
         connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
         /** Menu aleatório */
-        QAction shuffle(tr("Shuffle"), this);
+        QAction shuffle(_tr("Shuffle"), this);
         shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
         Utils::changeMenuIcon(shuffle, "shuffle-menu");
         connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
 
         /** Menu replay */
-        QAction replay(tr("Replay"), this);
+        QAction replay(_tr("Replay"), this);
         replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
         Utils::changeMenuIcon(replay, "replay-menu");
         connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
 
         /** Menu de configuração */
-        QAction settings(tr("Settings"), this);
+        QAction settings(_tr("Settings"), this);
         settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
         Utils::changeMenuIcon(settings, "settings");
         connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
 
         /** Menu sobre */
-        QAction mabout(tr("About"), this);
+        QAction mabout(_tr("About"), this);
         Utils::changeMenuIcon(mabout, "about");
         connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
 
         /** Montagem do menu de opções de vídeo */
-        optionVideo.addAction(&aspectratio);
-//        optionVideo.addAction(&rotation);
+        optionVideo->addMenu(aspectratio);
+        optionVideo->addAction(&rotation);
 
         /** Montagem do menu para outras opções */
         other->addMenu(channel);
-//        other->addAction(&speed);
+        other->addAction(&speed);
         other->addAction(&repeat);
 
         /** Montagem do menu principal */
@@ -1269,8 +1280,8 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         contextMenu->addAction(&shuffle);
         contextMenu->addAction(&replay);
         contextMenu->addSeparator();
-//        contextMenu->addMenu(&visualization);
-        contextMenu->addMenu(&optionVideo);
+        contextMenu->addMenu(visualization);
+        contextMenu->addMenu(optionVideo);
         contextMenu->addMenu(other);
         contextMenu->addSeparator();
         contextMenu->addAction(&settings);

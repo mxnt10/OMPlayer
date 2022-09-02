@@ -54,6 +54,7 @@ private Q_SLOTS:
     void firstPlay(const QString &name, int pos);
     void doubleplay(const QString &name);
     void setRenderer(const QString &op);
+    void switchAspectRatio(QAction *action);
     void playPause();
     void setStop();
     void Next();
@@ -109,7 +110,7 @@ private:
     Label *logo{}, *current{}, *end{};
     MediaInfo MI{};
     PlayList *playlist{};
-    QAction *channelAction{};
+    QAction *channelAction{}, *aspectAction{};
     QLabel *ltime{};
     QMenu *channel{}, *aspectratio{};
     QGridLayout *layout{};

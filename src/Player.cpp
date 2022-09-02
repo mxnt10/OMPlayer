@@ -298,21 +298,21 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     subMenu = new ClickableMenu(_tr("AspectRatio"));
     aspectratio = new QMenu(this);
     aspectratio = subMenu;
-    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT());
-    subMenu->_addAction(Utils::aspectStr(Utils::AspectVideo ))->setData(Utils::AspectVideo);
-    subMenu->_addAction(Utils::aspectStr(Utils::AspectAuto  ))->setData(Utils::AspectAuto);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect11    ))->setData(Utils::Aspect11);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect21    ))->setData(Utils::Aspect21);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect32    ))->setData(Utils::Aspect32);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect43    ))->setData(Utils::Aspect43);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect54    ))->setData(Utils::Aspect54);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect118   ))->setData(Utils::Aspect118);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect149   ))->setData(Utils::Aspect149);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1410  ))->setData(Utils::Aspect1410);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect169   ))->setData(Utils::Aspect169);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1610  ))->setData(Utils::Aspect1610);
-    subMenu->_addAction(Utils::aspectStr(Utils::Aspect235   ))->setData(Utils::Aspect235);
-    subMenu->_addAction(Utils::aspectStr(Utils::AspectCustom))->setData(Utils::AspectCustom);
+    aspectAction = subMenu->_addAction(Utils::aspectStr(Utils::AspectVideo));
+    aspectAction->setData(Utils::aspectNum(Utils::AspectVideo));
+    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(switchAspectRatio(QAction*)));
+    subMenu->_addAction(Utils::aspectStr(Utils::AspectAuto ))->setData(Utils::AspectAuto);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect11   ))->setData(Utils::Aspect11);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect21   ))->setData(Utils::Aspect21);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect32   ))->setData(Utils::Aspect32);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect43   ))->setData(Utils::Aspect43);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect54   ))->setData(Utils::Aspect54);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect118  ))->setData(Utils::Aspect118);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect149  ))->setData(Utils::Aspect149);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1410 ))->setData(Utils::Aspect1410);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect169  ))->setData(Utils::Aspect169);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect1610 ))->setData(Utils::Aspect1610);
+    subMenu->_addAction(Utils::aspectStr(Utils::Aspect235  ))->setData(Utils::Aspect235);
     ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
@@ -322,6 +322,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
         ag->addAction(action);
         action->setCheckable(true);
     }
+    aspectAction->setChecked(true);
 }
 
 
@@ -389,6 +390,24 @@ void OMPlayer::setRenderer(const QString &op) {
 
     if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
                    qUtf8Printable(op), vo->id());
+}
+
+
+void OMPlayer::switchAspectRatio(QAction *action) {
+    Utils::Aspect r = Utils::Aspect(action->data().toInt());
+    if (action == aspectAction) {
+        action->toggle();
+        return;
+    }
+    if (r == Utils::AspectVideo) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::VideoAspectRatio);
+    else if (r == Utils::AspectAuto) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::RendererAspectRatio);
+    else {
+        mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::CustomAspectRation);
+        mediaPlayer->renderer()->setOutAspectRatio(Utils::aspectNum(r));
+    }
+    aspectAction->setChecked(false);
+    aspectAction = action;
+    aspectAction->setChecked(true);
 }
 
 

@@ -284,7 +284,6 @@ double Utils::aspectNum(Aspect aspect) {
         case Utils::Aspect1410:   return (double) 14 / 10;
         case Utils::Aspect118:    return (double) 11 / 8;
         case Utils::AspectAuto:   return (-1);
-        case Utils::AspectCustom: return (-2);
         default: return 0;
     }
 }
@@ -306,7 +305,6 @@ QString Utils::aspectStr(Aspect aspect) {
         case Utils::Aspect1410:   return "14:10";
         case Utils::Aspect118:    return "11:8";
         case Utils::AspectAuto:   return QObject::tr("Window");
-        case Utils::AspectCustom: return QObject::tr("Custom");
         default: return QApplication::tr("Unknown");
     }
 }

@@ -21,9 +21,6 @@
 #include "StatisticsView.h"
 #include "Slider.h"
 
-using namespace QtAV;
-using namespace MediaInfoDLL;
-
 class OMPlayer : public QWidget {
 Q_OBJECT
 public:
@@ -101,14 +98,14 @@ private Q_SLOTS:
 
 private:
     About *about{};
-    AVPlayer *mediaPlayer{};
+    QtAV::AVPlayer *mediaPlayer{};
     Button *playBtn{}, *stopBtn{};
     Button *nextBtn{}, *previousBtn{};
     Button *replayBtn{}, *shuffleBtn{};
     Button *volumeBtn{};
     EventFilter *filter{};
     Label *logo{}, *current{}, *end{};
-    MediaInfo MI{};
+    MediaInfoDLL::MediaInfo MI{};
     PlayList *playlist{};
     QAction *channelAction{}, *aspectAction{};
     QLabel *ltime{};
@@ -123,8 +120,8 @@ private:
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};
-    VideoOutput *video{};
-    VideoPreviewWidget *preview{};
+    QtAV::VideoOutput *video{};
+    QtAV::VideoPreviewWidget *preview{};
     bool control{false}, listmenu{false};
     bool playing{false}, pausing{false}, muted{false};
     bool restart{false}, randplay{false};

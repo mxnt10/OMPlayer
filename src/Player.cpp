@@ -3,9 +3,6 @@
 #include <QRandomGenerator>
 #include <QToolTip>
 
-#include <MediaInfoDLL.h>
-#include <filesystem>
-
 #include "ClickableMenu.h"
 #include "JsonTools.h"
 #include "Player.h"
@@ -609,7 +606,8 @@ void OMPlayer::onStart() {
         qint64 duration = mediaPlayer->mediaStopPosition();
 
         MI.Open(url.toStdWString());
-        QString format = QString::fromStdWString(MI.Get(Stream_General, 0, __T("Format"), Info_Text, Info_Name));
+        QString format = QString::fromStdWString( MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
+                                                         MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
         MI.Close();
 
         qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
@@ -1133,7 +1131,7 @@ void OMPlayer::handleError(const AVError &error) {
     Utils::rm_nl(tr);
     qDebug("%s(%sAVError%s)%s::%s %s", GRE, RED, GRE, RED, ERR, tr.c_str());
 
-    if (!std::filesystem::exists(mediaPlayer->file().toStdString()) || invalid) {
+    if (!QFileInfo::exists(mediaPlayer->file()) || invalid) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
             playing = false;
             onStop();

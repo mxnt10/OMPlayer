@@ -233,9 +233,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Layout principal criado usando sobreposição de widgets */
-    layout = new QGridLayout();
+    layout = new QHBoxLayout();
     layout->setMargin(0);
-    layout->addWidget(video->widget(), 0, 0);
+    layout->addWidget(video->widget());
     this->setLayout(layout);
 
 
@@ -349,7 +349,7 @@ void OMPlayer::onLoad() {
 
 /** Setando opções de Rendenização */
 void OMPlayer::setRenderer(const QString &op) {
-    VideoRenderer *vo{};
+    if (layout) layout->removeWidget(video->widget());
 
     struct {
         const char* name;
@@ -364,32 +364,31 @@ void OMPlayer::setRenderer(const QString &op) {
                 {"Widget",     VideoRendererId_Widget       }, {nullptr, 0}};
 
     for (int i = 0; rend[i].name; ++i) {
-        if (QString::compare(op, rend[i].name, Qt::CaseSensitive) == 0)
-            vo = VideoRenderer::create(rend[i].id);
+        if (QString::compare(op, rend[i].name, Qt::CaseSensitive) == 0) {
+            video = VideoRenderer::create(rend[i].id);
+            video->widget()->setMouseTracking(true);
+            break;
+        }
     }
 
     /** Verificando se o layout já foi criado. É necessário readicionar o widget ao mudar a renderização. */
-    if (layout) layout->removeWidget(video->widget());
-
-    if (vo && vo->isAvailable())
-        video = new VideoOutput(vo->id(), this);
-    else video = new VideoOutput(this);
-    video->widget()->setMouseTracking(true);
+    if (!video && !video->isAvailable()) video = new VideoOutput(this);
     mediaPlayer->setRenderer(video);
 
     /** Readicionando o widget ao layout */
-    if (layout) layout->addWidget(video->widget(), 0, 0);
+    if (layout) layout->addWidget(video->widget());
 
     const VideoRendererId vid = mediaPlayer->renderer()->id();
     if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
     else mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
-    if (vo) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
-                   qUtf8Printable(op), vo->id());
+    if (video) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
+                      qUtf8Printable(op), video->id());
 }
 
 
+/** Alterando a dimensão de tela */
 void OMPlayer::switchAspectRatio(QAction *action) {
     Utils::Aspect r = Utils::Aspect(action->data().toInt());
     if (action == aspectAction) {

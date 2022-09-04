@@ -110,7 +110,7 @@ private:
     QAction *channelAction{}, *aspectAction{};
     QLabel *ltime{};
     QMenu *channel{}, *aspectratio{};
-    QGridLayout *layout{};
+    QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QStringList listnum{};
@@ -120,7 +120,7 @@ private:
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};
-    QtAV::VideoOutput *video{};
+    QtAV::VideoRenderer *video{};
     QtAV::VideoPreviewWidget *preview{};
     bool control{false}, listmenu{false};
     bool playing{false}, pausing{false}, muted{false};

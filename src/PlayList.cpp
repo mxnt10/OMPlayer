@@ -75,8 +75,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     auto size = new QFrame();
     size->setFixedWidth(10);
     size->installEventFilter(filter2);
-    connect(filter2, &EventFilter::emitEnter, [](){resizeMouse();});
-    connect(filter2, &EventFilter::emitLeave, [](){arrowMouse(); });
+    connect(filter2, &EventFilter::emitEnter, [](){ resizeMouse(); });
+    connect(filter2, &EventFilter::emitLeave, [](){ arrowMouse();  });
 
 
     /** Layout da playlist */

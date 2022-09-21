@@ -132,6 +132,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
     connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
 
+
+    /** Verificando se as opções de replay e aleatório estão ativas */
     if (JsonTools::boolJson("on_replay")) setReplay();
     if (JsonTools::boolJson("on_shuffle")) setShuffle();
 
@@ -644,7 +646,6 @@ void OMPlayer::onStop() {
         onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
         updateChannelMenu();
-        onTimeSliderLeave();
     }
 }
 

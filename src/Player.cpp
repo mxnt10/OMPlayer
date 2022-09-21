@@ -1,7 +1,9 @@
 #include <QGraphicsOpacityEffect>
 #include <QMenu>
+#include <QPropertyAnimation>
 #include <QRandomGenerator>
 #include <QToolTip>
+#include <QWidgetAction>
 
 #include "ClickableMenu.h"
 #include "JsonTools.h"
@@ -213,7 +215,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Widget separado do pai para os controles e a playlist */
     wctl = new QWidget(this);
-    wctl->setMouseTracking(true);
     wctl->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
     wctl->setAttribute(Qt::WA_NoSystemBackground, true);
     wctl->setAttribute(Qt::WA_TranslucentBackground, true);
@@ -322,6 +323,20 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
         action->setCheckable(true);
     }
     aspectAction->setChecked(true);
+
+
+    /** Menu de velocidade para o menu de contexto */
+    subMenu = new ClickableMenu(_tr("Speed"));
+    speed = new QMenu(this);
+    speed = subMenu;
+    speedBox = new QDoubleSpinBox(nullptr);
+    speedBox->setRange(0.20, 10);
+    speedBox->setValue(1.0);
+    speedBox->setSingleStep(0.20);
+    connect(speedBox, SIGNAL(valueChanged(double)), SLOT(onSpinBoxChanged(double)));
+    auto *actspeed = new QWidgetAction(nullptr);
+    actspeed->setDefaultWidget(speedBox);
+    subMenu->addAction(actspeed);
 }
 
 
@@ -409,6 +424,12 @@ void OMPlayer::switchAspectRatio(QAction *action) {
 }
 
 
+/** Controle da velocidade do reprodutor */
+void OMPlayer::onSpinBoxChanged(double val) {
+    if (playing && !mediaPlayer->isPaused() && mediaPlayer->isPlaying()) mediaPlayer->setSpeed(val);
+}
+
+
 /** Função que possui o propósito de ajustar a ordem de execução ao remover itens da playlist anteriores ao
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
@@ -462,6 +483,8 @@ void OMPlayer::setSelect(int item) {
 /** Função geral para execução de arquivos multimídia */
 void OMPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
+    speedBox->setValue(1);
+    mediaPlayer->setSpeed(1);
     mediaPlayer->play(isplay);
     if (index > (-1)) {
         playlist->selectCurrent(index);
@@ -843,7 +866,7 @@ void OMPlayer::leaveList() {
 /** Pré-visualização ao posicionar o mouse no slider */
 void OMPlayer::onTimeSliderHover(int pos, int value) {
     int fixV = 72;
-    QPoint gpos = slider->pos();
+    QPoint gpos = QPoint(slider->pos().x(), this->height() - 105);
 
     /** Definição da posição na tela e exibição do tooltip */
     QPoint gpos1 = mapToGlobal(gpos + QPoint(pos, -30));
@@ -893,10 +916,7 @@ void OMPlayer::onTimeSliderLeave(OMPlayer::ST status) {
         preview->close();
         prev->close();
     }
-    if (status == Default) {
-        ispreview = false;
-        hideTrue();
-    }
+    if (status == Default) ispreview = false;
 }
 
 
@@ -1205,6 +1225,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         arrowMouse();
     }
 
+    contmenu = true;
     auto *contextMenu = new CMenu(nullptr, this);
 
     if (listmenu && enterpos) {
@@ -1236,9 +1257,6 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         if (mediaPlayer->repeat() == 0) Utils::changeMenuIcon(repeat, "repeat");
         else Utils::changeMenuIcon(repeat, "repeat-on");
         connect(&repeat, SIGNAL(triggered()), SLOT(setRepeat()));
-
-        /** Velocidade de execução */
-        QAction speed(_tr("Speed"), this);
 
         /** Dimensão de exibição */
         QAction rotation(_tr("Rotation"), this);
@@ -1286,7 +1304,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
         /** Montagem do menu para outras opções */
         other->addMenu(channel);
-        other->addAction(&speed);
+        other->addMenu(speed);
         other->addAction(&repeat);
 
         /** Montagem do menu principal */

@@ -50,11 +50,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object)
 
     if (option == General) {
-        /** O widget filho abre mais rápido que o pai, por isso esse delay */
-        if (!first) {
-            QTimer::singleShot(1200, [this](){start = true;});
-            first = true;
-        }
+        /** O widget filho abre mais rápido que o pai, por isso o delay */
+        if (!first) QTimer::singleShot(1200, [this](){ start = true; first = true; });
 
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {
@@ -113,7 +110,6 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::ToolTip) {
             if (!fixed) {
                 qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
-                blankMouse();
                 emit emitLeave();
             }
             moving = false;

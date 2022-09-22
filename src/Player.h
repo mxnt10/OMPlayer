@@ -111,6 +111,8 @@ private:
     MediaInfoDLL::MediaInfo MI{};
     PlayList *playlist{};
     QAction *channelAction{}, *aspectAction{};
+    QDoubleSpinBox *speedBox{};
+    QGraphicsOpacityEffect *effect{}, *effect2{};
     QLabel *ltime{};
     QMenu *channel{}, *aspectratio{}, *speed{};
     QHBoxLayout *layout{};

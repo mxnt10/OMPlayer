@@ -206,7 +206,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Ajuste dos controles */
-    auto *fgctl = new QVBoxLayout();
+    auto *fctl = new QWidget();
+    auto *fgctl = new QVBoxLayout(fctl);
     fgctl->setContentsMargins(10, 12, 10, 22);
     fgctl->addLayout(fgslider);
     fgctl->addLayout(buttons);
@@ -225,8 +226,17 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     controls->setSpacing(0);
     controls->addWidget(playlist, 0, 0);
     controls->addLayout(bgctl, 1, 0);
-    controls->addLayout(fgctl, 1, 0);
+    controls->addWidget(fctl, 1, 0);
     controls->setAlignment(BOTTON);
+
+
+    /** Efeito de transparência funcional para a playlist. O setWindowOpacity() não rolou. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(1.0);
+    effect2 = new QGraphicsOpacityEffect(this);
+    effect2->setOpacity(1.0);
+    bgcontrol->setGraphicsEffect(effect);
+    fctl->setGraphicsEffect(effect2);
 
 
     /** Definição da logo */

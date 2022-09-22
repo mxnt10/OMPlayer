@@ -448,6 +448,32 @@ void PlayList::changeIcons() {
 }
 
 
+/** Minimização antes dos diálogos */
+void PlayList::hideFade() {
+    fadePls(Hide);
+}
+
+
+/** Efeito fade bacana para a playlist */
+void PlayList::fadePls(PLS option) {
+    auto *animation = new QPropertyAnimation(effect, "opacity");
+    animation->setDuration(120);
+
+    if (option == Show) {
+        animation->setStartValue(0);
+        animation->setEndValue(1);
+        wpls->setVisible(true);
+    } else if (option == Hide) {
+        animation->setStartValue(1);
+        animation->setEndValue(0);
+
+        /** A visibilidade deve mudar para evitar possíveis bugs */
+        connect(animation, &QPropertyAnimation::finished, [this](){ wpls->setVisible(false); });
+    }
+    animation->start();
+}
+
+
 /**********************************************************************************************************************/
 
 
@@ -466,7 +492,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
             qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
             emit emitnohide();
-            wpls->setVisible(true);
+            fadePls(Show);
             isshow = true;
 
             /** Verificando visibilidade de lista vazia */
@@ -477,7 +503,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
         } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
             arrowMouse();
             emit emithide();
-            wpls->setVisible(false);
+            fadePls(Hide);
             isshow = false;
         }
     }

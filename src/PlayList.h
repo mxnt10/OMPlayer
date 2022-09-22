@@ -30,6 +30,7 @@ public:
     void selectCurrent(int indx);
     void insert(const QString &url, int row, qint64 duration = 0, const QString &format = nullptr, ST status = Default);
     void changeIcons();
+    void hideFade();
 
 protected:
     bool event(QEvent *event) override;
@@ -39,9 +40,11 @@ protected:
 
 private:
     enum M3UFormat {M3U8 = 0, DetectFormat = 1};
+    enum PLS {Show = 0, Hide = 1};
     void load_m3u(const QString& file, M3UFormat format);
     void insertItemAt(const PlayListItem &item, int row);
     void setItemAt(const PlayListItem &item, int row);
+    void fadePls(PLS option);
 
 signals:
     void aboutToPlay(const QString &url);

@@ -48,7 +48,14 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     ltime = new QLabel(pv);
     ltime->setAttribute(Qt::WA_NoSystemBackground, true);
     ltime->setAttribute(Qt::WA_TranslucentBackground, true);
-
+    wvol = new QWidget();
+    wvol->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
+    wvol->setAttribute(Qt::WA_NoSystemBackground, true);
+    wvol->setAttribute(Qt::WA_TranslucentBackground, true);
+    lvol = new QLabel(wvol);
+    lvol->setStyleSheet("border: 2px solid white; border-radius: 10px;");
+    lvol->setFixedSize(42, 22);
+    lvol->setAlignment(CENTER);
 
     /** Janelas de configurações do programa, informações e demais */
     about = new About(this);
@@ -147,6 +154,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(volume, SIGNAL(sliderMoved(int)), SLOT(setVolume(int)));
     connect(volume, SIGNAL(sliderPressed()), SLOT(setVolume()));
     connect(volume, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(volume, SIGNAL(emitLeave()), SLOT(onTimeVolumeLeave()));
 
 
     /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
@@ -753,8 +761,7 @@ void OMPlayer::enterFullScreen() {
 
     if (this->isMaximized()) maximize = true; /** Mapear interface maximizada */
     this->showFullScreen();
-    wctl->close();
-    blankMouse();
+    fadeWctl(Hide);
     filter->setMove(false);
     enterpos = false;
 }
@@ -768,11 +775,42 @@ void OMPlayer::leaveFullScreen() {
     /** Precisa caso a interface já estava maximizada antes. Note que showMaximized() só funciona após a execução
      * de showNormal(), a tela não pula direto de fulscreen para maximizado. */
     if (maximize) this->showMaximized();
-
-    wctl->close();
-    blankMouse();
+    fadeWctl(Hide);
     filter->setMove(false);
     enterpos = maximize = false;
+}
+
+
+/** Efeito fade bacana para os controles e a playlist */
+void OMPlayer::fadeWctl(FADE option) {
+    auto *animation = new QPropertyAnimation(effect, "opacity");
+    auto *animation2 = new QPropertyAnimation(effect2, "opacity");
+    animation->setDuration(120);
+    animation2->setDuration(120);
+
+    if (option == Show) {
+        fade = true;
+        animation->setStartValue(0);
+        animation->setEndValue(1);
+        animation2->setStartValue(0);
+        animation2->setEndValue(1);
+        wctl->show();
+        wctl->activateWindow();
+    } else if (option == Hide) {
+        fade = false;
+        animation->setStartValue(1);
+        animation->setEndValue(0);
+        animation2->setStartValue(1);
+        animation2->setEndValue(0);
+
+        connect(animation, &QPropertyAnimation::finished, [this](){
+            wctl->close();
+            if (!contmenu) blankMouse();
+            contmenu = false;
+        });
+    }
+    animation->start();
+    animation2->start();
 }
 
 
@@ -783,7 +821,7 @@ void OMPlayer::setHide() {
         control = false;
         return;
     }
-    wctl->close();
+    fadeWctl(Hide);
     hideTrue();
     filter->setMove(false);
 }
@@ -792,8 +830,7 @@ void OMPlayer::setHide() {
 /** Função auxiliar para abrir os controles e a playlist */
 void OMPlayer::setShow() {
     if (showsett) return;
-    wctl->show();
-    wctl->activateWindow();
+    fadeWctl(Show);
 }
 
 
@@ -823,10 +860,10 @@ void OMPlayer::setAbout() {
 void OMPlayer::showInfo() {
     showsett = true;
     filter->setSett(showsett);
-    setHide();
     this->setMaximumSize(size);
     this->setMinimumSize(size);
-    infoview->show();
+    playlist->hideFade();
+    QTimer::singleShot(250, [this](){ infoview->show(); });
 }
 
 
@@ -1004,15 +1041,23 @@ void OMPlayer::volumeFinished(qreal pos) {
 /** Pré-visualização ao posicionar o mouse na barra de volume */
 void OMPlayer::onTimeVolume(int pos, int value) {
     string str;
-    if (value < 10 ) str = "0";
+    if (value < 10 && value > 0) str = "0";
+    QString text = QString::asprintf(" %s%i ", str.c_str(), value);
 
     /** Definição da posição na tela e exibição do tooltip */
-    if (value > 0) {
+    if (QString::compare(lvol->text(), text) != 0) {
         QPoint point = QPoint(volume->pos().x(), this->height() - volume->pos().y());
-        QPoint gpos = mapToGlobal(point + QPoint(pos - 19, - 40));
+        QPoint gpos = mapToGlobal(point + QPoint(pos - 18, -24));
+        lvol->setText(text);
+        wvol->move(gpos);
+        wvol->show();
+    }
+}
 
-        QToolTip::showText(gpos, QString::asprintf(" %s%i ", str.c_str(), value), this);
-    } else QToolTip::hideText();
+
+/** Fechar a visualização do volume */
+void OMPlayer::onTimeVolumeLeave() {
+    wvol->close();
 }
 
 
@@ -1250,7 +1295,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
         QAction saveplaylist(_tr("Save Playlist"), this);
 
-        contextMenu->addAction(&saveplaylist);
+//        contextMenu->addAction(&saveplaylist);
         contextMenu->addAction(&mediainfo);
         contextMenu->exec(mapToGlobal(pos));
         return;
@@ -1311,7 +1356,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
         /** Montagem do menu de opções de vídeo */
         optionVideo->addMenu(aspectratio);
-        optionVideo->addAction(&rotation);
+//        optionVideo->addAction(&rotation);
 
         /** Montagem do menu para outras opções */
         other->addMenu(channel);
@@ -1326,7 +1371,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         contextMenu->addAction(&shuffle);
         contextMenu->addAction(&replay);
         contextMenu->addSeparator();
-        contextMenu->addMenu(visualization);
+//        contextMenu->addMenu(visualization);
         contextMenu->addMenu(optionVideo);
         contextMenu->addMenu(other);
         contextMenu->addSeparator();

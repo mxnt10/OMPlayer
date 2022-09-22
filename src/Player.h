@@ -41,10 +41,12 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
+    enum FADE {Show = 1, Hide = 2};
     void play(const QString &isplay, int index = (-1));
     void nextRand();
     void enterFullScreen();
     void updateChannelMenu();
+    void fadeWctl(FADE Option);
 
 private Q_SLOTS:
     void setTotalItems();
@@ -91,6 +93,7 @@ private Q_SLOTS:
     void setVolume(int value);
     void volumeFinished(qreal pos);
     void onTimeVolume(int pos, int value);
+    void onTimeVolumeLeave();
     void changeChannel(QAction *action);
     void enterList();
     void leaveList();
@@ -113,14 +116,14 @@ private:
     QAction *channelAction{}, *aspectAction{};
     QDoubleSpinBox *speedBox{};
     QGraphicsOpacityEffect *effect{}, *effect2{};
-    QLabel *ltime{};
+    QLabel *ltime{}, *lvol{};
     QMenu *channel{}, *aspectratio{}, *speed{};
     QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QStringList listnum{};
     QTimer *click{};
-    QWidget *wctl{}, *prev{}, *pv{};
+    QWidget *wctl{}, *prev{}, *pv{}, *wvol{};
     ScreenSaver *screensaver;
     Settings *sett{};
     StatisticsView *infoview{};

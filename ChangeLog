@@ -6,6 +6,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ## [ 1.5 ] - 2022-08-04 ##################################################
 
 ### Added / Adicionado
+ - Adicionado efeito fade nos controles e na playlist.
  - Adicionado suporte ao redirecionamento da playlist.
  - Adicionado recursos para salvar as alterações no reprodutor.
  - Adicionado suporte a tradução:
@@ -16,6 +17,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Adicionado o estilo slider-hover em qss.
  - Adicionado recursos no menu de contexto:
     - AspectRatio.
+    - Speed.
 ###
 
 ### Upgraded / Atualizado
@@ -38,6 +40,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Otimização de performance em Utils.
  - Refatoração de código no fonte Settings.{cpp/h} em src.
  - Modificado o estilo do slider do progresso de reprodução e volume.
+ - Reajustes na posição do preview.
 ###
 
 ### Removed / Removido

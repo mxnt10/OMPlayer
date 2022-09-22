@@ -4,6 +4,7 @@
 #include <QFileDialog>
 #include <QLayout>
 #include <QMoveEvent>
+#include <QPropertyAnimation>
 #include <QStandardPaths>
 #include <QTextCodec>
 
@@ -22,6 +23,12 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     model = new PlayListModel(this);
     delegate = new PlayListDelegate(this);
     load(First);
+
+
+    /** Efeito de transparência funcional para a playlist. O setWindowOpacity() não rolou. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(1.0);
+    setGraphicsEffect(effect);
 
 
     /** Lista para visualização da playlist */

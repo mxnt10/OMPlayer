@@ -1,4 +1,3 @@
-#include <QGraphicsOpacityEffect>
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>

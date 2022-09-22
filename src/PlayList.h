@@ -2,6 +2,7 @@
 #define PLAYLIST_H
 
 #include <QDir>
+#include <QGraphicsOpacityEffect>
 #include <QLabel>
 #include <QListView>
 #include <QModelIndex>
@@ -67,9 +68,10 @@ private Q_SLOTS:
 private:
     Button *clearBtn{};
     Button *addBtn{}, *removeBtn{};
-    QLabel *cleanlist{};
     PlayListDelegate *delegate{};
     PlayListModel *model{};
+    QGraphicsOpacityEffect *effect{};
+    QLabel *cleanlist{};
     QListView *listView{};
     QString sum{}, actsum{};
     QStringList hashlist{};

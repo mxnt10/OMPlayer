@@ -4,6 +4,8 @@
 #include <QtAV>
 #include <QtAVWidgets>
 
+#include <QDoubleSpinBox>
+#include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
 #include <QLayout>
 #include <QScreen>
@@ -51,6 +53,7 @@ private Q_SLOTS:
     void firstPlay(const QString &name, int pos);
     void doubleplay(const QString &name);
     void setRenderer(const QString &op);
+    void onSpinBoxChanged(double val);
     void switchAspectRatio(QAction *action);
     void playPause();
     void setStop();
@@ -109,7 +112,7 @@ private:
     PlayList *playlist{};
     QAction *channelAction{}, *aspectAction{};
     QLabel *ltime{};
-    QMenu *channel{}, *aspectratio{};
+    QMenu *channel{}, *aspectratio{}, *speed{};
     QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
@@ -127,7 +130,7 @@ private:
     bool restart{false}, randplay{false};
     bool enterpos{false}, showsett{false};
     bool invalid{false}, ispreview{false};
-    bool maximize{false};
+    bool maximize{false}, fade{false}, contmenu{false};
     int Width{192}, Height{108};
     int previousitem{0}, actualitem{0}, nextitem{0};
     int count{0}, unit{500}, totalitems{0};

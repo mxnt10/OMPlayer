@@ -1008,7 +1008,9 @@ void OMPlayer::onTimeVolume(int pos, int value) {
 
     /** Definição da posição na tela e exibição do tooltip */
     if (value > 0) {
-        QPoint gpos = mapToGlobal(volume->pos() + QPoint(pos + 12, 5));
+        QPoint point = QPoint(volume->pos().x(), this->height() - volume->pos().y());
+        QPoint gpos = mapToGlobal(point + QPoint(pos - 19, - 40));
+
         QToolTip::showText(gpos, QString::asprintf(" %s%i ", str.c_str(), value), this);
     } else QToolTip::hideText();
 }

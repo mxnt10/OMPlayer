@@ -26,7 +26,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     this->setAutoFillBackground(true);
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
-    this->setStyleSheet(Utils::setStyle("global"));
     double vol = JsonTools::floatJson("volume");
 
 
@@ -52,93 +51,77 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     wvol->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
     wvol->setAttribute(Qt::WA_NoSystemBackground, true);
     wvol->setAttribute(Qt::WA_TranslucentBackground, true);
-    lvol = new QLabel(wvol);
-    lvol->setStyleSheet("border: 2px solid white; border-radius: 10px;");
-    lvol->setFixedSize(42, 22);
-    lvol->setAlignment(CENTER);
+    lvol = new Label(CENTER, 42, 22, wvol);
+    lvol->setStyleSheet(Utils::setStyle("widget"));
 
     /** Janelas de configurações do programa, informações e demais */
     about = new About(this);
     sett = new Settings(this);
     infoview = new StatisticsView(this);
     screensaver = new ScreenSaver(this);
-    connect(sett, SIGNAL(emitvalue(QString)), this, SLOT(setRenderer(QString)));
-    connect(sett, SIGNAL(changethemeicon()), this, SLOT(changeIcons()));
-    connect(sett, SIGNAL(emitclose()), this, SLOT(closeDialog()));
-    connect(infoview, SIGNAL(emitclose()), this, SLOT(closeDialog()));
-    connect(about, SIGNAL(emitclose()), this, SLOT(closeDialog()));
+    connect(sett, &Settings::changethemeicon, [this](){ changeIcons(); });
+    connect(sett, &Settings::emitvalue, this, &OMPlayer::setRenderer);
+    connect(sett, &Settings::emitclose, this, &OMPlayer::closeDialog);
+    connect(infoview, &StatisticsView::emitclose, this, &OMPlayer::closeDialog);
+    connect(about, &About::emitclose, this, &OMPlayer::closeDialog);
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new AVPlayer(this);
     setRenderer(JsonTools::stringJson("renderer"));
-    connect(mediaPlayer->audio(), SIGNAL(volumeChanged(qreal)), SLOT(volumeFinished(qreal)));
-    connect(mediaPlayer, SIGNAL(seekFinished(qint64)), SLOT(seekFinished(qint64)));
-    connect(mediaPlayer, SIGNAL(positionChanged(qint64)), SLOT(updateSlider(qint64)));
-    connect(mediaPlayer, SIGNAL(notifyIntervalChanged()), SLOT(updateSliderUnit()));
-    connect(mediaPlayer, SIGNAL(started()), SLOT(onStart()));
-    connect(mediaPlayer, SIGNAL(stopped()), SLOT(onStop()));
-    connect(mediaPlayer, SIGNAL(paused(bool)), SLOT(onPaused(bool)));
-    connect(mediaPlayer, SIGNAL(mediaStatusChanged(QtAV::MediaStatus)), SLOT(onMediaStatusChanged()));
-    connect(mediaPlayer, SIGNAL(error(QtAV::AVError)), SLOT(handleError(QtAV::AVError)));
+    connect(mediaPlayer->audio(), &QtAV::AudioOutput::volumeChanged, this, &OMPlayer::volumeFinished);
+    connect(mediaPlayer, &AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
+    connect(mediaPlayer, &AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
+    connect(mediaPlayer, &AVPlayer::positionChanged, this, &OMPlayer::updateSlider);
+    connect(mediaPlayer, &AVPlayer::notifyIntervalChanged, this, &OMPlayer::updateSliderUnit);
+    connect(mediaPlayer, &AVPlayer::started, this, &OMPlayer::onStart);
+    connect(mediaPlayer, &AVPlayer::stopped, this, &OMPlayer::onStop);
+    connect(mediaPlayer, &AVPlayer::paused, this, &OMPlayer::onPaused);
+    connect(mediaPlayer, &AVPlayer::error, this, &OMPlayer::handleError);
 
 
     /** Playlist do reprodutor */
     playlist = new PlayList();
     setTotalItems();
-    connect(playlist, SIGNAL(aboutToPlay(QString)), SLOT(doubleplay(QString)));
-    connect(playlist, SIGNAL(firstPlay(QString,int)), SLOT(firstPlay(QString,int)));
-    connect(playlist, SIGNAL(selected(int)), SLOT(setSelect(int)));
-    connect(playlist, SIGNAL(emitremove(int)), SLOT(ajustActualItem(int)));
-    connect(playlist, SIGNAL(emithiden()), SLOT(setHide()));
-    connect(playlist, SIGNAL(emithide()), SLOT(hideTrue()));
-    connect(playlist, SIGNAL(emitnohide()), SLOT(hideFalse()));
-    connect(playlist, SIGNAL(enterListView()), SLOT(enterList()));
-    connect(playlist, SIGNAL(leaveListView()), SLOT(leaveList()));
-    connect(playlist, SIGNAL(emitstop()), SLOT(setStop()));
-    connect(playlist, SIGNAL(emitItems()), SLOT(setTotalItems()));
+    connect(playlist, &PlayList::aboutToPlay, this, &OMPlayer::doubleplay);
+    connect(playlist, &PlayList::firstPlay, this, &OMPlayer::firstPlay);
+    connect(playlist, &PlayList::selected, this, &OMPlayer::setSelect);
+    connect(playlist, &PlayList::emitremove, this, &OMPlayer::ajustActualItem);
+    connect(playlist, &PlayList::emithide, this, &OMPlayer::hideTrue);
+    connect(playlist, &PlayList::emitnohide, this, &OMPlayer::hideFalse);
+    connect(playlist, &PlayList::enterListView, this, &OMPlayer::enterList);
+    connect(playlist, &PlayList::leaveListView, this, &OMPlayer::leaveList);
+    connect(playlist, &PlayList::emitstop, this, &OMPlayer::setStop);
+    connect(playlist, &PlayList::emitItems, this, &OMPlayer::setTotalItems);
+    connect(playlist, &PlayList::setcontmenu, [this](){ contmenu = true; });
 
 
-    /** Barra de progresso de execução */
+    /** Barra de progresso de execução e Labels */
+    current = new Label(CENTER, 70, "-- -- : -- --");
+    end = new Label(CENTER, 70, "-- -- : -- --");
     slider = new Slider(this, true, (-1), 28, 0);
-    connect(slider, SIGNAL(onHover(int,int)), SLOT(onTimeSliderHover(int,int)));
-    connect(slider, SIGNAL(sliderMoved(int)), SLOT(seekBySlider(int)));
-    connect(slider, SIGNAL(emitEnter()), SLOT(onTimeSliderEnter()));
-    connect(slider, SIGNAL(emitLeave()), SLOT(onTimeSliderLeave()));
-    connect(slider, SIGNAL(sliderPressed()), SLOT(seekBySlider()));
-
-
-    /** Labels para mostrar o tempo de execução e a duração */
-    current = new Label(CENTER, 70, "Current time", "-- -- : -- --");
-    connect(current, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(current, SIGNAL(emitLeave()), SLOT(hideTrue()));
-    end = new Label(CENTER, 70, "Duration", "-- -- : -- --");
-    connect(end, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(end, SIGNAL(emitLeave()), SLOT(hideTrue()));
+    connect(slider, &Slider::onHover, this, &OMPlayer::onTimeSliderHover);
+    connect(slider, &Slider::sliderMoved, this, &OMPlayer::seekBySlider);
+    connect(slider, &Slider::emitEnter, this, &OMPlayer::onTimeSliderEnter);
+    connect(slider, &Slider::emitLeave, [this](){ onTimeSliderLeave(); });
+    connect(slider, &Slider::sliderPressed, [this](){ seekBySlider(slider->value()); });
 
 
     /** Botões para os controles de reprodução */
     playBtn = new Button(Button::button, "play", 48, tr("Play"));
-    connect(playBtn, SIGNAL(clicked()), SLOT(playPause()));
-    connect(playBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     stopBtn = new Button(Button::button, "stop", 32, tr("Stop"));
-    connect(stopBtn, SIGNAL(clicked()), SLOT(setStop()));
-    connect(stopBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     nextBtn = new Button(Button::button, "next", 32, tr("Next"));
-    connect(nextBtn, SIGNAL(clicked()), SLOT(Next()));
-    connect(nextBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     previousBtn = new Button(Button::button, "previous", 32, tr("Previous"));
-    connect(previousBtn, SIGNAL(clicked()), SLOT(Previous()));
-    connect(previousBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     replayBtn = new Button(Button::button, "replay", 32, tr("Replay"));
-    connect(replayBtn, SIGNAL(clicked()), SLOT(setReplay()));
-    connect(replayBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     shuffleBtn = new Button(Button::button, "shuffle", 32, tr("Shuffle"));
-    connect(shuffleBtn, SIGNAL(clicked()), SLOT(setShuffle()));
-    connect(shuffleBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
     volumeBtn = new Button(Button::button, "volume_high", 32, tr("Volume") + ": " + QString::number(vol * 100));
-    connect(volumeBtn, SIGNAL(clicked()), SLOT(setMute()));
-    connect(volumeBtn, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(playBtn, &Button::clicked, this, &OMPlayer::playPause);
+    connect(stopBtn, &Button::clicked, this, &OMPlayer::setStop);
+    connect(nextBtn, &Button::clicked, this, &OMPlayer::Next);
+    connect(previousBtn, &Button::clicked, this, &OMPlayer::Previous);
+    connect(replayBtn, &Button::clicked, this, &OMPlayer::setReplay);
+    connect(shuffleBtn, &Button::clicked, this, &OMPlayer::setShuffle);
+    connect(volumeBtn, &Button::clicked, this, &OMPlayer::setMute);
 
 
     /** Verificando se as opções de replay e aleatório estão ativas */
@@ -150,24 +133,14 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     volume = new Slider(this, false, 90, (-1), 100, "volume");
     volume->setValue(int(vol * 100));
     mediaPlayer->audio()->setVolume(vol);
-    connect(volume, SIGNAL(onHover(int,int)), SLOT(onTimeVolume(int,int)));
-    connect(volume, SIGNAL(sliderMoved(int)), SLOT(setVolume(int)));
-    connect(volume, SIGNAL(sliderPressed()), SLOT(setVolume()));
-    connect(volume, SIGNAL(emitEnter()), SLOT(hideFalse()));
-    connect(volume, SIGNAL(emitLeave()), SLOT(onTimeVolumeLeave()));
-
-
-    /** Assistentes para mapear quando a ocultação dos controles não deve ser feita */
-    qDebug("%s(%sInterface%s)%s::%sPreparando o layout da interface ...\033[0m", GRE, RED, GRE, RED, CYA);
-    auto *enterfilter = new EventFilter(this, EventFilter::Other);
-    auto *nohideleft = new QWidget();
-    auto *nohideright = new QWidget();
-    nohideleft->installEventFilter(enterfilter);
-    nohideright->installEventFilter(enterfilter);
-    connect(enterfilter, SIGNAL(emitEnter()), SLOT(hideFalse()));
+    connect(volume, &Slider::onHover, this, &OMPlayer::onTimeVolume);
+    connect(volume, &Slider::sliderMoved, this, &OMPlayer::setVolume);
+    connect(volume, &Slider::sliderPressed, [this](){ setVolume(volume->value()); });
+    connect(volume, &Slider::emitLeave, [this](){ wvol->close(); });
 
 
     /** Plano de fundo semitransparente dos controles de reprodução */
+    qDebug("%s(%sInterface%s)%s::%sPreparando o layout da interface ...\033[0m", GRE, RED, GRE, RED, CYA);
     auto *bgcontrol = new QWidget();
     bgcontrol->setMaximumHeight(120);
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
@@ -190,7 +163,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Layout dos botões */
     auto *buttons = new QHBoxLayout();
     buttons->setSpacing(5);
-    buttons->addWidget(nohideleft);
+    buttons->addStretch(1);
     buttons->addSpacing(30);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
@@ -203,7 +176,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     buttons->addWidget(nextBtn);
     buttons->addWidget(volumeBtn);
     buttons->addWidget(volume);
-    buttons->addWidget(nohideright);
+    buttons->addStretch(1);
 
 
     /** Ajustes na barra de execução para inserir o tempo de execução e a duração */
@@ -213,8 +186,15 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     fgslider->addWidget(end);
 
 
-    /** Ajuste dos controles */
+    /** Conteiner dos controles */
     auto *fctl = new QWidget();
+    auto *ffilter = new EventFilter(this, EventFilter::Control);
+    fctl->installEventFilter(ffilter);
+    connect(ffilter, &EventFilter::emitLeave, this, &OMPlayer::hideTrue);
+    connect(ffilter, &EventFilter::emitEnter, this, &OMPlayer::hideFalse);
+
+
+    /** Ajuste dos controles */
     auto *fgctl = new QVBoxLayout(fctl);
     fgctl->setContentsMargins(10, 12, 10, 22);
     fgctl->addLayout(fgslider);
@@ -248,11 +228,11 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Definição da logo */
-    logo = new Label(CENTER);
+    logo = new Label(CENTER, 0, 0);
     logo->setPixmap(QPixmap(Utils::setIcon(Utils::Logo)));
 
 
-    /** Layout principal criado usando sobreposição de widgets */
+    /** Layout principal para os widgets */
     layout = new QHBoxLayout();
     layout->setMargin(0);
     layout->addWidget(video->widget());
@@ -863,7 +843,7 @@ void OMPlayer::showInfo() {
     this->setMaximumSize(size);
     this->setMinimumSize(size);
     playlist->hideFade();
-    QTimer::singleShot(250, [this](){ infoview->show(); });
+    QTimer::singleShot(130, [this](){ infoview->show(); });
 }
 
 
@@ -966,18 +946,12 @@ void OMPlayer::onTimeSliderLeave(OMPlayer::ST status) {
 }
 
 
-/** Altera o tempo de execução ao pressionar ou mover a barra de progresso de execução */
+/** Altera o tempo de execução da barra de progresso de execução */
 void OMPlayer::seekBySlider(int value) {
     if (mediaPlayer->isPaused() && mediaPlayer->currentVideoStream() > (-1) &&
         mediaPlayer->statistics().video.frame_rate == 0) return;
     mediaPlayer->setSeekType(QtAV::AccurateSeek);
     mediaPlayer->seek(qint64(value) * unit);
-}
-
-
-/** Altera o tempo de execução ao pressionar a barra de progresso de execução */
-void OMPlayer::seekBySlider() {
-    seekBySlider(slider->value());
 }
 
 
@@ -993,7 +967,7 @@ void OMPlayer::setMute() {
     if (playing && !mediaPlayer->statistics().audio.available) return;
     if (muted) {
         muted = false;
-        setVolume();
+        setVolume(volume->value());
     } else {
         setVolume(0);
         muted = true;
@@ -1006,12 +980,6 @@ void OMPlayer::setVolume(int value) {
     /** O volume do reprodutor é definido com um valor do tipo double que vai de 0.0 a 1.0, portanto o valor
      * do tipo int a ser recebido, precisa ser reajustado e convertido. */
     mediaPlayer->audio()->setVolume((double)value / 100);
-}
-
-
-/** Altera o volume do reprodutor ao pressionar a barra de volume */
-void OMPlayer::setVolume() {
-    setVolume(volume->value());
 }
 
 
@@ -1052,12 +1020,6 @@ void OMPlayer::onTimeVolume(int pos, int value) {
         wvol->move(gpos);
         wvol->show();
     }
-}
-
-
-/** Fechar a visualização do volume */
-void OMPlayer::onTimeVolumeLeave() {
-    wvol->close();
 }
 
 
@@ -1171,6 +1133,7 @@ void OMPlayer::changeIcons(OMPlayer::ST change) {
         Utils::changeIcon(nextBtn, "next");
         Utils::changeIcon(previousBtn, "previous");
         playlist->changeIcons();
+        about->changeIcons();
     }
 }
 

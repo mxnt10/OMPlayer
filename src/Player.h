@@ -85,15 +85,12 @@ private Q_SLOTS:
     void enablePause();
     void clickCount();
     void detectClick();
-    void seekBySlider();
     void seekBySlider(int value);
     void seekFinished(qint64 pos);
     void setMute();
-    void setVolume();
     void setVolume(int value);
     void volumeFinished(qreal pos);
     void onTimeVolume(int pos, int value);
-    void onTimeVolumeLeave();
     void changeChannel(QAction *action);
     void enterList();
     void leaveList();

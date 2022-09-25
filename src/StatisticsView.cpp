@@ -1,5 +1,6 @@
 #include <QDebug>
 #include <QFileInfo>
+#include <QHeaderView>
 #include <QLayout>
 #include <QTimerEvent>
 
@@ -16,6 +17,10 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
     setModal(true);
+    setFocus();
+
+
+    /** Iniciando as informações dos itens */
     initItems(&baseItems, getBaseInfoKeys());
     initItems(&videoItems, getVideoInfoKeys());
     initItems(&audioItems, getAudioInfoKeys());
@@ -31,7 +36,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
     /** Botão para fechar a janela */
     closebtn = new Button(Button::button, "apply", 32, tr("Close"));
-    connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
+    connect(closebtn, &Button::pressed, this, &StatisticsView::onClose);
 
 
     /** Layout para as abas */
@@ -189,7 +194,7 @@ QVariantList StatisticsView::getAudioInfoValues(const Statistics& s) {
         << QString::number(s.audio.bit_rate/1000).append(QString::fromLatin1(" Kb/s"))
         << QString::number(s.audio_only.sample_rate).append(QString::fromLatin1(" Hz"))
         << s.audio_only.sample_fmt
-        << QString::fromLatin1("%1 (%2)").arg(QString::number(s.audio_only.channels), s.audio_only.channel_layout)
+        << QString::fromLatin1("%1 (Layout: %2)").arg(QString::number(s.audio_only.channels), s.audio_only.channel_layout)
         << s.audio.frames
         << s.audio_only.frame_size
         << s.audio.frame_rate;
@@ -256,11 +261,20 @@ void StatisticsView::setStatistics(const Statistics& s) {
     }
 
     /** Buscando o maior comprimento para a janela */
+    view1->header()->setStretchLastSection(false);
+    view2->header()->setStretchLastSection(false);
+    view3->header()->setStretchLastSection(false);
+
     settaginfos();
     visibility();
     int csize = view1->size();
     if (csize < view2->size()) csize = view2->size();
     if (csize < view3->size()) csize = view3->size();
+
+    view1->header()->setStretchLastSection(true);
+    view2->header()->setStretchLastSection(true);
+    view3->header()->setStretchLastSection(true);
+
     csize = csize + 40;
     qDebug("%s(%sDEBUG%s):%s Ajustando comprimento de infoview em %i ...\033[0m", GRE, RED, GRE, BLU, csize);
 

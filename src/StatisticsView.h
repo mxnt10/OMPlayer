@@ -22,7 +22,7 @@ protected:
     void showEvent(QShowEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
 
-signals:
+Q_SIGNALS:
     void emitclose();
 
 private Q_SLOTS:

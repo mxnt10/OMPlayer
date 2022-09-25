@@ -15,7 +15,7 @@ TreeView::TreeView(const QList<QTreeWidgetItem *>& item, QWidget *parent) : QTre
     addTopLevelItems(item);
 
     /** Propriedades definidas para o redirecionamento */
-    header()->setStretchLastSection(false);
+    header()->setStretchLastSection(true);
     header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     /** Prevenindo a exibição do scrool bar */

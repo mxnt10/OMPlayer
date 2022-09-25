@@ -21,7 +21,7 @@ protected:
     void leaveEvent(QEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
-signals:
+Q_SIGNALS:
     void emitEnter();
     void emitLeave();
     void onHover(int pos, int value);
@@ -32,7 +32,6 @@ private Q_SLOTS:
 private:
     [[nodiscard]] inline int pick(const QPoint &pt) const;
     [[nodiscard]] int pixelPosToRangeValue(int pos) const;
-
     int val{0};
     QString stl{};
 };

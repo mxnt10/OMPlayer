@@ -46,7 +46,7 @@ private:
     void setItemAt(const PlayListItem &item, int row);
     void fadePls(PLS option);
 
-signals:
+Q_SIGNALS:
     void aboutToPlay(const QString &url);
     void firstPlay(const QString &url, int row);
     void selected(int item);

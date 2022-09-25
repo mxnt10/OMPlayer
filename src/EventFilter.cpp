@@ -12,34 +12,17 @@
 
 
 /** Construtor do filtro de eventos */
-EventFilter::EventFilter(QWidget *parent, UITYPE i) : QObject(parent) {
-    option = i;
-}
+EventFilter::EventFilter(QWidget *parent, UITYPE i) : QObject(parent), option(i) {}
 
 
 /** Destrutor */
 EventFilter::~EventFilter() = default;
 
 
-/**********************************************************************************************************************/
-
-
-/** Método para alterar o valor da váriável moving */
-void EventFilter::setMove(bool var) {
-    moving = var;
-}
-
-
-/** Método para alterar o valor da váriável fixed */
-void EventFilter::setFixed(bool var) {
-    fixed = var;
-}
-
-
-/** Método para alterar o valor da váriável sett */
-void EventFilter::setSett(bool var) {
-    sett = var;
-}
+/** Funções auxiliares */
+void EventFilter::setMove(bool var)  { moving = var; }
+void EventFilter::setFixed(bool var) { fixed = var;  }
+void EventFilter::setSett(bool var)  { sett = var;   }
 
 
 /**********************************************************************************************************************/

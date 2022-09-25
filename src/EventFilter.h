@@ -16,7 +16,7 @@ public:
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 
-signals:
+Q_SIGNALS:
     void emitMouseMove();
     void emitMousePress();
     void emitMouseRelease();

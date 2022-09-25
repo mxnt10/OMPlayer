@@ -19,9 +19,9 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    setStyleSheet(Utils::setStyle("global")); // ToolTip
     setFixedSize(0, 0);
     setModal(true);
+    setFocus();
 
 
     /** Estrutura das renderizações */
@@ -47,14 +47,14 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
         if (vo && vo->isAvailable()) {
             vid_map[i].btn = new Button(Button::radio, "radio-unselect", 18, nullptr, vid_map[i].name);
 
-            if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){rendererSelect(vid_map[0].btn, vid_map[0].name);});
-            if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){rendererSelect(vid_map[1].btn, vid_map[1].name);});
-            if (i == 2) connect(vid_map[2].btn, &Button::pressed, [this](){rendererSelect(vid_map[2].btn, vid_map[2].name);});
-            if (i == 3) connect(vid_map[3].btn, &Button::pressed, [this](){rendererSelect(vid_map[3].btn, vid_map[3].name);});
-            if (i == 4) connect(vid_map[4].btn, &Button::pressed, [this](){rendererSelect(vid_map[4].btn, vid_map[4].name);});
-            if (i == 5) connect(vid_map[5].btn, &Button::pressed, [this](){rendererSelect(vid_map[5].btn, vid_map[5].name);});
-            if (i == 6) connect(vid_map[6].btn, &Button::pressed, [this](){rendererSelect(vid_map[6].btn, vid_map[6].name);});
-            if (i == 7) connect(vid_map[7].btn, &Button::pressed, [this](){rendererSelect(vid_map[7].btn, vid_map[7].name);});
+            if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){ rendererSelect(vid_map[0].btn, vid_map[0].name); });
+            if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){ rendererSelect(vid_map[1].btn, vid_map[1].name); });
+            if (i == 2) connect(vid_map[2].btn, &Button::pressed, [this](){ rendererSelect(vid_map[2].btn, vid_map[2].name); });
+            if (i == 3) connect(vid_map[3].btn, &Button::pressed, [this](){ rendererSelect(vid_map[3].btn, vid_map[3].name); });
+            if (i == 4) connect(vid_map[4].btn, &Button::pressed, [this](){ rendererSelect(vid_map[4].btn, vid_map[4].name); });
+            if (i == 5) connect(vid_map[5].btn, &Button::pressed, [this](){ rendererSelect(vid_map[5].btn, vid_map[5].name); });
+            if (i == 6) connect(vid_map[6].btn, &Button::pressed, [this](){ rendererSelect(vid_map[6].btn, vid_map[6].name); });
+            if (i == 7) connect(vid_map[7].btn, &Button::pressed, [this](){ rendererSelect(vid_map[7].btn, vid_map[7].name); });
 
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
                 Utils::changeIcon(vid_map[i].btn, "radio-select");
@@ -69,7 +69,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     combotheme->setCurrentText(JsonTools::stringJson("theme"));
     connect(combotheme, SIGNAL(currentTextChanged(QString)), SLOT(setIcon(QString)));
 
-    auto *labeltheme = new Label(RIGHT, 0, nullptr, tr("Icon Themes") + ": ");
+    auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");
     auto *themes = new QGridLayout();
     themes->addWidget(labeltheme, 0, 0);
     themes->addWidget(combotheme, 0, 1);
@@ -95,7 +95,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
     /** Botão para fechar a janela */
     closebtn = new Button(Button::button, "apply", 32, tr("Apply and Close"));
-    connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
+    connect(closebtn, &Button::pressed, this, &Settings::onClose);
 
 
     /** Layout para organização das configurações */
@@ -128,7 +128,7 @@ Settings::~Settings() = default;
 
 /** Emissão para fechar a janela */
 void Settings::onClose() {
-    qDebug("%s(%sSettings%s):%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
+    qDebug("%s(%sSettings%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
     emit emitclose();
     this->close();
 }
@@ -154,13 +154,12 @@ void Settings::setIcon(const QString &index) {
     JsonTools::stringJson("theme", index);
     Utils::initUtils(Utils::Theme);
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < 8; ++i)
         if (vid_map[i].btn) {
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
                 Utils::changeIcon(vid_map[i].btn, "radio-select");
             else Utils::changeIcon(vid_map[i].btn, "radio-unselect");
         }
-    }
 
     Utils::changeIcon(closebtn, "apply");
     emit changethemeicon();

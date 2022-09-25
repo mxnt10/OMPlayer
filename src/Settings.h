@@ -19,7 +19,7 @@ public:
         Button *btn;
     };
 
-signals:
+Q_SIGNALS:
     void emitclose();
     void emitvalue(const QString &value);
     void changethemeicon();

@@ -1,3 +1,28 @@
+/* Definição geral dos widgets */
+* {
+    background-color: transparent;
+    color: white;
+}
+
+/* Painel das abas */
+QTabWidget::pane {
+    border: 1px solid #333;
+    border-radius: 10px;
+}
+
 /* Definição geral das abas */
-background-color: transparent;
-color: white;
+QTabBar::tab {
+    border: 1px solid #333;
+    border-radius: 10px;
+    padding: 5px 10px;
+}
+
+/* Tab selecionado*/
+QTabBar::tab:selected {
+    background-color: rgba(0, 100, 200, 50);
+}
+
+/* Tirar linhas dos agrupamentos */
+QGroupBox {
+    border: 0;
+}

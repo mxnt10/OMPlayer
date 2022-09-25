@@ -33,7 +33,6 @@ public:
     void hideFade();
 
 protected:
-    bool event(QEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -53,11 +52,11 @@ Q_SIGNALS:
     void emitremove(int item);
     void emitstop();
     void emithide();
-    void emithiden();
     void emitnohide();
     void enterListView();
     void leaveListView();
     void emitItems();
+    void setcontmenu();
 
 public Q_SLOTS:
     void addItems(const QStringList &parms = QStringList());

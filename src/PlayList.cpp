@@ -7,6 +7,7 @@
 #include <QPropertyAnimation>
 #include <QStandardPaths>
 #include <QTextCodec>
+#include <QTimer>
 
 #include "EventFilter.h"
 #include "JsonTools.h"
@@ -43,17 +44,17 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
     connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
-    connect(filter, &EventFilter::emitEnter, [this](){emit enterListView();});
-    connect(filter, &EventFilter::emitLeave, [this](){emit leaveListView();});
+    connect(filter, &EventFilter::emitEnter, [this](){ emit enterListView(); });
+    connect(filter, &EventFilter::emitLeave, [this](){ emit leaveListView(); });
 
 
     /** Botões para o painel da playlist */
     addBtn = new Button(Button::button, "add", 32, tr("Add items"));
-    connect(addBtn, SIGNAL(clicked()), SLOT(addItems()));
     removeBtn = new Button(Button::button, "remove", 32, tr("Remove items"));
-    connect(removeBtn, SIGNAL(clicked()), SLOT(removeSelectedItems()));
     clearBtn = new Button(Button::button, "clean", 32, tr("Clear playlist"));
-    connect(clearBtn, SIGNAL(clicked()), SLOT(clearItems()));
+    connect(addBtn, &Button::clicked, [this](){ addItems(); });
+    connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
+    connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);
 
 
     /** Plano de fundo da playlist */
@@ -83,7 +84,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     size->setFixedWidth(10);
     size->installEventFilter(filter2);
     connect(filter2, &EventFilter::emitEnter, [](){ resizeMouse(); });
-    connect(filter2, &EventFilter::emitLeave, [](){ arrowMouse();  });
+    connect(filter2, &EventFilter::emitLeave, [](){ arrowMouse(); });
 
 
     /** Layout da playlist */
@@ -189,6 +190,7 @@ void PlayList::save(const QString &url) {
 
 /** Função para adicionar itens a playlist */
 void PlayList::addItems(const QStringList &parms) {
+    emit setcontmenu();
     QStringList files;
 
     /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
@@ -213,7 +215,11 @@ void PlayList::addItems(const QStringList &parms) {
             "WAV Audio (*.wav);;WavPack Audio (*.wp *.wvp);;Media Playlist (*.m3u *.m3u8);;All Files (*);;"
         );
     else files = parms;
-    if (files.isEmpty()) return;
+
+    if (files.isEmpty()) {
+        blankMouse();
+        return;
+    }
 
     bool select = false;
     int a = 0;
@@ -222,7 +228,6 @@ void PlayList::addItems(const QStringList &parms) {
     QString isplay;
 
     for (int i = 0; i < files.size(); ++i) {
-
         const QString &file = files.at(i);
         QString suffix = QFileInfo(file).suffix().toLower();
 
@@ -230,8 +235,7 @@ void PlayList::addItems(const QStringList &parms) {
         else if (suffix == "m3u8" || suffix == "m3u") {
             load_m3u(file, DetectFormat);
             return;
-        }
-        else {
+        } else {
             if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
                 hashlist.append(Utils::stringHash(file));
                 qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(file));
@@ -451,6 +455,7 @@ void PlayList::changeIcons() {
 /** Minimização antes dos diálogos */
 void PlayList::hideFade() {
     fadePls(Hide);
+    QTimer::singleShot(130, [this](){ isshow = false; });
 }
 
 
@@ -509,13 +514,6 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
     }
     if (!resize && *QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) arrowMouse();
     QWidget::mouseMoveEvent(event);
-}
-
-
-/** Emissão que serve como assistência para ocultar os controles */
-bool PlayList::event(QEvent *event) {
-    if (int(event->type()) == 110 && !isshow) emit emithiden();
-    return QWidget::event(event);
 }
 
 

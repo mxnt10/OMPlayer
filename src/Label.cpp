@@ -1,3 +1,5 @@
+#include <QDebug>
+
 #include "Label.h"
 #include "Utils.h"
 
@@ -6,13 +8,21 @@
 
 
 /** Contrutor para o Label */
-Label::Label(const QFlag& align, int w, const QString& tooltip, const QString& text) {
+Label::Label(const QFlag& align, int w, const QString& text) {
     setMouseTracking(true);
     setAlignment(align);
-    txt = tooltip;
 
     if (w > 0) setFixedWidth(w);
     if (!text.isEmpty()) setText(text);
+}
+
+
+/** Contrutor para o Label */
+Label::Label(const QFlag &align, int w, int h, QWidget *parent) : QLabel(parent) {
+    setAlignment(align);
+
+    if (w > 0) setFixedWidth(w);
+    if (h > 0) setFixedHeight(h);
 }
 
 
@@ -25,15 +35,6 @@ Label::~Label() = default;
 
 /** Ação ao posicionar o mouse sobre o label */
 void Label::enterEvent(QEvent *event) {
-    if (!txt.isEmpty())
-        qDebug("%s(%sDEBUG%s):%s Mouse posicionado no label %s ...\033[0m", GRE, RED, GRE, VIO, qUtf8Printable(txt));
-    emit emitEnter();
+    qDebug("%s(%sDEBUG%s):%s Mouse posicionado em um label ...\033[0m", GRE, RED, GRE, VIO);
     QLabel::enterEvent(event);
-}
-
-
-/** Ação ao desposicionar o mouse sobre o label */
-void Label::leaveEvent(QEvent *event) {
-    emit emitLeave();
-    QLabel::leaveEvent(event);
 }

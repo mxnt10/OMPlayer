@@ -9,30 +9,30 @@
 /**********************************************************************************************************************/
 
 
+/** Construtor que define a interface */
 About::About(QWidget *parent) : QDialog(parent) {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    setStyleSheet(Utils::setStyle("global")); // ToolTip
     setMaximumSize(0, 0);
     setModal(true);
 
 
     /** Nome do programa e descrição */
-    auto *description = new Label(TOP, 0, nullptr, getDescription());
-    auto *name = new Label(TOP, 0, nullptr, PRG_DESC);
+    auto *description = new Label(TOP, 0, getDescription());
+    auto *name = new Label(TOP, 0, PRG_DESC);
     name->setStyleSheet("font-size: 24pt");
 
 
     /** Definição do icon logo */
-    auto *iconlogo = new Label(CENTER);
+    auto *iconlogo = new Label(CENTER, 0, 0);
     iconlogo->setPixmap(QPixmap(Utils::setIcon()));
 
 
     /** Versão do programa e demais informações*/
-    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, nullptr,
+    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0,
                               tr("Version") + " " + QString::fromStdString(VERSION));
-    auto *maintainer = new Label(BOTTON, 0, nullptr, getTextMaintainer());
+    auto *maintainer = new Label(BOTTON, 0, getTextMaintainer());
     version->setStyleSheet("font-size: 11pt");
     maintainer->setStyleSheet("font-size: 11pt");
 
@@ -40,8 +40,8 @@ About::About(QWidget *parent) : QDialog(parent) {
     /** Botão para fechar a janela e para o sobre do QtAV */
     closebtn = new Button(Button::button, "apply", 32, tr("Close"));
     qtavbtn = new Button(Button::button, "info", 32, tr("About QtAV"));
-    connect(closebtn, SIGNAL(pressed()), SLOT(onClose()));
-    connect(qtavbtn, SIGNAL(pressed()), SLOT(setAboutQtAV()));
+    connect(closebtn, &Button::clicked, this, &About::onClose);
+    connect(qtavbtn, &Button::clicked, this, &QtAV::about);
 
 
     /** Layout dos botões */
@@ -107,18 +107,8 @@ QString About::getDescription() {
 }
 
 
-/** Sobre o QtAV */
-void About::setAboutQtAV() {
-    QtAV::about();
-}
-
-
-/**********************************************************************************************************************/
-
-
-/** Ajustes após a exibição das configurações */
-void About::showEvent(QShowEvent *event) {
+/** Alterando o tema dos ícones */
+void About::changeIcons() {
     Utils::changeIcon(closebtn, "apply");
     Utils::changeIcon(qtavbtn, "info");
-    QDialog::showEvent(event);
 }

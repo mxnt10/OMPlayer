@@ -6,19 +6,12 @@
 class Label : public QLabel {
 Q_OBJECT
 public:
-    explicit Label(const QFlag& align, int w = 0, const QString& tooltip = nullptr, const QString& text = nullptr);
+    explicit Label(const QFlag& align, int w = 0, const QString& text = nullptr);
+    explicit Label(const QFlag& align, int w = 0, int h = 0, QWidget *parent = nullptr);
     ~Label() override;
 
 protected:
     void enterEvent(QEvent *event) override;
-    void leaveEvent(QEvent *event) override;
-
-signals:
-    void emitEnter();
-    void emitLeave();
-
-private:
-    QString txt{};
 };
 
 #endif //OMPLAYER_LABEL_H

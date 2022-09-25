@@ -16,21 +16,17 @@ Q_OBJECT
 public:
     explicit About(QWidget *parent = nullptr);
     ~About() override;
+    void changeIcons();
 
-protected:
-    void showEvent(QShowEvent *event) override;
-
-signals:
+Q_SIGNALS:
     void emitclose();
 
 private Q_SLOTS:
     void onClose();
-    static void setAboutQtAV();
 
 private:
     static QString getTextMaintainer();
     static QString getDescription();
-
     Button *closebtn{}, *qtavbtn{};
 };
 

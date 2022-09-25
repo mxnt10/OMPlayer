@@ -15,10 +15,10 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &too
     num = size;
     type = btn;
     txt = text;
+    setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
-    setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
 
     /** Definindo ícone */
     QString theme = JsonTools::stringJson("theme");

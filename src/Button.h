@@ -22,7 +22,7 @@ private:
     QString ico{};
     QString txt{};
 
-signals:
+Q_SIGNALS:
     void emitEnter();
 };
 

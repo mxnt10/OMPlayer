@@ -1,4 +1,5 @@
 #include <QApplication>
+#include <QDebug>
 #include <QMouseEvent>
 #include <QStyleOption>
 

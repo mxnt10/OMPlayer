@@ -129,6 +129,11 @@ void Slider::leaveEvent(QEvent *event) {
 
 /** Evento que mapeia a movimentação do mouse */
 void Slider::wheelEvent(QWheelEvent *event) {
-    emit sliderMoved(val);
+    if (stl == "slider") {
+        if (event->angleDelta().y() > 0) emit sliderMoved(val + 5);
+        else emit sliderMoved(val - 5);
+    } else {
+        emit sliderMoved(val);
+    }
     QSlider::wheelEvent(event);
 }

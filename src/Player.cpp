@@ -59,7 +59,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     sett = new Settings(this);
     infoview = new StatisticsView(this);
     screensaver = new ScreenSaver(this);
-    connect(sett, &Settings::changethemeicon, [this](){ changeIcons(); });
+    connect(sett, &Settings::changethemeicon, [=](){ changeIcons(); });
     connect(sett, &Settings::emitvalue, this, &OMPlayer::setRenderer);
     connect(sett, &Settings::emitclose, this, &OMPlayer::closeDialog);
     connect(infoview, &StatisticsView::emitclose, this, &OMPlayer::closeDialog);
@@ -93,7 +93,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(playlist, &PlayList::leaveListView, this, &OMPlayer::leaveList);
     connect(playlist, &PlayList::emitstop, this, &OMPlayer::setStop);
     connect(playlist, &PlayList::emitItems, this, &OMPlayer::setTotalItems);
-    connect(playlist, &PlayList::setcontmenu, [this](){ contmenu = true; });
+    connect(playlist, &PlayList::setcontmenu, [=](){ contmenu = true; });
 
 
     /** Barra de progresso de execução e Labels */
@@ -103,8 +103,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(slider, &Slider::onHover, this, &OMPlayer::onTimeSliderHover);
     connect(slider, &Slider::sliderMoved, this, &OMPlayer::seekBySlider);
     connect(slider, &Slider::emitEnter, this, &OMPlayer::onTimeSliderEnter);
-    connect(slider, &Slider::emitLeave, [this](){ onTimeSliderLeave(); });
-    connect(slider, &Slider::sliderPressed, [this](){ seekBySlider(slider->value()); });
+    connect(slider, &Slider::emitLeave, [=](){ onTimeSliderLeave(); });
+    connect(slider, &Slider::sliderPressed, [=](){ seekBySlider(slider->value()); });
 
 
     /** Botões para os controles de reprodução */
@@ -135,8 +135,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     mediaPlayer->audio()->setVolume(vol);
     connect(volume, &Slider::onHover, this, &OMPlayer::onTimeVolume);
     connect(volume, &Slider::sliderMoved, this, &OMPlayer::setVolume);
-    connect(volume, &Slider::sliderPressed, [this](){ setVolume(volume->value()); });
-    connect(volume, &Slider::emitLeave, [this](){ wvol->close(); });
+    connect(volume, &Slider::sliderPressed, [=](){ setVolume(volume->value()); });
+    connect(volume, &Slider::emitLeave, [=](){ wvol->close(); });
 
 
     /** Plano de fundo semitransparente dos controles de reprodução */
@@ -245,36 +245,39 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->installEventFilter(filter);
     wctl->installEventFilter(filter);
     wctl->installEventFilter(cfilter);
-    connect(filter, SIGNAL(emitMouseMove()), SLOT(setShow()));
-    connect(filter, SIGNAL(emitDoubleClick()), SLOT(changeFullScreen()));
-    connect(filter, SIGNAL(emitMousePress()), SLOT(enablePause()));
-    connect(filter, SIGNAL(emitMouseRelease()), SLOT(clickCount()));
-    connect(filter, SIGNAL(customContextMenuRequested(QPoint)), SLOT(ShowContextMenu(QPoint)));
-    connect(filter, SIGNAL(emitOpen()), SLOT(openMedia()));
-    connect(filter, SIGNAL(emitEsc()), SLOT(leaveFullScreen()));
-    connect(filter, SIGNAL(emitShuffle()), SLOT(setShuffle()));
-    connect(filter, SIGNAL(emitReplay()), SLOT(setReplay()));
-    connect(filter, SIGNAL(emitReplayOne()), SLOT(setRepeat()));
-    connect(filter, SIGNAL(emitSettings()), SLOT(setSettings()));
-    connect(filter, SIGNAL(emitPlay()), SLOT(playPause()));
-    connect(filter, SIGNAL(emitNext()), SLOT(Next()));
-    connect(filter, SIGNAL(emitPrevious()), SLOT(Previous()));
-    connect(filter, SIGNAL(emitLeave()), SLOT(setHide()));
-    connect(cfilter, SIGNAL(emitLeave()), SLOT(setHide()));
+    connect(filter, &EventFilter::emitMouseMove, this, &OMPlayer::setShow);
+    connect(filter, &EventFilter::emitDoubleClick, this, &OMPlayer::changeFullScreen);
+    connect(filter, &EventFilter::emitMousePress, this, &OMPlayer::enablePause);
+    connect(filter, &EventFilter::emitMouseRelease, this, &OMPlayer::clickCount);
+    connect(filter, &EventFilter::customContextMenuRequested, this, &OMPlayer::ShowContextMenu);
+    connect(filter, &EventFilter::emitEsc, this, &OMPlayer::leaveFullScreen);
+    connect(filter, &EventFilter::emitShuffle, this, &OMPlayer::setShuffle);
+    connect(filter, &EventFilter::emitReplay, this, &OMPlayer::setReplay);
+    connect(filter, &EventFilter::emitReplayOne, this, &OMPlayer::setRepeat);
+    connect(filter, &EventFilter::emitPlay, this, &OMPlayer::playPause);
+    connect(filter, &EventFilter::emitNext, this, &OMPlayer::Next);
+    connect(filter, &EventFilter::emitPrevious, this, &OMPlayer::Previous);
+    connect(filter, &EventFilter::emitLeave, this, &OMPlayer::setHide);
+    connect(filter, &EventFilter::emitOpen, [=](){ openMedia(); });
+    connect(filter, &EventFilter::emitSettings, [=](){ setDialog(SettingsD); });
+    connect(cfilter, &EventFilter::emitLeave, [=](){
+        if (!contmenu) playlist->hideFade();
+        QTimer::singleShot(130, [=](){ setHide(); });
+    });
 
 
     /** Temporizador para o cálculo do número de cliques em 300ms */
     click = new QTimer(this);
     click->setSingleShot(true);
     click->setInterval(300);
-    connect(click, SIGNAL(timeout()), this, SLOT(detectClick()));
+    connect(click, &QTimer::timeout, this, &OMPlayer::detectClick);
 
 
     /** Menu dos canais de áudio para o menu de contexto */
     auto *subMenu = new ClickableMenu(_tr("Channel"));
     channel = new QMenu(this);
     channel = subMenu;
-    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeChannel(QAction*)));
+    connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::changeChannel);
     subMenu->addAction(_tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
     subMenu->addAction(_tr("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
     subMenu->addAction(_tr("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
@@ -297,7 +300,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     aspectratio = subMenu;
     aspectAction = subMenu->_addAction(Utils::aspectStr(Utils::AspectVideo));
     aspectAction->setData(Utils::aspectNum(Utils::AspectVideo));
-    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(switchAspectRatio(QAction*)));
+    connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::switchAspectRatio);
     subMenu->_addAction(Utils::aspectStr(Utils::AspectAuto ))->setData(Utils::AspectAuto);
     subMenu->_addAction(Utils::aspectStr(Utils::Aspect11   ))->setData(Utils::Aspect11);
     subMenu->_addAction(Utils::aspectStr(Utils::Aspect21   ))->setData(Utils::Aspect21);
@@ -326,11 +329,11 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     subMenu = new ClickableMenu(_tr("Speed"));
     speed = new QMenu(this);
     speed = subMenu;
-    speedBox = new QDoubleSpinBox(nullptr);
+    speedBox = new QDoubleSpinBox();
     speedBox->setRange(0.20, 10);
     speedBox->setValue(1.0);
     speedBox->setSingleStep(0.20);
-    connect(speedBox, SIGNAL(valueChanged(double)), SLOT(onSpinBoxChanged(double)));
+    connect(speedBox, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double d){ onSpinBoxChanged(d); });
     auto *actspeed = new QWidgetAction(nullptr);
     actspeed->setDefaultWidget(speedBox);
     subMenu->addAction(actspeed);
@@ -762,14 +765,15 @@ void OMPlayer::leaveFullScreen() {
 
 
 /** Efeito fade bacana para os controles e a playlist */
-void OMPlayer::fadeWctl(FADE option) {
+void OMPlayer::fadeWctl(OMPlayer::FADE option) {
     auto *animation = new QPropertyAnimation(effect, "opacity");
     auto *animation2 = new QPropertyAnimation(effect2, "opacity");
     animation->setDuration(120);
     animation2->setDuration(120);
 
+    connect(animation, &QPropertyAnimation::valueChanged, [=](const QVariant &value){});
+
     if (option == Show) {
-        fade = true;
         animation->setStartValue(0);
         animation->setEndValue(1);
         animation2->setStartValue(0);
@@ -777,7 +781,6 @@ void OMPlayer::fadeWctl(FADE option) {
         wctl->show();
         wctl->activateWindow();
     } else if (option == Hide) {
-        fade = false;
         animation->setStartValue(1);
         animation->setEndValue(0);
         animation2->setStartValue(1);
@@ -802,7 +805,6 @@ void OMPlayer::setHide() {
         return;
     }
     fadeWctl(Hide);
-    hideTrue();
     filter->setMove(false);
 }
 
@@ -814,36 +816,24 @@ void OMPlayer::setShow() {
 }
 
 
-/** Função para abrir as configurações */
-void OMPlayer::setSettings() {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
+/** Função que abre os diálogos */
+void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
     showsett = true;
     filter->setSett(showsett);
     this->setMaximumSize(size);
     this->setMinimumSize(size);
-    sett->show();
-}
 
-
-/** Função para exibir o sobre */
-void OMPlayer::setAbout() {
-    qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
-    showsett = true;
-    filter->setSett(showsett);
-    this->setMaximumSize(size);
-    this->setMinimumSize(size);
-    about->show();
-}
-
-
-/** Função para exibir a janela de informações de mídia atual */
-void OMPlayer::showInfo() {
-    showsett = true;
-    filter->setSett(showsett);
-    this->setMaximumSize(size);
-    this->setMinimumSize(size);
-    playlist->hideFade();
-    QTimer::singleShot(130, [this](){ infoview->show(); });
+    if (dialog == AboutD) {
+        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
+        about->show();
+    } else if (dialog == SettingsD) {
+        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
+        sett->show();
+    } else if (dialog == InfoD) {
+        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de informações de mídia ...\033[0m", GRE, RED, GRE, CYA);
+        playlist->hideFade();
+        QTimer::singleShot(130, [this](){ infoview->show(); });
+    }
 }
 
 
@@ -936,7 +926,7 @@ void OMPlayer::onTimeSliderEnter() {
 
 
 /** Saindo da pré-visualização */
-void OMPlayer::onTimeSliderLeave(OMPlayer::ST status) {
+void OMPlayer::onTimeSliderLeave(OMPlayer::STATUS status) {
     if (preview->isVisible()) {
         qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
         preview->close();
@@ -1108,7 +1098,7 @@ void OMPlayer::updateSliderUnit() {
 
 
 /** Função para recarregar os ícones do programa */
-void OMPlayer::changeIcons(OMPlayer::ST change) {
+void OMPlayer::changeIcons(OMPlayer::STATUS change) {
     QToolTip::hideText();
     int value = int(mediaPlayer->audio()->volume() * 100);
     QString tooltip = tr("Volume") + ": " + QString::number(value);
@@ -1254,7 +1244,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         /** Menu de informação de mídia */
         QAction mediainfo(_tr("Current Media Info"), this);
         Utils::changeMenuIcon(mediainfo, "about");
-        connect(&mediainfo, SIGNAL(triggered()), SLOT(showInfo()));
+        connect(&mediainfo, &QAction::triggered, [=](){ setDialog(InfoD); });
 
         QAction saveplaylist(_tr("Save Playlist"), this);
 
@@ -1310,12 +1300,12 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         QAction settings(_tr("Settings"), this);
         settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
         Utils::changeMenuIcon(settings, "settings");
-        connect(&settings, SIGNAL(triggered()), SLOT(setSettings()));
+        connect(&settings, &QAction::triggered, [=](){ setDialog(SettingsD); });
 
         /** Menu sobre */
         QAction mabout(_tr("About"), this);
         Utils::changeMenuIcon(mabout, "about");
-        connect(&mabout, SIGNAL(triggered()), SLOT(setAbout()));
+        connect(&mabout, &QAction::triggered, [=](){ setDialog(AboutD); });
 
         /** Montagem do menu de opções de vídeo */
         optionVideo->addMenu(aspectratio);

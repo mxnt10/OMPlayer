@@ -28,7 +28,6 @@ Q_OBJECT
 public:
     explicit OMPlayer(QWidget *parent = nullptr);
     ~OMPlayer() override;
-    enum ST {Default = 0, IsPlay = 1};
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
@@ -41,12 +40,14 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 private:
-    enum FADE {Show = 1, Hide = 2};
+    enum STATUS { Default = 0, IsPlay = 1 };
+    enum DIALOG { AboutD = 0, SettingsD = 1, InfoD = 2 };
+    enum FADE { Show = 1, Hide = 2 };
     void play(const QString &isplay, int index = (-1));
     void nextRand();
     void enterFullScreen();
     void updateChannelMenu();
-    void fadeWctl(FADE Option);
+    void fadeWctl(OMPlayer::FADE Option);
 
 private Q_SLOTS:
     void setTotalItems();
@@ -71,15 +72,13 @@ private Q_SLOTS:
     void setShow();
     void hideTrue();
     void hideFalse();
-    void setSettings();
-    void setAbout();
-    void showInfo();
+    void setDialog(OMPlayer::DIALOG);
     void closeDialog();
     void changeFullScreen();
     void leaveFullScreen();
     void onTimeSliderHover(int pos, int value);
     void onTimeSliderEnter();
-    void onTimeSliderLeave(OMPlayer::ST status = Default);
+    void onTimeSliderLeave(OMPlayer::STATUS status = Default);
     void updateSlider(qint64 value);
     void updateSliderUnit();
     void enablePause();
@@ -94,7 +93,7 @@ private Q_SLOTS:
     void changeChannel(QAction *action);
     void enterList();
     void leaveList();
-    void changeIcons(OMPlayer::ST change = Default);
+    void changeIcons(OMPlayer::STATUS change = Default);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);

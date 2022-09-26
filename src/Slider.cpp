@@ -19,7 +19,7 @@ Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum,
     setTracking(true);
     setDisabled(disable);
     setStyleSheet(Utils::setStyle(style));
-    connect(this, SIGNAL(valueChanged(int)), SLOT(getValue(int)));
+    connect(this, SIGNAL(valueChanged(int)), this, SLOT(getValue(int)));
     stl = style;
 
     if (wsize > (-1)) setFixedWidth(wsize);

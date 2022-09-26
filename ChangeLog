@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.5 ] - 2022-08-04 ##################################################
+## [ 1.5 ] - 2022-10-01 ##################################################
 
 ### Added / Adicionado
  - Adicionado efeito fade nos controles e na playlist.
@@ -21,6 +21,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ###
 
 ### Upgraded / Atualizado
+ - Atualização do método connect() em todo o código.
  - Usando sources de ScreenSaver do SMPlayer.
 ###
 
@@ -41,11 +42,22 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Refatoração de código no fonte Settings.{cpp/h} em src.
  - Modificado o estilo do slider do progresso de reprodução e volume.
  - Reajustes na posição do preview.
+ - Ajustes ao avançar e voltar o tempo de reprodução usando
+   a rolagem do mouse.
+ - Alterações na classe Label fazendo uso de dois construtores.
 ###
 
 ### Removed / Removido
- - Função resetWidth() em PlaylistDelegate sendo desnecessário com o
-   de redirecionamento.
+ - Removido a função resetWidth() em PlaylistDelegate sendo desnecessário
+   com o redirecionamento.
+ - Removido a função protegida event() da classe Playlist,
+   pois não teve mais utilidade.
+ - Removido o uso do tooltip em questão de instabilidades
+   ao usar o efeito fade.
+ - Removido estilo global.qss em qss.
+ - Removido a função protegida leaveEvent() da classe Label.
+ - Removido a função protegida showEvent() de About, sendo substituida
+   pela função changeIcons().
 ###
 
 ### Fixed / Corrigido
@@ -59,6 +71,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Interface permanece maximizada na próxima inicialização ao fechar.
  - Ajustes nas funções setTotalItems() e changeIcons().
  - Correções na exibição dos QWidgets em caso de failsafe.
+ - Pequenas correções na visualização das informações de mídia.
 ###
 
 ##########################################################################

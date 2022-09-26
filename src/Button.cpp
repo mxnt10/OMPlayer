@@ -54,8 +54,8 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &too
 
     /** ToolTip */
     if (type == button) {
-        if (tooltip.isEmpty()) setToolTip(ico);
-        else setToolTip(tooltip);
+//        if (tooltip.isEmpty()) setToolTip(ico);
+//        else setToolTip(tooltip);
     }
 }
 

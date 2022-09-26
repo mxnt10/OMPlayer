@@ -34,7 +34,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
     if (option == General) {
         /** O widget filho abre mais rápido que o pai, por isso o delay */
-        if (!first) QTimer::singleShot(1200, [this](){ start = true; first = true; });
+        if (!first) QTimer::singleShot(1200, [=](){ start = true; first = true; });
 
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {
@@ -122,14 +122,16 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Emissão para ativar o menu de contexto */
         if (event->type() == QEvent::ContextMenu) {
             contextmenu = true;
-            if (!fixed) emit emitLeave();
             auto *e = dynamic_cast<QContextMenuEvent *>(event);
             emit customContextMenuRequested(e->pos());
         }
     }
 
     /** Emissão para os controles */
-    if (option == Control && event->type() == QEvent::Leave) emit emitLeave();
+    if (option == Control) {
+        if (event->type() == QEvent::Enter) emit emitEnter();
+        if (event->type() == QEvent::Leave) emit emitLeave();
+    }
 
     /** Emissão para outros widgets */
     if (option == Other) {

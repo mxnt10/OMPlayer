@@ -1,7 +1,6 @@
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
-#include <QToolTip>
 #include <QWidgetAction>
 
 #include "ClickableMenu.h"
@@ -261,8 +260,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(filter, &EventFilter::emitOpen, [=](){ openMedia(); });
     connect(filter, &EventFilter::emitSettings, [=](){ setDialog(SettingsD); });
     connect(cfilter, &EventFilter::emitLeave, [=](){
-        if (!contmenu) playlist->hideFade();
-        QTimer::singleShot(130, [=](){ setHide(); });
+        if (!contmenu || listmenu) playlist->hideFade();
+        setHide();
     });
 
 
@@ -771,8 +770,6 @@ void OMPlayer::fadeWctl(OMPlayer::FADE option) {
     animation->setDuration(120);
     animation2->setDuration(120);
 
-    connect(animation, &QPropertyAnimation::valueChanged, [=](const QVariant &value){});
-
     if (option == Show) {
         animation->setStartValue(0);
         animation->setEndValue(1);
@@ -832,7 +829,8 @@ void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
     } else if (dialog == InfoD) {
         qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de informações de mídia ...\033[0m", GRE, RED, GRE, CYA);
         playlist->hideFade();
-        QTimer::singleShot(130, [this](){ infoview->show(); });
+        setHide();
+        infoview->show();
     }
 }
 
@@ -1099,7 +1097,6 @@ void OMPlayer::updateSliderUnit() {
 
 /** Função para recarregar os ícones do programa */
 void OMPlayer::changeIcons(OMPlayer::STATUS change) {
-    QToolTip::hideText();
     int value = int(mediaPlayer->audio()->volume() * 100);
     QString tooltip = tr("Volume") + ": " + QString::number(value);
 
@@ -1257,7 +1254,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
     if (!enterpos) {
         /** Opções de menu*/
         auto *other = new CMenu(_tr("Other Options"), this);
-        auto *visualization = new CMenu(_tr("Visualizations"), this);
+//        auto *visualization = new CMenu(_tr("Visualizations"), this);
         auto *optionVideo = new CMenu(_tr("Video Options"), this);
 
         /** Modo repetição */

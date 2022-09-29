@@ -2,11 +2,10 @@
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
 #include <QWidgetAction>
+#include <ClickableMenu>
+#include <Utils>
 
-#include "ClickableMenu.h"
-#include "JsonTools.h"
 #include "Player.h"
-#include "Utils.h"
 
 #define ClickableMenu(x) ClickableMenu(x + "\t\t")
 #define TR(x) ("  " + tr(x))

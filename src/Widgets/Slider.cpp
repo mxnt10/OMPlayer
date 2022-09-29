@@ -1,10 +1,9 @@
 #include <QApplication>
-#include <QDebug>
 #include <QMouseEvent>
 #include <QStyleOption>
+#include <Utils>
 
 #include "Slider.h"
-#include "Utils.h"
 
 
 /**********************************************************************************************************************/

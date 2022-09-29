@@ -18,6 +18,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Adicionado recursos no menu de contexto:
     - AspectRatio.
     - Speed.
+ - Adicionado folha de estilo label.qss em qss.
 ###
 
 ### Upgraded / Atualizado
@@ -45,6 +46,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Ajustes ao avançar e voltar o tempo de reprodução usando
    a rolagem do mouse.
  - Alterações na classe Label fazendo uso de dois construtores.
+ - Modificação na organização de arquivos fontes em subdiretórios
+   Utils e Widgets.
 ###
 
 ### Removed / Removido

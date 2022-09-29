@@ -3,9 +3,8 @@
 
 #include <QDialog>
 #include <QtAV/Statistics.h>
-
-#include "Button.h"
-#include "TreeView.h"
+#include <Button>
+#include <TreeView>
 
 using namespace QtAV;
 

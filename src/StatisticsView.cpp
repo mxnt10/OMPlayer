@@ -3,9 +3,10 @@
 #include <QHeaderView>
 #include <QLayout>
 #include <QTimerEvent>
+#include <Utils>
 
 #include "StatisticsView.h"
-#include "Utils.h"
+
 
 
 /**********************************************************************************************************************/

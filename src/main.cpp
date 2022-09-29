@@ -22,13 +22,11 @@
 #include <QDir>
 #include <QCommandLineParser>
 #include <QLoggingCategory>
-
 #include <SingleApplication>
+#include <Utils>
 
-#include "JsonTools.h"
 #include "Player.h"
 #include "Translator.h"
-#include "Utils.h"
 
 #define DEBUG true
 

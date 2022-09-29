@@ -1,6 +1,8 @@
 #ifndef OMPLAYER_JSONTOOLS_H
 #define OMPLAYER_JSONTOOLS_H
 
+#include <QJsonValue>
+
 class JsonTools {
 public:
     static void settingsJson();

@@ -6,10 +6,8 @@
 #include <QLabel>
 #include <QListView>
 #include <QModelIndex>
-
 #include <PlayListUtils>
-
-#include "Button.h"
+#include <Button>
 
 #define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 

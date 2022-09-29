@@ -8,11 +8,10 @@
 #include <QStandardPaths>
 #include <QTextCodec>
 #include <QTimer>
+#include <Utils>
 
 #include "EventFilter.h"
-#include "JsonTools.h"
 #include "PlayList.h"
-#include "Utils.h"
 
 
 /**********************************************************************************************************************/

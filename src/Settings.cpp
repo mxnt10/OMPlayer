@@ -2,11 +2,10 @@
 #include <QGroupBox>
 #include <QLayout>
 #include <QTabWidget>
+#include <Label>
+#include <Utils>
 
-#include "Label.h"
-#include "JsonTools.h"
 #include "Settings.h"
-#include "Utils.h"
 
 using namespace QtAV;
 

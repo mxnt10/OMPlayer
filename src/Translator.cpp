@@ -2,8 +2,8 @@
 #include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
+#include <Utils>
 
-#include "Utils.h"
 #include "Translator.h"
 
 

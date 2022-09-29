@@ -1,5 +1,4 @@
 #include <QCryptographicHash>
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 

@@ -4,8 +4,7 @@
 #include <QtAV>
 #include <QtAVWidgets>
 #include <QDialog>
-
-#include "Button.h"
+#include <Button>
 
 class Settings : public QDialog {
 Q_OBJECT

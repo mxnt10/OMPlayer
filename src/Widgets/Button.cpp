@@ -1,10 +1,8 @@
 #include <QPainter>
-
 #include <string>
+#include <Utils>
 
 #include "Button.h"
-#include "JsonTools.h"
-#include "Utils.h"
 
 
 /**********************************************************************************************************************/

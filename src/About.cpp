@@ -1,9 +1,9 @@
 #include <QLayout>
 #include <QtAVWidgets>
+#include <Label>
+#include <Utils>
 
 #include "About.h"
-#include "Label.h"
-#include "Utils.h"
 
 
 /**********************************************************************************************************************/

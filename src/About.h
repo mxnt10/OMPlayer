@@ -2,8 +2,7 @@
 #define OMPLAYER_ABOUT_H
 
 #include <QDialog>
-
-#include "Button.h"
+#include <Button>
 
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"

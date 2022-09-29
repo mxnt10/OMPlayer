@@ -3,7 +3,7 @@
 
 #include <QAction>
 #include <QApplication>
-#include "Button.h"
+#include <Button>
 
 #define VERSION "1.5"
 

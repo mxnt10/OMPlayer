@@ -3,7 +3,6 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
-
 #include <QDoubleSpinBox>
 #include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
@@ -13,15 +12,15 @@
 
 #include <MediaInfoDLL.h>
 #include <ScreenSaver>
+#include <Button>
+#include <Label>
+#include <Slider>
 
 #include "About.h"
-#include "Button.h"
 #include "EventFilter.h"
-#include "Label.h"
 #include "PlayList.h"
 #include "Settings.h"
 #include "StatisticsView.h"
-#include "Slider.h"
 
 class OMPlayer : public QWidget {
 Q_OBJECT

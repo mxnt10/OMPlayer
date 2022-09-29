@@ -1,0 +1,6 @@
+/* Definição para os labels */
+QLabel {
+    background-color: rgba(0, 0, 0, 100);
+    border: 2px solid #cccccc;
+    border-radius: 10px;
+}

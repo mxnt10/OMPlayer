@@ -45,7 +45,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     for (int i = 0; i < 8; ++i) {
         vo = VideoRenderer::create(vid_map[i].id);
         if (vo && vo->isAvailable()) {
-            vid_map[i].btn = new Button(Button::radio, "radio-unselect", 18, nullptr, vid_map[i].name);
+            vid_map[i].btn = new Button(Button::radio, "radio-unselect", 18, vid_map[i].name);
 
             if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){ rendererSelect(vid_map[0].btn, vid_map[0].name); });
             if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){ rendererSelect(vid_map[1].btn, vid_map[1].name); });

@@ -12,21 +12,13 @@
 /**********************************************************************************************************************/
 
 
-/** Construtor */
+/** Construtor e destrutor */
 PlayListDelegate::PlayListDelegate(QObject *parent): QStyledItemDelegate(parent) {}
-
-
-/** Destrutor */
 PlayListDelegate::~PlayListDelegate() = default;
 
 
-/**********************************************************************************************************************/
-
-
 /** Definindo um tamanho específico */
-void PlayListDelegate::setWith(int w) {
-    width = w;
-}
+void PlayListDelegate::setWith(int w) { width = w; }
 
 
 /**********************************************************************************************************************/

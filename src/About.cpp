@@ -18,15 +18,11 @@ About::About(QWidget *parent) : QDialog(parent) {
     setModal(true);
 
 
-    /** Nome do programa e descrição */
+    /** Nome do programa e descrição e ícone */
+    auto *iconlogo = new Label(CENTER, Utils::setIcon());
     auto *description = new Label(TOP, 0, getDescription());
     auto *name = new Label(TOP, 0, PRG_DESC);
     name->setStyleSheet("font-size: 24pt");
-
-
-    /** Definição do icon logo */
-    auto *iconlogo = new Label(CENTER, 0, 0);
-    iconlogo->setPixmap(QPixmap(Utils::setIcon()));
 
 
     /** Versão do programa e demais informações*/

@@ -11,7 +11,7 @@
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(ButtonType btn, const QString &icon, int size, const QString &tooltip, const QString &text) {
+Button::Button(ButtonType btn, const QString &icon, int size, const QString &text) {
     num = size;
     type = btn;
     txt = text;
@@ -28,9 +28,9 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &too
         QPixmap pixmap{Utils::setIconTheme(theme, icon)};
 
         QPainter p;
-        p.setRenderHint(QPainter::Antialiasing,true);
-        p.setRenderHint(QPainter::SmoothPixmapTransform,true);
-        p.setRenderHint(QPainter::LosslessImageRendering,true);
+        p.setRenderHint(QPainter::Antialiasing, true);
+        p.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        p.setRenderHint(QPainter::LosslessImageRendering, true);
         p.drawPixmap(QRect(100, 100, num, num), pixmap, pixmap.rect());
 
         QIcon img;
@@ -50,13 +50,6 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &too
     std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
     upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
     ico = QString::fromStdString(upper);
-
-
-    /** ToolTip */
-    if (type == button) {
-//        if (tooltip.isEmpty()) setToolTip(ico);
-//        else setToolTip(tooltip);
-    }
 }
 
 

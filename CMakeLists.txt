@@ -27,7 +27,6 @@ include_directories(
         /usr/include/qt5/QtAV
         /usr/include/qt5/QtAVWidgets
         common/MediaInfoLib/Source/MediaInfoDLL
-#        common/Visualization
         common/ScreenSaver
         src/PlayListUtils
 )
@@ -64,9 +63,6 @@ add_executable(
         common/ScreenSaver/powersaving.h
         common/ScreenSaver/screensaver.cpp
         common/ScreenSaver/screensaver.h
-
-#        common/Visualization/visualisationrenderer.cpp
-#        common/Visualization/visualisationrenderer.h
 )
 
 target_link_libraries(

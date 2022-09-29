@@ -7,7 +7,7 @@ class Button : public QPushButton {
 Q_OBJECT
 public:
     enum ButtonType{ button = 1, radio = 2, tag = 3};
-    explicit Button(ButtonType btn, const QString &icon, int size = 0, const QString &tooltip = nullptr, const QString &text = nullptr);
+    explicit Button(ButtonType btn, const QString &icon, int size = 0, const QString &text = nullptr);
     ~Button() override;
 
 protected:

@@ -32,6 +32,4 @@ TreeView::~TreeView() = default;
 
 
 /** Retorna o tamanho das linhas do treeview */
-int TreeView::size() {
-    return header()->sectionSize(0) + header()->sectionSize(1);
-}
+int TreeView::size() { return header()->sectionSize(0) + header()->sectionSize(1); }

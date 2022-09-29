@@ -31,14 +31,11 @@ Translator::Translator(QObject *parent) : QObject(parent) {
 
 
 /** Função que retorna se alguma tradução foi carregada */
-bool Translator::load() {
-    return translator->load(local);
-}
+bool Translator::load() { return translator->load(local); }
 
 
 /** Função para instalar a tradução */
 void Translator::installTranslator() {
-    qDebug("%s(%sTranslator%s)%s::%sArquivo de tradução carregado: %s ...\033[m", GRE, RED, GRE, RED, YEL,
-           qUtf8Printable(local));
+    qDebug("%s(%sTranslator%s)%s::%sCarregando tradução: %s ...\033[m", GRE, RED, GRE, RED, YEL, qUtf8Printable(local));
     QCoreApplication::installTranslator(translator);
 }

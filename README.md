@@ -18,8 +18,6 @@
 
 - Qt5 >= 5.15.3
 - QtAV >= 1.13.0
-- libmediainfo >= 22.03
-- libzen >= 0.4.39
 
 ## Shotcuts
 

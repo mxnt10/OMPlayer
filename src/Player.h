@@ -113,7 +113,7 @@ private:
     QGraphicsOpacityEffect *effect{}, *effect2{};
     QLabel *ltime{}, *lvol{};
     QMenu *channel{}, *aspectratio{}, *speed{};
-    QGridLayout *layout{};
+    QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QStringList listnum{};

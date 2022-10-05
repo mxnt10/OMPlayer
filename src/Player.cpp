@@ -233,9 +233,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Layout principal para os widgets */
-    layout = new QGridLayout();
+    layout = new QHBoxLayout();
     layout->setMargin(0);
-    layout->addWidget(video->widget(), 0, 0);
+    layout->addWidget(video->widget());
     this->setLayout(layout);
 
 
@@ -348,9 +348,7 @@ OMPlayer::~OMPlayer() = default;
 
 
 /** Função para abrir arquivos multimídia */
-void OMPlayer::openMedia(const QStringList &parms) {
-    playlist->addItems(parms);
-}
+void OMPlayer::openMedia(const QStringList &parms) { playlist->addItems(parms); }
 
 
 /** Rodando as funções após aberto outras instâncias */
@@ -366,7 +364,8 @@ void OMPlayer::onLoad() {
 
 /** Setando opções de Rendenização */
 void OMPlayer::setRenderer(const QString &op) {
-    if (layout) layout->removeWidget(video->widget());
+    VideoRenderer *replace;
+    if (video) replace = video; /** Pegando a referência */
 
     struct {
         const char* name;
@@ -392,8 +391,8 @@ void OMPlayer::setRenderer(const QString &op) {
     if (!video && !video->isAvailable()) video = new VideoOutput(this);
     mediaPlayer->setRenderer(video);
 
-    /** Readicionando o widget ao layout */
-    if (layout) layout->addWidget(video->widget());
+    /** Substituindo o widget no layout */
+    if (layout) layout->replaceWidget(replace->widget(), video->widget());
 
     const VideoRendererId vid = mediaPlayer->renderer()->id();
     if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)

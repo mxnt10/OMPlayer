@@ -18,7 +18,7 @@ Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum,
     setTracking(true);
     setDisabled(disable);
     setStyleSheet(Utils::setStyle(style));
-    connect(this, SIGNAL(valueChanged(int)), this, SLOT(getValue(int)));
+    connect(this, &Slider::valueChanged, this, &Slider::getValue);
     stl = style;
 
     if (wsize > (-1)) setFixedWidth(wsize);
@@ -131,8 +131,6 @@ void Slider::wheelEvent(QWheelEvent *event) {
     if (stl == "slider") {
         if (event->angleDelta().y() > 0) emit sliderMoved(val + 5);
         else emit sliderMoved(val - 5);
-    } else {
-        emit sliderMoved(val);
-    }
+    } else emit sliderMoved(val);
     QSlider::wheelEvent(event);
 }

@@ -113,12 +113,12 @@ private:
     QGraphicsOpacityEffect *effect{}, *effect2{};
     QLabel *ltime{}, *lvol{};
     QMenu *channel{}, *aspectratio{}, *speed{};
-    QHBoxLayout *layout{};
+    QGridLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
     QStringList listnum{};
     QTimer *click{};
-    QWidget *wctl{}, *prev{}, *pv{}, *wvol{};
+    QWidget *wctl{}, *prev{}, *pv{}, *wvol{}, *wlayout{};
     ScreenSaver *screensaver;
     Settings *sett{};
     StatisticsView *infoview{};

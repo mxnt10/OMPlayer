@@ -226,14 +226,16 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Definição da logo */
+    wlayout = new QWidget();
+    wlayout->setMouseTracking(true);
     logo = new Label(CENTER, 0, 0);
     logo->setPixmap(QPixmap(Utils::setIcon(Utils::Logo)));
 
 
     /** Layout principal para os widgets */
-    layout = new QHBoxLayout();
+    layout = new QGridLayout();
     layout->setMargin(0);
-    layout->addWidget(video->widget());
+    layout->addWidget(video->widget(), 0, 0);
     this->setLayout(layout);
 
 
@@ -628,8 +630,8 @@ void OMPlayer::onStart() {
         qint64 duration = mediaPlayer->mediaStopPosition();
 
         MI.Open(url.toStdWString());
-        QString format = QString::fromStdWString( MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
-                                                         MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+        QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
+                                                        MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
         MI.Close();
 
         qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));

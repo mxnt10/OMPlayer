@@ -66,7 +66,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new AVPlayer(this);
-    setRenderer(JsonTools::stringJson("renderer"));
     connect(mediaPlayer->audio(), &QtAV::AudioOutput::volumeChanged, this, &OMPlayer::volumeFinished);
     connect(mediaPlayer, &AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
     connect(mediaPlayer, &AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
@@ -226,16 +225,33 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Definição da logo */
-    wlayout = new QWidget();
-    wlayout->setMouseTracking(true);
+    auto *wlogo = new QWidget();
+    wlogo->setMouseTracking(true);
     logo = new Label(CENTER, 0, 0);
     logo->setPixmap(QPixmap(Utils::setIcon(Utils::Logo)));
+
+
+    /** Layout da logo */
+    wlayout = new QWidget();
+    wlayout->setMouseTracking(true);
+    auto *llogo = new QGridLayout(wlayout);
+    llogo->setMargin(0);
+    llogo->addWidget(logo, 0, 0);
+    llogo->addWidget(wlogo, 0, 0);
+
+
+    /** Lista de widgets do programa */
+    stack = new QStackedWidget();
+    stack->setMouseTracking(true);
+    stack->addWidget(wlayout);
+    setRenderer(JsonTools::stringJson("renderer"));
+    stack->setCurrentIndex(0);
 
 
     /** Layout principal para os widgets */
     layout = new QHBoxLayout();
     layout->setMargin(0);
-    layout->addWidget(video->widget());
+    layout->addWidget(stack);
     this->setLayout(layout);
 
 
@@ -364,8 +380,10 @@ void OMPlayer::onLoad() {
 
 /** Setando opções de Rendenização */
 void OMPlayer::setRenderer(const QString &op) {
-    VideoRenderer *replace;
-    if (video) replace = video; /** Pegando a referência */
+    if (stack->count() == 2) stack->removeWidget(video->widget());
+
+    /** Para mudar a renderização é necessário recriar o widget removido para depois ser readicionado.
+     * O uso do QStackWidget vai garantir que o widget vai ser exibido no lugar da logo sem problemas. */
 
     struct {
         const char* name;
@@ -387,12 +405,11 @@ void OMPlayer::setRenderer(const QString &op) {
         }
     }
 
-    /** Verificando se o layout já foi criado. É necessário readicionar o widget ao mudar a renderização. */
+    /** Ao recriar o widget, o índice do QStackWidget precisará ser definido novamente */
     if (!video && !video->isAvailable()) video = new VideoOutput(this);
     mediaPlayer->setRenderer(video);
-
-    /** Substituindo o widget no layout */
-    if (layout) layout->replaceWidget(replace->widget(), video->widget());
+    stack->addWidget(video->widget());
+    if (playing) stack->setCurrentIndex(1);
 
     const VideoRendererId vid = mediaPlayer->renderer()->id();
     if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)
@@ -613,10 +630,12 @@ void OMPlayer::onPaused(bool paused) {
 
 /** Função que define alguns parâmetros ao iniciar a reprodução */
 void OMPlayer::onStart() {
+    playing = true;
+
     Utils::changeIcon(playBtn, "pause", tr("Pause"));
+    stack->setCurrentIndex(1);
     slider->setDisabled(false);
     infoview->setStatistics(mediaPlayer->statistics());
-    playing = true;
 
     /** Definindo dimensões para o preview */
     Width = mediaPlayer->statistics().video_only.width;
@@ -644,11 +663,11 @@ void OMPlayer::onStart() {
     end->setText(QTime(0, 0, 0).addMSecs(
             int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
 
-    screensaver->disable();
     onTimeSliderLeave(IsPlay);
     changeIcons(IsPlay);
     updateChannelMenu();
     updateSlider(mediaPlayer->position());
+    screensaver->disable();
 }
 
 
@@ -659,15 +678,16 @@ void OMPlayer::onStop() {
         Utils::changeIcon(playBtn, "play", tr("Play"));
         this->setWindowTitle(QString(PRG_NAME));
 
+        stack->setCurrentIndex(0);
         slider->setMaximum(0);
         slider->setDisabled(true);
         current->setText("-- -- : -- --");
         end->setText("-- -- : -- --");
 
-        screensaver->enable();
         onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
         updateChannelMenu();
+        screensaver->enable();
     }
 }
 
@@ -1203,6 +1223,8 @@ void OMPlayer::changeEvent(QEvent *event) {
         else if (this->windowState() == Qt::WindowMaximized) {
             qDebug("%s(%sDEBUG%s):%s Maximizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
             JsonTools::boolJson("maximized", true);
+            playlist->hideFade();
+
         }
         else if (this->windowState() == (Qt::WindowMinimized|Qt::WindowMaximized)) {
             qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);

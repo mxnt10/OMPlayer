@@ -48,6 +48,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Alterações na classe Label fazendo uso de dois construtores.
  - Modificação na organização de arquivos fontes em subdiretórios
    Utils e Widgets.
+ - Usando QStackWidget para pilhar os widgets para exibição.
 ###
 
 ### Removed / Removido

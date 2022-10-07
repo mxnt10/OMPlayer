@@ -8,6 +8,7 @@
 #include <QGuiApplication>
 #include <QLayout>
 #include <QScreen>
+#include <QStackedWidget>
 #include <QTimer>
 
 #include <MediaInfoDLL.h>
@@ -116,6 +117,7 @@ private:
     QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};
+    QStackedWidget *stack{};
     QStringList listnum{};
     QTimer *click{};
     QWidget *wctl{}, *prev{}, *pv{}, *wvol{}, *wlayout{};

@@ -391,9 +391,7 @@ QString PlayList::getItems(int s) {
 
 
 /** Função para retornar o número total de itens da playlist */
-int PlayList::setListSize() {
-    return model->rowCount(QModelIndex());
-}
+int PlayList::setListSize() { return model->rowCount(QModelIndex()); }
 
 
 /** Função para remover apenas os itens selecionados */

@@ -277,7 +277,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(filter, &EventFilter::emitOpen, [this](){ openMedia(); });
     connect(filter, &EventFilter::emitSettings, [this](){ setDialog(SettingsD); });
     connect(cfilter, &EventFilter::emitLeave, [this](){
-        if (!contmenu || listmenu) playlist->hideFade();
+        if (!contmenu) playlist->hideFade();
         setHide();
     });
 
@@ -464,7 +464,7 @@ void OMPlayer::ajustActualItem(int item) {
     }
 
     if (item == actualitem) {
-        if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
+        if (actualitem == playlist->setListSize() && !restart && !randplay) {
             playing = false;
             mediaPlayer->stop();
             playlist->selectClean();
@@ -728,9 +728,7 @@ void OMPlayer::setShuffle() {
 
 
 /** Função para ativar a função pause com um clique */
-void OMPlayer::enablePause() {
-    if (!enterpos) pausing = true;
-}
+void OMPlayer::enablePause() { if (!enterpos) pausing = true; }
 
 
 /** Contador para mapear o clique único */

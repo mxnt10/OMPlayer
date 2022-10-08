@@ -62,6 +62,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Removido a função protegida leaveEvent() da classe Label.
  - Removido a função protegida showEvent() de About, sendo substituida
    pela função changeIcons().
+ - Removido o tema gradient, porque era feio.
 ###
 
 ### Fixed / Corrigido

@@ -452,7 +452,7 @@ void PlayList::changeIcons() {
 /** Minimização antes dos diálogos */
 void PlayList::hideFade() {
     emit emithide();
-    fadePls(Hide);
+    if (isshow) fadePls(Hide);
     QTimer::singleShot(130, [this](){ isshow = false; });
 }
 

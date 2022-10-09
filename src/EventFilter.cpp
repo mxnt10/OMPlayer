@@ -1,5 +1,4 @@
 #include <QContextMenuEvent>
-#include <QDebug>
 #include <QEvent>
 #include <QTimer>
 #include <QWidget>
@@ -33,8 +32,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object)
 
     if (option == General) {
-        /** O widget filho abre mais rápido que o pai, por isso o delay */
-        if (!first) QTimer::singleShot(1000, [this](){ start = true; first = true; });
+        /** O widget filho pode abrir mais rápido que o pai, por isso o delay */
+        if (!first) QTimer::singleShot(500, [this](){ start = true; first = true; });
 
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {

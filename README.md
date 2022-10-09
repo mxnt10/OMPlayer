@@ -11,8 +11,8 @@
 
 <h2>Required Packages</h2>
 
-- <b>Qt5</b> >= 5.15.3
-- <b>QtAV</b> >= 1.13.0
+- Qt5 >= 5.15.3
+- QtAV >= 1.13.0
 
 <h2>Shotcuts</h2>
 
@@ -27,7 +27,7 @@
 
 <h2>Installation Instructions</h2>
 
-To install <b>OMPlayer</b>, use the following commands:
+To install OMPlayer, use the following commands:
 ```
 $ git clone https://github.com/mxnt10/OMPlayer.git
 $ cd OMPlayer
@@ -51,7 +51,7 @@ the overlay prevented the video from being viewed.
 <h2>GNU General Public License</h2>
 
 This repository has scripts that were created to be free software.<br/>
-Therefore, they can be distributed and/or modified within the terms of the <b><i>GNU General Public License</i></b>.
+Therefore, they can be distributed and/or modified within the terms of the <i>GNU General Public License</i>.
 
 >
 >[General Public License](https://pt.wikipedia.org/wiki/GNU_General_Public_License)
@@ -65,5 +65,5 @@ please submit a message to one of the contacts below.
 
 <h2>Contact</h2>
 
-Maintainer: <b>Mauricio Ferrari</b> - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
+Maintainer: Mauricio Ferrari - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
 Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

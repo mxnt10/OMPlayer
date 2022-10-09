@@ -20,10 +20,10 @@
 - <b>Ctrl+H</b>: Shuffle mode.
 - <b>Ctrl+T</b>: Repeat mode.
 - <b>Ctrl+Alt+T</b>: Repeat current media (repeat one).
-- <b>Alt+Enter</b>: Show or exit fullscreen.
+- 🖥️ <b>Alt+Enter</b>: Show or exit fullscreen.
 - <b>Alt+S</b>: Show Settings.
-- <b>Esc</b>: Exit fullscreen.
-- Multimedia Keys: <b>Play/Pause, Next, Previous.</b>
+- 🖥️ <b>Esc</b>: Exit fullscreen.
+- Multimedia Keys: <b>Play/Pause ⏯️️, Previous ⏮️, Next ⏭.</b>
 
 <h2>Installation Instructions</h2>
 

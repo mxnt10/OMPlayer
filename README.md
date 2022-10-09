@@ -19,12 +19,14 @@
     which uses ffmpeg for handling multimedia files.
 </div>
 
-<h2>Required Packages</h2>
+<h1>Required Packages</h1>
 
 - Qt5 >= 5.15.3
 - QtAV >= 1.13.0
 
-<h2>Shotcuts</h2>
+<h1>Shotcuts</h1>
+
+<h3>
 
 - 🎬 Ctrl+A or Ctrl+O: Open files.
 - 🔀 Ctrl+H: Shuffle mode.
@@ -35,7 +37,9 @@
 - 🖥️ Esc: Exit fullscreen.
 - Multimedia Keys: Play/Pause ⏯️️ , Previous ⏮️ , Next ⏭ .
 
-<h2>Installation Instructions</h2>
+</h3>
+
+<h1>Installation Instructions</h1>
 
 To install OMPlayer, use the following commands:
 ```
@@ -47,7 +51,7 @@ $ sudo su
 ```
 The script already does the compilation.
 
-<h2>Limitations</h2>
+<h1>Limitations</h1>
 
 - The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
@@ -58,7 +62,7 @@ so adjustments in the code were necessary to obtain this information through oth
 - For multimedia controls, floating widget was used, not widget overlay. Depending on the decoding option,
 the overlay prevented the video from being viewed.
 
-<h2>GNU General Public License</h2>
+<h1>GNU General Public License</h1>
 
 This repository has scripts that were created to be free software.<br/>
 Therefore, they can be distributed and/or modified within the terms of the <i>`GNU General Public License`</i>.
@@ -68,12 +72,12 @@ Therefore, they can be distributed and/or modified within the terms of the <i>`G
 >
 > Free Software Foundation (FSF) Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-<h2>Comments</h2>
+<h1>Comments</h1>
 
 In case of bugs, problems of execution or construction of packages, constructive criticism, among others,
 please submit a message to one of the contacts below.
 
-<h2>Contact</h2>
+<h1>Contact</h1>
 
 Maintainer: Mauricio Ferrari - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
 Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

@@ -11,24 +11,24 @@
 
 <h2> Required packages </h2>
 
-> - <b>Qt5</b> >= 5.15.3
-> - <b>QtAV</b> >= 1.13.0
+- <b>Qt5</b> >= 5.15.3
+- <b>QtAV</b> >= 1.13.0
 
 <h2> Shotcuts </h2>
 
-> - <b>Ctrl+A</b> or <b>Ctrl+O</b>: Open files.
-> - <b>Ctrl+H</b>: Shuffle mode.
-> - <b>Ctrl+T</b>: Repeat mode.
-> - <b>Ctrl+Alt+T</b>: Repeat current media (repeat one).
-> - <b>Alt+Enter</b>: Show or exit fullscreen.
-> - <b>Alt+S</b>: Show Settings.
-> - <b>Esc</b>: Exit fullscreen.
-> - Multimedia Keys: <b>Play/Pause, Next, Previous.</b>
+- <b>Ctrl+A</b> or <b>Ctrl+O</b>: Open files.
+- <b>Ctrl+H</b>: Shuffle mode.
+- <b>Ctrl+T</b>: Repeat mode.
+- <b>Ctrl+Alt+T</b>: Repeat current media (repeat one).
+- <b>Alt+Enter</b>: Show or exit fullscreen.
+- <b>Alt+S</b>: Show Settings.
+- <b>Esc</b>: Exit fullscreen.
+- Multimedia Keys: <b>Play/Pause, Next, Previous.</b>
 
 <h2> Installation instructions </h2>
 
 To install <b>OMPlayer</b>, use the following commands:
-```
+```diff
 $ git clone https://github.com/mxnt10/OMPlayer.git
 $ cd OMPlayer
 
@@ -39,13 +39,15 @@ The script already does the compilation.
 
 <h2> Limitations </h2>
 
->- The framework does not have the next and previous functions,
+- The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
+<br/><br/>
 
->- It is only possible to obtain the information of the multimedia file during its playback,
+- It is only possible to obtain the information of the multimedia file during its playback,
 so adjustments in the code were necessary to obtain this information through other methods.
+  <br/><br/>
 
->- For multimedia controls, floating widget was used, not widget overlay. Depending on the decoding option,
+- For multimedia controls, floating widget was used, not widget overlay. Depending on the decoding option,
 the overlay prevented the video from being viewed.
 
 <h2> GNU General Public License </h2>
@@ -53,9 +55,10 @@ the overlay prevented the video from being viewed.
 This repository has scripts that were created to be free software.<br/>
 Therefore, they can be distributed and/or modified within the terms of the <b><i>GNU General Public License</i></b>.
 
+>
 >[General Public License](https://pt.wikipedia.org/wiki/GNU_General_Public_License)
 >
->Free Software Foundation (FSF) Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
+> Free Software Foundation (FSF) Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
 <h2> Comments </h2>
 

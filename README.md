@@ -27,14 +27,16 @@
 <h1>Shotcuts</h1>
 
 <h3>
-🎬 <sub>Ctrl+A or Ctrl+O: Open files.</sub><br/>
-🔀 <sub>Ctrl+H: Shuffle mode.</sub><br/>
-🔁 <sub>Ctrl+T: Repeat mode.</sub><br/>
-🔂 <sub>Ctrl+Alt+T: Repeat current media (repeat one).</sub><br/>
-🖥️ <sub>Alt+Enter: Show or exit fullscreen.</sub><br/>
-🛠️ <sub>Alt+S: Show Settings.</sub><br/>
-🖥️ <sub>Esc: Exit fullscreen.</sub><br/>
-<sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub>
+  <ul>
+    <li>💿 <sub><u>Ctrl+A or Ctrl+O: Open files.</sub></li>
+    <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>
+    <li>🔁 <sub>Ctrl+T: Repeat mode.</sub></li>
+    <li>🔂 <sub>Ctrl+Alt+T: Repeat current media (repeat one).</sub></li>
+    <li>🖥️ <sub>Alt+Enter: Show or exit fullscreen.</sub></li>
+    <li>🛠️ <sub>Alt+S: Show Settings.</sub></li>
+    <li>🖥️ <sub>Esc: Exit fullscreen.</sub></li>
+    <li>🎬 <sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub></li>
+  <ul>
 </h3>
 
 <h1>Installation Instructions</h1>

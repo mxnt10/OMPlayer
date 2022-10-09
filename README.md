@@ -1,5 +1,17 @@
 <div align="center">
   <h1>OMPlayer - Open Multimedia Player</h1>
+    <a href="/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/mxnt10/OMPlayer?color=blue&label=License&style=flat-square">
+    </a>
+    <a href="https://github.com/mxnt10/OMPlayer/releases">
+        <img src="https://img.shields.io/github/v/release/mxnt10/OMPlayer?color=blue&label=Release%20Version&style=flat-square" alt=""/>
+        <img src="https://img.shields.io/github/repo-size/mxnt10/OMPlayer?color=blue&label=Repo%20Size&style=flat-square" alt=""/>
+        <img src="https://img.shields.io/github/last-commit/mxnt10/OMPlayer?color=blue&label=Last%20Commit&style=flat-square" alt=""/>
+        <img src="https://img.shields.io/github/release-date/mxnt10/OMPlayer?color=blue&label=Release%20Date&style=flat-square" alt=""/>
+    </a>
+    <a href="https://github.com/mxnt10/OMPlayer/stargazers">
+        <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mxnt10/OMPlayer?color=blue&label=GitHub%20Stars&style=flat-square">
+    </a><br/><br/>
     <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
     <br/><br/>
     Multimedia player developed in C++ using Qt5 as an interface.

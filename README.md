@@ -1,12 +1,10 @@
 <div align="center">
   <h1>OMPlayer - Open Multimedia Player</h1>
-  <h3>
-      <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
-      <br/><br/>
-      Multimedia player developed in C++ using Qt5 as an interface.
-      To play multimedia files, the program uses the QtAV framework,
-      which uses ffmpeg for handling multimedia files.
-  </h3>
+    <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
+    <br/><br/>
+    Multimedia player developed in C++ using Qt5 as an interface.
+    To play multimedia files, the program uses the QtAV framework,
+    which uses ffmpeg for handling multimedia files.
 </div>
 
 <h2>Required Packages</h2>
@@ -51,7 +49,7 @@ the overlay prevented the video from being viewed.
 <h2>GNU General Public License</h2>
 
 This repository has scripts that were created to be free software.<br/>
-Therefore, they can be distributed and/or modified within the terms of the <i>GNU General Public License</i>.
+Therefore, they can be distributed and/or modified within the terms of the <i>`GNU General Public License`</i>.
 
 >
 >[General Public License](https://pt.wikipedia.org/wiki/GNU_General_Public_License)

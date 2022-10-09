@@ -67,5 +67,5 @@ please submit a message to one of the contacts below.
 
 <h2> Contact </h2>
 
-Maintainer: <b>Mauricio Ferrari</b> - <a><i>m10ferrari1200@gmail.com</i></a><br/>
-Telegram: <a><i>@maurixnovatrento</i></a><br/>
+Maintainer: <b>Mauricio Ferrari</b> - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
+Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

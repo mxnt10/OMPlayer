@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>OMPlayer - Open Multimedia Player</h1>
+  <h1>𝗢𝗠𝗣𝗹𝗮𝘆𝗲𝗿 - 𝗢𝗽𝗲𝗻 𝗠𝘂𝗹𝘁𝗶𝗺𝗲𝗱𝗶𝗮 𝗣𝗹𝗮𝘆𝗲𝗿</h1>
     <a href="/LICENSE">
         <img alt="GitHub" src="https://img.shields.io/github/license/mxnt10/OMPlayer?color=blue&label=License&style=flat-square">
     </a>
@@ -28,15 +28,15 @@
 
 <h3>
   <ul>
-    <li>💿 <sub><u>Ctrl+A or Ctrl+O: Open files.</sub></li>
+    <li>📂 <sub>Ctrl+A or Ctrl+O: Open files.</sub></li>
     <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>
     <li>🔁 <sub>Ctrl+T: Repeat mode.</sub></li>
     <li>🔂 <sub>Ctrl+Alt+T: Repeat current media (repeat one).</sub></li>
     <li>🖥️ <sub>Alt+Enter: Show or exit fullscreen.</sub></li>
     <li>🛠️ <sub>Alt+S: Show Settings.</sub></li>
     <li>🖥️ <sub>Esc: Exit fullscreen.</sub></li>
-    <li>🎬 <sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub></li>
-  <ul>
+    <li>🎵 <sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub></li>
+  </ul>
 </h3>
 
 <h1>Installation Instructions</h1>

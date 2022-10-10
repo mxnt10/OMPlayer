@@ -19,16 +19,16 @@
     which uses ffmpeg foɾ hɑndling multimediɑ files.
 </div>
 
-<h3>Required Packages</h3>
+<h3>𝖱𝖾𝗊𝗎𝗂𝗋𝖾𝖽 𝖯𝖺𝖼𝗄𝖺𝗀𝖾𝗌</h3>
 <ul>
     <li>𝐐𝐭𝟓 >= 5.15.3</li>
     <li>𝐐𝐭𝐀𝐕 >= 1.13.0</li>
 </ul>
 
 <h3>
-  Shotcuts
+  Shotcuts<br/>
   <ul>
-    <li>📂 <sub>Ctrl+A or Ctrl+O: Open files.</sub></li>
+    <li>📂 <sub>𝐂𝐭𝐫𝐥+𝐀 or 𝐂𝐭𝐫𝐥+𝐎: Open files.</sub></li>
     <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>
     <li>🔁 <sub>Ctrl+T: Repeat mode.</sub></li>
     <li>🔂 <sub>Ctrl+Alt+T: Repeat current media (repeat one).</sub></li>

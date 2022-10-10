@@ -25,8 +25,9 @@
     <li>𝐐𝐭𝐀𝐕 >= 1.13.0</li>
 </ul>
 
+<h2>Shotcuts</h2>
+
 <h3>
-  Shotcuts<br/>
   <ul>
     <li>📂 <sub>𝐂𝐭𝐫𝐥+𝐀 or 𝐂𝐭𝐫𝐥+𝐎: Open files.</sub></li>
     <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>

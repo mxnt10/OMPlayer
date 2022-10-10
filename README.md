@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>𝗢𝗠𝗣𝗹𝗮𝘆𝗲𝗿 - 𝗢𝗽𝗲𝗻 𝗠𝘂𝗹𝘁𝗶𝗺𝗲𝗱𝗶𝗮 𝗣𝗹𝗮𝘆𝗲𝗿</h1>
+  <h1>OMPlɑγeɾ - Open Multimediɑ Plɑγeɾ</h1>
     <a href="/LICENSE">
         <img alt="GitHub" src="https://img.shields.io/github/license/mxnt10/OMPlayer?color=blue&label=License&style=flat-square">
     </a>
@@ -14,9 +14,9 @@
     </a><br/><br/>
     <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
     <br/><br/>
-    Multimedia player developed in C++ using Qt5 as an interface.
-    To play multimedia files, the program uses the QtAV framework,
-    which uses ffmpeg for handling multimedia files.
+    Multimediɑ plɑγeɾ developed in C++ using Qt5 ɑs ɑn inteɾfɑce.
+    To plɑγ multimediɑ files, the pɾogɾɑm uses the QtAV fɾɑmewoɾk,
+    which uses ffmpeg foɾ hɑndling multimediɑ files.
 </div>
 
 <h1>Required Packages</h1>

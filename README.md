@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>𝗢𝗠𝗣𝗹𝗮𝘆𝗲𝗿 - 𝗢𝗽𝗲𝗻 𝗠𝗲𝗱𝗶𝗮 𝗣𝗹𝗮𝘆𝗲𝗿</h1>
+  <h1>OMPlɑγeɾ - Open Multimediɑ Plɑγeɾ</h1>
     <a href="/LICENSE">
         <img alt="GitHub" src="https://img.shields.io/github/license/mxnt10/OMPlayer?color=blue&label=License&style=flat-square">
     </a>
@@ -19,13 +19,15 @@
     which uses ffmpeg foɾ hɑndling multimediɑ files.
 </div>
 
-<h3>𝖱𝖾𝗊𝗎𝗂𝗋𝖾𝖽 𝖯𝖺𝖼𝗄𝖺𝗀𝖾𝗌</h3>
+<h3>Required Packages</h3>
 
-- 𝐐𝐭𝟓 >= 5.15.3
-- 𝐐𝐭𝐀𝐕 >= 1.13.0
+- Qt5 >= 5.15.3
+- QtAV >= 1.13.0
 
-<h3>Shotcuts
-<ul>
+<h3>Shotcuts</h3>
+
+<h3>
+  <ul>
     <li>📂 <sub>Ctrl+A or Ctrl+O: Open files.</sub></li>
     <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>
     <li>🔁 <sub>Ctrl+T: Repeat mode.</sub></li>
@@ -34,9 +36,10 @@
     <li>🛠️ <sub>Alt+S: Show Settings.</sub></li>
     <li>🖥️ <sub>Esc: Exit fullscreen.</sub></li>
     <li>🎵 <sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub></li>
-</ul><br/>
+  </ul>
+</h3>
 
-Instɑllɑtion Instɾuctions</h3>
+<h3>Installation Instructions</h3>
 
 To install OMPlayer, use the following commands:
 ```
@@ -48,7 +51,7 @@ $ sudo su
 ```
 The script already does the compilation.
 
-<h3>Limitɑtions</h3>
+<h3>Limitations</h3>
 
 - The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
@@ -74,7 +77,7 @@ Therefore, they can be distributed and/or modified within the terms of the <i>`G
 In case of bugs, problems of execution or construction of packages, constructive criticism, among others,
 please submit a message to one of the contacts below.
 
-<h3>Contɑct</h3>
+<h3>Contact</h3>
 
 Maintainer: Mauricio Ferrari - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
 Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

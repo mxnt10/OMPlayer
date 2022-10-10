@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>OMPlɑγeɾ - Open Multimediɑ Plɑγeɾ</h1>
+  <h1>𝐎𝐌𝐏𝐥𝐚𝐲𝐞𝐫 - 𝐎𝐩𝐞𝐧 𝐌𝐞𝐝𝐢𝐚 𝐏𝐥𝐚𝐲𝐞𝐫</h1>
     <a href="/LICENSE">
         <img alt="GitHub" src="https://img.shields.io/github/license/mxnt10/OMPlayer?color=blue&label=License&style=flat-square">
     </a>
@@ -19,7 +19,7 @@
     which uses ffmpeg foɾ hɑndling multimediɑ files.
 </div>
 
-<h3>Requiɾed Pɑckɑges</h3>
+<h3>𝐑𝐞𝐪𝐮𝐢𝐫𝐞𝐝 𝐏𝐚𝐜𝐤𝐚𝐠𝐞𝐬</h3>
 
 - 𝐐𝐭𝟓 >= 5.15.3
 - 𝐐𝐭𝐀𝐕 >= 1.13.0

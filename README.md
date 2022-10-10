@@ -25,7 +25,7 @@
     <li>𝐐𝐭𝐀𝐕 >= 1.13.0</li>
 </ul>
 
-<h2>Shotcuts</h2>
+<h2>𝖲𝗁𝗈𝗍𝖼𝗎𝗍𝗌</h2>
 
 <h3>
   <ul>
@@ -40,7 +40,7 @@
   </ul>
 </h3>
 
-<h3>Installation Instructions</h3>
+<h2>𝖨𝗇𝗌𝗍𝖺𝗅𝗅𝖺𝗍𝗂𝗈𝗇 𝖨𝗇𝗌𝗍𝗋𝗎𝖼𝗍𝗂𝗈𝗇𝗌</h2>
 
 To install OMPlayer, use the following commands:
 ```
@@ -52,7 +52,7 @@ $ sudo su
 ```
 The script already does the compilation.
 
-<h3>Limitations</h3>
+<h2>𝖫𝗂𝗆𝗂𝗍𝖺𝗍𝗂𝗈𝗇𝗌</h2>
 
 - The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
@@ -63,7 +63,7 @@ so adjustments in the code were necessary to obtain this information through oth
 - For multimedia controls, floating widget was used, not widget overlay. Depending on the decoding option,
 the overlay prevented the video from being viewed.
 
-<h3>GNU General Public License</h3>
+<h2>𝖦𝖭𝖴 𝖦𝖾𝗇𝖾𝗋𝖺𝗅 𝖯𝗎𝖻𝗅𝗂𝖼 𝖫𝗂𝖼𝖾𝗇𝗌𝖾</h2>
 
 This repository has scripts that were created to be free software.<br/>
 Therefore, they can be distributed and/or modified within the terms of the <i>`GNU General Public License`</i>.
@@ -73,12 +73,12 @@ Therefore, they can be distributed and/or modified within the terms of the <i>`G
 >
 > Fɾee Softwɑɾe Foundɑtion (FSF) Inc. 51 Fɾɑnklin St, Fifth Flooɾ, Boston, MA 02110-1301 USA
 
-<h3>Comments</h3>
+<h2>𝖢𝗈𝗆𝗆𝖾𝗇𝗍𝗌</h2>
 
 In cɑse of bugs, pɾoblems of execution oɾ constɾuction of pɑckɑges, constɾuctive cɾiticism, ɑmong otheɾs,
 pleɑse submit ɑ messɑge to one of the contɑcts below.
 
-<h3>Contact</h3>
+<h2>𝖢𝗈𝗇𝗍𝖺𝖼𝗍</h2>
 
 Maintainer: Mauricio Ferrari - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
 Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

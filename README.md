@@ -19,15 +19,13 @@
     which uses ffmpeg foɾ hɑndling multimediɑ files.
 </div>
 
-<h1>Required Packages</h1>
+<h3>Requiɾed Pɑckɑges</h3>
 
-- Qt5 >= 5.15.3
-- QtAV >= 1.13.0
+- 𝐐𝐭𝟓 >= 5.15.3
+- 𝐐𝐭𝐀𝐕 >= 1.13.0
 
-<h1>Shotcuts</h1>
-
-<h3>
-  <ul>
+<h3>Shotcuts
+<ul>
     <li>📂 <sub>Ctrl+A or Ctrl+O: Open files.</sub></li>
     <li>🔀 <sub>Ctrl+H: Shuffle mode.</sub></li>
     <li>🔁 <sub>Ctrl+T: Repeat mode.</sub></li>
@@ -36,10 +34,9 @@
     <li>🛠️ <sub>Alt+S: Show Settings.</sub></li>
     <li>🖥️ <sub>Esc: Exit fullscreen.</sub></li>
     <li>🎵 <sub>Multimedia Keys: Play/Pause</sub> ⏯️️<sub>, Previous</sub> ⏮️<sub>, Next</sub> ⏭<sub>.</sub></li>
-  </ul>
-</h3>
+</ul><br/>
 
-<h1>Installation Instructions</h1>
+Instɑllɑtion Instɾuctions</h3>
 
 To install OMPlayer, use the following commands:
 ```
@@ -51,7 +48,7 @@ $ sudo su
 ```
 The script already does the compilation.
 
-<h1>Limitations</h1>
+<h3>Limitɑtions</h3>
 
 - The framework does not have the next and previous functions,
 so it was necessary to create methods in the code to guarantee these functionalities.
@@ -62,7 +59,7 @@ so adjustments in the code were necessary to obtain this information through oth
 - For multimedia controls, floating widget was used, not widget overlay. Depending on the decoding option,
 the overlay prevented the video from being viewed.
 
-<h1>GNU General Public License</h1>
+<h3>GNU General Public License</h3>
 
 This repository has scripts that were created to be free software.<br/>
 Therefore, they can be distributed and/or modified within the terms of the <i>`GNU General Public License`</i>.
@@ -72,12 +69,12 @@ Therefore, they can be distributed and/or modified within the terms of the <i>`G
 >
 > Free Software Foundation (FSF) Inc. 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
 
-<h1>Comments</h1>
+<h3>Comments</h3>
 
 In case of bugs, problems of execution or construction of packages, constructive criticism, among others,
 please submit a message to one of the contacts below.
 
-<h1>Contact</h1>
+<h3>Contɑct</h3>
 
 Maintainer: Mauricio Ferrari - <a href=""><i>m10ferrari1200@gmail.com</i></a><br/>
 Telegram: <a href=""><i>@maurixnovatrento</i></a><br/>

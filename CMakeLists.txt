@@ -36,6 +36,13 @@ include_directories(
 add_subdirectory( common/SingleApplication )
 add_subdirectory( common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL )
 
+if(WIN32)
+    set(SRC_WIN
+        common/ScreenSaver/winscreensaver.cpp
+        common/ScreenSaver/winscreensaver.h
+    )
+endif()
+
 add_executable(
         OMPlayer
         src/main.cpp
@@ -74,6 +81,7 @@ add_executable(
         common/ScreenSaver/powersaving.h
         common/ScreenSaver/screensaver.cpp
         common/ScreenSaver/screensaver.h
+        ${SRC_WIN}
 )
 
 target_link_libraries(

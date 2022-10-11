@@ -82,7 +82,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
         /** Mapeando o movimento do mouse */
         if (event->type() == QEvent::MouseMove && !moving && start) {
-            qDebug("%s(%sDEBUG%s):%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, DGR);
+            qDebug("%s(%sEventFilter%s)%s::%s Mouse com Movimentação ...\033[0m", GRE, RED, GRE, RED, DGR);
             arrowMouse();
             emit emitMouseMove();
             moving = true;
@@ -91,7 +91,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         /** Aproveitando o evento do tooltip para usar como mapeamento de mouse parado */
         if (event->type() == QEvent::ToolTip) {
             if (!fixed) {
-                qDebug("%s(%sDEBUG%s):%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, YEL);
+                qDebug("%s(%sEventFilter%s)%s::%s Mouse sem Movimentação ...\033[0m", GRE, RED, GRE, RED, YEL);
                 emit emitLeave();
             }
             moving = false;
@@ -99,7 +99,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
         /** Ação após a destruição do menu de contexto */
         if (event->type() == QEvent::ChildRemoved && contextmenu) {
-            qDebug("%s(%sDEBUG%s):%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
+            qDebug("%s(%sEventFilter%s)%s::%s Finalizando o Menu de Contexto ...\033[0m", GRE, RED, GRE, RED, CYA);
             if (sett || fixed) arrowMouse();
             else blankMouse();
             contextmenu = false;
@@ -126,14 +126,8 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         }
     }
 
-    /** Emissão para os controles */
+    /** Emissão para os controles e demais */
     if (option == Control) {
-        if (event->type() == QEvent::Enter) emit emitEnter();
-        if (event->type() == QEvent::Leave) emit emitLeave();
-    }
-
-    /** Emissão para outros widgets */
-    if (option == Other) {
         if (event->type() == QEvent::Enter) emit emitEnter();
         if (event->type() == QEvent::Leave) emit emitLeave();
     }

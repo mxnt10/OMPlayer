@@ -26,8 +26,7 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Versão do programa e demais informações*/
-    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0,
-                              tr("Version") + " " + QString::fromStdString(VERSION));
+    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, tr("Version") + " " + STR(VERSION));
     auto *maintainer = new Label(BOTTON, 0, getTextMaintainer());
     version->setStyleSheet("font-size: 11pt");
     maintainer->setStyleSheet("font-size: 11pt");
@@ -89,9 +88,8 @@ void About::onClose() {
 
 /** Informações adicionais */
 QString About::getTextMaintainer() {
-    return tr("Maintainer") + ": " + QString::fromStdString(MAINTAINER) + "\n" + \
-    tr("E-Mail") + ": " + QString::fromStdString(EMAIL) + "\n\n" + \
-    tr("License") + ": " + QString::fromStdString(LICENSE);
+    return tr("Maintainer") + ": " + STR(MAINTAINER) + "\n" + \
+    tr("E-Mail") + ": " + STR(EMAIL) + "\n\n" + tr("License") + ": " + STR(LICENSE);
 }
 
 

@@ -91,7 +91,7 @@ QString Utils::setIconTheme(const QString &theme, const QString &icon) {
 
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const QString &style) {
-    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, qUtf8Printable(style));
+    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, STR(style));
     QStringList locals{def.defaultDir, def.localDir, def.currentDir};
     QString qss;
 
@@ -139,7 +139,7 @@ QString Utils::defaultIcon(const QString &icon) {
         return {};
     }
 
-    qDebug("%s(%sUtils%s)%s::%sUsando ícone do sistema: %s ...\033[0m", GRE, RED, GRE, RED, BLU, qUtf8Printable(icon));
+    qDebug("%s(%sUtils%s)%s::%sUsando ícone do sistema: %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(icon));
     if (icon == "play")           return "media-playback-start";
     if (icon == "pause")          return "media-playback-pause";
     if (icon == "stop")           return "media-playback-stop";

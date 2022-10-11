@@ -416,8 +416,8 @@ void OMPlayer::setRenderer(const QString &op) {
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
     else mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
-    if (video) qDebug("%s(%sDEBUG%s):%s Setando rendenização %s %i ...\033[0m", GRE, RED, GRE, BLU,
-                      qUtf8Printable(op), video->id());
+    if (video) qDebug("%s(%sSettings%s)%s::%s Setando rendenização %s %i ...\033[0m",
+                      GRE, RED, GRE, RED, BLU, STR(op), video->id());
 }
 
 
@@ -480,7 +480,7 @@ void OMPlayer::ajustActualItem(int item) {
 
 
 /** Calculando o total de itens */
-void OMPlayer::setTotalItems() {
+void OMPlayer::setTotalItems() { //todo
     totalitems = playlist->setListSize();
     qDebug("%s(%sDEBUG%s):%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, BLU, totalitems);
 }
@@ -1237,7 +1237,7 @@ void OMPlayer::closeEvent(QCloseEvent *event) {
     screensaver->enable();
     playlist->save();
     qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
-    event->accept();
+    event->accept(); //todo
 }
 
 
@@ -1247,7 +1247,7 @@ void OMPlayer::closeEvent(QCloseEvent *event) {
 /** Função para o menu de contexto do programa */
 void OMPlayer::ShowContextMenu(const QPoint &pos) {
     if (listmenu || !enterpos) {
-        qDebug("%s(%sDEBUG%s):%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Iniciando o Menu de Contexto ...\033[0m", GRE, RED, GRE, RED, CYA);
         arrowMouse();
     }
 

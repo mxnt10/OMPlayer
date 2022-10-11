@@ -32,7 +32,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Lista para visualização da playlist */
-    auto *filter = new EventFilter(this, EventFilter::Other);
+    auto *filter = new EventFilter(this, EventFilter::Control);
     listView = new QListView();
     listView->setModel(model);
     listView->setItemDelegate(delegate);
@@ -78,7 +78,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Gerando uma linha vertical transparente */
-    auto *filter2 = new EventFilter(this, EventFilter::Other);
+    auto *filter2 = new EventFilter(this, EventFilter::Control);
     auto size = new QFrame();
     size->setFixedWidth(10);
     size->installEventFilter(filter2);
@@ -150,10 +150,10 @@ void PlayList::load(ST load, const QString &url) {
     if (!f.open(QIODevice::ReadOnly)) return;
 
     actsum = Utils::setHash(url);
-    qDebug("%s(%sDEBUG%s):%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, BLU, qUtf8Printable(actsum));
+    qDebug("%s(%sPlaylist%s)%s::%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(actsum));
 
     if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
-        qDebug("%s(%sDEBUG%s):%s Carregando a playlist ...\033[0m", GRE, RED, GRE, ORA);
+        qDebug("%s(%sPlaylist%s)%s::%s Carregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
         if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
         QDataStream ds(&f);
         QList<PlayListItem> list;
@@ -168,7 +168,7 @@ void PlayList::load(ST load, const QString &url) {
         }
         sum = actsum;
     } else
-        qDebug("%s(%sDEBUG%s):%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, BLU);
+        qDebug("%s(%sPlaylist%s)%s::%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, RED, BLU);
     f.close();
     if (load != First) save();
 }
@@ -176,7 +176,7 @@ void PlayList::load(ST load, const QString &url) {
 
 /** Função para salvar a playlist ao fechar */
 void PlayList::save(const QString &url) {
-    qDebug("%s(%sDEBUG%s):%s Salvando a playlist ...\033[0m", GRE, RED, GRE, ORA);
+    qDebug("%s(%sPlaylist%s)%s::%s Salvando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
     QFile f(url);
     if (!f.open(QIODevice::WriteOnly)) return;
     QDataStream ds(&f);
@@ -237,7 +237,7 @@ void PlayList::addItems(const QStringList &parms) {
         } else {
             if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
                 hashlist.append(Utils::stringHash(file));
-                qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(file));
+                qDebug("%s(%sPlaylist%s)%s::%s Adicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(file));
                 insert(file, a + t);
                 a++;
             } else {
@@ -302,7 +302,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
                 else if (QFileInfo::exists(playlist_path + "/" + url)) url = playlist_path + "/" + url;
 
                 if (QFileInfo::exists(url)) {
-                    qDebug("%s(%sDEBUG%s):%s Adicionando %s ...\033[0m", GRE, RED, GRE, RDL, qUtf8Printable(url));
+                    qDebug("%s(%sPlaylist%s)%s::%s Adicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(url));
                     insert(url, i, qint64(duration));
                     i++;
                 }
@@ -436,9 +436,7 @@ void PlayList::onAboutToPlay(const QModelIndex &index) {
 
 
 /** Função para emitir o intem selecionado na playlist */
-void PlayList::onSelect(const QModelIndex &index) {
-    emit selected(int(index.row()));
-}
+void PlayList::onSelect(const QModelIndex &index) { emit selected(int(index.row())); }
 
 
 /** Função para recarregar os ícones da playlist */
@@ -493,7 +491,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
         }
     } else {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
-            qDebug("%s(%sDEBUG%s):%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, VIO);
+            qDebug("%s(%sPlaylist%s)%s::%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, RED, VIO);
             emit emitnohide();
             fadePls(Show);
             isshow = true;

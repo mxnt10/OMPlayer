@@ -1,5 +1,4 @@
 #include <QCoreApplication>
-#include <QDebug>
 #include <QFileInfo>
 #include <QLocale>
 #include <Utils>
@@ -36,6 +35,6 @@ bool Translator::load() { return translator->load(local); }
 
 /** Função para instalar a tradução */
 void Translator::installTranslator() {
-    qDebug("%s(%sTranslator%s)%s::%sCarregando tradução: %s ...\033[m", GRE, RED, GRE, RED, YEL, qUtf8Printable(local));
+    qDebug("%s(%sTranslator%s)%s::%sCarregando tradução: %s ...\033[m", GRE, RED, GRE, RED, YEL, STR(local));
     QCoreApplication::installTranslator(translator);
 }

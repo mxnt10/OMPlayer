@@ -7,7 +7,6 @@
 #include "StatisticsView.h"
 
 
-
 /**********************************************************************************************************************/
 
 
@@ -394,6 +393,10 @@ void StatisticsView::settaginfos() {
 }
 
 
+/** Função para alterar o ícone do botão */
+void StatisticsView::changeIcons() { Utils::changeIcon(closebtn, "apply"); }
+
+
 /**********************************************************************************************************************/
 
 
@@ -406,7 +409,6 @@ void StatisticsView::hideEvent(QHideEvent *event) {
 
 /** Evento para iniciar o temporizador */
 void StatisticsView::showEvent(QShowEvent *event) {
-    Utils::changeIcon(closebtn, "apply"); //todo
     visibility();
     settaginfos();
     timer = startTimer(1000);

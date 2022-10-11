@@ -15,6 +15,7 @@ public:
     ~StatisticsView() override;
     void setStatistics(const Statistics &s);
     void setCurrentTime(int current);
+    void changeIcons();
 
 protected:
     void hideEvent(QHideEvent *event) override;

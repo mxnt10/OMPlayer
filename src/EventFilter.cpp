@@ -33,7 +33,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
     if (option == General) {
         /** O widget filho pode abrir mais rápido que o pai, por isso o delay */
-        if (!first) QTimer::singleShot(500, [this](){ start = true; first = true; });
+        if (!first) QTimer::singleShot(200, [this](){ start = true; first = true; });
 
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {

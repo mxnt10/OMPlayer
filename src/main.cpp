@@ -8,6 +8,8 @@
  * Dependências:
  *      - Qt5
  *      - QtAV
+ *
+ * Dependências incluídas:
  *      - libmediainfo
  *      - libzen
  *

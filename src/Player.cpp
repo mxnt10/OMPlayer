@@ -1134,6 +1134,7 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         Utils::changeIcon(nextBtn, "next");
         Utils::changeIcon(previousBtn, "previous");
         playlist->changeIcons();
+        infoview->changeIcons();
         about->changeIcons();
     }
 }

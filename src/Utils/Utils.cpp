@@ -24,9 +24,9 @@ void Utils::initUtils(Status option) {
 
 
 /**
- * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é conveniente. Por isso, é usado
- * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível apenas à caráter
- * de testes de execução e depuração do reprodutor. */
+ * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é tão conveniente. Por isso, é usado
+ * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível à caráter
+ * de testes de execução e depuração do reprodutor e em caso de portabilizar o reprodutor. */
 QString Utils::getLocal(Status option) {
     if (option == Current) return QDir::currentPath();
     return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));

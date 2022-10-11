@@ -33,8 +33,8 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela e para o sobre do QtAV */
-    closebtn = new Button(Button::button, "apply", 32, tr("Close"));
-    qtavbtn = new Button(Button::button, "info", 32, tr("About QtAV"));
+    closebtn = new Button(Button::button, "apply", 32);
+    qtavbtn = new Button(Button::button, "info", 32);
     connect(closebtn, &Button::clicked, this, &About::onClose);
     connect(qtavbtn, &Button::clicked, this, &QtAV::about);
 

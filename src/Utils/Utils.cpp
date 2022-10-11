@@ -182,11 +182,10 @@ void Utils::rm_nl(string &s) { for (uint p = s.find('\n'); p != (uint) string::n
 
 
 /** Alteração dos botões */
-void Utils::changeIcon(Button *btn, const QString &thm, const QString &ttp) {
+void Utils::changeIcon(Button *btn, const QString &thm) {
     if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
         btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
     else btn->setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
-    if (!ttp.isNull()) btn->setToolTip(ttp);
 }
 
 

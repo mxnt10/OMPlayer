@@ -105,13 +105,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para os controles de reprodução */
-    playBtn = new Button(Button::button, "play", 48, tr("Play"));
-    stopBtn = new Button(Button::button, "stop", 32, tr("Stop"));
-    nextBtn = new Button(Button::button, "next", 32, tr("Next"));
-    previousBtn = new Button(Button::button, "previous", 32, tr("Previous"));
-    replayBtn = new Button(Button::button, "replay", 32, tr("Replay"));
-    shuffleBtn = new Button(Button::button, "shuffle", 32, tr("Shuffle"));
-    volumeBtn = new Button(Button::button, "volume_high", 32, tr("Volume") + ": " + QString::number(vol * 100));
+    playBtn = new Button(Button::button, "play", 48);
+    stopBtn = new Button(Button::button, "stop", 32);
+    nextBtn = new Button(Button::button, "next", 32);
+    previousBtn = new Button(Button::button, "previous", 32);
+    replayBtn = new Button(Button::button, "replay", 32);
+    shuffleBtn = new Button(Button::button, "shuffle", 32);
+    volumeBtn = new Button(Button::button, "volume_high", 32);
     connect(playBtn, &Button::clicked, this, &OMPlayer::playPause);
     connect(stopBtn, &Button::clicked, this, &OMPlayer::setStop);
     connect(nextBtn, &Button::clicked, this, &OMPlayer::Next);
@@ -480,9 +480,9 @@ void OMPlayer::ajustActualItem(int item) {
 
 
 /** Calculando o total de itens */
-void OMPlayer::setTotalItems() { //todo
+void OMPlayer::setTotalItems() {
     totalitems = playlist->setListSize();
-    qDebug("%s(%sDEBUG%s):%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, BLU, totalitems);
+    qDebug("%s(%sPlaylist%s)%s::%s Total de itens na playlist: %i ... \033[0m", GRE, RED, GRE, RED, BLU, totalitems);
 }
 
 
@@ -490,8 +490,8 @@ void OMPlayer::setTotalItems() { //todo
 void OMPlayer::setSelect(int item) {
     if (!playing) {
         actualitem = item;
-        qDebug("%s(%sDEBUG%s):%s Selecionando o item %s manualmente ...\033[0m", GRE, RED, GRE, ORA,
-               qUtf8Printable(Utils::mediaTitle(playlist->getItems(item))));
+        qDebug("%s(%sPlaylist%s)%s::%s Selecionando o item %s manualmente ...\033[0m",
+               GRE, RED, GRE, RED, ORA, STR(Utils::mediaTitle(playlist->getItems(item))));
     }
 }
 
@@ -528,7 +528,7 @@ void OMPlayer::play(const QString &isplay, int index) {
 /** Para executar os itens recém adicionados da playlist */
 void OMPlayer::firstPlay(const QString &isplay, int pos) {
     if (!mediaPlayer->isPlaying()) {
-        qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+        qDebug("%s(%sPlayer%s)%s::%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
         play(isplay, pos);
     }
 }
@@ -536,14 +536,14 @@ void OMPlayer::firstPlay(const QString &isplay, int pos) {
 
 /** Executa um item selecionado da playlist */
 void OMPlayer::doubleplay(const QString &name) {
-    qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+    qDebug("%s(%sPlayer%s)%s::%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
     play(name, playlist->selectItems());
 }
 
 
 /** Função para selecionar aleatóriamente a próxima mídia */
 void OMPlayer::nextRand() {
-    qDebug("%s(%sDEBUG%s):%s Reproduzindo uma mídia aleatória ...\033[0m", GRE, RED, GRE, ORA);
+    qDebug("%s(%sPlayer%s)%s::%s Reproduzindo uma mídia aleatória ...\033[0m", GRE, RED, GRE, RED, ORA);
     if (listnum.size() < playlist->setListSize()) {
         actualitem = QRandomGenerator::global()->bounded(playlist->setListSize() - 1);
 
@@ -562,8 +562,8 @@ void OMPlayer::nextRand() {
         listnum.append(QString::number(actualitem));
     }
 
-    qDebug("%s(%sDEBUG%s):%s Número de itens reproduzidos aleatoriamente: %i ...\033[0m",
-           GRE, RED, GRE, BLU, listnum.size());
+    qDebug("%s(%sPlayer%s)%s::%s Número de itens reproduzidos aleatoriamente: %i ...\033[0m",
+           GRE, RED, GRE, RED, BLU, listnum.size());
     play(playlist->getItems(actualitem), actualitem);
 }
 
@@ -578,7 +578,7 @@ void OMPlayer::Next() {
             return;
         }
 
-        qDebug("%s(%sDEBUG%s):%s Reproduzindo o próximo item ...\033[0m", GRE, RED, GRE, ORA);
+        qDebug("%s(%sPlayer%s)%s::%s Reproduzindo o próximo item ...\033[0m", GRE, RED, GRE, RED, ORA);
         play(playlist->getItems(nextitem), nextitem);
     }
 }
@@ -587,7 +587,7 @@ void OMPlayer::Next() {
 /** Botão previous */
 void OMPlayer::Previous() {
     if (mediaPlayer->isPlaying() || playing) {
-        qDebug("%s(%sDEBUG%s):%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, ORA);
+        qDebug("%s(%sPlayer%s)%s::%s Reproduzindo um item anterior ...\033[0m", GRE, RED, GRE, RED, ORA);
         play(playlist->getItems(previousitem), previousitem);
     }
 }
@@ -597,7 +597,7 @@ void OMPlayer::Previous() {
 void OMPlayer::playPause() {
     if (!mediaPlayer->isPlaying()) {
         if (playlist->setListSize() > 0) {
-            qDebug("%s(%sDEBUG%s):%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            qDebug("%s(%sPlayer%s)%s::%s Reproduzindo um Arquivo Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
             if (playlist->getItems(actualitem).isEmpty()) actualitem = 0;
             play(playlist->getItems(actualitem), actualitem);
         }
@@ -619,11 +619,11 @@ void OMPlayer::setStop() {
 /** Função para alterar o botão play/pause */
 void OMPlayer::onPaused(bool paused) {
     if (paused) {
-        qDebug("%s(%sDEBUG%s):%s Pausando ...\033[0m", GRE, RED, GRE, ORA);
-        Utils::changeIcon(playBtn, "play", tr("Play"));
+        qDebug("%s(%sPlayer%s)%s::%s Pausando ...\033[0m", GRE, RED, GRE, RED, ORA);
+        Utils::changeIcon(playBtn, "play");
     } else {
-        qDebug("%s(%sDEBUG%s):%s Reproduzindo ...\033[0m", GRE, RED, GRE, ORA);
-        Utils::changeIcon(playBtn, "pause", tr("Pause"));
+        qDebug("%s(%sPlayer%s)%s::%s Reproduzindo ...\033[0m", GRE, RED, GRE, RED, ORA);
+        Utils::changeIcon(playBtn, "pause");
     }
 }
 
@@ -632,7 +632,7 @@ void OMPlayer::onPaused(bool paused) {
 void OMPlayer::onStart() {
     playing = true;
 
-    Utils::changeIcon(playBtn, "pause", tr("Pause"));
+    Utils::changeIcon(playBtn, "pause");
     stack->setCurrentIndex(1);
     slider->setDisabled(false);
     infoview->setStatistics(mediaPlayer->statistics());
@@ -652,7 +652,7 @@ void OMPlayer::onStart() {
                                                         MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
         MI.Close();
 
-        qDebug("%s(%sDEBUG%s):%s Atualizando %s ...\033[0m", GRE, RED, GRE, UPD, qUtf8Printable(url));
+        qDebug("%s(%sPlayer%s)%s::%s Atualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(url));
         playlist->removeSelectedItems(PlayList::Update);
         playlist->insert(url, row, duration, format, PlayList::Update);
     }
@@ -674,8 +674,8 @@ void OMPlayer::onStart() {
 /** Função que define alguns parâmetros ao parar a reprodução */
 void OMPlayer::onStop() {
     if (!playing) {
-        qDebug("%s(%sDEBUG%s):%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, ORA);
-        Utils::changeIcon(playBtn, "play", tr("Play"));
+        qDebug("%s(%sPlayer%s)%s::%s Finalizando a Reprodução ...\033[0m", GRE, RED, GRE, RED, ORA);
+        Utils::changeIcon(playBtn, "play");
         this->setWindowTitle(QString(PRG_NAME));
 
         stack->setCurrentIndex(0);
@@ -757,7 +757,7 @@ void OMPlayer::changeFullScreen() {
 
 /** Entrar no modo tela cheia */
 void OMPlayer::enterFullScreen() {
-    qDebug("%s(%sDEBUG%s):%s Entrando no Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
+    qDebug("%s(%sInterface%s)%s::%s Entrando no Modo Tela Cheia ...\033[0m", GRE, RED, GRE, RED, ORA);
 
     if (this->isMaximized()) maximize = true; /** Mapear interface maximizada */
     this->showFullScreen();
@@ -769,7 +769,7 @@ void OMPlayer::enterFullScreen() {
 
 /** Sair do modo tela cheia */
 void OMPlayer::leaveFullScreen() {
-    qDebug("%s(%sDEBUG%s):%s Saindo do Modo Tela Cheia ...\033[0m", GRE, RED, GRE, ORA);
+    qDebug("%s(%sInterface%s)%s::%s Saindo do Modo Tela Cheia ...\033[0m", GRE, RED, GRE, RED, ORA);
     this->showNormal();
 
     /** Precisa caso a interface já estava maximizada antes. Note que showMaximized() só funciona após a execução
@@ -839,13 +839,13 @@ void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
     this->setMinimumSize(size);
 
     if (dialog == AboutD) {
-        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Iniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, RED, CYA);
         about->show();
     } else if (dialog == SettingsD) {
-        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Iniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
         sett->show();
     } else if (dialog == InfoD) {
-        qDebug("%s(%sDEBUG%s):%s Iniciando o diálogo de informações de mídia ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Iniciando o diálogo de informações ...\033[0m", GRE, RED, GRE, RED, CYA);
         playlist->hideFade();
         setHide();
         infoview->show();
@@ -865,7 +865,7 @@ void OMPlayer::closeDialog() {
 /** Ativar ocultação  */
 void OMPlayer::hideTrue() {
     if (enterpos) {
-        qDebug("%s(%sDEBUG%s):%s Ocultação liberada ...\033[0m", GRE, RED, GRE, SHW);
+        qDebug("%s(%sControls%s)%s::%s Ocultação liberada ...\033[0m", GRE, RED, GRE, RED, SHW);
         enterpos = false;
     }
     filter->setFixed(enterpos);
@@ -875,7 +875,7 @@ void OMPlayer::hideTrue() {
 /** Desativar ocultação */
 void OMPlayer::hideFalse() {
     if (!enterpos) {
-        qDebug("%s(%sDEBUG%s):%s Ocultação impedida ...\033[0m", GRE, RED, GRE, HID);
+        qDebug("%s(%sControls%s)%s::%s Ocultação impedida ...\033[0m", GRE, RED, GRE, RED, HID);
         enterpos = true;
     }
     filter->setFixed(enterpos);
@@ -890,9 +890,7 @@ void OMPlayer::enterList() {
 
 
 /** Mouse fora dos itens da playlist */
-void OMPlayer::leaveList() {
-    listmenu = false;
-}
+void OMPlayer::leaveList() { listmenu = false; }
 
 
 /** Pré-visualização ao posicionar o mouse no slider */
@@ -935,7 +933,7 @@ void OMPlayer::onTimeSliderHover(int pos, int value) {
 /** Apenas para exibição do debug */
 void OMPlayer::onTimeSliderEnter() {
     if (playing && mediaPlayer->statistics().video.frame_rate == 0)
-        qDebug("%s(%sDEBUG%s):%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Exibindo a pré-visualização ...\033[0m", GRE, RED, GRE, RED, CYA);
     ispreview = true;
     hideFalse();
 }
@@ -944,7 +942,7 @@ void OMPlayer::onTimeSliderEnter() {
 /** Saindo da pré-visualização */
 void OMPlayer::onTimeSliderLeave(OMPlayer::STATUS status) {
     if (preview->isVisible()) {
-        qDebug("%s(%sDEBUG%s):%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, CYA);
+        qDebug("%s(%sInterface%s)%s::%s Finalizando a pré-visualização ...\033[0m", GRE, RED, GRE, RED, CYA);
         preview->close();
         prev->close();
     }
@@ -963,8 +961,8 @@ void OMPlayer::seekBySlider(int value) {
 
 /** Ação ao terminar a atualização do slider */
 void OMPlayer::seekFinished(qint64 pos) {
-    qDebug("%s(%sDEBUG%s):%s Atualizando posição de execução %lld / %lld ...\033[0m", GRE, RED, GRE, ORA,
-           pos, mediaPlayer->position());
+    qDebug("%s(%sPlayer%s)%s::%s Atualizando posição de execução %lld / %lld ...\033[0m",
+           GRE, RED, GRE, RED, ORA, pos, mediaPlayer->position());
 }
 
 
@@ -992,23 +990,22 @@ void OMPlayer::setVolume(int value) {
 /** Ação ao terminar a atualização do volume */
 void OMPlayer::volumeFinished(qreal pos) {
     int value = int(pos * 100);
-    qDebug("%s(%sDEBUG%s):%s Alterando o volume para %i ...\033[0m", GRE, RED, GRE, ORA, value);
-    QString tooltip = tr("Volume") + ": " + QString::number(value);
+    qDebug("%s(%sPlayer%s)%s::%s Alterando o volume para %i ...\033[0m", GRE, RED, GRE, RED, ORA, value);
     muted = false;
 
     if (JsonTools::floatJson("volume") != pos) JsonTools::floatJson("volume", (float)pos);
 
     if (playing && !mediaPlayer->statistics().audio.available) {
-        Utils::changeIcon(volumeBtn, "nosound", tr("No Video Sound"));
+        Utils::changeIcon(volumeBtn, "nosound");
         return;
     }
 
     if (value == 0) {
-        Utils::changeIcon(volumeBtn, "mute", tr("Muted"));
+        Utils::changeIcon(volumeBtn, "mute");
         muted = true;
-    } else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low", tooltip);
-    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium", tooltip);
-    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high", tooltip);
+    } else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low");
+    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium");
+    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high");
 }
 
 
@@ -1071,7 +1068,7 @@ void OMPlayer::changeChannel(QAction *action) {
     channelAction->setChecked(true);
 
     if (!ao->close()) {
-        qDebug("%s(%sDEBUG%s)%s::%s Falha ao fechar o áudio ...", GRE, RED, GRE, RED, ERR);
+        qDebug("%s(%sPlayer%s)%s::%s Falha ao fechar o áudio ...", GRE, RED, GRE, RED, ERR);
         return;
     }
 
@@ -1080,7 +1077,7 @@ void OMPlayer::changeChannel(QAction *action) {
     af.setChannelLayout(cl);
     ao->setAudioFormat(af);
 
-    if (!ao->open()) qDebug("%s(%sDEBUG%s)%s::%s Falha ao abrir o áudio ...", GRE, RED, GRE, RED, ERR);
+    if (!ao->open()) qDebug("%s(%sPlayer%s)%s::%s Falha ao abrir o áudio ...", GRE, RED, GRE, RED, ERR);
 }
 
 
@@ -1116,18 +1113,17 @@ void OMPlayer::updateSliderUnit() {
 /** Função para recarregar os ícones do programa */
 void OMPlayer::changeIcons(OMPlayer::STATUS change) {
     int value = int(mediaPlayer->audio()->volume() * 100);
-    QString tooltip = tr("Volume") + ": " + QString::number(value);
 
     if (playing && !mediaPlayer->statistics().audio.available)
-        Utils::changeIcon(volumeBtn, "nosound", tr("No Video Sound"));
-    else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low", tooltip);
-    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium", tooltip);
-    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high", tooltip);
-    else if (value == 0) Utils::changeIcon(volumeBtn, "mute", tr("Muted"));
+        Utils::changeIcon(volumeBtn, "nosound");
+    else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low");
+    else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium");
+    else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high");
+    else if (value == 0) Utils::changeIcon(volumeBtn, "mute");
 
     if (change != IsPlay) {
-        if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause", tr("Pause"));
-        else Utils::changeIcon(playBtn, "play", tr("Play"));
+        if (mediaPlayer->isPlaying()) Utils::changeIcon(playBtn, "pause");
+        else Utils::changeIcon(playBtn, "play");
 
         if (restart) Utils::changeIcon(replayBtn, "replay-on");
         else Utils::changeIcon(replayBtn, "replay");
@@ -1160,12 +1156,13 @@ void OMPlayer::onMediaStatusChanged() {
             status = "Loaded !";
             break;
         default:
-            qDebug("%s(%sDEBUG%s):%s Status não mapeado:%s %i\033[0m", GRE, RED, GRE, RDL, ERR, player->mediaStatus());
+            qDebug("%s(%sPlayer%s)%s::%s Status não mapeado:%s %i\033[0m",
+                   GRE, RED, GRE, RED, RDL, ERR, player->mediaStatus());
             break;
     }
 
     if (!status.isEmpty())
-        qDebug("%s(%sDEBUG%s):%s Status do Arquivo Multimídia %s\033[0m", GRE, RED, GRE, SND, qUtf8Printable(status));
+        qDebug("%s(%sPlayer%s)%s::%s Status do Arquivo Multimídia %s\033[0m", GRE, RED, GRE, RED, SND, STR(status));
 }
 
 
@@ -1211,21 +1208,21 @@ void OMPlayer::resizeEvent(QResizeEvent *event) {
 void OMPlayer::changeEvent(QEvent *event) {
     if(event->type() == QEvent::WindowStateChange) {
         if (this->windowState() == Qt::WindowNoState) {
-            qDebug("%s(%sDEBUG%s):%s Restaurando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            qDebug("%s(%sInterface%s)%s::%s Restaurando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
             JsonTools::boolJson("maximized", false);
         }
         else if (this->windowState() == Qt::WindowMinimized) {
-            qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            qDebug("%s(%sInterface%s)%s::%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
             if (showsett) this->showNormal();
         }
         else if (this->windowState() == Qt::WindowMaximized) {
-            qDebug("%s(%sDEBUG%s):%s Maximizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            qDebug("%s(%sInterface%s)%s::%s Maximizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
             JsonTools::boolJson("maximized", true);
             playlist->hideFade();
 
         }
         else if (this->windowState() == (Qt::WindowMinimized|Qt::WindowMaximized)) {
-            qDebug("%s(%sDEBUG%s):%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, ORA);
+            qDebug("%s(%sInterface%s)%s::%s Minimizando o Reprodutor Multimídia ...\033[0m", GRE, RED, GRE, RED, ORA);
             if (showsett) this->showNormal();
         }
     }
@@ -1236,8 +1233,8 @@ void OMPlayer::changeEvent(QEvent *event) {
 void OMPlayer::closeEvent(QCloseEvent *event) {
     screensaver->enable();
     playlist->save();
-    qDebug("%s(%sDEBUG%s):%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, CYA);
-    event->accept(); //todo
+    qDebug("%s(%sInterface%s)%s::%s Finalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, RED, CYA);
+    event->accept();
 }
 
 

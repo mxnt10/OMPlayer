@@ -35,7 +35,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button(Button::button, "apply", 32, tr("Close"));
+    closebtn = new Button(Button::button, "apply", 32);
     connect(closebtn, &Button::pressed, this, &StatisticsView::onClose);
 
 

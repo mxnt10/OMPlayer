@@ -66,7 +66,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     auto *combotheme = new QComboBox();
     combotheme->addItems(Utils::subdirIcons());
     combotheme->setCurrentText(JsonTools::stringJson("theme"));
-    connect(combotheme, SIGNAL(currentTextChanged(QString)), SLOT(setIcon(QString)));
+    connect(combotheme, &QComboBox::currentTextChanged, this, &Settings::setIcon);
 
     auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");
     auto *themes = new QGridLayout();
@@ -93,7 +93,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button(Button::button, "apply", 32, tr("Apply and Close"));
+    closebtn = new Button(Button::button, "apply", 32);
     connect(closebtn, &Button::pressed, this, &Settings::onClose);
 
 

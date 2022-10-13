@@ -1,28 +1,34 @@
 cmake_minimum_required(VERSION 3.20)
 project(OMPlayer)
 
-include(GNUInstallDirs)
-include(InstallRequiredSystemLibraries)
 
+# Habilitando suporte LTO
+include(CheckIPOSupported)
+check_ipo_supported(RESULT supported OUTPUT error)
+
+
+# Definição de variáveis
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
+find_package(Threads REQUIRED)
 
+
+# Buscando sources do QT5
 find_package(
         Qt5 COMPONENTS
-        Core
-        DBus
-        Gui
-        Quick
-        Widgets
+        Core DBus Gui Quick Widgets
         REQUIRED
 )
 
+
+# Adicionando sources manualmente
 include_directories(
         /usr/include/qt5/QtAV
         /usr/include/qt5/QtAVWidgets
@@ -33,16 +39,27 @@ include_directories(
         src/Utils
 )
 
+
+# Adicionando recursos ao projeto
 add_subdirectory( common/SingleApplication )
 add_subdirectory( common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL )
 
+
+# Verificando compatibilidade de sistemas
 if(WIN32)
-    set(SRC_WIN
+    set(SRC_SCREENSAVER
         common/ScreenSaver/winscreensaver.cpp
         common/ScreenSaver/winscreensaver.h
     )
+else()
+    set(SRC_SCREENSAVER
+        common/ScreenSaver/screensaver.cpp
+        common/ScreenSaver/screensaver.h
+    )
 endif()
 
+
+# Criando o executável do programa
 add_executable(
         OMPlayer
         src/main.cpp
@@ -79,21 +96,35 @@ add_executable(
 
         common/ScreenSaver/powersaving.cpp
         common/ScreenSaver/powersaving.h
-        common/ScreenSaver/screensaver.cpp
-        common/ScreenSaver/screensaver.h
-        ${SRC_WIN}
+        ${SRC_SCREENSAVER}
 )
 
+
+# Verificando Ativação do LTO
+if( supported )
+    message(STATUS "IPO / LTO enabled")
+    set_property(TARGET OMPlayer PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+else()
+    message(STATUS "IPO / LTO not supported: <${error}>")
+endif()
+
+
+# Linkando as bibliotecas
 target_link_libraries(
         OMPlayer
         SingleApplication::SingleApplication
+        Threads::Threads
+        QtAV QtAVWidgets
         Qt5::Core
         Qt5::DBus
         Qt5::Gui
         Qt5::Quick
         Qt5::Widgets
-        QtAV
-        QtAVWidgets
-        mediainfo
-        dl
+        mediainfo dl
 )
+
+#set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+#set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+#find_package(Threads REQUIRED)
+#add_executable(test test.cpp)
+#target_link_libraries(test Threads::Threads)

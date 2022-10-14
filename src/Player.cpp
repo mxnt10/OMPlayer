@@ -6,7 +6,6 @@
 #include <Utils>
 
 #include "Player.h"
-
 #define ClickableMenu(x) ClickableMenu(x + "\t\t")
 #define TR(x) ("  " + tr(x))
 #define ACTION(x) addAction("  " + x)
@@ -290,15 +289,15 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Menu dos canais de áudio para o menu de contexto */
-    auto *subMenu = new ClickableMenu(TR("Channel"));
+    auto *subMenu = new ClickableMenu(tr("Channel"));
     channel = new QMenu(this);
     channel = subMenu;
     connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::changeChannel);
-    subMenu->addAction(TR("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
-    subMenu->addAction(TR("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
-    subMenu->addAction(TR("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
-    subMenu->addAction(TR("Left"))->setData(AudioFormat::ChannelLayout_Left);
-    subMenu->addAction(TR("Right"))->setData(AudioFormat::ChannelLayout_Right);
+    subMenu->addAction(tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
+    subMenu->addAction(tr("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
+    subMenu->addAction(tr("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
+    subMenu->addAction(tr("Left"))->setData(AudioFormat::ChannelLayout_Left);
+    subMenu->addAction(tr("Right"))->setData(AudioFormat::ChannelLayout_Right);
     auto *ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
@@ -311,24 +310,24 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Menu dos dimensões de tela para o menu de contexto */
-    subMenu = new ClickableMenu(TR("AspectRatio"));
+    subMenu = new ClickableMenu(tr("Aspect Ratio"));
     aspectratio = new QMenu(this);
     aspectratio = subMenu;
-    aspectAction = subMenu->ACTION(Utils::aspectStr(Utils::AspectVideo));
+    aspectAction = subMenu->addAction(Utils::aspectStr(Utils::AspectVideo));
     aspectAction->setData(Utils::aspectNum(Utils::AspectVideo));
     connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::switchAspectRatio);
-    subMenu->ACTION(Utils::aspectStr(Utils::AspectAuto ))->setData(Utils::AspectAuto);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect11   ))->setData(Utils::Aspect11);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect21   ))->setData(Utils::Aspect21);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect32   ))->setData(Utils::Aspect32);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect43   ))->setData(Utils::Aspect43);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect54   ))->setData(Utils::Aspect54);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect118  ))->setData(Utils::Aspect118);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect149  ))->setData(Utils::Aspect149);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect1410 ))->setData(Utils::Aspect1410);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect169  ))->setData(Utils::Aspect169);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect1610 ))->setData(Utils::Aspect1610);
-    subMenu->ACTION(Utils::aspectStr(Utils::Aspect235  ))->setData(Utils::Aspect235);
+    subMenu->addAction(Utils::aspectStr(Utils::AspectAuto ))->setData(Utils::AspectAuto);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect11   ))->setData(Utils::Aspect11);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect21   ))->setData(Utils::Aspect21);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect32   ))->setData(Utils::Aspect32);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect43   ))->setData(Utils::Aspect43);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect54   ))->setData(Utils::Aspect54);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect118  ))->setData(Utils::Aspect118);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect149  ))->setData(Utils::Aspect149);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect1410 ))->setData(Utils::Aspect1410);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect169  ))->setData(Utils::Aspect169);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect1610 ))->setData(Utils::Aspect1610);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect235  ))->setData(Utils::Aspect235);
     ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
@@ -342,7 +341,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Menu de velocidade para o menu de contexto */
-    subMenu = new ClickableMenu(TR("Speed"));
+    subMenu = new ClickableMenu(tr("Speed"));
     speed = new QMenu(this);
     speed = subMenu;
     speedBox = new QDoubleSpinBox();
@@ -428,6 +427,8 @@ void OMPlayer::switchAspectRatio(QAction *action) {
         action->toggle();
         return;
     }
+
+    qDebug("%s(%sMenu%s)%s::%s Setando aspect ratio %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(Utils::aspectStr(r)));
     if (r == Utils::AspectVideo) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::VideoAspectRatio);
     else if (r == Utils::AspectAuto) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::RendererAspectRatio);
     else {
@@ -659,14 +660,14 @@ void OMPlayer::onStart() {
 
     /** Definindo o tempo de duração no slider */
     slider->setMinimum(int(mediaPlayer->mediaStartPosition()));
-    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition())/ unit);
     end->setText(QTime(0, 0, 0).addMSecs(
             int(mediaPlayer->mediaStopPosition())).toString(QString::fromLatin1("HH:mm:ss")));
 
     onTimeSliderLeave(IsPlay);
     changeIcons(IsPlay);
     updateChannelMenu();
-    updateSlider(mediaPlayer->position());
+    updateSlider(mediaPlayer->position()); /** 00:00:00 */
     screensaver->disable();
 }
 
@@ -962,7 +963,7 @@ void OMPlayer::seekBySlider(int value) {
 /** Ação ao terminar a atualização do slider */
 void OMPlayer::seekFinished(qint64 pos) {
     qDebug("%s(%sPlayer%s)%s::%s Atualizando posição de execução %lld / %lld ...\033[0m",
-           GRE, RED, GRE, RED, ORA, pos, mediaPlayer->position());
+           GRE, RED, GRE, RED, ORA, pos, mediaPlayer->duration());
 }
 
 
@@ -1105,7 +1106,7 @@ void OMPlayer::updateSlider(qint64 value) {
 /** Função para atualizar a barra de progresso de execução */
 void OMPlayer::updateSliderUnit() {
     unit = mediaPlayer->notifyInterval();
-    slider->setMaximum(int(mediaPlayer->mediaStopPosition() - Utils::setDifere(unit))/ unit);
+    slider->setMaximum(int(mediaPlayer->mediaStopPosition())/ unit);
     updateSlider(mediaPlayer->position());
 }
 
@@ -1257,11 +1258,11 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         contextMenu->setWindowOpacity(0.9);
 
         /** Menu de informação de mídia */
-        QAction mediainfo(TR("Current Media Info"), this);
+        QAction mediainfo(tr("Current Media Info"), this);
         Utils::changeMenuIcon(mediainfo, "about");
         connect(&mediainfo, &QAction::triggered, [this](){ setDialog(InfoD); });
 
-        QAction saveplaylist(TR("Save Playlist"), this);
+        QAction saveplaylist(tr("Save Playlist"), this);
 
 //        contextMenu->addAction(&saveplaylist);
         contextMenu->addAction(&mediainfo);
@@ -1271,9 +1272,9 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
     if (!enterpos) {
         /** Opções de menu*/
-        auto *other = new CMenu(TR("Other Options"), this);
-//        auto *visualization = new CMenu(TR("Visualizations"), this);
-        auto *optionVideo = new CMenu(TR("Video Options"), this);
+        auto *other = new CMenu(tr("Other Options"), this);
+        auto *visualization = new CMenu(tr("Visualizations"), this);
+        auto *optionVideo = new CMenu(tr("Video Options"), this);
 
         /** Modo repetição */
         QAction repeat(TR("Repeat Mode"), this);
@@ -1292,33 +1293,33 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         connect(&open, SIGNAL(triggered()), SLOT(openMedia()));
 
         /** Menu tela cheia */
-        QAction fullscreen(TR("Show Fullscreen"), this);
+        QAction fullscreen(tr("Show Fullscreen"), this);
         if (this->isFullScreen())
-            fullscreen.setText(TR("Exit Fullscreen"));
+            fullscreen.setText(tr("Exit Fullscreen"));
         fullscreen.setShortcut(QKeySequence(ALT | Qt::Key_Enter));
         Utils::changeMenuIcon(fullscreen, "fullscreen");
         connect(&fullscreen, SIGNAL(triggered()), SLOT(changeFullScreen()));
 
         /** Menu aleatório */
-        QAction shuffle(TR("Shuffle"), this);
+        QAction shuffle(tr("Shuffle"), this);
         shuffle.setShortcut(QKeySequence(CTRL | Qt::Key_H));
         Utils::changeMenuIcon(shuffle, "shuffle-menu");
         connect(&shuffle, SIGNAL(triggered()), SLOT(setShuffle()));
 
         /** Menu replay */
-        QAction replay(TR("Replay"), this);
+        QAction replay(tr("Replay"), this);
         replay.setShortcut(QKeySequence(CTRL | Qt::Key_T));
         Utils::changeMenuIcon(replay, "replay-menu");
         connect(&replay, SIGNAL(triggered()), SLOT(setReplay()));
 
         /** Menu de configuração */
-        QAction settings(TR("Settings"), this);
+        QAction settings(tr("Settings"), this);
         settings.setShortcut(QKeySequence(ALT | Qt::Key_S));
         Utils::changeMenuIcon(settings, "settings");
         connect(&settings, &QAction::triggered, [this](){ setDialog(SettingsD); });
 
         /** Menu sobre */
-        QAction mabout(TR("About"), this);
+        QAction mabout(tr("About"), this);
         Utils::changeMenuIcon(mabout, "about");
         connect(&mabout, &QAction::triggered, [this](){ setDialog(AboutD); });
 

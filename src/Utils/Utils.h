@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <Button>
 
-#define VERSION "1.5"
+#define VERSION "1.6"
 #define STR qUtf8Printable
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug

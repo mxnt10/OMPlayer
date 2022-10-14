@@ -169,10 +169,6 @@ QString Utils::defaultIcon(const QString &icon) {
 }
 
 
-/** Cálculo do diferença do intervalo de tempo */
-int Utils::setDifere(int unit) { if (unit >= 100) return 500; return unit * 6; }
-
-
 /** Cálculo somente da largura do quadro uma vez que a altura vem pré-estabelecida */
 int Utils::calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 

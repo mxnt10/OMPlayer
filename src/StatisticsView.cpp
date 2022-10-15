@@ -100,7 +100,7 @@ StatisticsView::~StatisticsView() = default;
 
 /** Emissão para fechar a janela */
 void StatisticsView::onClose() {
-    qDebug("%s(%sStatisticsView%s)%s::%s Fechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
+    qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
     emit emitclose();
     this->close();
 }
@@ -213,7 +213,7 @@ void StatisticsView::initItems(QList<QTreeWidgetItem *> *items, const QStringLis
 
 /** Função usada para setar as estatísticas dos itens atuais */
 void StatisticsView::setStatistics(const Statistics& s) {
-    qDebug("%s(%sStatisticsView%s)%s::%s Atualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
+    qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
 
     int i = 0;
@@ -275,7 +275,7 @@ void StatisticsView::setStatistics(const Statistics& s) {
     view3->header()->setStretchLastSection(true);
 
     csize = csize + 40;
-    qDebug("%s(%sStatisticsView%s)%s::%s Ajustando comprimento de infoview em %i ...\033[0m",
+    qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
            GRE, RED, GRE, RED, BLU, csize);
 
     this->setMinimumSize(csize, 340);

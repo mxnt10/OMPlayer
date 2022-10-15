@@ -150,10 +150,10 @@ void PlayList::load(ST load, const QString &url) {
     if (!f.open(QIODevice::ReadOnly)) return;
 
     actsum = Utils::setHash(url);
-    qDebug("%s(%sPlaylist%s)%s::%s Capturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(actsum));
+    qDebug("%s(%sPlaylist%s)%s::%sCapturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(actsum));
 
     if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
-        qDebug("%s(%sPlaylist%s)%s::%s Carregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
+        qDebug("%s(%sPlaylist%s)%s::%sCarregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
         if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
         QDataStream ds(&f);
         QList<PlayListItem> list;
@@ -168,7 +168,7 @@ void PlayList::load(ST load, const QString &url) {
         }
         sum = actsum;
     } else
-        qDebug("%s(%sPlaylist%s)%s::%s MD5 Hash Coincide ...\033[0m", GRE, RED, GRE, RED, BLU);
+        qDebug("%s(%sPlaylist%s)%s::%sMD5 Hash Coincide ...\033[0m", GRE, RED, GRE, RED, BLU);
     f.close();
     if (load != First) save();
 }
@@ -176,7 +176,7 @@ void PlayList::load(ST load, const QString &url) {
 
 /** Função para salvar a playlist ao fechar */
 void PlayList::save(const QString &url) {
-    qDebug("%s(%sPlaylist%s)%s::%s Salvando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
+    qDebug("%s(%sPlaylist%s)%s::%sSalvando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
     QFile f(url);
     if (!f.open(QIODevice::WriteOnly)) return;
     QDataStream ds(&f);
@@ -237,7 +237,6 @@ void PlayList::addItems(const QStringList &parms) {
         } else {
             if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
                 hashlist.append(Utils::stringHash(file));
-                qDebug("%s(%sPlaylist%s)%s::%s Adicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(file));
                 insert(file, a + t);
                 a++;
             } else {
@@ -302,7 +301,6 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
                 else if (QFileInfo::exists(playlist_path + "/" + url)) url = playlist_path + "/" + url;
 
                 if (QFileInfo::exists(url)) {
-                    qDebug("%s(%sPlaylist%s)%s::%s Adicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(url));
                     insert(url, i, qint64(duration));
                     i++;
                 }
@@ -323,6 +321,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format, ST status) {
+    qDebug("%s(%sPlaylist%s)%s::%sAdicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(url));
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);
@@ -412,6 +411,7 @@ void PlayList::removeSelectedItems(PlayList::ST status) {
 
 /** Limpando os itens da playlist */
 void PlayList::clearItems() {
+    qDebug("%s(%sPlaylist%s)%s::%sZerando a playlist ...\033[0m", GRE, RED, GRE, RED, RDL);
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
     cleanlist->setVisible(true);
     hashlist.clear();
@@ -491,7 +491,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
         }
     } else {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
-            qDebug("%s(%sPlaylist%s)%s::%s Mouse posicionado na playlist ...\033[0m", GRE, RED, GRE, RED, VIO);
+            qDebug("%s(%sPlaylist%s)%s::%sMouse posicionado na playlist ...\033[0m", GRE, RED, GRE, RED, VIO);
             emit emitnohide();
             fadePls(Show);
             isshow = true;

@@ -137,7 +137,7 @@ void Settings::onClose() {
 void Settings::rendererSelect(Button *btn, const QString &name) {
     if (QString::compare(JsonTools::stringJson("renderer"), name) == 0) return;
 
-    qDebug("%s(%sSettings%s)%s::%s Selecionando renderizador %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(name));
+    qDebug("%s(%sSettings%s)%s::%sSelecionando renderizador %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(name));
 
     for (int i = 0; i < 8; ++i)
         if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
@@ -150,7 +150,7 @@ void Settings::rendererSelect(Button *btn, const QString &name) {
 
 /** Modificando as configurações de temas */
 void Settings::setIcon(const QString &index) {
-    qDebug("%s(%sSettings%s)%s::%s Tema de ícones %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(index));
+    qDebug("%s(%sSettings%s)%s::%sTema de ícones %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(index));
     JsonTools::stringJson("theme", index);
     Utils::initUtils(Utils::Theme);
 

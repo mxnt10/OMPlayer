@@ -70,7 +70,6 @@ public:
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void rm_nl(string &s);
     static int calcX(int z, int x, int y);
-    static int setDifere(int unit);
     static QStringList subdirIcons();
     static double aspectNum(Aspect aspect);
     static QString aspectStr(Aspect aspect);

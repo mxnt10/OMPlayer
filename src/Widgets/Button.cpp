@@ -63,10 +63,10 @@ void Button::enterEvent(QEvent *event) {
     emit emitEnter();
 
     if (type == button) {
-        qDebug("%s(%sButton%s)%s::%s Mouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
+        qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
         setIconSize(QSize(num + 2, num + 2));
     } else if (type == radio) {
-        qDebug("%s(%sButton%s)%s::%s Mouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(txt));
+        qDebug("%s(%sButton%s)%s::%sMouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(txt));
         setText(" " + txt);
     }
     QPushButton::enterEvent(event);
@@ -84,7 +84,7 @@ void Button::leaveEvent(QEvent *event) {
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
     if (type == button) {
-        qDebug("%s(%sButton%s)%s::%s Pressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
+        qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
         setIconSize(QSize(num - 2, num - 2));
     }
     QPushButton::mousePressEvent(event);

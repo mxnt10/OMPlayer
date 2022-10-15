@@ -133,6 +133,7 @@ private:
     bool enterpos{false}, showsett{false};
     bool invalid{false}, ispreview{false};
     bool maximize{false}, fade{false}, contmenu{false};
+    bool prevent{false}, powersaving{false};
     int Width{192}, Height{108};
     int previousitem{0}, actualitem{0}, nextitem{0};
     int count{0}, unit{500}, totalitems{0};

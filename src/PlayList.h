@@ -6,8 +6,11 @@
 #include <QLabel>
 #include <QListView>
 #include <QModelIndex>
+#include <QThread>
 #include <PlayListUtils>
 #include <Button>
+
+#include "Worker.h"
 
 #define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 
@@ -53,11 +56,11 @@ Q_SIGNALS:
     void emitnohide();
     void enterListView();
     void leaveListView();
-    void emitItems();
-    void setcontmenu();
+    void nomousehide();
 
 public Q_SLOTS:
-    void addItems(const QStringList &parms = QStringList());
+    void getFiles();
+    void addItems(const QStringList &files);
     void removeSelectedItems(PlayList::ST status = Default);
 
 private Q_SLOTS:
@@ -74,11 +77,14 @@ private:
     QLabel *cleanlist{};
     QListView *listView{};
     QString sum{}, actsum{};
-    QStringList hashlist{};
     QWidget *wpls{};
-    int maxRows{-1};
+    int rmRows{0};
     int startsize{0}, startlistsize{0}, startpos{0};
     bool isshow{false}, resize{false};
+
+    /** Suporte multithread */
+    QThread *thread;
+    Worker *worker;
 };
 
 #endif // PLAYLIST_H

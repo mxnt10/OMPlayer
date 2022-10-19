@@ -25,6 +25,16 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     load(First);
 
 
+    /** Usando multithread para buscar arquivos */
+    thread = new QThread();
+    worker = new Worker(this); /** ou usa this ou nada de dialog */
+    worker->moveToThread(thread);
+    connect(worker, &Worker::valueChanged, this, &PlayList::addItems);
+    connect(thread, &QThread::started, worker, &Worker::doWork);
+    connect(worker, &Worker::workRequested, [this](){ thread->start(); });
+    connect(worker, &Worker::finished, [this](){ thread->quit(); });
+
+
     /** Efeito de transparência funcional para a playlist. O setWindowOpacity() não rolou. */
     effect = new QGraphicsOpacityEffect(this);
     effect->setOpacity(1.0);
@@ -51,7 +61,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     addBtn = new Button(Button::button, "add", 32, tr("Add items"));
     removeBtn = new Button(Button::button, "remove", 32, tr("Remove items"));
     clearBtn = new Button(Button::button, "clean", 32, tr("Clear playlist"));
-    connect(addBtn, &Button::clicked, [this](){ addItems(); });
+    connect(addBtn, &Button::clicked, this, &PlayList::getFiles);
     connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
     connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);
 
@@ -136,8 +146,11 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 }
 
 
-/** Destrutor */
-PlayList::~PlayList() = default;
+/** Destrutor necessário */
+PlayList::~PlayList() {
+    delete thread;
+    delete worker;
+}
 
 
 /**********************************************************************************************************************/
@@ -161,14 +174,12 @@ void PlayList::load(ST load, const QString &url) {
         int add = 0;
         for (const auto &i : list) {
             if (QFileInfo::exists(i.url())) {
-                hashlist.append(Utils::stringHash(i.url()));
                 insertItemAt(i, add);
                 add++;
             }
         }
         sum = actsum;
-    } else
-        qDebug("%s(%sPlaylist%s)%s::%sMD5 Hash Coincide ...\033[0m", GRE, RED, GRE, RED, BLU);
+    }
     f.close();
     if (load != First) save();
 }
@@ -187,34 +198,16 @@ void PlayList::save(const QString &url) {
 }
 
 
+/** Usando um thread separado para buscar os arquivos */
+void PlayList::getFiles() {
+    emit nomousehide();
+    thread->wait();
+    worker->requestWork();
+}
+
+
 /** Função para adicionar itens a playlist */
-void PlayList::addItems(const QStringList &parms) {
-    emit setcontmenu();
-    QStringList files;
-
-    /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-    for (int i = 0; i < 500; i++) arrowMouse();
-
-    if (parms.isEmpty()) files = \
-        QFileDialog::getOpenFileNames(
-            nullptr, tr("Select multimedia files"),
-            QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()),
-            "Video Files (*.3gp *.3gpp *.m4v *.mp4 *.m2v *.mp2 *.mpeg *.mpg *.vob *.ogg *.ogv *.mov *.rmvb *.webm "
-            "*.flv *.mkv *.wmv *.avi *.divx);;"
-            "Audio Files (*.ac3 *.flac *.mid *.midi *.m4a *.mp3 *.opus *.mka *.wma *.wav);;"
-            "3GPP Multimedia Files (*.3ga *.3gp *.3gpp);;3GPP2 Multimedia Files (*.3g2 *.3gp2 *.3gpp2);;"
-            "AVI Video (*.avf *.avi *.divx);;Flash Video (*.flv);;Matroska Video (*.mkv);;"
-            "Microsoft Media Format (*.wmp);;MPEG Video (*.m2v *.mp2 *.mpe *.mpeg *.mpg *.ts *.vob *.vdr);;"
-            "MPEG-4 Video (*.f4v *.lrv *.m4v *.mp4);;OGG Video (*.ogg *.ogv);;"
-            "QuickTime Video (*.moov *.mov *.qt *.qtvr);;RealMedia Format (*.rv *.rvx *.rmvb);;"
-            "WebM Video (*.webm);;Windows Media Video (*.wmv);;"
-            "AAC Audio (*.aac *.adts *.ass );;Dolby Digital Audio (*.ac3);;FLAC Audio (*.flac);;"
-            "Matroska Audio (*.mka);;MIDI Audio (*.kar *.mid *.midi);;MPEG-4 Audio (*.f4a *.m4a);;"
-            "MP3 Audio (*.mp3 *.mpga);;OGG Audio (*.oga *.opus *.spx);;Windows Media Audio (*.wma);;"
-            "WAV Audio (*.wav);;WavPack Audio (*.wp *.wvp);;Media Playlist (*.m3u *.m3u8);;All Files (*);;"
-        );
-    else files = parms;
-
+void PlayList::addItems(const QStringList &files) {
     if (files.isEmpty()) {
         blankMouse();
         return;
@@ -223,7 +216,6 @@ void PlayList::addItems(const QStringList &parms) {
     bool select = false;
     int a = 0;
     int t = model->rowCount(QModelIndex());
-    int total = files.size();
     QString isplay;
 
     for (int i = 0; i < files.size(); ++i) {
@@ -235,14 +227,8 @@ void PlayList::addItems(const QStringList &parms) {
             load_m3u(file, DetectFormat);
             return;
         } else {
-            if (hashlist.filter(QRegExp("^(" + Utils::stringHash(file) + ")$")).isEmpty()) {
-                hashlist.append(Utils::stringHash(file));
-                insert(file, a + t);
-                a++;
-            } else {
-                total--;
-                continue;
-            }
+            insert(file, a + t - rmRows);
+            a++;
 
             if (!select) {
                 isplay = file;
@@ -255,10 +241,10 @@ void PlayList::addItems(const QStringList &parms) {
     if (setListSize() == 0) cleanlist->setVisible(true);
     else cleanlist->setVisible(false);
 
+    rmRows = 0;
     save();
-    if (total == 0) return;
     emit firstPlay(isplay, t);
-    emit emitItems();
+    if(cleanlist) if (cleanlist->isVisible()) cleanlist->setVisible(false);
 }
 
 
@@ -314,7 +300,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
         save();
         emit firstPlay(getItems(0), 0);
-        emit emitItems();
+        if(cleanlist) if (cleanlist->isVisible()) cleanlist->setVisible(false);
     }
 }
 
@@ -339,16 +325,17 @@ void PlayList::insert(const QString &url, int row, qint64 duration, const QStrin
 
 /** Adiciona os itens para serem visualizados na playlist */
 void PlayList::insertItemAt(const PlayListItem &item, int row) {
-    if (maxRows > 0 && model->rowCount(QModelIndex()) >= maxRows)
-        model->removeRows(maxRows, model->rowCount(QModelIndex()) - maxRows + 1, QModelIndex());
+    model->insertRow(row);
 
-    int i = model->items().indexOf(item, row + 1);
-    if (i > 0) model->removeRow(i);
-    if (!model->insertRow(row)) return;
-
+    /** Verificando itens repetidos */
     if (row > 0) {
-        i = model->items().lastIndexOf(item, row - 1);
-        if (i >= 0) model->removeRow(i);
+        for (int j = 0; j < model->rowCount(QModelIndex()) + 1; j++) {
+            if (model->items().lastIndexOf(item, j) >= 0) {
+                model->removeRow(row);
+                rmRows++;
+                break;
+            }
+        }
     }
     setItemAt(item, row);
 }
@@ -400,7 +387,6 @@ void PlayList::removeSelectedItems(PlayList::ST status) {
 
     QModelIndexList s = selection->selectedIndexes();
     for (int i = s.size() - 1; i >= 0; --i) {
-        hashlist.removeOne(Utils::stringHash(getItems(s.at(i).row())));
         model->removeRow(s.at(i).row());
         if (setListSize() == 0) cleanlist->setVisible(true);
         if (status == Default) emit emitremove(s.at(i).row());
@@ -414,9 +400,7 @@ void PlayList::clearItems() {
     qDebug("%s(%sPlaylist%s)%s::%sZerando a playlist ...\033[0m", GRE, RED, GRE, RED, RDL);
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
     cleanlist->setVisible(true);
-    hashlist.clear();
     emit emitstop();
-    emit emitItems();
     save();
 }
 

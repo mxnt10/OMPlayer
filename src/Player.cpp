@@ -76,7 +76,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Playlist do reprodutor */
     playlist = new PlayList();
-    setTotalItems();
     connect(playlist, &PlayList::aboutToPlay, this, &OMPlayer::doubleplay);
     connect(playlist, &PlayList::firstPlay, this, &OMPlayer::firstPlay);
     connect(playlist, &PlayList::selected, this, &OMPlayer::setSelect);
@@ -86,8 +85,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(playlist, &PlayList::enterListView, this, &OMPlayer::enterList);
     connect(playlist, &PlayList::leaveListView, this, &OMPlayer::leaveList);
     connect(playlist, &PlayList::emitstop, this, &OMPlayer::setStop);
-    connect(playlist, &PlayList::emitItems, this, &OMPlayer::setTotalItems);
-    connect(playlist, &PlayList::setcontmenu, [this](){ contmenu = true; });
+    connect(playlist, &PlayList::nomousehide, [this](){ nomousehide = true; });
 
 
     /** Barra de progresso de execução e Labels */
@@ -361,16 +359,11 @@ OMPlayer::~OMPlayer() = default;
 
 
 /** Função para abrir arquivos multimídia */
-void OMPlayer::openMedia(const QStringList &parms) { playlist->addItems(parms); }
-
-
-/** Rodando as funções após aberto outras instâncias */
-void OMPlayer::onLoad() {
-    playlist->load(PlayList::Second);
-    if (totalitems < playlist->setListSize()) {
-        if (!playing) play(playlist->getItems(totalitems), totalitems);
-        else playlist->selectCurrent(actualitem);
-        setTotalItems();
+void OMPlayer::openMedia(const QStringList &parms) {
+    if(!parms.isEmpty()) playlist->addItems(parms);
+    else {
+        nomousehide = true;
+        playlist->getFiles();
     }
 }
 
@@ -453,7 +446,6 @@ void OMPlayer::onSpinBoxChanged(double val) {
  * arquivo multimídia sendo reproduzido no momento */
 void OMPlayer::ajustActualItem(int item) {
     listnum.clear();  /** É preferível redefinir a contagem aleatória */
-    setTotalItems();
     if (!playing) return;
 
     if (item < actualitem) {
@@ -484,13 +476,6 @@ void OMPlayer::ajustActualItem(int item) {
         qDebug("%s(%sPlayer%s)%s::%sRemovido item posterior %i ...\033[0m", GRE, RED, GRE, RED, ORA, item);
         playlist->selectCurrent(actualitem);
     }
-}
-
-
-/** Calculando o total de itens */
-void OMPlayer::setTotalItems() {
-    totalitems = playlist->setListSize();
-    qDebug("%s(%sPlaylist%s)%s::%sTotal de itens na playlist: %i ... \033[0m", GRE, RED, GRE, RED, BLU, totalitems);
 }
 
 
@@ -820,8 +805,8 @@ void OMPlayer::fadeWctl(OMPlayer::FADE option) {
 
         connect(animation, &QPropertyAnimation::finished, [this](){
             wctl->close();
-            if (!contmenu) blankMouse();
-            contmenu = false;
+            if (!contmenu && !nomousehide) blankMouse();
+            contmenu = nomousehide = false;
         });
     }
     animation->start();

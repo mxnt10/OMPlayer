@@ -31,7 +31,6 @@ public:
 
 public Q_SLOTS:
     void openMedia(const QStringList &parms = QStringList());
-    void onLoad();
 
 protected:
     void moveEvent(QMoveEvent *event) override;
@@ -50,7 +49,6 @@ private:
     void fadeWctl(OMPlayer::FADE Option);
 
 private Q_SLOTS:
-    void setTotalItems();
     void setSelect(int item);
     void ajustActualItem(int item);
     void firstPlay(const QString &name, int pos);
@@ -127,7 +125,7 @@ private:
     Slider *slider{}, *volume{};
     QtAV::VideoRenderer *video{};
     QtAV::VideoPreviewWidget *preview{};
-    bool control{false}, listmenu{false};
+    bool control{false}, listmenu{false}, nomousehide{false};
     bool playing{false}, pausing{false}, muted{false};
     bool restart{false}, randplay{false};
     bool enterpos{false}, showsett{false};
@@ -136,7 +134,7 @@ private:
     bool prevent{false}, powersaving{false};
     int Width{192}, Height{108};
     int previousitem{0}, actualitem{0}, nextitem{0};
-    int count{0}, unit{500}, totalitems{0};
+    int count{0}, unit{500};
 };
 
 #endif //OMPLAYER_PLAYER_H

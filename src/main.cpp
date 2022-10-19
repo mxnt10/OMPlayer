@@ -27,6 +27,7 @@
 #include <SingleApplication>
 #include <Utils>
 
+#include "MessageReceiver.h"
 #include "Player.h"
 #include "Translator.h"
 
@@ -38,27 +39,22 @@
 
 int main(int argc, char *argv[]) {
     SingleApplication Player(argc, argv, true, SingleApplication::Mode::SecondaryNotification);
-    Utils::initUtils();
+    MessageReceiver msg;
 
-    QDir dir(QDir::homePath() + "/.config/OMPlayer");
-    if (!dir.exists()) dir.mkpath(".");
-    JsonTools::settingsJson();
 
-    Translator translator;
-    if (translator.load()) translator.installTranslator();
-
+    /**************************************** Instrução apenas para depuração *************************************/
     #pragma clang diagnostic push
     #pragma ide diagnostic ignored "Simplify"
     #pragma ide diagnostic ignored "UnreachableCode"
 
-    QLoggingCategory::setFilterRules("*.error=false\n*.warning=false\n"
-                                     "*.critical=false\n*.info=false");
-
-    if (!DEBUG) /** Instrução apenas para depuração */
-        QLoggingCategory::setFilterRules("*=false");
+    QLoggingCategory::setFilterRules("*.error=false\n*.warning=false\n*.critical=false\n*.info=false");
+    if (!DEBUG) QLoggingCategory::setFilterRules("*=false");
 
     #pragma clang diagnostic pop
+    /**************************************************************************************************************/
 
+
+    /** Debug geral da aplicação */
     qDebug("%s(%sSingleApplication%s)%s::%sInformações da instância atual:"
            "\n                     - PID Primário: %lli"
            "\n                     - Usuário primário: %s"
@@ -66,8 +62,8 @@ int main(int argc, char *argv[]) {
            "\n                     - ID da instância: %i"
            "\033[m", GRE, RED, GRE, RED, BLU,
            Player.primaryPid(),
-           qUtf8Printable(Player.primaryUser()),
-           qUtf8Printable(Player.currentUser()),
+           STR(Player.primaryUser()),
+           STR(Player.currentUser()),
            Player.instanceId());
 
     /** Propriedades do Programa */
@@ -83,29 +79,39 @@ int main(int argc, char *argv[]) {
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
     parser.process(Player);
 
-    /** Define a interface do programa, envia os argumentos para o reprodutor */
-    OMPlayer player;
-    if (!parser.positionalArguments().isEmpty()) {
-        player.openMedia(parser.positionalArguments());
+    /** Verificando instâncias abertas e impedindo novas instâncias */
+    if (Player.isSecondary()) {
+        Player.sendMessage(parser.positionalArguments().join('\n').toUtf8());
+        qDebug("%s(%sSingleApplication%s)%s::%sInstância secundária, fechando!\033[m", GRE, RED, GRE, RED, RDL);
+        return 0;
     }
 
-    /** Verificando instâncias abertas e impedindo novas instâncias */
-    if( Player.isSecondary() ) {
-        Player.sendMessage("OK");
-        qDebug("%s(%sSingleApplication%s)%s::%sInstância secundária, fechando!\033[m", GRE, RED, GRE, RED, BLU);
-        return 0;
-    } else {
-        QObject::connect(&Player, &SingleApplication::instanceStarted, [&player]() {
-            qDebug("%s(%sSingleApplication%s)%s::%sAberto outra instância ...\033[m", GRE, RED, GRE, RED, BLU);
-            player.hide();
-            player.show();
-            player.activateWindow();
-        });
-        QObject::connect(&Player, &SingleApplication::receivedMessage, [&player]() {
-            qDebug("%s(%sSingleApplication%s)%s::%sRecarregando playlist ...\033[m", GRE, RED, GRE, RED, BLU);
-            player.onLoad();
-        });
-    }
+    /** Verificando diretório padrão */
+    Utils::initUtils();
+    QDir dir(QDir::homePath() + "/.config/OMPlayer");
+    if (!dir.exists()) dir.mkpath(".");
+    JsonTools::settingsJson();
+
+    /** Instalando tradução e construindo a interface */
+    Translator translator;
+    if (translator.load()) translator.installTranslator();
+
+    OMPlayer player;
+    if (!parser.positionalArguments().isEmpty()) player.openMedia(parser.positionalArguments());
+
+    QObject::connect(&Player, &SingleApplication::instanceStarted, [&player]() {
+        qDebug("%s(%sSingleApplication%s)%s::%sAberto outra instância ...\033[m", GRE, RED, GRE, RED, BLU);
+        auto eFlags = player.windowFlags();
+        player.setWindowFlags(eFlags | Qt::WindowStaysOnTopHint);
+        player.show();
+        player.setWindowFlags(eFlags);
+        player.show();
+        player.raise();
+        player.activateWindow();
+    });
+
+    QObject::connect(&Player, &SingleApplication::receivedMessage, &msg, &MessageReceiver::receivedMessage);
+    QObject::connect(&msg, &MessageReceiver::parms, &player, &OMPlayer::openMedia);
 
     if (JsonTools::boolJson("maximized")) player.showMaximized();
     else player.show();

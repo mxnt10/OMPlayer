@@ -42,7 +42,6 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
             Qt::KeyboardModifiers modifiers = ke->modifiers();
 
             switch (key) {
-                case Qt::Key_A:
                 case Qt::Key_O:
                     if (modifiers == CTRL) emit emitOpen();
                     break;

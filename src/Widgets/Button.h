@@ -5,9 +5,10 @@
 
 class Button : public QPushButton {
 Q_OBJECT
+
 public:
-    enum ButtonType{ button = 1, radio = 2, tag = 3};
-    explicit Button(ButtonType btn, const QString &icon, int size = 0, const QString &text = nullptr);
+    enum BUTTONTYPE{ Default = 0, Radio = 1, Tag = 2 };
+    explicit Button(Button::BUTTONTYPE btn, const QString &icon, int size = 0, const QString &text = nullptr);
     ~Button() override;
 
 protected:
@@ -18,7 +19,7 @@ protected:
 
 private:
     int num{0};
-    ButtonType type{};
+    Button::BUTTONTYPE type{Button::Default};
     QString ico{};
     QString txt{};
 

@@ -9,7 +9,7 @@
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(ButtonType btn, const QString &icon, int size, const QString &text) {
+Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size, const QString &text) {
     num = size;
     type = btn;
     txt = text;
@@ -39,8 +39,8 @@ Button::Button(ButtonType btn, const QString &icon, int size, const QString &tex
 
 
     /** Para botões que agem feito radio buttons */
-    if (btn != radio) setFixedSize(num, num);
-    if (btn == radio) setText(txt);
+    if (btn != Button::Radio) setFixedSize(num, num);
+    if (btn == Button::Radio) setText(txt);
 
 
     /** Apenas para o Debug */
@@ -62,10 +62,10 @@ Button::~Button() = default;
 void Button::enterEvent(QEvent *event) {
     emit emitEnter();
 
-    if (type == button) {
+    if (type == Button::Default) {
         qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
         setIconSize(QSize(num + 2, num + 2));
-    } else if (type == radio) {
+    } else if (type == Button::Radio) {
         qDebug("%s(%sButton%s)%s::%sMouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(txt));
         setText(" " + txt);
     }
@@ -75,15 +75,15 @@ void Button::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    if (type == button) setIconSize(QSize(num, num));
-    else if (type == radio) setText(txt);
+    if (type == Button::Default) setIconSize(QSize(num, num));
+    else if (type == Button::Radio) setText(txt);
     QPushButton::leaveEvent(event);
 }
 
 
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
-    if (type == button) {
+    if (type == Button::Default) {
         qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
         setIconSize(QSize(num - 2, num - 2));
     }
@@ -93,6 +93,6 @@ void Button::mousePressEvent(QMouseEvent *event) {
 
 /** Finalizando o efeito do botão */
 void Button::mouseReleaseEvent(QMouseEvent *event) {
-    if (type == button) setIconSize(QSize(num + 2, num + 2));
+    if (type == Button::Default) setIconSize(QSize(num + 2, num + 2));
     QPushButton::mouseReleaseEvent(event);
 }

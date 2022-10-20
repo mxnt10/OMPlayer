@@ -4,6 +4,7 @@
 #include <QVariant>
 
 class PlayListItem {
+
 public:
     explicit PlayListItem();
     [[nodiscard]] QString title() const;

@@ -5,6 +5,7 @@
 
 class PlayListDelegate : public QStyledItemDelegate {
 Q_OBJECT
+
 public:
     explicit PlayListDelegate(QObject *parent = nullptr);
     ~PlayListDelegate() override;

@@ -4,6 +4,7 @@
 #include <QJsonValue>
 
 class JsonTools {
+
 public:
     static void settingsJson();
     static QString stringJson(const QString &key);

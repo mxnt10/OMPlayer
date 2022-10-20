@@ -100,13 +100,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para os controles de reprodução */
-    playBtn = new Button(Button::button, "play", 48);
-    stopBtn = new Button(Button::button, "stop", 32);
-    nextBtn = new Button(Button::button, "next", 32);
-    previousBtn = new Button(Button::button, "previous", 32);
-    replayBtn = new Button(Button::button, "replay", 32);
-    shuffleBtn = new Button(Button::button, "shuffle", 32);
-    volumeBtn = new Button(Button::button, "volume_high", 32);
+    playBtn = new Button(Button::Default, "play", 48);
+    stopBtn = new Button(Button::Default, "stop", 32);
+    nextBtn = new Button(Button::Default, "next", 32);
+    previousBtn = new Button(Button::Default, "previous", 32);
+    replayBtn = new Button(Button::Default, "replay", 32);
+    shuffleBtn = new Button(Button::Default, "shuffle", 32);
+    volumeBtn = new Button(Button::Default, "volume_high", 32);
     connect(playBtn, &Button::clicked, this, &OMPlayer::playPause);
     connect(stopBtn, &Button::clicked, this, &OMPlayer::setStop);
     connect(nextBtn, &Button::clicked, this, &OMPlayer::Next);
@@ -413,7 +413,7 @@ void OMPlayer::setRenderer(const QString &op) {
 
 /** Alterando a dimensão de tela */
 void OMPlayer::switchAspectRatio(QAction *action) {
-    Utils::Aspect r = Utils::Aspect(action->data().toInt());
+    Utils::ASPECTRATIO r = Utils::ASPECTRATIO(action->data().toInt());
     if (action == aspectAction) {
         action->toggle();
         return;

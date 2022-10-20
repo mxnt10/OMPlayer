@@ -12,7 +12,7 @@
 
 
 /** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
-void Utils::initUtils(Status option) {
+void Utils::initUtils(Utils::STATUS option) {
     if (option == Default) {
         qDebug("%s(%sUtils%s)%s::%sDefinição de locais padrão ...\033[0m", GRE, RED, GRE, RED, ORA);
         def.defaultDir = defaultDir();
@@ -27,7 +27,7 @@ void Utils::initUtils(Status option) {
  * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é tão conveniente. Por isso, é usado
  * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível à caráter
  * de testes de execução e depuração do reprodutor e em caso de portabilizar o reprodutor. */
-QString Utils::getLocal(Status option) {
+QString Utils::getLocal(Utils::STATUS option) {
     if (option == Current) return QDir::currentPath();
     return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));
 }
@@ -42,7 +42,7 @@ QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
 
 
 /** Retorna o ícone do programa */
-QString Utils::setIcon(Status logo) {
+QString Utils::setIcon(Utils::STATUS logo) {
     QStringList locals;
     QString iconfile, icon;
 
@@ -220,12 +220,6 @@ QString Utils::setHash(const QString &url) {
 }
 
 
-/** Capturando o hash MD5 de uma string */
-QString Utils::stringHash(const QString &url) {
-    return QCryptographicHash::hash(url.toLocal8Bit(), QCryptographicHash::Md5).toHex();
-}
-
-
 /** Função que retorna os subdiretórios presente em icons */
 QStringList Utils::subdirIcons() {
     qDebug("%s(%sUtils%s)%s::%sBuscando temas ...\033[0m", GRE, RED, GRE, RED, HID);
@@ -263,7 +257,7 @@ QString Utils::scanXDGData() {
 
 
 /** Retorno das dimensões de tela */
-double Utils::aspectNum(Aspect aspect) {
+double Utils::aspectNum(Utils::ASPECTRATIO aspect) {
     switch (aspect) {
         case Utils::AspectVideo:  return 0;
         case Utils::Aspect21:     return (double) 2 / 1;
@@ -284,7 +278,7 @@ double Utils::aspectNum(Aspect aspect) {
 
 
 /** Retorna o texto das dimensões de tela */
-QString Utils::aspectStr(Aspect aspect) {
+QString Utils::aspectStr(Utils::ASPECTRATIO aspect) {
     switch (aspect) {
         case Utils::AspectVideo:  return QApplication::tr("Video");
         case Utils::Aspect21:     return "2:1";

@@ -52,31 +52,31 @@ struct { /** Criado com objetivo de otimização de performance */
 } def;
 
 class Utils {
+
 public:
-    enum Aspect {
+    enum ASPECTRATIO {
         AspectAuto = 1, Aspect43 = 2, Aspect54 = 3, Aspect149 = 4, Aspect169 = 5, Aspect1610 = 6, Aspect235 = 7,
         Aspect11 = 8, Aspect32 = 9, Aspect1410 = 10, Aspect118 = 11, Aspect21 = 12, AspectVideo = 0
     };
-    enum Status {Default = 0, Logo = 1, Current = 2, Theme = 3};
-    static void initUtils(Status option = Default);
-    static QString setIcon(Status logo = Default);
+    enum STATUS {Default = 0, Logo = 1, Current = 2, Theme = 3};
+    static void initUtils(Utils::STATUS option = Utils::Default);
+    static QString setIcon(Utils::STATUS logo = Utils::Default);
     static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
     static QString mediaTitle(const QString &mediafile);
     static QString defaultIcon(const QString &icon);
     static QString setHash(const QString &url);
-    static QString stringHash(const QString &url);
     static void changeIcon(Button *btn, const QString &thm);
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void rm_nl(string &s);
     static int calcX(int z, int x, int y);
     static QStringList subdirIcons();
-    static double aspectNum(Aspect aspect);
-    static QString aspectStr(Aspect aspect);
+    static double aspectNum(Utils::ASPECTRATIO aspect);
+    static QString aspectStr(Utils::ASPECTRATIO aspect);
     static QStringList setLocals();
 
 private:
-    static QString getLocal(Status option = Default);
+    static QString getLocal(Utils::STATUS option = Utils::Default);
     static QString defaultDir();
     static QString scanXDGData();
 };

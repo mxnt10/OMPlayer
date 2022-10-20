@@ -11,7 +11,7 @@
 
 
 /** Construtor do filtro de eventos */
-EventFilter::EventFilter(QWidget *parent, UITYPE i) : QObject(parent), option(i) {}
+EventFilter::EventFilter(QWidget *parent, EventFilter::UITYPE i) : QObject(parent), option(i) {}
 
 
 /** Destrutor */
@@ -31,7 +31,7 @@ void EventFilter::setSett(bool var)  { sett = var;   }
 bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object)
 
-    if (option == General) {
+    if (option == EventFilter::General) {
         /** O widget filho pode abrir mais rápido que o pai, por isso o delay */
         if (!first) QTimer::singleShot(200, [this](){ start = true; first = true; });
 
@@ -126,7 +126,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     }
 
     /** Emissão para os controles e demais */
-    if (option == Control) {
+    if (option == EventFilter::Control) {
         if (event->type() == QEvent::Enter) emit emitEnter();
         if (event->type() == QEvent::Leave) emit emitLeave();
     }

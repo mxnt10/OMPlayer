@@ -1,6 +1,7 @@
 #include <QPainter>
 #include <string>
 #include <Utils>
+#include <utility>
 
 #include "Button.h"
 
@@ -9,14 +10,12 @@
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size, const QString &text) {
-    num = size;
-    type = btn;
-    txt = text;
+Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size, const QString &text) : num(size), type(btn) {
     setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
     setMouseTracking(true);
+    txt = text;
 
     /** Definindo ícone */
     QString theme = JsonTools::stringJson("theme");

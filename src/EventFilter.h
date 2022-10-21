@@ -5,6 +5,7 @@
 
 class EventFilter : public QObject{
 Q_OBJECT
+
 public:
     enum UITYPE {Defaut = 0, General = 1, Control = 2};
     explicit EventFilter(QWidget *parent, EventFilter::UITYPE i = EventFilter::Defaut);

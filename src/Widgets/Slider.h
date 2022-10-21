@@ -5,6 +5,7 @@
 
 class Slider : public QSlider {
 Q_OBJECT
+
 public:
     explicit Slider(QWidget *parent = nullptr,
                     bool disable = false,

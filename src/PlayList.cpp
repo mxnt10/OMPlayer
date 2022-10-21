@@ -27,7 +27,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
-    worker = new Worker(this); /** ou usa this ou nada de dialog */
+    worker = new Worker(this, Worker::Add_Items); /** ou usa this ou nada de dialog */
     worker->moveToThread(thread);
     connect(worker, &Worker::valueChanged, this, &PlayList::addItems);
     connect(thread, &QThread::started, worker, &Worker::doWork);
@@ -58,9 +58,9 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button(Button::button, "add", 32, tr("Add items"));
-    removeBtn = new Button(Button::button, "remove", 32, tr("Remove items"));
-    clearBtn = new Button(Button::button, "clean", 32, tr("Clear playlist"));
+    addBtn = new Button(Button::Default, "add", 32, tr("Add items"));
+    removeBtn = new Button(Button::Default, "remove", 32, tr("Remove items"));
+    clearBtn = new Button(Button::Default, "clean", 32, tr("Clear playlist"));
     connect(addBtn, &Button::clicked, this, &PlayList::getFiles);
     connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
     connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);

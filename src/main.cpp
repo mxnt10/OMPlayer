@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
     parser.addPositionalArgument("url_files", QApplication::tr("Open multimedia files."));
     parser.process(Player);
 
-    /** Verificando instâncias abertas e impedindo novas instâncias */
+    /** Verificação de instâncias secundárias para a passagem de parâmetros para a primeira */
     if (Player.isSecondary()) {
         Player.sendMessage(parser.positionalArguments().join('\n').toUtf8());
         qDebug("%s(%sSingleApplication%s)%s::%sInstância secundária, fechando!\033[m", GRE, RED, GRE, RED, RDL);
@@ -110,6 +110,7 @@ int main(int argc, char *argv[]) {
         player.activateWindow();
     });
 
+    /** Pegando os argumentos das instâncias secundárias */
     QObject::connect(&Player, &SingleApplication::receivedMessage, &msg, &MessageReceiver::receivedMessage);
     QObject::connect(&msg, &MessageReceiver::parms, &player, &OMPlayer::openMedia);
 

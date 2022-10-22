@@ -162,24 +162,19 @@ void PlayList::load(ST load, const QString &url) {
     if (!f.exists()) save();
     if (!f.open(QIODevice::ReadOnly)) return;
 
-    actsum = Utils::setHash(url);
-    qDebug("%s(%sPlaylist%s)%s::%sCapturando MD5 Hash %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(actsum));
-
-    if (QString::compare(sum, actsum, Qt::CaseInsensitive)) {
-        qDebug("%s(%sPlaylist%s)%s::%sCarregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
-        if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
-        QDataStream ds(&f);
-        QList<PlayListItem> list;
-        ds >> list;
-        int add = 0;
-        for (const auto &i : list) {
-            if (QFileInfo::exists(i.url())) {
-                insertItemAt(i, add);
-                add++;
-            }
+    qDebug("%s(%sPlaylist%s)%s::%sCarregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
+    if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+    QDataStream ds(&f);
+    QList<PlayListItem> list;
+    ds >> list;
+    int add = 0;
+    for (const auto &i: list) {
+        if (QFileInfo::exists(i.url())) {
+            insertItemAt(i, add);
+            add++;
         }
-        sum = actsum;
     }
+
     f.close();
     if (load != First) save();
 }
@@ -193,8 +188,6 @@ void PlayList::save(const QString &url) {
     QDataStream ds(&f);
     ds << model->items();
     f.close();
-    actsum = Utils::setHash(url);
-    sum = actsum;
 }
 
 
@@ -213,10 +206,9 @@ void PlayList::addItems(const QStringList &files) {
         return;
     }
 
-    bool select = false;
     int a = 0;
     int t = model->rowCount(QModelIndex());
-    QString isplay;
+    rmRows = 0;
 
     for (int i = 0; i < files.size(); ++i) {
         const QString &file = files.at(i);
@@ -229,22 +221,22 @@ void PlayList::addItems(const QStringList &files) {
         } else {
             insert(file, a + t - rmRows);
             a++;
-
-            if (!select) {
-                isplay = file;
-                select = true;
-            }
         }
     }
+
+    qDebug("%s(%sPlaylist%s)%s::%sItens inseridos na playlist:"
+           "\n            - Existentes:  %s%4i%s"
+           "\n            - Adicionados: %s%4i%s"
+           "\n            - Repetidos:   %s%4i%s"
+           "\n            - Total:       %s%4i"
+           "\033[0m", GRE, RED, GRE, RED, BLU, YEL, t, BLU, GRE, a - rmRows, BLU, RDL, rmRows, BLU, VIO, a + t - rmRows);
 
     /** Verificando visibilidade de lista vazia */
     if (setListSize() == 0) cleanlist->setVisible(true);
     else cleanlist->setVisible(false);
 
-    rmRows = 0;
     save();
-    emit firstPlay(isplay, t);
-    if(cleanlist) if (cleanlist->isVisible()) cleanlist->setVisible(false);
+    emit firstPlay(getItems(t), t);
 }
 
 
@@ -300,7 +292,6 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
         save();
         emit firstPlay(getItems(0), 0);
-        if(cleanlist) if (cleanlist->isVisible()) cleanlist->setVisible(false);
     }
 }
 

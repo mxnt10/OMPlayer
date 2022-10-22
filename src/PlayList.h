@@ -16,6 +16,7 @@
 
 class PlayList : public QWidget {
 Q_OBJECT
+
 public:
     explicit PlayList(QWidget *parent = nullptr);
     ~PlayList() override;
@@ -76,10 +77,8 @@ private:
     QGraphicsOpacityEffect *effect{};
     QLabel *cleanlist{};
     QListView *listView{};
-    QString sum{}, actsum{};
     QWidget *wpls{};
-    int rmRows{0};
-    int startsize{0}, startlistsize{0}, startpos{0};
+    int startsize{0}, startlistsize{0}, startpos{0}, rmRows{0};
     bool isshow{false}, resize{false};
 
     /** Suporte multithread */

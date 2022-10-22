@@ -215,6 +215,8 @@ QString Utils::setHash(const QString &url) {
         }
 
         f.close();
+        qDebug("%s(%sUtils%s)%s::%sCapturando MD5 Hash %s ...\033[0m",
+               GRE, RED, GRE, RED, BLU, STR(hash.result().toHex()));
         return hash.result().toHex();
     } else return {};
 }

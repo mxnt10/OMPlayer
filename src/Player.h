@@ -25,6 +25,7 @@
 
 class OMPlayer : public QWidget {
 Q_OBJECT
+
 public:
     explicit OMPlayer(QWidget *parent = nullptr);
     ~OMPlayer() override;

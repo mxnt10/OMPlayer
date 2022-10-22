@@ -37,7 +37,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     prev->setAttribute(Qt::WA_TranslucentBackground, true);
     pv = new QWidget(prev);
     pv->setStyleSheet(Utils::setStyle("widget"));
-    preview = new VideoPreviewWidget(pv);
+    preview = new QtAV::VideoPreviewWidget(pv);
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
     ltime = new QLabel(pv);
     ltime->setAttribute(Qt::WA_NoSystemBackground, true);
@@ -62,16 +62,16 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
-    mediaPlayer = new AVPlayer(this);
+    mediaPlayer = new QtAV::AVPlayer(this);
     connect(mediaPlayer->audio(), &QtAV::AudioOutput::volumeChanged, this, &OMPlayer::volumeFinished);
-    connect(mediaPlayer, &AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
-    connect(mediaPlayer, &AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
-    connect(mediaPlayer, &AVPlayer::positionChanged, this, &OMPlayer::updateSlider);
-    connect(mediaPlayer, &AVPlayer::notifyIntervalChanged, this, &OMPlayer::updateSliderUnit);
-    connect(mediaPlayer, &AVPlayer::started, this, &OMPlayer::onStart);
-    connect(mediaPlayer, &AVPlayer::stopped, [this](){ if(!prevent) onStop(); });
-    connect(mediaPlayer, &AVPlayer::paused, this, &OMPlayer::onPaused);
-    connect(mediaPlayer, &AVPlayer::error, this, &OMPlayer::handleError);
+    connect(mediaPlayer, &QtAV::AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
+    connect(mediaPlayer, &QtAV::AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
+    connect(mediaPlayer, &QtAV::AVPlayer::positionChanged, this, &OMPlayer::updateSlider);
+    connect(mediaPlayer, &QtAV::AVPlayer::notifyIntervalChanged, this, &OMPlayer::updateSliderUnit);
+    connect(mediaPlayer, &QtAV::AVPlayer::started, this, &OMPlayer::onStart);
+    connect(mediaPlayer, &QtAV::AVPlayer::stopped, [this](){ if(!prevent) onStop(); });
+    connect(mediaPlayer, &QtAV::AVPlayer::paused, this, &OMPlayer::onPaused);
+    connect(mediaPlayer, &QtAV::AVPlayer::error, this, &OMPlayer::handleError);
 
 
     /** Playlist do reprodutor */
@@ -289,11 +289,11 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     channel = new QMenu(this);
     channel = subMenu;
     connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::changeChannel);
-    subMenu->addAction(tr("As input"))->setData(AudioFormat::ChannelLayout_Unsupported);
-    subMenu->addAction(tr("Stereo"))->setData(AudioFormat::ChannelLayout_Stereo);
-    subMenu->addAction(tr("Mono (Center)"))->setData(AudioFormat::ChannelLayout_Center);
-    subMenu->addAction(tr("Left"))->setData(AudioFormat::ChannelLayout_Left);
-    subMenu->addAction(tr("Right"))->setData(AudioFormat::ChannelLayout_Right);
+    subMenu->addAction(tr("As input"))->setData(QtAV::AudioFormat::ChannelLayout_Unsupported);
+    subMenu->addAction(tr("Stereo"))->setData(QtAV::AudioFormat::ChannelLayout_Stereo);
+    subMenu->addAction(tr("Mono (Center)"))->setData(QtAV::AudioFormat::ChannelLayout_Center);
+    subMenu->addAction(tr("Left"))->setData(QtAV::AudioFormat::ChannelLayout_Left);
+    subMenu->addAction(tr("Right"))->setData(QtAV::AudioFormat::ChannelLayout_Right);
     auto *ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
@@ -377,32 +377,34 @@ void OMPlayer::setRenderer(const QString &op) {
 
     struct {
         const char* name;
-        VideoRendererId id;
-    } rend[] = {{"OpenGL",     VideoRendererId_OpenGLWidget },
-                {"QGLWidget2", VideoRendererId_GLWidget2    },
-                {"Direct2D",   VideoRendererId_Direct2D     },
-                {"GDI",        VideoRendererId_GDI          },
-                {"XVideo",     VideoRendererId_XV           },
-                {"X11",        VideoRendererId_X11          },
-                {"QGLWidget",  VideoRendererId_GLWidget     },
-                {"Widget",     VideoRendererId_Widget       }, {nullptr, 0}};
+        QtAV::VideoRendererId id;
+    } rend[] = {{"OpenGL",     QtAV::VideoRendererId_OpenGLWidget },
+                {"QGLWidget2", QtAV::VideoRendererId_GLWidget2    },
+                {"Direct2D",   QtAV::VideoRendererId_Direct2D     },
+                {"GDI",        QtAV::VideoRendererId_GDI          },
+                {"XVideo",     QtAV::VideoRendererId_XV           },
+                {"X11",        QtAV::VideoRendererId_X11          },
+                {"QGLWidget",  QtAV::VideoRendererId_GLWidget     },
+                {"Widget",     QtAV::VideoRendererId_Widget       }, {nullptr, 0}};
 
     for (int i = 0; rend[i].name; ++i) {
         if (QString::compare(op, rend[i].name, Qt::CaseSensitive) == 0) {
-            video = VideoRenderer::create(rend[i].id);
+            video = QtAV::VideoRenderer::create(rend[i].id);
             video->widget()->setMouseTracking(true);
             break;
         }
     }
 
     /** Ao recriar o widget, o índice do QStackWidget precisará ser definido novamente */
-    if (!video && !video->isAvailable()) video = new VideoOutput(this);
+    if (!video && !video->isAvailable()) video = new QtAV::VideoOutput(this);
     mediaPlayer->setRenderer(video);
     stack->addWidget(video->widget());
     if (playing) stack->setCurrentIndex(1);
 
-    const VideoRendererId vid = mediaPlayer->renderer()->id();
-    if (vid == VideoRendererId_XV || vid == VideoRendererId_GLWidget2 || vid == VideoRendererId_OpenGLWidget)
+    const QtAV::VideoRendererId vid = mediaPlayer->renderer()->id();
+    if (vid == QtAV::VideoRendererId_XV ||
+        vid == QtAV::VideoRendererId_GLWidget2 ||
+        vid == QtAV::VideoRendererId_OpenGLWidget)
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
     else mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
@@ -420,10 +422,11 @@ void OMPlayer::switchAspectRatio(QAction *action) {
     }
 
     qDebug("%s(%sMenu%s)%s::%sSetando aspect ratio %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(Utils::aspectStr(r)));
-    if (r == Utils::AspectVideo) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::VideoAspectRatio);
-    else if (r == Utils::AspectAuto) mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::RendererAspectRatio);
+    if (r == Utils::AspectVideo) mediaPlayer->renderer()->setOutAspectRatioMode(QtAV::VideoRenderer::VideoAspectRatio);
+    else if (r == Utils::AspectAuto)
+        mediaPlayer->renderer()->setOutAspectRatioMode(QtAV::VideoRenderer::RendererAspectRatio);
     else {
-        mediaPlayer->renderer()->setOutAspectRatioMode(VideoRenderer::CustomAspectRation);
+        mediaPlayer->renderer()->setOutAspectRatioMode(QtAV::VideoRenderer::CustomAspectRation);
         mediaPlayer->renderer()->setOutAspectRatio(Utils::aspectNum(r));
     }
     aspectAction->setChecked(false);
@@ -1032,10 +1035,10 @@ void OMPlayer::onTimeVolume(int pos, int value) {
 void OMPlayer::updateChannelMenu() {
     if (channelAction) channelAction->setChecked(false);
 
-    AudioOutput *ao = mediaPlayer ? mediaPlayer->audio() : nullptr;
+    QtAV::AudioOutput *ao = mediaPlayer ? mediaPlayer->audio() : nullptr;
     if (!ao) return;
 
-    AudioFormat::ChannelLayout cl = ao->audioFormat().channelLayout();
+    QtAV::AudioFormat::ChannelLayout cl = ao->audioFormat().channelLayout();
     QList<QAction*> as = channel->actions();
 
     /** Buscando e alterando o canal no menu */
@@ -1061,8 +1064,8 @@ void OMPlayer::changeChannel(QAction *action) {
     }
 
     /** Verificando existência de áudio */
-    AudioFormat::ChannelLayout cl = (AudioFormat::ChannelLayout)action->data().toInt();
-    AudioOutput *ao = mediaPlayer ? mediaPlayer->audio() : nullptr;
+    QtAV::AudioFormat::ChannelLayout cl = (QtAV::AudioFormat::ChannelLayout)action->data().toInt();
+    QtAV::AudioOutput *ao = mediaPlayer ? mediaPlayer->audio() : nullptr;
     if (!ao) return;
 
     channelAction->setChecked(false);
@@ -1075,7 +1078,7 @@ void OMPlayer::changeChannel(QAction *action) {
     }
 
     /** Alterando o formato */
-    AudioFormat af(ao->audioFormat());
+    QtAV::AudioFormat af(ao->audioFormat());
     af.setChannelLayout(cl);
     ao->setAudioFormat(af);
 
@@ -1132,17 +1135,17 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
 /** Função para mapear o status de um arquivo multimídia */
 void OMPlayer::onMediaStatusChanged() {
     QString status;
-    auto *player = reinterpret_cast<AVPlayer*>(sender());
+    auto *player = reinterpret_cast<QtAV::AVPlayer*>(sender());
     if (!player) return;
 
     switch (player->mediaStatus()) {
-        case InvalidMedia:
+        case QtAV::InvalidMedia:
             invalid = true;
             break;
-        case BufferedMedia:
+        case QtAV::BufferedMedia:
             status = "Buffered !";
             break;
-        case LoadedMedia:
+        case QtAV::LoadedMedia:
             status = "Loaded !";
             break;
         case 7:
@@ -1177,7 +1180,7 @@ void OMPlayer::onMediaStatusChanged() {
 
 
 /** Debug em caso de eventuais erros */
-void OMPlayer::handleError(const AVError &error) {
+void OMPlayer::handleError(const QtAV::AVError &error) {
     string tr = error.string().toStdString();
     Utils::rm_nl(tr);
     qDebug("%s(%sAVError%s)%s::%s %s", GRE, RED, GRE, RED, ERR, tr.c_str());

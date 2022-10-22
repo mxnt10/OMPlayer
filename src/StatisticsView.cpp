@@ -18,6 +18,15 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     setModal(true);
     setFocus();
 
+    /** Usando multithread para buscar arquivos */
+    thread = new QThread();
+    worker = new Worker(nullptr, Worker::Md5Hash);
+    worker->moveToThread(thread);
+    connect(worker, &Worker::valueMD5, this, &StatisticsView::setMd5);
+    connect(thread, &QThread::started, worker, &Worker::doWork);
+    connect(worker, &Worker::workRequested, [this](){ thread->start(); });
+    connect(worker, &Worker::finished, [this](){ thread->quit(); });
+
 
     /** Iniciando as informações dos itens */
     initItems(&baseItems, getBaseInfoKeys());
@@ -31,10 +40,11 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     view3 = new TreeView(audioItems);
     CTIME = baseItems[5];
     FPS = videoItems[6];
+    MD5 = baseItems[6];
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button(Button::button, "apply", 32);
+    closebtn = new Button(Button::Default, "apply", 32);
     connect(closebtn, &Button::pressed, this, &StatisticsView::onClose);
 
 
@@ -59,8 +69,8 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botões que servirão de tag info */
-    screen = new Button(Button::tag, nullptr, 36);
-    ratio = new Button(Button::tag, nullptr, 36);
+    screen = new Button(Button::Tag, nullptr, 36);
+    ratio = new Button(Button::Tag, nullptr, 36);
 
 
     /** Layout para as tag infos */
@@ -92,10 +102,18 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
 /** Destrutor */
-StatisticsView::~StatisticsView() = default;
+StatisticsView::~StatisticsView() {
+    thread->quit();
+    delete thread;
+    delete worker;
+}
 
 
 /**********************************************************************************************************************/
+
+
+/** setar nas informações o hash MD5 dos arquivos multimídia */
+void StatisticsView::setMd5(const QString &md5) { MD5->setData(1, Qt::DisplayRole, md5); }
 
 
 /** Emissão para fechar a janela */
@@ -114,7 +132,8 @@ QStringList StatisticsView::getBaseInfoKeys() {
         << tr("File Size")
         << tr("Format")
         << tr("Bit Rate")
-        << tr("Duration");
+        << tr("Duration")
+        << tr("Md5Sum");
 }
 
 
@@ -149,7 +168,7 @@ QStringList StatisticsView::getAudioInfoKeys() {
 
 
 /** Informações básicas de mídia */
-QVariantList StatisticsView::getBaseInfoValues(const Statistics& s) {
+QVariantList StatisticsView::getBaseInfoValues(const QtAV::Statistics& s) {
     QString rate, duration;
     if (!s.url.isEmpty()) {
         rate = QString::number(s.bit_rate/1000).append(QString::fromLatin1(" Kb/s"));
@@ -162,12 +181,13 @@ QVariantList StatisticsView::getBaseInfoValues(const Statistics& s) {
         << fsize
         << s.format
         << rate
-        << duration;
+        << duration
+        << QString();
 }
 
 
 /** Informações de vídeo */
-QVariantList StatisticsView::getVideoInfoValues(const Statistics& s) {
+QVariantList StatisticsView::getVideoInfoValues(const QtAV::Statistics& s) {
     QString sizev = QString::fromLatin1("%1x%2").arg(s.video_only.width).arg(s.video_only.height);
     QString sizec = QString::fromLatin1("%1x%2").arg(s.video_only.coded_width).arg(s.video_only.coded_height);
 
@@ -186,7 +206,7 @@ QVariantList StatisticsView::getVideoInfoValues(const Statistics& s) {
 
 
 /** Informações de áudio */
-QVariantList StatisticsView::getAudioInfoValues(const Statistics& s) {
+QVariantList StatisticsView::getAudioInfoValues(const QtAV::Statistics& s) {
     return QVariantList()
         << QString::fromLatin1("%1 (%2)").arg(s.audio.codec, s.audio.codec_long)
         << QString::fromLatin1("%1 (%2)").arg(s.audio.decoder, s.audio.decoder_detail)
@@ -212,7 +232,7 @@ void StatisticsView::initItems(QList<QTreeWidgetItem *> *items, const QStringLis
 
 
 /** Função usada para setar as estatísticas dos itens atuais */
-void StatisticsView::setStatistics(const Statistics& s) {
+void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
 
@@ -280,6 +300,11 @@ void StatisticsView::setStatistics(const Statistics& s) {
 
     this->setMinimumSize(csize, 340);
     this->resize(csize, this->height());
+
+    worker->setFile(s.url);
+    MD5->setData(1, Qt::DisplayRole, tr("Calculating..."));
+    if (thread->isRunning()) thread->quit();
+    worker->requestWork();
 }
 
 

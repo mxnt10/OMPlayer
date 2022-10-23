@@ -65,6 +65,7 @@ add_executable(
         src/main.cpp
         src/About.cpp           src/About.h
         src/EventFilter.cpp     src/EventFilter.h
+        src/Extensions.cpp      src/Extensions.h
         src/MessageReceiver.cpp src/MessageReceiver.h
         src/Player.cpp          src/Player.h
         src/PlayList.cpp        src/PlayList.h

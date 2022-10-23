@@ -11,8 +11,8 @@ public:
     enum WORKER {Default = 0, Add_Items = 1, Md5Hash = 2, Update_Version = 3};
     explicit Worker(QObject *parent = nullptr, Worker::WORKER work = Worker::Default);
     void requestWork();
-    void setFile(const QString &val);
 
+    void setFile(const QString &val) { file = val; };
 
 signals:
     void workRequested();
@@ -24,7 +24,7 @@ public slots:
     void doWork();
 
 private:
-    QString file{};
+    QString file{}, extensions{}, dir{};
     Worker::WORKER option{Worker::Default};
 };
 

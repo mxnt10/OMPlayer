@@ -27,10 +27,10 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
-    worker = new Worker(this, Worker::Add_Items); /** ou usa this ou nada de dialog */
+    worker = new Worker(this); /** ou usa this ou nada de dialog */
     worker->moveToThread(thread);
     connect(worker, &Worker::valueChanged, this, &PlayList::addItems);
-    connect(thread, &QThread::started, worker, &Worker::doWork);
+    connect(thread, &QThread::started, worker, &Worker::doFiles);
     connect(worker, &Worker::workRequested, [this](){ thread->start(); });
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
 

@@ -8,36 +8,11 @@
 ExtensionList::ExtensionList() : QStringList() {}
 
 
-/**********************************************************************************************************************/
-
-
 /** Usado para montar o filtro para abrir arquivos para o reprodutor */
 QString ExtensionList::forFilter() {
 	QString s;
 	for (int i = 0; i < count(); i++) s = s + "*." + at(i) + " ";
 	if (!s.isEmpty()) s = " (" + s + ")";
-	return s;
-}
-
-
-/***/
-QStringList ExtensionList::forDirFilter() {
-	QStringList l;
-	for (int i = 0; i < count(); i++) {
-		QString s = "*." + at(i);
-		l << s;
-	}
-	return l;
-}
-
-
-/***/
-QString ExtensionList::forRegExp() {
-	QString s;
-	for (int n=0; n < count(); n++) {
-		if (!s.isEmpty()) s = s + "|";
-		s = s + "^" + at(n) + "$";
-	}
 	return s;
 }
 

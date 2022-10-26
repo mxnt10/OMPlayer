@@ -3,6 +3,61 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 1.6 ] - 2022-10-22 ##################################################
+
+### Added / Adicionado
+ - Sources:
+    - Adicionado Extensions.{cpp/h} em src.
+    - Adicionado MessageReceiver.{cpp/h} em src.
+    - Adicionado Worker.{cpp/h} em src.
+ - Adicionado suporte multithread.
+ - Adicionado verificação de hash md5 em arquivos multimídia.
+###
+
+### Upgraded / Atualizado
+ - Tradução atualizada.
+###
+
+### Changed / Modificado
+ - Incrementado mais debug ao código.
+ - Refatoração no sistema de adição de itens à playlist pela segunda
+   instância, passando os parâmetros por mensagem direto para a
+   primeira instância, mais garantido.
+ - Refatorado sistema de verificação de itens repetidos feito diretamente
+   após a adição dos itens para depois ser removido, sem bugs.
+ - Refatoração no código main, não precisa construir nenhuma
+   interface ou aplicar tradução a partir da segunda instância.
+ - Pequenas modificações no código dos botões.
+ - Não precisa mais verificar se a playlist foi alterada.
+ - Modificado opções para abrir/adicionar arquivos multimídia.
+###
+
+### Removed / Removido
+ - Removido funções:
+    - setDifere() em Utils, não mais necessário.
+    - stringHash() em Utils, não mais necessário.
+    - setTotalItems() em Player, não mais necessário.
+    - onLoad() em Player, não mais necessário.
+ - Removido atalho com Ctrl+A para abrir arquivos, já tem o Ctrl+O.
+###
+
+### Fixed / Corrigido
+ - Corrigido o Next automático após o término da mídia reproduzida,
+   substituindo a gambiarra autentica por um método eficiente.
+ - Corrigido a tradução.
+ - Corrigido powersaving sempre desativando a cada mídia reproduzida.
+ - Ajustes na configuração da velocidade de reprodução.
+ - Corrigido verificação de itens repetidos.
+ - Corrigido problemas ao adicionar itens pela segunda instância.
+ - Corrigida a exibição da interface da primeira instância após o
+   fechamento da segunda instância.
+ - Corrigido problemas com execução de itens após a adição de itens
+   na playlist.
+###
+
+##########################################################################
+
+
 ## [ 1.5 ] - 2022-10-01 ##################################################
 
 ### Added / Adicionado

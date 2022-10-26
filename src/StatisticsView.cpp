@@ -20,10 +20,10 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
-    worker = new Worker(nullptr, Worker::Md5Hash);
+    worker = new Worker();
     worker->moveToThread(thread);
     connect(worker, &Worker::valueMD5, this, &StatisticsView::setMd5);
-    connect(thread, &QThread::started, worker, &Worker::doWork);
+    connect(thread, &QThread::started, worker, &Worker::doHash);
     connect(worker, &Worker::workRequested, [this](){ thread->start(); });
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
 

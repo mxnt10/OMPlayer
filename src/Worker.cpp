@@ -14,7 +14,7 @@
 
 
 /** Construtor */
-Worker::Worker(QObject *parent, Worker::WORKER work) : QObject(parent), option(work) {
+Worker::Worker(QObject *parent) : QObject(parent) {
     Extensions e;
     extensions = tr("All Multimedia Files") + e.allPlayable().forFilter() + ";;" +
                  tr("Video and Audio Files") + e.multimedia().forFilter() + ";;" +
@@ -36,22 +36,27 @@ void Worker::requestWork() {
 }
 
 
-/** Função que será usado para processar opreações em thread */
-void Worker::doWork() {
+/** Thread para abrir para arquivos multimídia */
+void Worker::doFiles() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
-    if (option == Worker::Add_Items) {
-        /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
-        for (int i = 0; i < 500; i++) arrowMouse();
+    /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
+    for (int i = 0; i < 500; i++) arrowMouse();
 
-        QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), dir, extensions);
-        if (!files.isEmpty()) emit valueChanged(files);
-    }
+    QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), dir, extensions);
+    if (!files.isEmpty()) emit valueChanged(files);
 
-    if (option == Worker::Md5Hash) {
-        QString hash{Utils::setHash(file)};
-        emit valueMD5(hash);
-    }
+    DG_T << "Finalizando o thread " << QThread::currentThreadId();
+    emit finished();
+}
+
+
+/** Thread para obter o hash md5 de um arquivo */
+void Worker::doHash() {
+    DG_T << "Iniciando o thread " << QThread::currentThreadId();
+
+    QString hash{Utils::setHash(file)};
+    emit valueMD5(hash);
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
     emit finished();

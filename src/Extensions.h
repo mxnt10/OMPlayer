@@ -8,8 +8,6 @@ class ExtensionList : public QStringList {
 public:
 	ExtensionList();
 	QString forFilter();
-	QStringList forDirFilter();
-	QString forRegExp();
 };
 
 class Extensions {
@@ -25,8 +23,6 @@ public:
 	ExtensionList multimedia() { return _multimedia; };
 	ExtensionList allPlayable() { return _all_playable; };
 
-	static QString extensionFromUrl(const QString & url);
-
 protected:
     ExtensionList _3gp, _3gp2, _avi, _flash, _mkv, _mpeg, _mpeg2, _mpeg4, _ogg, _quicktime, _realmedia, _webm, _wmv;
     ExtensionList _acc, _dolby, _flac, _mka, _midi, _m4a, _mp3, _oga, _realaudio, _wma, _wav;
@@ -34,4 +30,4 @@ protected:
 	ExtensionList _multimedia, _all_playable;
 };
 
-#endif
+#endif //EXTENSIONS_H

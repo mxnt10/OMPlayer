@@ -348,6 +348,16 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *actspeed = new QWidgetAction(nullptr);
     actspeed->setDefaultWidget(speedBox);
     subMenu->addAction(actspeed);
+
+
+    /** Menu de saídas de áudio para o menu de contexto */
+    subMenu = new ClickableMenu(tr("Audio Track"));
+    audiotrack = new QMenu(this);
+    audiotrack = subMenu;
+    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeAudioTrack(QAction*)));
+    ta = new QActionGroup(subMenu);
+    ta->setExclusive(true);
+    initAudioTrackMenu();
 }
 
 
@@ -663,6 +673,7 @@ void OMPlayer::onStart() {
     onTimeSliderLeave(IsPlay);
     changeIcons(IsPlay);
     updateChannelMenu();
+    initAudioTrackMenu();
     updateSlider(mediaPlayer->position()); /** 00:00:00 */
 
     if (!powersaving) {
@@ -688,6 +699,7 @@ void OMPlayer::onStop() {
         onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
         updateChannelMenu();
+        initAudioTrackMenu();
 
         if (powersaving) {
             screensaver->enable();
@@ -1086,6 +1098,82 @@ void OMPlayer::changeChannel(QAction *action) {
 }
 
 
+/** Função para definir as saídas de áudio */
+void OMPlayer::initAudioTrackMenu() {
+    QAction *a{};
+    QList<QAction*> as = audiotrack->actions();
+    int track = mediaPlayer->currentAudioStream();
+    int tracks = mediaPlayer->audioStreamCount();
+
+    if (audiotrack->actions().count() == 0 && tracks == 0) {
+        /** Definindo o menu de contexto na inicialização */
+        a = audiotrack->addAction(tr("No sound"));
+        a->setData(as.size());
+        a->setCheckable(true);
+        a->setChecked(false);
+        audiotrack->addAction(a);
+        return;
+    } else {
+        /** Precisa para tirar o menu de sem som */
+        a = as.takeLast();
+        audiotrack->removeAction(a);
+        delete a;
+    }
+
+    /** Redefinindo o menu de contexto */
+    while (tracks < as.count()) {
+        a = as.takeLast();
+        ta->removeAction(a);
+        delete a;
+    }
+
+    /** Redefinindo o menu de contexto ao parar */
+    if (!playing) {
+        a = audiotrack->addAction(tr("No sound"));
+        a->setData(as.size());
+        a->setCheckable(true);
+        a->setChecked(false);
+        audiotrack->addAction(a);
+        return;
+    }
+
+    /** Adicionando saídas para o menu de contexto */
+    while (tracks > as.size()) {
+        a = audiotrack->addAction(tr("Track") + " " + QString::number(as.size()));
+        a->setData(as.size());
+        a->setCheckable(true);
+        a->setChecked(false);
+        ta->addAction(a);
+        as.push_back(a);
+    }
+
+    /** Setando a primeira opção */
+    trackAction = as.first();
+    trackAction->setChecked(true);
+}
+
+
+/** Função para alterar canais de áudio */
+void OMPlayer::changeAudioTrack(QAction *action){
+    int track = action->data().toInt();
+    if (trackAction == action) {
+        action->toggle();
+        return;
+    }
+
+    /** Verificando e mudando o canal de áudio */
+    if (!mediaPlayer->setAudioStream(track)) {
+        action->toggle();
+        return;
+    }
+
+    if (trackAction) trackAction->setChecked(false);
+    trackAction = action;
+    trackAction->setChecked(true);
+    if (infoview && infoview->isVisible()) infoview->setStatistics(mediaPlayer->statistics());
+}
+
+
 /** Função para atualizar a barra de progresso de execução */
 void OMPlayer::updateSlider(qint64 value) {
     if (mediaPlayer->isSeekable()) slider->setValue(int(value / unit));
@@ -1106,8 +1194,7 @@ void OMPlayer::updateSliderUnit() {
 void OMPlayer::changeIcons(OMPlayer::STATUS change) {
     int value = int(mediaPlayer->audio()->volume() * 100);
 
-    if (playing && !mediaPlayer->statistics().audio.available)
-        Utils::changeIcon(volumeBtn, "nosound");
+    if (playing && !mediaPlayer->statistics().audio.available) Utils::changeIcon(volumeBtn, "nosound");
     else if (value > 0 && value <= 25) Utils::changeIcon(volumeBtn, "volume_low");
     else if (value > 25 && value <= 75) Utils::changeIcon(volumeBtn, "volume_medium");
     else if (value > 75) Utils::changeIcon(volumeBtn, "volume_high");
@@ -1125,6 +1212,8 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         Utils::changeIcon(stopBtn, "stop");
         Utils::changeIcon(nextBtn, "next");
         Utils::changeIcon(previousBtn, "previous");
+
+        /** Alterando os ícones dos diálogos */
         playlist->changeIcons();
         infoview->changeIcons();
         about->changeIcons();
@@ -1338,6 +1427,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 //        optionVideo->addAction(&rotation);
 
         /** Montagem do menu para outras opções */
+        other->addMenu(audiotrack);
         other->addMenu(channel);
         other->addMenu(speed);
         other->addAction(&repeat);

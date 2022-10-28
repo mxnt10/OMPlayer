@@ -10,8 +10,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Adicionado Extensions.{cpp/h} em src.
     - Adicionado MessageReceiver.{cpp/h} em src.
     - Adicionado Worker.{cpp/h} em src.
+ - Recursos:
+    - Recurso para alteração dos canais de áudio.
+    - Adicionado verificação de hash md5 em arquivos multimídia.
  - Adicionado suporte multithread.
- - Adicionado verificação de hash md5 em arquivos multimídia.
 ###
 
 ### Upgraded / Atualizado

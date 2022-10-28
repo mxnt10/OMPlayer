@@ -3,6 +3,7 @@
 
 #include <QtAV>
 #include <QtAVWidgets>
+#include <QActionGroup>
 #include <QDoubleSpinBox>
 #include <QGraphicsOpacityEffect>
 #include <QGuiApplication>
@@ -47,6 +48,7 @@ private:
     void nextRand();
     void enterFullScreen();
     void updateChannelMenu();
+    void initAudioTrackMenu();
     void fadeWctl(OMPlayer::FADE Option);
 
 private Q_SLOTS:
@@ -90,6 +92,7 @@ private Q_SLOTS:
     void volumeFinished(qreal pos);
     void onTimeVolume(int pos, int value);
     void changeChannel(QAction *action);
+    void changeAudioTrack(QAction *action);
     void enterList();
     void leaveList();
     void changeIcons(OMPlayer::STATUS change = Default);
@@ -108,11 +111,12 @@ private:
     Label *logo{}, *current{}, *end{};
     MediaInfoDLL::MediaInfo MI{};
     PlayList *playlist{};
-    QAction *channelAction{}, *aspectAction{};
+    QAction *channelAction{}, *aspectAction{}, *trackAction{};
+    QActionGroup *ta{};
     QDoubleSpinBox *speedBox{};
     QGraphicsOpacityEffect *effect{}, *effect2{};
     QLabel *ltime{}, *lvol{};
-    QMenu *channel{}, *aspectratio{}, *speed{};
+    QMenu *channel{}, *aspectratio{}, *speed{}, *audiotrack{};
     QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
     QSize screen{QGuiApplication::screens().at(0)->geometry().size()};

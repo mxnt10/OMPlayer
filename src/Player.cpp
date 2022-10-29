@@ -660,8 +660,7 @@ void OMPlayer::onStart() {
         MI.Close();
 
         qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(url));
-        playlist->removeSelectedItems(PlayList::Update);
-        playlist->insert(url, row, duration, format, PlayList::Update);
+        playlist->updateItems(row, duration, format);
     }
 
     /** Definindo o tempo de duração no slider */

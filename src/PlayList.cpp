@@ -330,7 +330,8 @@ void PlayList::insertItemAt(const PlayListItem &item, int row, PlayList::STATUS 
             }
         }
     }
-    setItemAt(item, row);
+
+    model->setData(model->index(row), QVariant::fromValue(item), Qt::DisplayRole);
 }
 
 

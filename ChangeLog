@@ -7,6 +7,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Added / Adicionado
  - Sources:
+    - Adicionado Decoder.{cpp/h} em src.
     - Adicionado Extensions.{cpp/h} em src.
     - Adicionado MessageReceiver.{cpp/h} em src.
     - Adicionado Worker.{cpp/h} em src.
@@ -32,6 +33,9 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Pequenas modificações no código dos botões.
  - Não precisa mais verificar se a playlist foi alterada.
  - Modificado opções para abrir/adicionar arquivos multimídia.
+ - Modificado função rendererSelect() em Settings.
+ - Otimização de performance ao atualizar informações da playlist
+   substituindo o método gambiarra por um método eficiente e sofisticado.
 ###
 
 ### Removed / Removido

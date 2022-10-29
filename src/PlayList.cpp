@@ -299,29 +299,28 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
 
 /** Adiciona os itens para salvar na playlist */
-void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format, PlayList::STATUS status) {
+void PlayList::insert(const QString &url, int row, qint64 duration) {
     qDebug("%s(%sPlaylist%s)%s::%sAdicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(url));
     PlayListItem item;
     item.setUrl(url);
     item.setDuration(duration);
-    item.setFormat(format);
+    item.setFormat(nullptr);
 
     /** Definindo o título */
     if (!url.contains(QLatin1String("://")) || url.startsWith(QLatin1String("file://")))
         item.setTitle(QFileInfo(url).fileName());
     else item.setTitle(url);
 
-    insertItemAt(item, row, status);
-    if (status == PlayList::Update) listView->setCurrentIndex(model->index(row));
+    insertItemAt(item, row);
 }
 
 
 /** Adiciona os itens para serem visualizados na playlist */
-void PlayList::insertItemAt(const PlayListItem &item, int row, PlayList::STATUS status) {
+void PlayList::insertItemAt(const PlayListItem &item, int row) {
     model->insertRow(row);
 
     /** Verificando itens repetidos */
-    if (row > 0 && status != PlayList::Update) {
+    if (row > 0) {
         for (int j = 0; j < model->rowCount(QModelIndex()) + 1; j++) {
             if (model->items().lastIndexOf(item, j) >= 0) {
                 model->removeRow(row);
@@ -335,9 +334,13 @@ void PlayList::insertItemAt(const PlayListItem &item, int row, PlayList::STATUS 
 }
 
 
-/** Localiza um item para exibir na playlist */
-void PlayList::setItemAt(const PlayListItem &item, int row) {
-    model->setData(model->index(row), QVariant::fromValue(item), Qt::DisplayRole);
+/** Atualizando itens da playlist */
+void PlayList::updateItems(int row, qint64 duration, const QString &format) {
+    QModelIndex index = model->index(row);
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    pli.setDuration(duration);
+    pli.setFormat(format);
+    model->setData(model->index(row), QVariant::fromValue(pli), Qt::DisplayRole);
 }
 
 
@@ -375,7 +378,7 @@ int PlayList::setListSize() { return model->rowCount(QModelIndex()); }
 
 
 /** Função para remover apenas os itens selecionados */
-void PlayList::removeSelectedItems(PlayList::STATUS status) {
+void PlayList::removeSelectedItems() {
     QItemSelectionModel *selection = listView->selectionModel();
     if (!selection->hasSelection()) return;
 
@@ -383,7 +386,7 @@ void PlayList::removeSelectedItems(PlayList::STATUS status) {
     for (int i = s.size() - 1; i >= 0; --i) {
         model->removeRow(s.at(i).row());
         if (setListSize() == 0) cleanlist->setVisible(true);
-        if (status == PlayList::Default) emit emitremove(s.at(i).row());
+        emit emitremove(s.at(i).row());
     }
     save();
 }

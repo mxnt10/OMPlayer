@@ -21,7 +21,7 @@ public:
     explicit PlayList(QWidget *parent = nullptr);
     ~PlayList() override;
 
-    enum STATUS {Default = 0, First = 1, Second = 2, Update = 3};
+    enum STATUS {Default = 0, First = 1, Second = 2};
     void load(PlayList::STATUS load = PlayList::Default, const QString &url = DefDIR);
     void save(const QString &url = DefDIR);
     QString getItems(int s);
@@ -30,8 +30,8 @@ public:
     int selectItems();
     void selectClean();
     void selectCurrent(int indx);
-    void insert(const QString &url, int row, qint64 duration = 0, const QString &format = nullptr,
-                PlayList::STATUS status = PlayList::Default);
+    void insert(const QString &url, int row, qint64 duration = 0);
+    void updateItems(int row, qint64 duration, const QString &format);
     void changeIcons();
     void hideFade();
 
@@ -44,7 +44,7 @@ private:
     enum M3UFormat {M3U8 = 0, DetectFormat = 1};
     enum PLS {Show = 0, Hide = 1};
     void load_m3u(const QString& file, M3UFormat format);
-    void insertItemAt(const PlayListItem &item, int row, PlayList::STATUS status = PlayList::Default);
+    void insertItemAt(const PlayListItem &item, int row);
     void fadePls(PLS option);
 
 Q_SIGNALS:
@@ -62,7 +62,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void getFiles();
     void addItems(const QStringList &files);
-    void removeSelectedItems(PlayList::STATUS status = PlayList::Default);
+    void removeSelectedItems();
 
 private Q_SLOTS:
     void clearItems();

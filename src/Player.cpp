@@ -654,7 +654,7 @@ void OMPlayer::onStart() {
         QString url = mediaPlayer->file();
         qint64 duration = mediaPlayer->mediaStopPosition();
 
-        MI.Open(url.toStdWString());
+        MI.Open(url.toStdWString()); //TODO: thread.
         QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
                                                         MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
         MI.Close();

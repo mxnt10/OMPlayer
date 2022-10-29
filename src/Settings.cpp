@@ -23,6 +23,10 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setFocus();
 
 
+    /** layouts */
+    decoder = new Decoder();
+
+
     /** Estrutura das renderizações */
     vid_map = new Render[8];
     vid_map[0] = {"OpenGL",     VideoRendererId_OpenGLWidget, opengl      };
@@ -88,6 +92,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
    /** Organização por abas */
     auto *tab = new QTabWidget();
     tab->addTab(general, tr("General"));
+    tab->addTab(decoder, tr("Decoder"));
     tab->addTab(renderer, tr("Renderer"));
     tab->setStyleSheet(Utils::setStyle("tab"));
 

@@ -6,6 +6,8 @@
 #include <QDialog>
 #include <Button>
 
+#include "Decoder.h"
+
 class Settings : public QDialog {
 Q_OBJECT
 
@@ -32,6 +34,7 @@ private Q_SLOTS:
 private:
     Button *opengl{}, *qglwidget2{}, *x11renderer{}, *xvideo{}, *direct2d{}, *gdi{}, *qglwidget{}, *widget{};
     Button *closebtn{};
+    Decoder *decoder{};
     QtAV::VideoRenderer *vo{};
     struct Render *vid_map{};
 };

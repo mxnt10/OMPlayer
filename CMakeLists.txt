@@ -64,6 +64,7 @@ add_executable(
         OMPlayer
         src/main.cpp
         src/About.cpp           src/About.h
+        src/Decoder.cpp         src/Decoder.h
         src/EventFilter.cpp     src/EventFilter.h
         src/Extensions.cpp      src/Extensions.h
         src/MessageReceiver.cpp src/MessageReceiver.h

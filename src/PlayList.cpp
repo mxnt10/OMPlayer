@@ -157,16 +157,17 @@ PlayList::~PlayList() {
 
 
 /** Função para carregar a playlist ao abrir */
-void PlayList::load(ST load, const QString &url) {
+void PlayList::load(PlayList::STATUS load, const QString &url) {
     QFile f(url);
     if (!f.exists()) save();
     if (!f.open(QIODevice::ReadOnly)) return;
 
     qDebug("%s(%sPlaylist%s)%s::%sCarregando a playlist ...\033[0m", GRE, RED, GRE, RED, ORA);
-    if (load == Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
+    if (load == PlayList::Second) model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
     QDataStream ds(&f);
     QList<PlayListItem> list;
     ds >> list;
+
     int add = 0;
     for (const auto &i: list) {
         if (QFileInfo::exists(i.url())) {
@@ -229,7 +230,8 @@ void PlayList::addItems(const QStringList &files) {
            "\n            - Adicionados: %s%4i%s"
            "\n            - Repetidos:   %s%4i%s"
            "\n            - Total:       %s%4i"
-           "\033[0m", GRE, RED, GRE, RED, BLU, YEL, t, BLU, GRE, a - rmRows, BLU, RDL, rmRows, BLU, VIO, a + t - rmRows);
+           "\033[0m", GRE, RED, GRE, RED, BLU, YEL, t, BLU, GRE, a - rmRows,
+           BLU, RDL, rmRows, BLU, VIO, a + t - rmRows);
 
     /** Verificando visibilidade de lista vazia */
     if (setListSize() == 0) cleanlist->setVisible(true);
@@ -297,7 +299,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
 
 
 /** Adiciona os itens para salvar na playlist */
-void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format, ST status) {
+void PlayList::insert(const QString &url, int row, qint64 duration, const QString &format, PlayList::STATUS status) {
     qDebug("%s(%sPlaylist%s)%s::%sAdicionando %s ...\033[0m", GRE, RED, GRE, RED, RDL, STR(url));
     PlayListItem item;
     item.setUrl(url);
@@ -309,17 +311,17 @@ void PlayList::insert(const QString &url, int row, qint64 duration, const QStrin
         item.setTitle(QFileInfo(url).fileName());
     else item.setTitle(url);
 
-    insertItemAt(item, row);
-    if (status == Update) listView->setCurrentIndex(model->index(row));
+    insertItemAt(item, row, status);
+    if (status == PlayList::Update) listView->setCurrentIndex(model->index(row));
 }
 
 
 /** Adiciona os itens para serem visualizados na playlist */
-void PlayList::insertItemAt(const PlayListItem &item, int row) {
+void PlayList::insertItemAt(const PlayListItem &item, int row, PlayList::STATUS status) {
     model->insertRow(row);
 
     /** Verificando itens repetidos */
-    if (row > 0) {
+    if (row > 0 && status != PlayList::Update) {
         for (int j = 0; j < model->rowCount(QModelIndex()) + 1; j++) {
             if (model->items().lastIndexOf(item, j) >= 0) {
                 model->removeRow(row);
@@ -372,7 +374,7 @@ int PlayList::setListSize() { return model->rowCount(QModelIndex()); }
 
 
 /** Função para remover apenas os itens selecionados */
-void PlayList::removeSelectedItems(PlayList::ST status) {
+void PlayList::removeSelectedItems(PlayList::STATUS status) {
     QItemSelectionModel *selection = listView->selectionModel();
     if (!selection->hasSelection()) return;
 
@@ -380,7 +382,7 @@ void PlayList::removeSelectedItems(PlayList::ST status) {
     for (int i = s.size() - 1; i >= 0; --i) {
         model->removeRow(s.at(i).row());
         if (setListSize() == 0) cleanlist->setVisible(true);
-        if (status == Default) emit emitremove(s.at(i).row());
+        if (status == PlayList::Default) emit emitremove(s.at(i).row());
     }
     save();
 }

@@ -16,12 +16,12 @@
 /** Construtor */
 Worker::Worker(QObject *parent) : QObject(parent) {
     Extensions e;
-    extensions = tr("All Multimedia Files") + e.allPlayable().forFilter() + ";;" +
-                 tr("Video and Audio Files") + e.multimedia().forFilter() + ";;" +
+    extensions = tr("Multimedia Files") + e.multimedia().forFilter() + ";;" +
                  tr("Video") + e.video().forFilter() + ";;" +
                  tr("Audio") + e.audio().forFilter() + ";;" +
                  tr("Playlists") + e.playlist().forFilter() + ";;" +
-                 tr("All files") + " (*.*)";
+                 tr("All Media Files") + e.allPlayable().forFilter() + ";;" +
+                 tr("All Files") + " (*)";
     dir = QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath());
 }
 

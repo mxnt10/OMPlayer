@@ -200,7 +200,7 @@ QString Utils::setHash(const QString &url) {
     QFileInfo fi(url);
 
     int fsize = int(fi.size());
-    int bsize = 8192; //8KiB
+    int bsize = 262144; /** 256KiB */
 
     if (f.open(QIODevice::ReadOnly)) {
         char buf[bsize];

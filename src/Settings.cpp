@@ -46,14 +46,14 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
         if (vo && vo->isAvailable()) {
             vid_map[i].btn = new Button(Button::Radio, "radio-unselect", 18, vid_map[i].name);
 
-            if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){ rendererSelect(vid_map[0].btn, vid_map[0].name); });
-            if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){ rendererSelect(vid_map[1].btn, vid_map[1].name); });
-            if (i == 2) connect(vid_map[2].btn, &Button::pressed, [this](){ rendererSelect(vid_map[2].btn, vid_map[2].name); });
-            if (i == 3) connect(vid_map[3].btn, &Button::pressed, [this](){ rendererSelect(vid_map[3].btn, vid_map[3].name); });
-            if (i == 4) connect(vid_map[4].btn, &Button::pressed, [this](){ rendererSelect(vid_map[4].btn, vid_map[4].name); });
-            if (i == 5) connect(vid_map[5].btn, &Button::pressed, [this](){ rendererSelect(vid_map[5].btn, vid_map[5].name); });
-            if (i == 6) connect(vid_map[6].btn, &Button::pressed, [this](){ rendererSelect(vid_map[6].btn, vid_map[6].name); });
-            if (i == 7) connect(vid_map[7].btn, &Button::pressed, [this](){ rendererSelect(vid_map[7].btn, vid_map[7].name); });
+            if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){ rendererSelect(vid_map[0]); });
+            if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){ rendererSelect(vid_map[1]); });
+            if (i == 2) connect(vid_map[2].btn, &Button::pressed, [this](){ rendererSelect(vid_map[2]); });
+            if (i == 3) connect(vid_map[3].btn, &Button::pressed, [this](){ rendererSelect(vid_map[3]); });
+            if (i == 4) connect(vid_map[4].btn, &Button::pressed, [this](){ rendererSelect(vid_map[4]); });
+            if (i == 5) connect(vid_map[5].btn, &Button::pressed, [this](){ rendererSelect(vid_map[5]); });
+            if (i == 6) connect(vid_map[6].btn, &Button::pressed, [this](){ rendererSelect(vid_map[6]); });
+            if (i == 7) connect(vid_map[7].btn, &Button::pressed, [this](){ rendererSelect(vid_map[7]); });
 
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
                 Utils::changeIcon(vid_map[i].btn, "radio-select");
@@ -134,17 +134,17 @@ void Settings::onClose() {
 
 
 /** Resetando os botões */
-void Settings::rendererSelect(Button *btn, const QString &name) {
-    if (QString::compare(JsonTools::stringJson("renderer"), name) == 0) return;
+void Settings::rendererSelect(Render &value) {
+    if (QString::compare(JsonTools::stringJson("renderer"), value.name) == 0) return;
 
-    qDebug("%s(%sSettings%s)%s::%sSelecionando renderizador %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(name));
+    qDebug("%s(%sSettings%s)%s::%sSelecionando renderizador %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(value.name));
 
     for (int i = 0; i < 8; ++i)
         if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
 
-    Utils::changeIcon(btn, "radio-select");
-    JsonTools::stringJson("renderer", name);
-    emit emitvalue(name);
+    Utils::changeIcon(value.btn, "radio-select");
+    JsonTools::stringJson("renderer", value.name);
+    emit emitvalue(value.name);
 }
 
 

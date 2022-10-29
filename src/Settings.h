@@ -26,7 +26,7 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void onClose();
-    void rendererSelect(Button *btn, const QString &name);
+    void rendererSelect(Render &value);
     void setIcon(const QString &index);
 
 private:

@@ -4,7 +4,7 @@
 #include <QObject>
 
 class MessageReceiver : public QObject {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     explicit MessageReceiver(QObject *parent = nullptr);

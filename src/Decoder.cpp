@@ -1,3 +1,7 @@
+#include <QtAV>
+#include <QScrollArea>
+#include <QLabel>
+
 #include "Decoder.h"
 
 

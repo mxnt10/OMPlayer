@@ -33,10 +33,6 @@ QString Utils::getLocal(Utils::STATUS option) {
 }
 
 
-/** Diretório padrão e retorno de definição de locais padrão */
-QStringList Utils::setLocals() { return {def.defaultDir, def.localDir, def.currentDir}; }
-
-
 /** Diretório padrão do programa */
 QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
 
@@ -169,10 +165,6 @@ QString Utils::defaultIcon(const QString &icon) {
 }
 
 
-/** Cálculo somente da largura do quadro uma vez que a altura vem pré-estabelecida */
-int Utils::calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
-
-
 /** Usado para tirar o "\n" dos debugs */
 void Utils::rm_nl(string &s) { for (uint p = s.find('\n'); p != (uint) string::npos; p = s.find('\n')) s.erase(p, 1); }
 
@@ -297,4 +289,11 @@ QString Utils::aspectStr(Utils::ASPECTRATIO aspect) {
         case Utils::AspectAuto:   return QObject::tr("Window");
         default: return QApplication::tr("Unknown");
     }
+}
+
+
+/** Definindo o nome da tema */
+QString Utils::setThemeName() {
+    if(def.definedTheme.isEmpty()) def.definedTheme = JsonTools::stringJson("theme");
+    return def.definedTheme;
 }

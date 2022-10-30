@@ -18,7 +18,6 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
-    setFixedSize(0, 0);
     setModal(true);
     setFocus();
 

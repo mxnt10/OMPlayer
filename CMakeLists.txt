@@ -35,6 +35,7 @@ include_directories(
         common/MediaInfoLib/Source/MediaInfoDLL
         common/ScreenSaver
         src/PlayListUtils
+        src/PropertyEditor
         src/Widgets
         src/Utils
 )
@@ -82,6 +83,9 @@ add_executable(
         src/PlayListUtils/PlayListModel.cpp
         src/PlayListUtils/PlayListModel.h
 
+        src/PropertyEditor/PropertyEditor.cpp
+        src/PropertyEditor/PropertyEditor.h
+
         src/Utils/JsonTools.cpp
         src/Utils/JsonTools.h
         src/Utils/Utils.cpp
@@ -91,6 +95,8 @@ add_executable(
         src/Widgets/Button.h
         src/Widgets/ClickableMenu.cpp
         src/Widgets/ClickableMenu.h
+        src/Widgets/DecoderItemWidget.cpp
+        src/Widgets/DecoderItemWidget.h
         src/Widgets/Label.cpp
         src/Widgets/Label.h
         src/Widgets/Slider.cpp

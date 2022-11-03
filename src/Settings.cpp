@@ -168,3 +168,15 @@ void Settings::setIcon(const QString &index) {
     Utils::changeIcon(closebtn, "apply");
     emit changethemeicon();
 }
+
+
+/** */
+QVariantHash Settings::videoDecoderOptions() const {
+    return decoder->videoDecoderOptions();
+}
+
+QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() {
+    return decoder->decoderPriorityNames();
+}
+
+

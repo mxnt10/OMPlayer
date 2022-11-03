@@ -507,6 +507,8 @@ void OMPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     speedBox->setValue(1);
     mediaPlayer->setSpeed(1);
+    mediaPlayer->setPriority(sett->decoderPriorityNames());
+    mediaPlayer->setOptionsForVideoCodec(sett->videoDecoderOptions());
     mediaPlayer->play(isplay);
     if (index > (-1)) {
         playlist->selectCurrent(index);

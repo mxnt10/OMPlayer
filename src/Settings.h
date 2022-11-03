@@ -14,6 +14,8 @@ Q_OBJECT
 public:
     explicit Settings(QWidget *parent = nullptr);
     ~Settings() override;
+    [[nodiscard]] QVariantHash videoDecoderOptions() const;
+    QVector<QtAV::VideoDecoderId> decoderPriorityNames();
 
     struct Render {
         const char* name;

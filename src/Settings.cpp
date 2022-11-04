@@ -18,6 +18,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_TranslucentBackground, true);
+    setFixedWidth(400);
     setModal(true);
     setFocus();
 
@@ -170,11 +171,13 @@ void Settings::setIcon(const QString &index) {
 }
 
 
-/** */
+/** Retorna as opções de decodificação */
 QVariantHash Settings::videoDecoderOptions() const {
     return decoder->videoDecoderOptions();
 }
 
+
+/** Retorna a prioridade de execução */
 QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() {
     return decoder->decoderPriorityNames();
 }

@@ -11,9 +11,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Adicionado Extensions.{cpp/h} em src.
     - Adicionado MessageReceiver.{cpp/h} em src.
     - Adicionado Worker.{cpp/h} em src.
+    - Adicionado DecoderItemWidget.{cpp/h} em src/Widgets.
+    - Adicionado PropertyEditor.{cpp/h} em src/PropertyEditor.
  - Recursos:
     - Recurso para alteração dos canais de áudio.
     - Adicionado verificação de hash md5 em arquivos multimídia.
+    - Ativando suporte a decodificação.
  - Adicionado suporte multithread.
 ###
 
@@ -59,6 +62,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    fechamento da segunda instância.
  - Corrigido problemas com execução de itens após a adição de itens
    na playlist.
+ - Pequenas correções em Utils.
 ###
 
 ##########################################################################

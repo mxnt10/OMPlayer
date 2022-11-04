@@ -1,9 +1,3 @@
-/* Definição geral dos widgets */
-* {
-    background-color: transparent;
-    color: white;
-}
-
 /* Painel das abas */
 QTabWidget::pane {
     border: 1px solid #333;

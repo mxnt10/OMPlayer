@@ -33,8 +33,9 @@ QString Utils::getLocal(Utils::STATUS option) {
 }
 
 
-/** Diretório padrão do programa */
+/** Diretórios padrão do programa */
 QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
+QStringList Utils::setLocals() { return {def.defaultDir, def.localDir, def.currentDir}; }
 
 
 /** Retorna o ícone do programa */

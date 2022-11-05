@@ -73,8 +73,7 @@ public:
     static double aspectNum(Utils::ASPECTRATIO aspect);
     static QString aspectStr(Utils::ASPECTRATIO aspect);
     static QString setThemeName();
-
-    static QStringList setLocals() { return {def.defaultDir, def.localDir, def.currentDir}; }
+    static QStringList setLocals();
     static int calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 
 private:

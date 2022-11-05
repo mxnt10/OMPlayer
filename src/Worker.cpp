@@ -32,7 +32,7 @@ Worker::Worker(QObject *parent) : QObject(parent) {
 /** Função para chamar o thread */
 void Worker::requestWork() {
     DG_T << "Solicitando início do thread " << QThread::currentThreadId();
-    emit workRequested();
+    Q_EMIT workRequested();
 }
 
 
@@ -44,10 +44,10 @@ void Worker::doFiles() {
     for (int i = 0; i < 500; i++) arrowMouse();
 
     QStringList files = QFileDialog::getOpenFileNames(nullptr, tr("Select multimedia files"), dir, extensions);
-    if (!files.isEmpty()) emit valueChanged(files);
+    if (!files.isEmpty()) Q_EMIT valueChanged(files);
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
-    emit finished();
+    Q_EMIT finished();
 }
 
 
@@ -56,10 +56,10 @@ void Worker::doHash() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
     QString hash{Utils::setHash(file)};
-    emit valueMD5(hash);
+    Q_EMIT valueMD5(hash);
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
-    emit finished();
+    Q_EMIT finished();
 }
 
 #undef DG_T

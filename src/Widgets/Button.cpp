@@ -10,12 +10,12 @@
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size, const QString &text) : num(size), type(btn) {
+Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size) : num(size), type(btn) {
     setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
+    setFixedSize(num, num);
     setMouseTracking(true);
-    txt = text;
 
     /** Definindo ícone */
     QString theme = JsonTools::stringJson("theme");
@@ -37,11 +37,6 @@ Button::Button(Button::BUTTONTYPE btn, const QString &icon, int size, const QStr
     }
 
 
-    /** Para botões que agem feito radio buttons */
-    if (btn != Button::Radio) setFixedSize(num, num);
-    if (btn == Button::Radio) setText(txt);
-
-
     /** Apenas para o Debug */
     std::string upper = icon.toStdString();
     std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
@@ -59,14 +54,9 @@ Button::~Button() = default;
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent(QEvent *event) {
-    emit emitEnter();
-
     if (type == Button::Default) {
         qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(ico));
         setIconSize(QSize(num + 2, num + 2));
-    } else if (type == Button::Radio) {
-        qDebug("%s(%sButton%s)%s::%sMouse posicionado na seleção %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(txt));
-        setText(" " + txt);
     }
     QPushButton::enterEvent(event);
 }
@@ -75,7 +65,6 @@ void Button::enterEvent(QEvent *event) {
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
     if (type == Button::Default) setIconSize(QSize(num, num));
-    else if (type == Button::Radio) setText(txt);
     QPushButton::leaveEvent(event);
 }
 

@@ -7,8 +7,8 @@ class Button : public QPushButton {
 Q_OBJECT
 
 public:
-    enum BUTTONTYPE{ Default = 0, Radio = 1, Tag = 2 };
-    explicit Button(Button::BUTTONTYPE btn, const QString &icon, int size = 0, const QString &text = nullptr);
+    enum BUTTONTYPE{ Default = 0, Tag = 1 };
+    explicit Button(Button::BUTTONTYPE btn, const QString &icon, int size = 0);
     ~Button() override;
 
 protected:
@@ -22,9 +22,6 @@ private:
     Button::BUTTONTYPE type{Button::Default};
     QString ico{};
     QString txt{};
-
-Q_SIGNALS:
-    void emitEnter();
 };
 
 #endif //OMPLAYER_BUTTON_H

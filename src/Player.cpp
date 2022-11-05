@@ -20,6 +20,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setMinimumSize(min);
     this->setMouseTracking(true);
     this->setAutoFillBackground(true);
+    this->setStyleSheet(Utils::setStyle("global"));
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     double vol = JsonTools::floatJson("volume");
 

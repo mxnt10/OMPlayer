@@ -53,14 +53,14 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->installEventFilter(filter);
     connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
     connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
-    connect(filter, &EventFilter::emitEnter, [this](){ emit enterListView(); });
-    connect(filter, &EventFilter::emitLeave, [this](){ emit leaveListView(); });
+    connect(filter, &EventFilter::emitEnter, [this](){ Q_EMIT enterListView(); });
+    connect(filter, &EventFilter::emitLeave, [this](){ Q_EMIT leaveListView(); });
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button(Button::Default, "add", 32, tr("Add items"));
-    removeBtn = new Button(Button::Default, "remove", 32, tr("Remove items"));
-    clearBtn = new Button(Button::Default, "clean", 32, tr("Clear playlist"));
+    addBtn = new Button(Button::Default, "add", 32);
+    removeBtn = new Button(Button::Default, "remove", 32);
+    clearBtn = new Button(Button::Default, "clean", 32);
     connect(addBtn, &Button::clicked, this, &PlayList::getFiles);
     connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
     connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);
@@ -194,7 +194,7 @@ void PlayList::save(const QString &url) {
 
 /** Usando um thread separado para buscar os arquivos */
 void PlayList::getFiles() {
-    emit nomousehide();
+    Q_EMIT nomousehide();
     thread->wait();
     worker->requestWork();
 }
@@ -238,7 +238,7 @@ void PlayList::addItems(const QStringList &files) {
     else cleanlist->setVisible(false);
 
     save();
-    emit firstPlay(getItems(t), t);
+    Q_EMIT firstPlay(getItems(t), t);
 }
 
 
@@ -293,7 +293,7 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
         else cleanlist->setVisible(false);
 
         save();
-        emit firstPlay(getItems(0), 0);
+        Q_EMIT firstPlay(getItems(0), 0);
     }
 }
 
@@ -386,7 +386,7 @@ void PlayList::removeSelectedItems() {
     for (int i = s.size() - 1; i >= 0; --i) {
         model->removeRow(s.at(i).row());
         if (setListSize() == 0) cleanlist->setVisible(true);
-        emit emitremove(s.at(i).row());
+        Q_EMIT emitremove(s.at(i).row());
     }
     save();
 }
@@ -397,7 +397,7 @@ void PlayList::clearItems() {
     qDebug("%s(%sPlaylist%s)%s::%sZerando a playlist ...\033[0m", GRE, RED, GRE, RED, RDL);
     model->removeRows(0, model->rowCount(QModelIndex()), QModelIndex());
     cleanlist->setVisible(true);
-    emit emitstop();
+    Q_EMIT emitstop();
     save();
 }
 
@@ -412,12 +412,12 @@ qint64 PlayList::setDuration() {
 
 /** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
-    emit aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
+    Q_EMIT aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
 }
 
 
 /** Função para emitir o intem selecionado na playlist */
-void PlayList::onSelect(const QModelIndex &index) { emit selected(int(index.row())); }
+void PlayList::onSelect(const QModelIndex &index) { Q_EMIT selected(int(index.row())); }
 
 
 /** Função para recarregar os ícones da playlist */
@@ -430,7 +430,7 @@ void PlayList::changeIcons() {
 
 /** Minimização antes dos diálogos */
 void PlayList::hideFade() {
-    emit emithide();
+    Q_EMIT emithide();
     if (isshow) fadePls(Hide);
     QTimer::singleShot(130, [this](){ isshow = false; });
 }
@@ -473,7 +473,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
     } else {
         if (event->x() > (this->width() - wpls->width() - 20) && event->y() < this->height() - 8 && !isshow) {
             qDebug("%s(%sPlaylist%s)%s::%sMouse posicionado na playlist ...\033[0m", GRE, RED, GRE, RED, VIO);
-            emit emitnohide();
+            Q_EMIT emitnohide();
             fadePls(Show);
             isshow = true;
 
@@ -484,7 +484,7 @@ void PlayList::mouseMoveEvent(QMouseEvent *event) {
 
         } else if ((event->x() < (this->width() - wpls->width() - 20) || event->y() > this->height() - 8) && isshow) {
             arrowMouse();
-            emit emithide();
+            Q_EMIT emithide();
             fadePls(Hide);
             isshow = false;
         }

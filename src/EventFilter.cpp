@@ -43,35 +43,35 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
 
             switch (key) {
                 case Qt::Key_O:
-                    if (modifiers == CTRL) emit emitOpen();
+                    if (modifiers == CTRL) Q_EMIT emitOpen();
                     break;
                 case Qt::Key_H:
-                    if (modifiers == CTRL) emit emitShuffle();
+                    if (modifiers == CTRL) Q_EMIT emitShuffle();
                     break;
                 case Qt::Key_T:
-                    if (modifiers == CTRL) emit emitReplay();
-                    if (modifiers == (CTRL|ALT)) emit emitReplayOne();
+                    if (modifiers == CTRL) Q_EMIT emitReplay();
+                    if (modifiers == (CTRL|ALT)) Q_EMIT emitReplayOne();
                     break;
                 case Qt::Key_S:
                     if (modifiers == ALT) {
-                        emit emitSettings();
-                        emit emitLeave();
+                        Q_EMIT emitSettings();
+                        Q_EMIT emitLeave();
                     }
                     break;
                 case Qt::Key_MediaPlay:
-                    emit emitPlay();
+                    Q_EMIT emitPlay();
                     break;
                 case Qt::Key_MediaNext:
-                    emit emitNext();
+                    Q_EMIT emitNext();
                     break;
                 case Qt::Key_MediaPrevious:
-                    emit emitPrevious();
+                    Q_EMIT emitPrevious();
                     break;
                 case ENTER:
-                    if (modifiers == ALT) emit emitDoubleClick();
+                    if (modifiers == ALT) Q_EMIT emitDoubleClick();
                     break;
                 case ESC:
-                    emit emitEsc();
+                    Q_EMIT emitEsc();
                     break;
                 default:
                     break;
@@ -83,7 +83,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::MouseMove && !moving && start) {
             qDebug("%s(%sEventFilter%s)%s::%sMouse com Movimentação ...\033[0m", GRE, RED, GRE, RED, DGR);
             arrowMouse();
-            emit emitMouseMove();
+            Q_EMIT emitMouseMove();
             moving = true;
         }
 
@@ -91,7 +91,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::ToolTip) {
             if (!fixed) {
                 qDebug("%s(%sEventFilter%s)%s::%sMouse sem Movimentação ...\033[0m", GRE, RED, GRE, RED, YEL);
-                emit emitLeave();
+                Q_EMIT emitLeave();
             }
             moving = false;
         }
@@ -108,27 +108,27 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         if (event->type() == QEvent::MouseButtonPress) {
             auto *me = dynamic_cast<QMouseEvent*>(event);
             Qt::MouseButton bt = me->button();
-            if (bt == Qt::LeftButton) emit emitMousePress();
+            if (bt == Qt::LeftButton) Q_EMIT emitMousePress();
         }
 
         /** Emissão ao soltar o botão do mouse */
-        if (event->type() == QEvent::MouseButtonRelease) emit emitMouseRelease();
+        if (event->type() == QEvent::MouseButtonRelease) Q_EMIT emitMouseRelease();
 
         /** Mapeando duplo clique para o fullscreen */
-        if (event->type() == QEvent::MouseButtonDblClick) emit emitDoubleClick();
+        if (event->type() == QEvent::MouseButtonDblClick) Q_EMIT emitDoubleClick();
 
         /** Emissão para ativar o menu de contexto */
         if (event->type() == QEvent::ContextMenu) {
             contextmenu = true;
             auto *e = dynamic_cast<QContextMenuEvent *>(event);
-            emit customContextMenuRequested(e->pos());
+            Q_EMIT customContextMenuRequested(e->pos());
         }
     }
 
     /** Emissão para os controles e demais */
     if (option == EventFilter::Control) {
-        if (event->type() == QEvent::Enter) emit emitEnter();
-        if (event->type() == QEvent::Leave) emit emitLeave();
+        if (event->type() == QEvent::Enter) Q_EMIT emitEnter();
+        if (event->type() == QEvent::Leave) Q_EMIT emitLeave();
     }
 
     return false;

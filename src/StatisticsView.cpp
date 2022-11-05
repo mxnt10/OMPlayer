@@ -119,7 +119,7 @@ void StatisticsView::setMd5(const QString &md5) { MD5->setData(1, Qt::DisplayRol
 /** Emissão para fechar a janela */
 void StatisticsView::onClose() {
     qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    emit emitclose();
+    Q_EMIT emitclose();
     this->close();
 }
 

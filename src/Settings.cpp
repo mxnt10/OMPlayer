@@ -23,7 +23,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     setFocus();
 
 
-    /** layouts */
+    /** Opções de decodificação */
     decoder = new Decoder();
 
 
@@ -48,19 +48,20 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     for (int i = 0; i < 8; ++i) {
         vo = VideoRenderer::create(vid_map[i].id);
         if (vo && vo->isAvailable()) {
-            vid_map[i].btn = new Button(Button::Radio, "radio-unselect", 18, vid_map[i].name);
+            vid_map[i].btn = new QRadioButton(vid_map[i].name);
+            vid_map[i].btn->setFocusPolicy(Qt::NoFocus);
 
-            if (i == 0) connect(vid_map[0].btn, &Button::pressed, [this](){ rendererSelect(vid_map[0]); });
-            if (i == 1) connect(vid_map[1].btn, &Button::pressed, [this](){ rendererSelect(vid_map[1]); });
-            if (i == 2) connect(vid_map[2].btn, &Button::pressed, [this](){ rendererSelect(vid_map[2]); });
-            if (i == 3) connect(vid_map[3].btn, &Button::pressed, [this](){ rendererSelect(vid_map[3]); });
-            if (i == 4) connect(vid_map[4].btn, &Button::pressed, [this](){ rendererSelect(vid_map[4]); });
-            if (i == 5) connect(vid_map[5].btn, &Button::pressed, [this](){ rendererSelect(vid_map[5]); });
-            if (i == 6) connect(vid_map[6].btn, &Button::pressed, [this](){ rendererSelect(vid_map[6]); });
-            if (i == 7) connect(vid_map[7].btn, &Button::pressed, [this](){ rendererSelect(vid_map[7]); });
+            if (i == 0) connect(vid_map[0].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[0]); });
+            else if (i == 1) connect(vid_map[1].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[1]); });
+            else if (i == 2) connect(vid_map[2].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[2]); });
+            else if (i == 3) connect(vid_map[3].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[3]); });
+            else if (i == 4) connect(vid_map[4].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[4]); });
+            else if (i == 5) connect(vid_map[5].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[5]); });
+            else if (i == 6) connect(vid_map[6].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[6]); });
+            else if (i == 7) connect(vid_map[7].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[7]); });
 
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
-                Utils::changeIcon(vid_map[i].btn, "radio-select");
+                vid_map[i].btn->setChecked(true);
             oprenderer->addWidget(vid_map[i].btn, i, 0, LEFT);
         }
     }
@@ -133,7 +134,7 @@ Settings::~Settings() = default;
 /** Emissão para fechar a janela */
 void Settings::onClose() {
     qDebug("%s(%sSettings%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    emit emitclose();
+    Q_EMIT emitclose();
     this->close();
 }
 
@@ -141,15 +142,10 @@ void Settings::onClose() {
 /** Resetando os botões */
 void Settings::rendererSelect(Render &value) {
     if (QString::compare(JsonTools::stringJson("renderer"), value.name) == 0) return;
-
     qDebug("%s(%sSettings%s)%s::%sSelecionando renderizador %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(value.name));
 
-    for (int i = 0; i < 8; ++i)
-        if (vid_map[i].btn) Utils::changeIcon(vid_map[i].btn, "radio-unselect");
-
-    Utils::changeIcon(value.btn, "radio-select");
     JsonTools::stringJson("renderer", value.name);
-    emit emitvalue(value.name);
+    Q_EMIT emitvalue(value.name);
 }
 
 
@@ -157,17 +153,11 @@ void Settings::rendererSelect(Render &value) {
 void Settings::setIcon(const QString &index) {
     qDebug("%s(%sSettings%s)%s::%sTema de ícones %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(index));
     JsonTools::stringJson("theme", index);
+
     Utils::initUtils(Utils::Theme);
-
-    for (int i = 0; i < 8; ++i)
-        if (vid_map[i].btn) {
-            if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
-                Utils::changeIcon(vid_map[i].btn, "radio-select");
-            else Utils::changeIcon(vid_map[i].btn, "radio-unselect");
-        }
-
     Utils::changeIcon(closebtn, "apply");
-    emit changethemeicon();
+
+    Q_EMIT changethemeicon();
 }
 
 

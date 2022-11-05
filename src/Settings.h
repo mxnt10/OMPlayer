@@ -4,6 +4,7 @@
 #include <QtAV>
 #include <QtAVWidgets>
 #include <QDialog>
+#include <QRadioButton>
 #include <Button>
 
 #include "Decoder.h"
@@ -20,7 +21,7 @@ public:
     struct Render {
         const char* name;
         QtAV::VideoRendererId id;
-        Button *btn;
+        QRadioButton *btn;
     };
 
 Q_SIGNALS:
@@ -34,7 +35,7 @@ private Q_SLOTS:
     void setIcon(const QString &index);
 
 private:
-    Button *opengl{}, *qglwidget2{}, *x11renderer{}, *xvideo{}, *direct2d{}, *gdi{}, *qglwidget{}, *widget{};
+    QRadioButton *opengl{}, *qglwidget2{}, *x11renderer{}, *xvideo{}, *direct2d{}, *gdi{}, *qglwidget{}, *widget{};
     Button *closebtn{};
     Decoder *decoder{};
     QtAV::VideoRenderer *vo{};

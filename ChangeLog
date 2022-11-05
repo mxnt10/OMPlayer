@@ -39,6 +39,9 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Modificado função rendererSelect() em Settings.
  - Otimização de performance ao atualizar informações da playlist
    substituindo o método gambiarra por um método eficiente e sofisticado.
+ - Melhorando o código para seleção de renderização em Settings.
+ - Limpeza de código na classe Button.
+ - Modificação geral nos estilos em qss.
 ###
 
 ### Removed / Removido

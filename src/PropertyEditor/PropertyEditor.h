@@ -13,7 +13,7 @@ public:
     explicit PropertyEditor(QObject *parent = nullptr);
     void getProperties(QObject *obj);
     QWidget* buildUi(QObject* obj = nullptr);
-    QVariantHash exportAsHash() { return properties; }
+    QVariantHash exportAsHash();
 
 private:
     QWidget* createWidgetForFlags(const QString& name,
@@ -33,11 +33,6 @@ private:
                                 const QString& detail = QString(),
                                 QWidget* parent = nullptr);
 
-    QWidget* createWidgetForReal(const QString& name,
-                                 qreal value,
-                                 const QString& detail = QString(),
-                                 QWidget* parent = nullptr);
-
     QWidget* createWidgetForText(const QString& name,
                                  const QString& value,
                                  bool readOnly,
@@ -55,7 +50,6 @@ private Q_SLOTS:
     void onFlagChange(QAction *action);
     void onEnumChange(int value);
     void onIntChange(int value);
-    void onRealChange(qreal value);
     void onTextChange(const QString& value);
     void onBoolChange(bool value);
 

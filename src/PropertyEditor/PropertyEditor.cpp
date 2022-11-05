@@ -8,6 +8,7 @@
 #include <QSpinBox>
 #include <QToolButton>
 
+#include <ClickableMenu>
 #include <Utils>
 #include "PropertyEditor.h"
 
@@ -45,7 +46,7 @@ void PropertyEditor::getProperties(QObject *obj) {
 
 /** Criando os itens para ser adicionado a interface */
 QWidget* PropertyEditor::buildUi(QObject *obj) {
-    if (metaProperties.isEmpty()) return nullptr;
+    if (metaProperties.isEmpty()) return{};
     auto *w = new QWidget();
     auto *gl = new QGridLayout();
     w->setLayout(gl);
@@ -62,25 +63,17 @@ QWidget* PropertyEditor::buildUi(QObject *obj) {
                         obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() :
                         QString()), row, 0, Qt::AlignLeft | Qt::AlignVCenter);
             } else {
-                gl->addWidget(new QLabel(QObject::tr(mp.name())), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+                gl->addWidget(new QLabel(mp.name()), row, 0, Qt::AlignRight | Qt::AlignVCenter);
                 gl->addWidget(createWidgetForEnum(
                         QString::fromLatin1(mp.name()), value, mp.enumerator(),
                         obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() :
                         QString()), row, 1, Qt::AlignLeft | Qt::AlignVCenter);
             }
-        } else if ( mp.type() == QVariant::Int ||
-                    mp.type() == QVariant::UInt ||
-                    mp.type() == QVariant::LongLong ||
-                    mp.type() == QVariant::ULongLong ) {
-            gl->addWidget(new QLabel(QObject::tr(mp.name())), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+        } else if ( mp.type() == QVariant::Int || mp.type() == QVariant::UInt ||
+                    mp.type() == QVariant::LongLong || mp.type() == QVariant::ULongLong ) {
+            gl->addWidget(new QLabel(mp.name()), row, 0, Qt::AlignRight | Qt::AlignVCenter);
             gl->addWidget(createWidgetForInt(
                     QString::fromLatin1(mp.name()), value.toInt(),
-                    obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() : QString()),
-                          row, 1, Qt::AlignLeft | Qt::AlignVCenter);
-        } else if (mp.type() == QVariant::Double) {
-            gl->addWidget(new QLabel(QObject::tr(mp.name())), row, 0, Qt::AlignRight | Qt::AlignVCenter);
-            gl->addWidget(createWidgetForReal(
-                    QString::fromLatin1(mp.name()), value.toReal(),
                     obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() : QString()),
                           row, 1, Qt::AlignLeft | Qt::AlignVCenter);
         } else if (mp.type() == QVariant::Bool) {
@@ -89,7 +82,7 @@ QWidget* PropertyEditor::buildUi(QObject *obj) {
                     obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() : QString()),
                           row, 0, 1, 2, Qt::AlignLeft);
         } else {
-            gl->addWidget(new QLabel(QObject::tr(mp.name())), row, 0, Qt::AlignRight | Qt::AlignVCenter);
+            gl->addWidget(new QLabel(mp.name()), row, 0, Qt::AlignRight | Qt::AlignVCenter);
             gl->addWidget(createWidgetForText(
                     QString::fromLatin1(mp.name()), value.toString(), !mp.isWritable(),
                     obj ? obj->property(QByteArray("detail_").append(mp.name()).constData()).toString() : QString()),
@@ -109,10 +102,11 @@ QWidget* PropertyEditor::createWidgetForFlags(const QString& name, const QVarian
     auto *btn = new QToolButton(parent);
     if (!detail.isEmpty()) btn->setToolTip(detail);
     btn->setObjectName(name);
-    btn->setText(QObject::tr(name.toUtf8().constData()));
+    btn->setText(name.toUtf8().constData());
     btn->setPopupMode(QToolButton::InstantPopup);
 
-    auto *menu = new QMenu(btn);
+    auto *menu = new ClickableMenu(nullptr, btn);
+    menu->setWindowOpacity(1);
     menu->setObjectName(name);
     btn->setMenu(menu);
 
@@ -162,21 +156,6 @@ QWidget* PropertyEditor::createWidgetForInt(const QString& name, int value, cons
 }
 
 
-/** Criando widget para doublespinbox */
-QWidget* PropertyEditor::createWidgetForReal(const QString& name, qreal value,
-                                             const QString &detail, QWidget* parent) {
-    properties[name] = value;
-
-    auto *box = new QDoubleSpinBox(parent);
-    if (!detail.isEmpty()) box->setToolTip(detail);
-    box->setObjectName(name);
-    box->setValue(value);
-
-    connect(box, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [this](double d){ onRealChange(d); });
-    return box;
-}
-
-
 /** Criando widget para label */
 QWidget* PropertyEditor::createWidgetForText(const QString& name, const QString& value, bool readOnly,
                                              const QString& detail, QWidget* parent) {
@@ -204,10 +183,11 @@ QWidget* PropertyEditor::createWidgetForText(const QString& name, const QString&
 QWidget* PropertyEditor::createWidgetForBool(const QString& name, bool value, const QString &detail, QWidget* parent) {
     properties[name] = value;
 
-    auto *box = new QCheckBox(QObject::tr(name.toUtf8().constData()), parent);
+    auto *box = new QCheckBox(name.toUtf8().constData(), parent);
     if (!detail.isEmpty()) box->setToolTip(detail);
     box->setObjectName(name);
     box->setChecked(value);
+    box->setFocusPolicy(Qt::NoFocus);
 
     connect(box, &QCheckBox::clicked, this, &PropertyEditor::onBoolChange);
     return box;
@@ -248,13 +228,13 @@ void PropertyEditor::onEnumChange(int value) {
 void PropertyEditor::onIntChange(int value) { updatePropertyValue(sender()->objectName(), value); }
 
 
-/** Envia um qreal para o updatePropertyValue */
-void PropertyEditor::onRealChange(qreal value) { updatePropertyValue(sender()->objectName(), value); }
-
-
 /** Envia uma string para o updatePropertyValue */
 void PropertyEditor::onTextChange(const QString& value) { updatePropertyValue(sender()->objectName(), value); }
 
 
 /** Envia um valor booleano para o updatePropertyValue */
 void PropertyEditor::onBoolChange(bool value) { updatePropertyValue(sender()->objectName(), value); }
+
+
+/** Função que retorna as configurações de decodificação */
+QVariantHash PropertyEditor::exportAsHash() { return properties; }

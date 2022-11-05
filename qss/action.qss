@@ -1,9 +1,9 @@
 /* Definição geral do menu */
 QMenu {
     background-color: black;
-    color: white;
     border: 2px ridge #cccccc;
     border-radius: 10px;
+    color: white;
 }
 
 /* Definição dos itens do menu */
@@ -20,9 +20,16 @@ QMenu::item:selected {
 
 QMenu::indicator {
     border: 8px solid transparent;
-    border-radius: 11px;
-    width: 6px;
     height: 6px;
+    width: 6px;
+}
+
+QMenu::indicator:exclusive {
+    border-radius: 11px;
+}
+
+QMenu::indicator:non-exclusive {
+    border-radius: 7px;
 }
 
 QMenu::indicator:exclusive:unchecked {
@@ -37,4 +44,5 @@ QDoubleSpinBox {
     background-color: transparent;
     selection-background-color: transparent;
     border: 4px solid transparent;
+    color: white;
 }

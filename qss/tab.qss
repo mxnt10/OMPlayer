@@ -1,13 +1,20 @@
+/* Geral transparente */
+* { background-color: transparent; }
+
 /* Painel das abas */
 QTabWidget::pane {
+    margin-left: 1px;
     border: 1px solid #333;
-    border-radius: 10px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 /* Definição geral das abas */
 QTabBar::tab {
     border: 1px solid #333;
-    border-radius: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
     padding: 5px 10px;
 }
 
@@ -19,4 +26,26 @@ QTabBar::tab:selected {
 /* Tirar linhas dos agrupamentos */
 QGroupBox {
     border: 0;
+}
+
+/* Tirar linhas das opções de decodificação */
+QFrame {
+    border: 0;
+}
+
+/* Personalizar abstract item view dos widgets */
+QAbstractItemView {
+    background-color: black;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+
+/* Menu não exclusivo */
+QMenu::indicator:non-exclusive:unchecked {
+    background-color: #202020;
+}
+
+/* Menu não exclusivo pressionado */
+QMenu::indicator:non-exclusive:checked {
+    background-color: #4285f4;
 }

@@ -1,7 +1,6 @@
 /* Definições do list view */
 QListView {
     background-color: transparent;
-    color: white;
     border: 0;
 }
 

@@ -31,6 +31,7 @@ DecoderItemWidget::DecoderItemWidget(QWidget *parent): QFrame(parent) {
 
     /** CheckBox para os itens */
     check = new QCheckBox();
+    check->setFocusPolicy(Qt::NoFocus);
     connect(check, &QCheckBox::pressed, this, &DecoderItemWidget::checkPressed);
 
 

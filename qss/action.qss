@@ -18,28 +18,25 @@ QMenu::item:selected {
     border: 6px solid #0064c8;
 }
 
+/* Definição do indicador de seleção */
 QMenu::indicator {
     border: 8px solid transparent;
+    border-radius: 11px;
     height: 6px;
     width: 6px;
 }
 
-QMenu::indicator:exclusive {
-    border-radius: 11px;
-}
-
-QMenu::indicator:non-exclusive {
-    border-radius: 7px;
-}
-
+/* Definição não selecionada */
 QMenu::indicator:exclusive:unchecked {
     background-color: #202020;
 }
 
+/* Definição selecionada */
 QMenu::indicator:exclusive:checked {
     background-color: white;
 }
 
+/* Definição para o spinbox da velocidade de execução */
 QDoubleSpinBox {
     background-color: transparent;
     selection-background-color: transparent;

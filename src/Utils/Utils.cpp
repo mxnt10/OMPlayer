@@ -88,7 +88,6 @@ QString Utils::setIconTheme(const QString &theme, const QString &icon) {
 
 /** Função que retorna as configurações do estilo selecionado */
 QString Utils::setStyle(const QString &style) {
-    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, STR(style));
     QStringList locals{def.defaultDir, def.localDir, def.currentDir};
     QString qss;
 
@@ -117,6 +116,7 @@ QString Utils::setStyle(const QString &style) {
     if (!file.open(QFile::ReadOnly)) return {};
     QString styleSheet{QLatin1String(file.readAll())};
     file.close();
+    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, STR(style));
     return styleSheet;
 }
 
@@ -150,8 +150,6 @@ QString Utils::defaultIcon(const QString &icon) {
     if (icon == "add")            return "list-add";
     if (icon == "remove")         return "list-remove";
     if (icon == "clean")          return "im-ban-kick-user";
-    if (icon == "radio-select")   return "emblem-checked";
-    if (icon == "radio-unselect") return "package-available";
     if (icon == "apply")          return "dialog-ok-apply";
     if (icon == "folder")         return "document-open-folder";
     if (icon == "fullscreen")     return "view-fullscreen";
@@ -238,11 +236,12 @@ QString Utils::scanXDGData() {
     QString env(tmp ? tmp : "");
     if (env.isEmpty()) return {};
 
-    QStringList splitt = env.split(":");
+    QStringList splitt = env.split(':');
     for (int i = 0; i < splitt.size(); i ++) {
         QDir dir(splitt[i] + "/usr/share/OMPlayer");
         if (dir.exists()) {
-            qDebug("%s(%sUtils%s)%s::%sUsando XDG_DATA_DIRS ...\033[0m", GRE, RED, GRE, RED, HID);
+            qDebug("%s(%sUtils%s)%s::%sUsando XDG_DATA_DIRS: %s%s ...\033[0m",
+                   GRE, RED, GRE, RED, HID, SHW, STR(splitt[i]));
             def.definedXDG = splitt[i];
             return splitt[i];
         }

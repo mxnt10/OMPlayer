@@ -106,6 +106,7 @@ QWidget* PropertyEditor::createWidgetForFlags(const QString& name, const QVarian
     btn->setPopupMode(QToolButton::InstantPopup);
 
     auto *menu = new ClickableMenu(nullptr, btn);
+    menu->setStyleSheet(Utils::setStyle("tabmenu"));
     menu->setWindowOpacity(1);
     menu->setObjectName(name);
     btn->setMenu(menu);

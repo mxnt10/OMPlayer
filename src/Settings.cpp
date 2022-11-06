@@ -95,7 +95,15 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     tab->addTab(general, tr("General"));
     tab->addTab(decoder, tr("Decoder"));
     tab->addTab(renderer, tr("Renderer"));
-    tab->setStyleSheet(Utils::setStyle("tab"));
+
+    QString str = Utils::setStyle("tab").replace(
+            QRegExp("_RADIO_UNCHECKED__"),
+            Utils::setIconTheme(Utils::setThemeName(),"radio-unselect")).replace(
+                    QRegExp("_RADIO_UNCHECKED_HOVER_"),
+                    Utils::setIconTheme(Utils::setThemeName(),"radio-hover")).replace(
+                            QRegExp("_RADIO_CHECKED_"),
+                            Utils::setIconTheme(Utils::setThemeName(),"radio-select"));
+    tab->setStyleSheet(str);
 
 
     /** Botão para fechar a janela */

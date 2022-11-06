@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 1.6 ] - 2022-10-22 ##################################################
+## [ 2.0 ] - 2022-11-06 ##################################################
 
 ### Added / Adicionado
  - Sources:
@@ -17,7 +17,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Recurso para alteração dos canais de áudio.
     - Adicionado verificação de hash md5 em arquivos multimídia.
     - Ativando suporte a decodificação.
- - Adicionado suporte multithread.
+    - Adicionado suporte multithread.
+ - Estilos:
+    - global.qss
+    - tabmenu.qss
 ###
 
 ### Upgraded / Atualizado

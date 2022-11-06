@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pkgver='1.6'
+pkgver=$(sed s"/VERSION \"//" <(grep -Eo "VERSION [\"]([0-9]+)+[.][0-9]+" src/Utils/Utils.h))
 install_root=${install_root:-""}
 
 set -e

@@ -1,6 +1,7 @@
 /* Geral transparente */
 * { background-color: transparent; }
 
+
 /* Painel das abas */
 QTabWidget::pane {
     margin-left: 1px;
@@ -10,6 +11,7 @@ QTabWidget::pane {
     border-bottom-right-radius: 5px;
 }
 
+
 /* Definição geral das abas */
 QTabBar::tab {
     border: 1px solid #333;
@@ -18,20 +20,15 @@ QTabBar::tab {
     padding: 5px 10px;
 }
 
+
 /* Tab selecionado*/
-QTabBar::tab:selected {
-    background-color: rgba(0, 100, 200, 50);
-}
+QTabBar::tab:selected { background-color: rgba(0, 100, 200, 50); }
 
-/* Tirar linhas dos agrupamentos */
-QGroupBox {
-    border: 0;
-}
 
-/* Tirar linhas das opções de decodificação */
-QFrame {
-    border: 0;
-}
+/* Tirar linhas dos agrupamentos e frames */
+QGroupBox { border: 0; }
+QFrame    { border: 0; }
+
 
 /* Personalizar abstract item view dos widgets */
 QAbstractItemView {
@@ -40,12 +37,13 @@ QAbstractItemView {
     border-radius: 4px;
 }
 
-/* Menu não exclusivo */
-QMenu::indicator:non-exclusive:unchecked {
-    background-color: #202020;
-}
 
-/* Menu não exclusivo pressionado */
-QMenu::indicator:non-exclusive:checked {
-    background-color: #4285f4;
-}
+/** Opções para o RadioButton */
+QRadioButton { width: 100px; }
+
+QRadioButton::indicator       { width: 22px; height: 22px; }
+QRadioButton::indicator:hover { margin-right: 4px; }
+
+QRadioButton::indicator:unchecked       { image: url(_RADIO_UNCHECKED__);      }
+QRadioButton::indicator:unchecked:hover { image: url(_RADIO_UNCHECKED_HOVER_); }
+QRadioButton::indicator:checked         { image: url(_RADIO_CHECKED_);         }

@@ -101,7 +101,6 @@ QVariantHash Decoder::videoDecoderOptions() const {
 /** Setando prioridade de execução de decodificadores */
 QVector<QtAV::VideoDecoderId> Decoder::decoderPriorityNames() {
     if (optionDecoder.isEmpty()) videoDecoderEnableChanged();
-    qDebug() << optionDecoder;
     return idsFromNames(optionDecoder);
 }
 

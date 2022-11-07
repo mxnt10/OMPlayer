@@ -1,5 +1,6 @@
 #include <QLayout>
 #include <QPainter>
+#include <QTimer>
 #include <Button>
 #include <Utils>
 
@@ -25,7 +26,7 @@ DecoderItemWidget::DecoderItemWidget(QWidget *parent): QFrame(parent) {
 
 
     /** Botão de expansão */
-    auto *expandBtn = new Button(Button::Default, "add", 28);
+    expandBtn = new Button(Button::Default, "add", 28);
     connect(expandBtn, &Button::clicked, this, &DecoderItemWidget::toggleEditorVisible);
 
 
@@ -74,12 +75,26 @@ void DecoderItemWidget::toggleEditorVisible() {
     if (!editorWidget) return;
     editorWidget->setVisible(!editorWidget->isVisible());
 
-    auto *b = qobject_cast<Button*>(sender());
-    if (b) b->setIcon(QIcon(editorWidget->isVisible()?Utils::setIconTheme(Utils::setThemeName(), "remove"):
-                            Utils::setIconTheme(Utils::setThemeName(), "add")));
+    QString theme = Utils::setThemeName();
+    QString name{"add"};
+
+    if (editorWidget->isVisible()) name = "remove";
+    iconName = name;
+
+    expandBtn->setIcon(QIcon(Utils::setIconTheme(theme, name)));
     parentWidget()->adjustSize();
 }
 
 
 /** Emissão ao pressionar o checkbox */
-void DecoderItemWidget::checkPressed() { Q_EMIT enableChanged(); }
+void DecoderItemWidget::checkPressed() { QTimer::singleShot(500, [this](){ Q_EMIT enableChanged(); }); }
+
+
+/** Alterando o ícone dos botões */
+void DecoderItemWidget::changeIcons() {
+    QString theme = Utils::setThemeName();
+    QString name{"add"};
+
+    if (iconName == "remove") name = "remove";
+    expandBtn->setIcon(QIcon(Utils::setIconTheme(theme, name)));
+}

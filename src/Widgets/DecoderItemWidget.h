@@ -4,6 +4,7 @@
 #include <QCheckBox>
 #include <QFrame>
 #include <QLabel>
+#include <Button>
 #include <PropertyEditor>
 
 class DecoderItemWidget : public QFrame {
@@ -12,6 +13,7 @@ Q_OBJECT
 public:
     explicit DecoderItemWidget(QWidget* parent = nullptr);
     void buildUiFor(QObject *obj);
+    void changeIcons();
 
     [[nodiscard]] QVariantHash getOptions() const { return editor->exportAsHash(); }
     [[nodiscard]] bool isChecked() const { return check->isChecked(); }
@@ -29,10 +31,12 @@ private Q_SLOTS:
     void toggleEditorVisible();
 
 private:
-    QCheckBox *check;
-    QLabel *desc;
+    Button *expandBtn{};
     PropertyEditor *editor{};
-    QWidget *editorWidget{nullptr};
+    QCheckBox *check{};
+    QLabel *desc{};
+    QString iconName{};
+    QWidget *editorWidget{};
 };
 
 #endif //OMPLAYER_DECODERITEMWIDGET_H

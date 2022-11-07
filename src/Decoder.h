@@ -15,7 +15,7 @@ public:
 
     [[nodiscard]] QVariantHash videoDecoderOptions() const;
     QVector<QtAV::VideoDecoderId> decoderPriorityNames();
-
+    void changeIcons();
 
 private Q_SLOTS:
     static QVector<QtAV::VideoDecoderId> idsFromNames(const QStringList& names);
@@ -24,6 +24,7 @@ private Q_SLOTS:
 private:
     QList<DecoderItemWidget *> decItems{};
     QVBoxLayout *decLayout{};
+    QStringList optionDecoder{};
 
 };
 

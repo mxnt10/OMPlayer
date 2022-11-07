@@ -51,13 +51,15 @@ Decoder::Decoder(QWidget *parent): QWidget(parent) {
 
 
     /** Layout dos widgets gerados */
+    auto *label = new QLabel(nullptr, this);
+    label->setText(QApplication::tr("Decoder options") + " (" + QApplication::tr("Open new media is required") + ")");
     auto *vb = new QVBoxLayout();
     vb->setSpacing(0);
-    vb->addWidget(new QLabel("Decoder options (Open new media is required)"));
+    vb->addWidget(label);
     vb->addLayout(decLayout);
 
 
-    /** Layout para ajustar os widgets gerados na */
+    /** Layout para ajustar os widgets gerados */
     auto *vlsroll = new QVBoxLayout(scrollAreaWidgetContents);
     vlsroll->setSpacing(0);
     vlsroll->addLayout(vb);
@@ -75,8 +77,15 @@ Decoder::~Decoder() = default;
 /**********************************************************************************************************************/
 
 
-/***/ //todo
-void Decoder::videoDecoderEnableChanged() {}
+/** Setando opções ao selecionar as opções de decodificação */
+void Decoder::videoDecoderEnableChanged() {
+    QStringList names;
+    foreach (DecoderItemWidget *iw, decItems) {
+        if (iw->isChecked()) names.append(iw->name());
+    }
+    qDebug("%s(%sDecoder%s)%s::%sDecodificações ativas (%s)\033[0m", GRE, RED, GRE, RED, HID, STR(names.join(' ')));
+    optionDecoder = names;
+}
 
 
 /** Opções de decodificação de vídeo */
@@ -91,12 +100,9 @@ QVariantHash Decoder::videoDecoderOptions() const {
 
 /** Setando prioridade de execução de decodificadores */
 QVector<QtAV::VideoDecoderId> Decoder::decoderPriorityNames() {
-    QStringList names;
-    foreach (DecoderItemWidget *iw, decItems) {
-        if (iw->isChecked()) names.append(iw->name());
-    }
-    qDebug() << STR(names.join(' '));
-    return idsFromNames(names);
+    if (optionDecoder.isEmpty()) videoDecoderEnableChanged();
+    qDebug() << optionDecoder;
+    return idsFromNames(optionDecoder);
 }
 
 
@@ -110,4 +116,12 @@ QVector<QtAV::VideoDecoderId> Decoder::idsFromNames(const QStringList& names) {
         decs.append(id);
     }
     return decs;
+}
+
+
+/** Alterando os ícones dos botões do widgets de decodificação */
+void Decoder::changeIcons() {
+    foreach (DecoderItemWidget* diw, decItems) {
+        diw->changeIcons();
+    }
 }

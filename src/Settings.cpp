@@ -1,7 +1,6 @@
 #include <QComboBox>
 #include <QGroupBox>
 #include <QLayout>
-#include <QTabWidget>
 #include <Label>
 #include <Utils>
 
@@ -24,7 +23,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Opções de decodificação */
-    decoder = new Decoder();
+    decoder = new Decoder(this);
 
 
     /** Estrutura das renderizações */
@@ -91,19 +90,11 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
    /** Organização por abas */
-    auto *tab = new QTabWidget();
+    tab = new QTabWidget();
     tab->addTab(general, tr("General"));
     tab->addTab(decoder, tr("Decoder"));
     tab->addTab(renderer, tr("Renderer"));
-
-    QString str = Utils::setStyle("tab").replace(
-            QRegExp("_RADIO_UNCHECKED__"),
-            Utils::setIconTheme(Utils::setThemeName(),"radio-unselect")).replace(
-                    QRegExp("_RADIO_UNCHECKED_HOVER_"),
-                    Utils::setIconTheme(Utils::setThemeName(),"radio-hover")).replace(
-                            QRegExp("_RADIO_CHECKED_"),
-                            Utils::setIconTheme(Utils::setThemeName(),"radio-select"));
-    tab->setStyleSheet(str);
+    tab->setStyleSheet(changeIconsStyle());
 
 
     /** Botão para fechar a janela */
@@ -164,6 +155,8 @@ void Settings::setIcon(const QString &index) {
 
     Utils::initUtils(Utils::Theme);
     Utils::changeIcon(closebtn, "apply");
+    tab->setStyleSheet(changeIconsStyle());
+    decoder->changeIcons();
 
     Q_EMIT changethemeicon();
 }
@@ -181,3 +174,19 @@ QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() {
 }
 
 
+/** Mudando o ícone nos estilos */
+QString Settings::changeIconsStyle() {
+    QString str{Utils::setStyle("tab")};
+    QString theme{Utils::setThemeName()};
+
+    QString ru{Utils::setIconTheme(theme, "radio-unselect")};
+    if(!ru.isEmpty()) str.replace(QRegExp("/\\* _RADIO_UNCHECKED__ \\*/"), "image: url(" + ru + ");");
+
+    QString rh{Utils::setIconTheme(theme, "radio-hover")};
+    if(!rh.isEmpty()) str.replace(QRegExp("/\\* _RADIO_UNCHECKED_HOVER_ \\*/"), "image: url(" + rh + ");");
+
+    QString rs{Utils::setIconTheme(theme, "radio-select")};
+    if(!rs.isEmpty()) str.replace(QRegExp("/\\* _RADIO_CHECKED_ \\*/"), "image: url(" + rs + ");");
+
+    return str;
+}

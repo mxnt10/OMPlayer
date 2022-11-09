@@ -1,7 +1,6 @@
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
-#include <QFileDialog>
 #include <QLayout>
 #include <QMoveEvent>
 #include <QPropertyAnimation>
@@ -11,6 +10,7 @@
 #include <Utils>
 
 #include "EventFilter.h"
+#include "Extensions.h"
 #include "PlayList.h"
 
 
@@ -25,14 +25,12 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     load(First);
 
 
-    /** Usando multithread para buscar arquivos */
-    thread = new QThread();
-    worker = new Worker(this); /** ou usa this ou nada de dialog */
-    worker->moveToThread(thread);
-    connect(worker, &Worker::valueChanged, this, &PlayList::addItems);
-    connect(thread, &QThread::started, worker, &Worker::doFiles);
-    connect(worker, &Worker::workRequested, [this](){ thread->start(); });
-    connect(worker, &Worker::finished, [this](){ thread->quit(); });
+    /** Criação do diálogo para abrir arquivos de mídia */
+    Extensions e;
+    diag = new QFileDialog(this);
+    diag->setFileMode(QFileDialog::ExistingFiles);
+    diag->setNameFilter(e.filters());
+    diag->setDirectory(QStandardPaths::standardLocations(QStandardPaths::MoviesLocation).value(0, QDir::homePath()));
 
 
     /** Efeito de transparência funcional para a playlist. O setWindowOpacity() não rolou. */
@@ -147,10 +145,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
 /** Destrutor necessário */
-PlayList::~PlayList() {
-    delete thread;
-    delete worker;
-}
+PlayList::~PlayList() = default;
 
 
 /**********************************************************************************************************************/
@@ -192,11 +187,16 @@ void PlayList::save(const QString &url) {
 }
 
 
-/** Usando um thread separado para buscar os arquivos */
+/** Usando uma função separada para buscar os arquivos */
 void PlayList::getFiles() {
     Q_EMIT nomousehide();
-    thread->wait();
-    worker->requestWork();
+
+    /** Hack para o mouse não ocultar no diálogo para abrir arquivos */
+    for (int i = 0; i < 400; i++) arrowMouse();
+
+    QStringList files;
+    if (diag->exec()) files = diag->selectedFiles();
+    if (!files.isEmpty()) addItems(files);
 }
 
 

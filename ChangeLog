@@ -39,6 +39,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Pequenas modificações no código dos botões.
  - Não precisa mais verificar se a playlist foi alterada.
  - Modificado opções para abrir/adicionar arquivos multimídia.
+ - Diálogo para adicionar arquivos de mídia dinâmico.
  - Modificado função rendererSelect() em Settings.
  - Otimização de performance ao atualizar informações da playlist
    substituindo o método gambiarra por um método eficiente e sofisticado.
@@ -58,8 +59,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Fixed / Corrigido
  - Corrigido o Next automático após o término da mídia reproduzida,
-   substituindo a gambiarra autentica por um método eficiente.
- - Corrigido a tradução.
+   substituindo a gambiarra autêntica por um método eficiente.
+ - Pequenas correções na tradução.
  - Corrigido powersaving sempre desativando a cada mídia reproduzida.
  - Ajustes na configuração da velocidade de reprodução.
  - Corrigido verificação de itens repetidos.

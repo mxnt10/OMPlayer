@@ -15,6 +15,7 @@ class Extensions {
 public:
 	Extensions();
 	~Extensions();
+    QString filters();
 
 	ExtensionList video() { return _video; };
 	ExtensionList audio() { return _audio; };

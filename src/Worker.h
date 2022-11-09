@@ -13,18 +13,16 @@ public:
 
     void setFile(const QString &val) { file = val; };
 
-signals:
+Q_SIGNALS:
     void workRequested();
-    void valueChanged(const QStringList &value);
     void valueMD5(const QString &value);
     void finished();
 
-public slots:
-    void doFiles();
+public Q_SLOTS:
     void doHash();
 
 private:
-    QString file{}, extensions{}, dir{};
+    QString file{};
 };
 
 #endif // WORKER_H

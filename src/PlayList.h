@@ -2,15 +2,13 @@
 #define PLAYLIST_H
 
 #include <QDir>
+#include <QFileDialog>
 #include <QGraphicsOpacityEffect>
 #include <QLabel>
 #include <QListView>
 #include <QModelIndex>
-#include <QThread>
 #include <PlayListUtils>
 #include <Button>
-
-#include "Worker.h"
 
 #define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 
@@ -70,6 +68,7 @@ private Q_SLOTS:
     void onAboutToPlay(const QModelIndex &index);
 
 private:
+    QFileDialog *diag{};
     Button *clearBtn{};
     Button *addBtn{}, *removeBtn{};
     PlayListDelegate *delegate{};
@@ -80,10 +79,6 @@ private:
     QWidget *wpls{};
     int startsize{0}, startlistsize{0}, startpos{0}, rmRows{0};
     bool isshow{false}, resize{false};
-
-    /** Suporte multithread */
-    QThread *thread;
-    Worker *worker;
 };
 
 #endif // PLAYLIST_H

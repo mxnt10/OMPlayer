@@ -1,3 +1,4 @@
+#include <QObject>
 #include "Extensions.h"
 
 
@@ -69,3 +70,17 @@ Extensions::Extensions() {
 
 /** Destrutor */
 Extensions::~Extensions() = default;
+
+
+/**********************************************************************************************************************/
+
+
+/** Retorna o filtro para selecionar os arquivos multimídia */
+QString Extensions::filters() {
+    return QObject::tr("Multimedia Files") + multimedia().forFilter() + ";;" +
+           QObject::tr("Video") + video().forFilter() + ";;" +
+           QObject::tr("Audio") + audio().forFilter() + ";;" +
+           QObject::tr("Playlists") + playlist().forFilter() + ";;" +
+           QObject::tr("All Media Files") + allPlayable().forFilter() + ";;" +
+           QObject::tr("All Files") + " (*)";
+}

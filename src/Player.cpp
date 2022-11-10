@@ -508,6 +508,7 @@ void OMPlayer::play(const QString &isplay, int index) {
     this->setWindowTitle(Utils::mediaTitle(isplay));
     speedBox->setValue(1);
     mediaPlayer->setSpeed(1);
+    mediaPlayer->stop();
     mediaPlayer->setPriority(sett->decoderPriorityNames());
     mediaPlayer->setOptionsForVideoCodec(sett->videoDecoderOptions());
     mediaPlayer->play(isplay);
@@ -1107,7 +1108,7 @@ void OMPlayer::initAudioTrackMenu() {
     int track = mediaPlayer->currentAudioStream();
     int tracks = mediaPlayer->audioStreamCount();
 
-    if (audiotrack->actions().count() == 0 && tracks == 0) {
+    if (as.count() == 0 || tracks == 0) {
         /** Definindo o menu de contexto na inicialização */
         a = audiotrack->addAction(tr("No sound"));
         a->setData(as.size());
@@ -1261,7 +1262,7 @@ void OMPlayer::onMediaStatusChanged() {
             break;
         default:
             qDebug("%s(%sPlayer%s)%s::%sStatus não mapeado:%s %i\033[0m",
-                   GRE, RED, GRE, RED, RDL, ERR, player->mediaStatus());
+                   GRE, RED, GRE, RED, YEL, ERR, player->mediaStatus());
             break;
     }
 
@@ -1284,7 +1285,11 @@ void OMPlayer::handleError(const QtAV::AVError &error) {
             previousitem = playlist->setListSize() - 1;
             actualitem = 0;
             nextitem = 1;
-        } else Next();
+        } else {
+            playing = true;
+            Next();
+        }
+        invalid = false;
     }
 }
 

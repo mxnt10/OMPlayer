@@ -183,7 +183,7 @@
         <translation type="vanished">Limpar lista de reprodução</translation>
     </message>
     <message>
-        <location filename="../src/PlayList.cpp" line="116"/>
+        <location filename="../src/PlayList.cpp" line="114"/>
         <source>Empty List</source>
         <translation>Lista Vazia</translation>
     </message>
@@ -200,14 +200,47 @@
         <translation>Abrir arquivos multimídia.</translation>
     </message>
     <message>
-        <location filename="../src/Decoder.cpp" line="54"/>
+        <location filename="../src/Decoder.cpp" line="55"/>
         <source>Decoder options</source>
         <translation>Opções de decodificação</translation>
     </message>
     <message>
-        <location filename="../src/Decoder.cpp" line="54"/>
+        <location filename="../src/Decoder.cpp" line="55"/>
         <source>Open new media is required</source>
         <translation>Requer abrir uma nova mídia</translation>
+    </message>
+</context>
+<context>
+    <name>QObject</name>
+    <message>
+        <location filename="../src/Extensions.cpp" line="80"/>
+        <source>Multimedia Files</source>
+        <translation>Arquivos Multimídia</translation>
+    </message>
+    <message>
+        <location filename="../src/Extensions.cpp" line="81"/>
+        <source>Video</source>
+        <translation>Vídeo</translation>
+    </message>
+    <message>
+        <location filename="../src/Extensions.cpp" line="82"/>
+        <source>Audio</source>
+        <translation>Áudio</translation>
+    </message>
+    <message>
+        <location filename="../src/Extensions.cpp" line="83"/>
+        <source>Playlists</source>
+        <translation>Lista de Reprodução</translation>
+    </message>
+    <message>
+        <location filename="../src/Extensions.cpp" line="84"/>
+        <source>All Media Files</source>
+        <translation>Todos os Arquivos de Mídia</translation>
+    </message>
+    <message>
+        <location filename="../src/Extensions.cpp" line="85"/>
+        <source>All Files</source>
+        <translation>Todos os Arquivos</translation>
     </message>
 </context>
 <context>

@@ -70,6 +70,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Corrigido problemas com execução de itens após a adição de itens
    na playlist.
  - Pequenas correções em Utils.
+ - Correções nas ações ao verificar arquivos de mídia válidos.
+ - Correções ao adicionar as opções de decodificação para arquivos
+   de áudio.
+ - Correções na função de verificação de faixas de áudio.
 ###
 
 ##########################################################################

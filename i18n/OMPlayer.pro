@@ -4,6 +4,7 @@ SOURCES = ../src/About.cpp \
           ../src/Decoder.cpp  \
           ../src/PlayList.cpp  \
           ../src/Settings.cpp   \
+          ../src/Extensions.cpp  \
           ../src/StatisticsView.cpp
 
 TRANSLATIONS = OMPlayer_pt.ts

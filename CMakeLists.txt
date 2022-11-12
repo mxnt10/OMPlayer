@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer)
+project(OMPlayer VERSION 2.0)
 
 
 # Habilitando suporte LTO
@@ -14,10 +14,20 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
+
+
+# Habilitando thread
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
-set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 find_package(Threads REQUIRED)
+
+
+# Suporte a notificações
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(OTHER_LIBS REQUIRED libnotify)
+endif ()
 
 
 # Buscando sources do QT5
@@ -42,22 +52,28 @@ include_directories(
 
 
 # Adicionando recursos ao projeto
-add_subdirectory( common/SingleApplication )
-add_subdirectory( common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL )
+add_subdirectory(common/SingleApplication)
+add_subdirectory(common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL)
 
 
-# Verificando compatibilidade de sistemas
-if(WIN32)
+# Adicionando sources de screensaver
+set(POWER_SAVING common/ScreenSaver/powersaving.cpp common/ScreenSaver/powersaving.h)
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(SRC_SCREENSAVER
-        common/ScreenSaver/winscreensaver.cpp
-        common/ScreenSaver/winscreensaver.h
-    )
-else()
-    set(SRC_SCREENSAVER
-        common/ScreenSaver/screensaver.cpp
-        common/ScreenSaver/screensaver.h
-    )
-endif()
+            ${POWER_SAVING}
+            common/ScreenSaver/winscreensaver.cpp
+            common/ScreenSaver/winscreensaver.h
+        )
+else ()
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(SRC_SCREENSAVER
+                ${POWER_SAVING}
+                common/ScreenSaver/screensaver.cpp
+                common/ScreenSaver/screensaver.h
+            )
+    endif ()
+endif ()
 
 
 # Criando o executável do programa
@@ -90,6 +106,7 @@ add_executable(
         src/Utils/JsonTools.h
         src/Utils/Utils.cpp
         src/Utils/Utils.h
+        $<$<PLATFORM_ID:Linux>:src/Utils/Notify.h>
 
         src/Widgets/Button.cpp
         src/Widgets/Button.h
@@ -103,20 +120,17 @@ add_executable(
         src/Widgets/Slider.h
         src/Widgets/TreeView.cpp
         src/Widgets/TreeView.h
-
-        common/ScreenSaver/powersaving.cpp
-        common/ScreenSaver/powersaving.h
         ${SRC_SCREENSAVER}
 )
 
 
 # Verificando Ativação do LTO
-if( supported )
+if (supported)
     message(STATUS "IPO / LTO enabled")
     set_property(TARGET OMPlayer PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-else()
+else ()
     message(STATUS "IPO / LTO not supported: <${error}>")
-endif()
+endif ()
 
 
 # Linkando as bibliotecas
@@ -131,4 +145,9 @@ target_link_libraries(
         Qt5::Quick
         Qt5::Widgets
         mediainfo dl
+        $<$<PLATFORM_ID:Linux>:${OTHER_LIBS_LIBRARIES}>
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_include_directories(OMPlayer PRIVATE ${OTHER_LIBS_INCLUDE_DIRS})
+endif ()

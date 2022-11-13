@@ -6,6 +6,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ## [ 2.0 ] - 2022-11-06 ##################################################
 
 ### Added / Adicionado
+ - Arquivos:
+    - Adicionado Deps_File.cmake em cmake.
+    - Adicionado notify.png em appdata.
+    - Incrementado mais ícones aos temas.
  - Sources:
     - Adicionado Decoder.{cpp/h} em src.
     - Adicionado Extensions.{cpp/h} em src.
@@ -13,11 +17,13 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Adicionado Worker.{cpp/h} em src.
     - Adicionado DecoderItemWidget.{cpp/h} em src/Widgets.
     - Adicionado PropertyEditor.{cpp/h} em src/PropertyEditor.
+    - Adicionado Notify.h em src/Utils.
  - Recursos:
     - Recurso para alteração dos canais de áudio.
     - Adicionado verificação de hash md5 em arquivos multimídia.
     - Ativando suporte a decodificação.
     - Adicionado suporte multithread.
+    - Ativando suporte a notificações.
  - Estilos:
     - global.qss
     - tabmenu.qss
@@ -25,6 +31,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Upgraded / Atualizado
  - Tradução atualizada.
+ - CMakeLists.txt corrigido, modificado e atualizado.
 ###
 
 ### Changed / Modificado
@@ -71,8 +78,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
    na playlist.
  - Pequenas correções em Utils.
  - Correções nas ações ao verificar arquivos de mídia válidos.
- - Correções ao adicionar as opções de decodificação para arquivos
-   de áudio.
+ - Correções para adicionar as opções de decodificação em caso de
+   arquivos de áudio.
  - Correções na função de verificação de faixas de áudio.
 ###
 

@@ -43,11 +43,15 @@ QString Utils::setIcon(Utils::STATUS logo) {
     QStringList locals;
     QString iconfile, icon;
 
-    if (logo == Logo) {
-        if (!def.definedLogo.isEmpty() && QFileInfo::exists(def.definedLogo)) return def.definedLogo;
+    if (logo != Utils::Default) {
+        if (logo == Utils::Logo && !def.definedLogo.isEmpty() && QFileInfo::exists(def.definedLogo))
+            return def.definedLogo;
+        if (logo == Utils::Notify && !def.definedNotify.isEmpty() && QFileInfo::exists(def.definedNotify))
+            return def.definedNotify;
         qDebug("%s(%sUtils%s)%s::%sSetando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
         locals.append({def.defaultDir + "/logo", def.localDir + "/appdata", def.currentDir + "/appdata"});
-        icon = "/logo.png";
+        if (logo == Utils::Logo) icon = "/logo.png";
+        else if (logo == Utils::Notify) icon = "/notify.png";
     } else {
         if (!def.definedIcon.isEmpty() && QFileInfo::exists(def.definedIcon)) return def.definedIcon;
         qDebug("%s(%sUtils%s)%s::%sSetando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
@@ -58,7 +62,9 @@ QString Utils::setIcon(Utils::STATUS logo) {
     for (int i = 0; i < 3; i++) {
         iconfile = locals[i] + icon;
         if (QFileInfo::exists(iconfile)) {
-            if (logo == Logo) def.definedLogo = iconfile; else def.definedIcon = iconfile;
+            if (logo == Utils::Default) def.definedIcon = iconfile;
+            else if (logo == Utils::Logo) def.definedLogo = iconfile;
+            else if (logo == Utils::Notify) def.definedNotify = iconfile;
             return iconfile;
         }
     }

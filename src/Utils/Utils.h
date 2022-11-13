@@ -48,6 +48,7 @@ struct { /** Criado com objetivo de otimização de performance */
     QString definedXDG;
     QString definedIcon;
     QString definedLogo;
+    QString definedNotify;
     QString definedTheme;
 } def;
 
@@ -58,7 +59,7 @@ public:
         AspectAuto = 1, Aspect43 = 2, Aspect54 = 3, Aspect149 = 4, Aspect169 = 5, Aspect1610 = 6, Aspect235 = 7,
         Aspect11 = 8, Aspect32 = 9, Aspect1410 = 10, Aspect118 = 11, Aspect21 = 12, AspectVideo = 0
     };
-    enum STATUS {Default = 0, Logo = 1, Current = 2, Theme = 3};
+    enum STATUS {Default = 0, Logo = 1, Notify = 2, Current = 3, Theme = 4};
     static void initUtils(Utils::STATUS option = Utils::Default);
     static QString setIcon(Utils::STATUS logo = Utils::Default);
     static QString setIconTheme(const QString &theme, const QString &icon);

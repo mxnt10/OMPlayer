@@ -40,30 +40,32 @@ find_package(Threads REQUIRED)
 # Suporte a notificações
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     find_package(PkgConfig REQUIRED)
-    pkg_check_modules(OTHER_LIBS REQUIRED libnotify)
+    pkg_check_modules(LIB_NOTIFY REQUIRED libnotify)
 endif ()
 
 
-# Buscando sources do QT5
+# Buscando sources do Qt5 e QtAV
 find_package(Qt5 COMPONENTS Core DBus Gui Quick Widgets REQUIRED)
+find_package(QtAV REQUIRED)
 
 
 # Adicionando sources manualmente
 include_directories(
-        /usr/include/qt5/QtAV
-        /usr/include/qt5/QtAVWidgets
+        ${QTAV_INCLUDE_DIRS} ${QTAVWIDGETS_INCLUDE_DIRS}
         ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL
         ${PROJECT_SOURCE_DIR}/common/ScreenSaver
         ${PROJECT_SOURCE_DIR}/src/PlayListUtils
-        ${PROJECT_SOURCE_DIR}/src/PropertyEditor
         ${PROJECT_SOURCE_DIR}/src/Widgets
         ${PROJECT_SOURCE_DIR}/src/Utils
 )
 
 
 # Adicionando recursos ao projeto
-add_subdirectory(common/SingleApplication)
-add_subdirectory(common/MediaInfoLib/Project/CMake common/MediaInfoLib/Source/MediaInfoDLL)
+add_subdirectory(${PROJECT_SOURCE_DIR}/common/SingleApplication)
+add_subdirectory(
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Project/CMake
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL
+)
 
 
 # Adicionando sources de screensaver
@@ -88,30 +90,30 @@ endif ()
 
 
 # Buscando fontes do programa em src
-file(GLOB SRC_FILES LIST_DIRECTORIES FALSE ${PROJECT_SOURCE_DIR}/src/*.h ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB SRC_FILES LIST_DIRECTORIES FALSE ${PROJECT_SOURCE_DIR}/src/*.*)
 update_deps_file(${SRC_FILES})
 
 
 # Buscando utilitários da playlist
-file(GLOB PLS_FILES ${PROJECT_SOURCE_DIR}/src/PlayListUtils/*.h ${PROJECT_SOURCE_DIR}/src/PlayListUtils/*.cpp)
+file(GLOB PLS_FILES ${PROJECT_SOURCE_DIR}/src/PlayListUtils/*.*)
 update_deps_file(${PLS_FILES})
 
 
 # Buscando widgets do programa
-file(GLOB WIDGETS_FILES ${PROJECT_SOURCE_DIR}/src/Widgets/*.h ${PROJECT_SOURCE_DIR}/src/Widgets/*.cpp)
+file(GLOB WIDGETS_FILES ${PROJECT_SOURCE_DIR}/src/Widgets/*.*)
 update_deps_file(${WIDGETS_FILES})
+
+
+# Buscando utilitários do programa
+file(GLOB UTILS_FILES ${PROJECT_SOURCE_DIR}/src/Utils/*.*)
+string(REGEX MATCHALL "${PROJECT_SOURCE_DIR}/src/Utils/[U|J|P][a-zA-Z]*[.][a-zA-Z]*" UTILS_FILES ${UTILS_FILES})
+update_deps_file(${UTILS_FILES})
 
 
 # Criando o executável do programa
 add_executable(
         OMPlayer
-        ${SRC_FILES} ${PLS_FILES} ${WIDGETS_FILES} ${SRC_SCREENSAVER}
-        ${PROJECT_SOURCE_DIR}/src/PropertyEditor/PropertyEditor.cpp
-        ${PROJECT_SOURCE_DIR}/src/PropertyEditor/PropertyEditor.h
-        ${PROJECT_SOURCE_DIR}/src/Utils/JsonTools.cpp
-        ${PROJECT_SOURCE_DIR}/src/Utils/JsonTools.h
-        ${PROJECT_SOURCE_DIR}/src/Utils/Utils.cpp
-        ${PROJECT_SOURCE_DIR}/src/Utils/Utils.h
+        ${SRC_FILES} ${PLS_FILES} ${WIDGETS_FILES} ${UTILS_FILES} ${SRC_SCREENSAVER}
         $<$<PLATFORM_ID:Linux>:${PROJECT_SOURCE_DIR}/src/Utils/Notify.h>
 )
 
@@ -130,16 +132,18 @@ target_link_libraries(
         OMPlayer
         SingleApplication::SingleApplication
         Threads::Threads
-        QtAV QtAVWidgets
         Qt5::Core
         Qt5::DBus
         Qt5::Gui
         Qt5::Quick
         Qt5::Widgets
         mediainfo dl
-        $<$<PLATFORM_ID:Linux>:${OTHER_LIBS_LIBRARIES}>
+        ${QTAV} ${QTAVWIDGETS_LIBRARIES}
+        $<$<PLATFORM_ID:Linux>:${LIB_NOTIFY_LIBRARIES}>
 )
 
+
+# Incluindo diretório do libnotify
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_include_directories(OMPlayer PRIVATE ${OTHER_LIBS_INCLUDE_DIRS})
+    target_include_directories(OMPlayer PRIVATE ${LIB_NOTIFY_INCLUDE_DIRS})
 endif ()

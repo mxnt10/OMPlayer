@@ -1,7 +1,6 @@
 #include <QPainter>
 #include <string>
 #include <Utils>
-#include <utility>
 
 #include "Button.h"
 

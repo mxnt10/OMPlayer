@@ -8,6 +8,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ### Added / Adicionado
  - Arquivos:
     - Adicionado Deps_File.cmake em cmake.
+    - Adicionado FindQtAV.cmake em cmake.
     - Adicionado notify.png em appdata.
     - Incrementado mais ícones aos temas.
  - Sources:
@@ -53,6 +54,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Melhorando o código para seleção de renderização em Settings.
  - Limpeza de código na classe Button.
  - Modificação geral nos estilos em qss.
+ - Fontes de PropertyEditor em Utils.
 ###
 
 ### Removed / Removido

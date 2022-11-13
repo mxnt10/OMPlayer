@@ -5,7 +5,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <Button>
-#include <PropertyEditor>
+#include <Utils>
 
 class DecoderItemWidget : public QFrame {
 Q_OBJECT

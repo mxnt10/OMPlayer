@@ -1,3 +1,7 @@
+#ifdef __linux__
+    #include <Notify.h>
+#endif
+
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
@@ -1273,9 +1277,19 @@ void OMPlayer::onMediaStatusChanged() {
 
 /** Debug em caso de eventuais erros */
 void OMPlayer::handleError(const QtAV::AVError &error) {
-    string tr = error.string().toStdString();
-    Utils::rm_nl(tr);
-    qDebug("%s(%sAVError%s)%s::%s %s", GRE, RED, GRE, RED, ERR, tr.c_str());
+    string txt = error.string().toStdString();
+    Utils::rm_nl(txt);
+    qDebug("%s(%sAVError%s)%s::%s %s", GRE, RED, GRE, RED, ERR, txt.c_str());
+
+    #if defined(Q_OS_LINUX)
+        /** Notificações de erro */
+        QStringList err = error.string().split('\n');
+        err.append(Utils::mediaTitle(mediaPlayer->file()));
+        err.append(err[0][0].toUpper());
+        err[2].append("\n" + err[1]);
+        err[3].append(err[0].remove(0, 1));
+        notify_send(err[3].toStdString().c_str(), err[2].toStdString().c_str());
+    #endif
 
     if (!QFileInfo::exists(mediaPlayer->file()) || invalid) {
         if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {

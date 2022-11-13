@@ -8,9 +8,9 @@
 #include <QSpinBox>
 #include <QToolButton>
 
-#include <ClickableMenu>
-#include <Utils>
+#include "ClickableMenu.h"
 #include "PropertyEditor.h"
+#include "Utils.h"
 
 
 /**********************************************************************************************************************/

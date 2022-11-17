@@ -5,6 +5,7 @@ project(OMPlayer VERSION 2.0)
 # Para adicionar módulos extras
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(Deps_File)
+include(GNUInstallDirs)
 
 
 # Se precisar está aqui. Verifica a versão do gcc.
@@ -29,7 +30,12 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 message(STATUS "Current Directory: " ${PROJECT_SOURCE_DIR})
+message(STATUS "Default CMAKE_INSTALL_PREFIX: " ${CMAKE_INSTALL_PREFIX})
 
+if(${CMAKE_BUILD_TYPE} MATCHES "Release")
+    set(CMAKE_INSTALL_PREFIX /usr)
+    message(STATUS "CMAKE_INSTALL_PREFIX for Release: " ${CMAKE_INSTALL_PREFIX})
+endif()
 
 # Habilitando thread
 set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
@@ -139,11 +145,38 @@ target_link_libraries(
         Qt5::Widgets
         mediainfo dl
         ${QTAV} ${QTAVWIDGETS_LIBRARIES}
-        $<$<PLATFORM_ID:Linux>:${LIB_NOTIFY_LIBRARIES}>
 )
 
 
 # Incluindo diretório do libnotify
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    target_link_libraries(OMPlayer ${LIB_NOTIFY_LIBRARIES})
     target_include_directories(OMPlayer PRIVATE ${LIB_NOTIFY_INCLUDE_DIRS})
 endif ()
+
+# Instalando o programa
+########################################################################################################################
+
+install(TARGETS OMPlayer mediainfo DESTINATION share/${PROJECT_NAME})
+
+file(GLOB ZEN_LIBS ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so*)
+install(FILES ${ZEN_LIBS} DESTINATION share/${PROJECT_NAME})
+
+file(GLOB TRANSLATION ${PROJECT_SOURCE_DIR}/i18n/*.qm)
+install(FILES ${TRANSLATION} DESTINATION share/${PROJECT_NAME}/i18n)
+
+install(FILES appdata/run
+        PERMISSIONS WORLD_EXECUTE
+                    GROUP_EXECUTE GROUP_WRITE GROUP_READ
+                    OWNER_EXECUTE OWNER_WRITE OWNER_READ
+        DESTINATION share/${PROJECT_NAME})
+
+install(FILES ChangeLog LICENSE README.md DESTINATION doc/${PROJECT_NAME}-${PROJECT_VERSION})
+install(FILES appdata/notify.png appdata/logo.png DESTINATION share/${PROJECT_NAME}/appdata)
+install(FILES appdata/OMPlayer.desktop DESTINATION share/applications)
+install(FILES appdata/OMPlayer.png DESTINATION share/pixmaps)
+
+install(DIRECTORY icons qss DESTINATION share/${PROJECT_NAME})
+
+install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin)")
+install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ../share/OMPlayer/run \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/OMPlayer)")

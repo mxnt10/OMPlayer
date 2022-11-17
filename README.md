@@ -31,7 +31,7 @@
 <h1>Shotcuts</h1>
 <h3>
   <ul>
-    <li>📂 <sub>𝗖𝘁𝗿𝗹+𝗔 oɾ 𝗖𝘁𝗿𝗹+𝗢: Open files.</sub></li>
+    <li>📂 <sub>𝗖𝘁𝗿𝗹+𝗢: Open files.</sub></li>
     <li>🔀 <sub>𝗖𝘁𝗿𝗹+𝗛: Shuffle mode.</sub></li>
     <li>🔁 <sub>𝗖𝘁𝗿𝗹+𝗧: Repeɑt mode.</sub></li>
     <li>🔂 <sub>𝗖𝘁𝗿𝗹+𝗔𝗹𝘁+𝗧: Repeɑt cuɾɾent mediɑ (ɾepeɑt one).</sub></li>
@@ -49,8 +49,11 @@ To instɑll 𝗢𝗠𝗣𝗹𝗮𝘆𝗲𝗿, use the following commɑnds:
 $ git clone https://github.com/mxnt10/OMPlayer.git
 $ cd OMPlayer
 
-$ sudo su
-# install_root=/usr ./install.sh
+$ mkdir -p build;
+$ cd build
+$ cmake -DCMAKE_BUILD_TYPE="Release" ..
+$ make
+$ sudo make install
 ```
 The scɾipt ɑlɾeɑdγ does the compilɑtion.
 

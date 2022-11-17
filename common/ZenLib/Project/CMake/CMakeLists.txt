@@ -156,16 +156,16 @@ set_target_properties(zen PROPERTIES
   CXX_STANDARD_REQUIRED YES
   )
 
-install(TARGETS zen EXPORT zen-export
-  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib
-  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
-
-install(FILES ${ZenLib_format_html_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Html)
-install(FILES ${ZenLib_format_http_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Http)
-
-install(EXPORT zen-export DESTINATION ${ZenLib_CONFIG_INSTALL_DIR} FILE ZenLibTargets.cmake)
+#install(TARGETS zen EXPORT zen-export
+#  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib
+#  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+#  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+#  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+#
+#install(FILES ${ZenLib_format_html_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Html)
+#install(FILES ${ZenLib_format_http_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Http)
+#
+#install(EXPORT zen-export DESTINATION ${ZenLib_CONFIG_INSTALL_DIR} FILE ZenLibTargets.cmake)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake_uninstall.cmake.in"
@@ -178,8 +178,8 @@ if(PKG_CONFIG_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libzen.pc.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
                  @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
-          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+#  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
+#          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
 # cmake-modules
@@ -192,10 +192,10 @@ configure_package_config_file(
 
 write_basic_config_version_file(ZenLibConfigVersion.cmake VERSION ${ZenLib_VERSION} COMPATIBILITY AnyNewerVersion)
 
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfigVersion.cmake
-  DESTINATION ${ZenLib_CONFIG_INSTALL_DIR})
+#install(FILES
+#  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfig.cmake
+#  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfigVersion.cmake
+#  DESTINATION ${ZenLib_CONFIG_INSTALL_DIR})
 
 if(NOT TARGET uninstall)
   add_custom_target(uninstall

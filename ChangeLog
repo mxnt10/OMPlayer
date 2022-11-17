@@ -64,6 +64,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - setTotalItems() em Player, não mais necessário.
     - onLoad() em Player, não mais necessário.
  - Removido atalho com Ctrl+A para abrir arquivos, já tem o Ctrl+O.
+ - Removido install.sh, pode ser usado make install normalmente.
 ###
 
 ### Fixed / Corrigido

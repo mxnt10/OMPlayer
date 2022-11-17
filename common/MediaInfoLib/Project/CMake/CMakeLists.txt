@@ -410,17 +410,17 @@ set_target_properties(mediainfo PROPERTIES
   CXX_STANDARD_REQUIRED YES
 )
 
-install(TARGETS mediainfo EXPORT mediainfo-export
-  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+#install(TARGETS mediainfo EXPORT mediainfo-export
+#  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+#  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+#  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
 
-install(EXPORT mediainfo-export DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR} FILE MediaInfoLibTargets.cmake)
+#install(EXPORT mediainfo-export DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR} FILE MediaInfoLibTargets.cmake)
 
 foreach(HEADER ${MediaInfoLib_PUBLIC_HDRS})
   string(REPLACE ${MediaInfoLib_SOURCES_PATH} "" DIR ${HEADER})
   string(REGEX REPLACE "/[^/]*$" "" DIR ${DIR})
-  install(FILES ${HEADER} DESTINATION include/${DIR})
+#  install(FILES ${HEADER} DESTINATION include/${DIR})
 endforeach(HEADER ${MediaInfoLib_PUBLIC_HDRS})
 
 # pkg-config
@@ -429,8 +429,8 @@ if(PKG_CONFIG_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libmediainfo.pc.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
                  @ONLY)
-  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
-          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+#  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
+#          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
 # cmake-modules
@@ -445,7 +445,7 @@ configure_package_config_file(
 
 write_basic_config_version_file(MediaInfoLibConfigVersion.cmake VERSION ${MediaInfoLib_VERSION} COMPATIBILITY AnyNewerVersion)
 
-install(FILES
-  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfig.cmake
-  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfigVersion.cmake
-  DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR})
+#install(FILES
+#  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfig.cmake
+#  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfigVersion.cmake
+#  DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR})

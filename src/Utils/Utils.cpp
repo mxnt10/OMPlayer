@@ -49,7 +49,7 @@ QString Utils::setIcon(Utils::STATUS logo) {
         if (logo == Utils::Notify && !def.definedNotify.isEmpty() && QFileInfo::exists(def.definedNotify))
             return def.definedNotify;
         qDebug("%s(%sUtils%s)%s::%sSetando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
-        locals.append({def.defaultDir + "/logo", def.localDir + "/appdata", def.currentDir + "/appdata"});
+        locals.append({def.defaultDir + "/appdata", def.localDir + "/appdata", def.currentDir + "/appdata"});
         if (logo == Utils::Logo) icon = "/logo.png";
         else if (logo == Utils::Notify) icon = "/notify.png";
     } else {

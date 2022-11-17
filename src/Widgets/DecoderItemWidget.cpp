@@ -81,7 +81,7 @@ void DecoderItemWidget::toggleEditorVisible() {
     if (editorWidget->isVisible()) name = "remove";
     iconName = name;
 
-    expandBtn->setIcon(QIcon(Utils::setIconTheme(theme, name)));
+    Utils::changeIcon(expandBtn, name);
     parentWidget()->adjustSize();
 }
 

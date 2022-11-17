@@ -1,0 +1,12 @@
+#!/bin/bash
+
+: "$(readlink -e -- "$0")"; HERE="${_%/*}"
+cd "$HERE" || exit 1
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"$HERE"
+
+[ "$(grep -E "nouveau|nvidia" <(lsmod))" ] && {
+    LIBGL_ALWAYS_SOFTWARE=1 "$HERE/OMPlayer" "$@" || exit 1
+} || {
+    "$HERE/OMPlayer" "$@" || exit 1
+}

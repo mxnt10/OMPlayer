@@ -10,6 +10,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
     - Adicionado Deps_File.cmake em cmake.
     - Adicionado FindQtAV.cmake em cmake.
     - Adicionado notify.png em appdata.
+    - Adicionado run em appdata.
     - Incrementado mais ícones aos temas.
  - Sources:
     - Adicionado Decoder.{cpp/h} em src.

@@ -6,10 +6,10 @@ QSlider::groove {
     height: 2px;
 }
 
+
 /* Mouse sobre a barra horizontal */
-QSlider::groove:hover {
-    background-color: rgba(20, 100, 200, 50);
-}
+QSlider::groove:hover { background-color: rgba(20, 100, 200, 50); }
+
 
 /* Definição do seletor */
 QSlider::handle {
@@ -19,6 +19,7 @@ QSlider::handle {
     margin: -7 -2;
     width: 10px;
 }
+
 
 /* Definição do progresso */
 QSlider::sub-page {

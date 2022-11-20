@@ -4,10 +4,10 @@ QListView {
     border: 0;
 }
 
+
 /* Definição do scroolbar */
-QScrollBar {
-    background-color: transparent;
-}
+QScrollBar { background-color: transparent; }
+
 
 /* Definição das barras do scroolbar */
 QScrollBar::handle {
@@ -15,21 +15,18 @@ QScrollBar::handle {
     border-radius: 8px;
 }
 
-/* Específico para a barra vertical */
-QScrollBar::handle:vertical {
-    margin: 20 0;
-}
 
-/* Específico para a barra horizontal */
-QScrollBar::handle:horizontal {
-    margin: 0 20;
-}
+/* Específico para a barra vertical e horizontal */
+QScrollBar::handle:vertical { margin: 20 0; }
+QScrollBar::handle:horizontal { margin: 0 20; }
+
 
 /* Definição para as bordas dos arrows */
 QScrollBar::add-line, QScrollBar::sub-line {
     border: 2px solid #cccccc;
     border-radius: 8px;
 }
+
 
 /* Definições para todos os arrows */
 QScrollBar::up-arrow, QScrollBar::down-arrow, QScrollBar::left-arrow, QScrollBar::right-arrow {

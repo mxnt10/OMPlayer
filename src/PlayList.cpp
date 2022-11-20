@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QMoveEvent>
 #include <QPropertyAnimation>
+#include <QScrollBar>
 #include <QStandardPaths>
 #include <QTextCodec>
 #include <QTimer>
@@ -141,6 +142,13 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
         listView->setFixedWidth(JsonTools::intJson("pls_listsize"));
         delegate->setWith(JsonTools::intJson("pls_size"));
     } else listView->setFixedWidth(280);
+
+
+    /** Desativando menu de contexto dos scroolbar */
+    foreach(QObject *widget, qApp->allWidgets()) {
+        auto *scrollBar = dynamic_cast<QScrollBar*>(widget);
+        if(scrollBar) scrollBar->setContextMenuPolicy(Qt::NoContextMenu);
+    }
 }
 
 

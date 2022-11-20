@@ -1,6 +1,7 @@
 #include <QtAV>
-#include <QScrollArea>
 #include <QLabel>
+#include <QScrollArea>
+#include <QScrollBar>
 #include <Utils>
 
 #include "Decoder.h"
@@ -14,9 +15,12 @@ Decoder::Decoder(QWidget *parent): QWidget(parent) {
 
     /** Widget para inserir os widgets gerados */
     auto *scrollAreaWidgetContents = new QWidget(this);
+    scrollAreaWidgetContents->setAttribute(Qt::WA_NoSystemBackground, true);
+    scrollAreaWidgetContents->setAttribute(Qt::WA_TranslucentBackground, true);
     auto *scrollArea = new QScrollArea(this);
     scrollArea->setWidgetResizable(true);
     scrollArea->setWidget(scrollAreaWidgetContents);
+    scrollArea->setStyleSheet(Utils::setStyle("playlist"));
 
 
     /** Definindo opções de decodificação */
@@ -67,8 +71,17 @@ Decoder::Decoder(QWidget *parent): QWidget(parent) {
 
     /** Layout geral */
     auto *vbs = new QVBoxLayout(this);
+    vbs->setMargin(1);
     vbs->addWidget(scrollArea);
+
+
+    /** Desativando menu de contexto dos scroolbar */
+    foreach(QObject *widget, qApp->allWidgets()) {
+        auto *scrollBar = dynamic_cast<QScrollBar*>(widget);
+        if(scrollBar) scrollBar->setContextMenuPolicy(Qt::NoContextMenu);
+    }
 }
+
 
 /** Destrutor */
 Decoder::~Decoder() = default;

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 2.0 ] - 2022-11-13 ##################################################
+## [ 2.0 ] - 2022-11-20 ##################################################
 
 ### Added / Adicionado
  - Arquivos:
@@ -85,6 +85,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Correções para adicionar as opções de decodificação em caso de
    arquivos de áudio.
  - Correções na função de verificação de faixas de áudio.
+ - Tirando o menu de contexto dos scroolbars.
 ###
 
 ##########################################################################

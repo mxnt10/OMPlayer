@@ -5,6 +5,7 @@ QMenu {
     border-radius: 10px;
 }
 
+
 /* Definição do separador do menu */
 QMenu::separator {
     background-color: #cccccc;
@@ -13,11 +14,13 @@ QMenu::separator {
     height: 2px;
 }
 
+
 /* Definição dos itens do menu */
 QMenu::item {
     border: 6px solid black;
     border-radius: 8px;
 }
+
 
 /* Definição dos itens selecionados */
 QMenu::item:selected {

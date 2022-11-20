@@ -6,11 +6,13 @@ QMenu {
     color: white;
 }
 
+
 /* Definição dos itens do menu */
 QMenu::item {
     border: 6px solid black;
     border-radius: 8px;
 }
+
 
 /* Definição dos itens selecionados */
 QMenu::item:selected {
@@ -18,7 +20,8 @@ QMenu::item:selected {
     border: 6px solid #0064c8;
 }
 
-/* Definição do indicador de seleção */
+
+/* Definições para indicador de seleção */
 QMenu::indicator {
     border: 8px solid transparent;
     border-radius: 11px;
@@ -26,15 +29,9 @@ QMenu::indicator {
     width: 6px;
 }
 
-/* Definição não selecionada */
-QMenu::indicator:exclusive:unchecked {
-    background-color: #202020;
-}
+QMenu::indicator:exclusive:unchecked { background-color: #202020; }
+QMenu::indicator:exclusive:checked { background-color: white;}
 
-/* Definição selecionada */
-QMenu::indicator:exclusive:checked {
-    background-color: white;
-}
 
 /* Definição para o spinbox da velocidade de execução */
 QDoubleSpinBox {

@@ -75,9 +75,7 @@ void DecoderItemWidget::toggleEditorVisible() {
     if (!editorWidget) return;
     editorWidget->setVisible(!editorWidget->isVisible());
 
-    QString theme = Utils::setThemeName();
     QString name{"add"};
-
     if (editorWidget->isVisible()) name = "remove";
     iconName = name;
 
@@ -92,9 +90,7 @@ void DecoderItemWidget::checkPressed() { QTimer::singleShot(500, [this](){ Q_EMI
 
 /** Alterando o ícone dos botões */
 void DecoderItemWidget::changeIcons() {
-    QString theme = Utils::setThemeName();
     QString name{"add"};
-
     if (iconName == "remove") name = "remove";
-    expandBtn->setIcon(QIcon(Utils::setIconTheme(theme, name)));
+    Utils::changeIcon(expandBtn, name);
 }

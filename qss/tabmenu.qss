@@ -7,10 +7,10 @@ QMenu {
     color: white;
 }
 
+
 /* Definição dos itens do menu */
-QMenu::item {
-    padding: 5px;
-}
+QMenu::item { padding: 5px; }
+
 
 /* Definindo os indicadores do menu */
 QMenu::indicator {
@@ -20,10 +20,10 @@ QMenu::indicator {
     height: 14px;
 }
 
+
 /* Indicadores não checados e selecionados */
-QMenu::indicator:non-exclusive:unchecked:selected {
-    border-color: #3daee9;
-}
+QMenu::indicator:non-exclusive:unchecked:selected { border-color: #3daee9; }
+
 
 /* Menu não exclusivo pressionado */
 QMenu::indicator:non-exclusive:checked {

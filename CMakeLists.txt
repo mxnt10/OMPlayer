@@ -159,7 +159,12 @@ endif ()
 
 install(TARGETS OMPlayer mediainfo DESTINATION share/${PROJECT_NAME})
 
-file(GLOB ZEN_LIBS ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so*)
+set(ZEN_LIBS
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0.4.39
+)
+
 install(FILES ${ZEN_LIBS} DESTINATION share/${PROJECT_NAME})
 
 file(GLOB TRANSLATION ${PROJECT_SOURCE_DIR}/i18n/*.qm)

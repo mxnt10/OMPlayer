@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <Button>
 
-#define VERSION "2.0"
+#define VERSION "2.0.1"
 #define STR qUtf8Printable
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug
@@ -38,6 +38,10 @@
 #define arrowMouse()  QApplication::setOverrideCursor(QCursor(Qt::ArrowCursor))
 #define blankMouse()  QApplication::setOverrideCursor(QCursor(Qt::BlankCursor))
 #define resizeMouse() QApplication::setOverrideCursor(QCursor(Qt::SizeHorCursor))
+
+#ifdef __linux__
+    void notify_send(const char *title, const char *msg);
+#endif
 
 using namespace std;
 

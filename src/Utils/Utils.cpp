@@ -11,6 +11,27 @@
 /**********************************************************************************************************************/
 
 
+#ifdef __linux__
+    #undef signals
+    #include <libnotify/notify.h>
+
+    /** Exibição de notificações do sistema usando libnotify */
+    void notify_send(const char *title, const char *msg) {
+        NotifyNotification *n;
+        notify_init("Open Multimedia Player");
+
+        n = notify_notification_new(title, msg, Utils::setIcon(Utils::Notify).toStdString().c_str());
+        notify_notification_set_timeout(n, 5000);
+
+        if (!notify_notification_show(n, nullptr)) return;
+
+        g_object_unref(G_OBJECT(n));
+    }
+
+    #define signals public
+#endif
+
+
 /** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
 void Utils::initUtils(Utils::STATUS option) {
     if (option == Default) {

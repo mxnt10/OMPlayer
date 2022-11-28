@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer VERSION 2.0)
+project(OMPlayer VERSION 2.0.1)
 
 
 # Para adicionar módulos extras
@@ -96,23 +96,23 @@ endif ()
 
 
 # Buscando fontes do programa em src
-file(GLOB SRC_FILES LIST_DIRECTORIES FALSE ${PROJECT_SOURCE_DIR}/src/*.*)
+file(GLOB SRC_FILES LIST_DIRECTORIES FALSE ${PROJECT_SOURCE_DIR}/src/*)
 update_deps_file(${SRC_FILES})
 
 
 # Buscando utilitários da playlist
-file(GLOB PLS_FILES ${PROJECT_SOURCE_DIR}/src/PlayListUtils/*.*)
+file(GLOB PLS_FILES ${PROJECT_SOURCE_DIR}/src/PlayListUtils/*)
 update_deps_file(${PLS_FILES})
 
 
 # Buscando widgets do programa
-file(GLOB WIDGETS_FILES ${PROJECT_SOURCE_DIR}/src/Widgets/*.*)
+file(GLOB WIDGETS_FILES ${PROJECT_SOURCE_DIR}/src/Widgets/*)
 update_deps_file(${WIDGETS_FILES})
 
 
 # Buscando utilitários do programa
-file(GLOB UTILS_FILES ${PROJECT_SOURCE_DIR}/src/Utils/*.*)
-string(REGEX MATCHALL "${PROJECT_SOURCE_DIR}/src/Utils/[U|J|P][a-zA-Z]*[.][a-zA-Z]*" UTILS_FILES ${UTILS_FILES})
+file(GLOB UTILS_FILES ${PROJECT_SOURCE_DIR}/src/Utils/*)
+#string(REGEX MATCHALL "${PROJECT_SOURCE_DIR}/src/Utils/[U|J|P][a-zA-Z]*[.][a-zA-Z]*" UTILS_FILES ${UTILS_FILES})
 update_deps_file(${UTILS_FILES})
 
 
@@ -120,7 +120,6 @@ update_deps_file(${UTILS_FILES})
 add_executable(
         OMPlayer
         ${SRC_FILES} ${PLS_FILES} ${WIDGETS_FILES} ${UTILS_FILES} ${SRC_SCREENSAVER}
-        $<$<PLATFORM_ID:Linux>:${PROJECT_SOURCE_DIR}/src/Utils/Notify.h>
 )
 
 
@@ -160,7 +159,6 @@ endif ()
 install(TARGETS OMPlayer mediainfo DESTINATION share/${PROJECT_NAME})
 
 set(ZEN_LIBS
-        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so
         ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0
         ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0.4.39
 )

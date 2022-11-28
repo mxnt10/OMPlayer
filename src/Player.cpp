@@ -1,7 +1,3 @@
-#ifdef __linux__
-    #include <Notify.h>
-#endif
-
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>

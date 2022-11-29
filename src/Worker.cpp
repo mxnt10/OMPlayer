@@ -31,24 +31,17 @@ void Worker::requestWork() {
 
 
 /** Thread para obter o hash md5 de um arquivo */
-void Worker::doHash() {
+void Worker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
-    QString hash{Utils::setHash(file)};
-    Q_EMIT valueMD5(hash);
-
-    DG_T << "Finalizando o thread " << QThread::currentThreadId();
-    Q_EMIT finished();
-}
-
-void Worker::doFormat() {
-    DG_T << "Iniciando o thread " << QThread::currentThreadId();
-
-    MI.Open(file.toStdWString()); //TODO: thread.
+    MI.Open(file.toStdWString());
     QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
                                                     MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
     MI.Close();
     Q_EMIT valueFormat(format);
+
+    QString hash{Utils::setHash(file)};
+    Q_EMIT valueMD5(hash);
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
     Q_EMIT finished();

@@ -20,8 +20,7 @@ Q_SIGNALS:
     void finished();
 
 public Q_SLOTS:
-    void doHash();
-    void doFormat();
+    void doWork();
 
 private:
     QString file{};

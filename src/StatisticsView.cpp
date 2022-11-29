@@ -24,9 +24,8 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     worker = new Worker();
     worker->moveToThread(thread);
     connect(worker, &Worker::valueMD5, this, &StatisticsView::setMd5);
-    connect(thread, &QThread::started, worker, &Worker::doHash);
     connect(worker, &Worker::valueFormat, this, &StatisticsView::setFormat);
-    connect(thread, &QThread::started, worker, &Worker::doFormat);
+    connect(thread, &QThread::started, worker, &Worker::doWork);
     connect(worker, &Worker::workRequested, [this](){ thread->start(); });
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
 

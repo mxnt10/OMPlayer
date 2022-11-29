@@ -25,10 +25,12 @@ protected:
     void timerEvent(QTimerEvent *event) override;
 
 Q_SIGNALS:
+    void emitFormat(const QString &format);
     void emitclose();
 
 private Q_SLOTS:
     void setMd5(const QString &md5);
+    void setFormat(const QString &format);
     void onClose();
 
 private:
@@ -50,7 +52,7 @@ private:
     QList<QTreeWidgetItem*> baseItems{};
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
-    QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{};
+    QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{}, *FORMAT{};
     QString ctime{}, fsize{}, url{};
     QtAV::Statistics statistics{};
     int timer{0};

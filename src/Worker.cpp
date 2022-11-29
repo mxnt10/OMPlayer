@@ -41,4 +41,17 @@ void Worker::doHash() {
     Q_EMIT finished();
 }
 
+void Worker::doFormat() {
+    DG_T << "Iniciando o thread " << QThread::currentThreadId();
+
+    MI.Open(file.toStdWString()); //TODO: thread.
+    QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
+                                                    MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
+    MI.Close();
+    Q_EMIT valueFormat(format);
+
+    DG_T << "Finalizando o thread " << QThread::currentThreadId();
+    Q_EMIT finished();
+}
+
 #undef DG_T

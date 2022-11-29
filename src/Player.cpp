@@ -50,6 +50,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     lvol = new Label(CENTER, 42, 22, wvol);
     lvol->setStyleSheet(Utils::setStyle("label"));
 
+
     /** Janelas de configurações do programa, informações e demais */
     about = new About(this);
     sett = new Settings(this);
@@ -59,6 +60,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(sett, &Settings::emitvalue, this, &OMPlayer::setRenderer);
     connect(sett, &Settings::emitclose, this, &OMPlayer::closeDialog);
     connect(infoview, &StatisticsView::emitclose, this, &OMPlayer::closeDialog);
+    connect(infoview, &StatisticsView::emitFormat, this, &OMPlayer::changePlaylist);
     connect(about, &About::emitclose, this, &OMPlayer::closeDialog);
 
 
@@ -652,20 +654,6 @@ void OMPlayer::onStart() {
     Width = mediaPlayer->statistics().video_only.width;
     Height = mediaPlayer->statistics().video_only.height;
 
-    /** Atualizando o status do item da playlist se necessário */
-    if (playlist->setDuration() == 0) {
-        int row = playlist->selectItems();
-        QString url = mediaPlayer->file();
-        qint64 duration = mediaPlayer->mediaStopPosition();
-
-        MI.Open(url.toStdWString()); //TODO: thread.
-        QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
-                                                        MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
-        MI.Close();
-
-        qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(url));
-        playlist->updateItems(row, duration, format);
-    }
 
     /** Definindo o tempo de duração no slider */
     slider->setMinimum(int(mediaPlayer->mediaStartPosition()));
@@ -709,6 +697,17 @@ void OMPlayer::onStop() {
             powersaving = false;
         }
     }
+}
+
+
+/** Atualização dos itens da playlist */
+void OMPlayer::changePlaylist(const QString &format) {
+    int row = playlist->selectItems();
+    QString url = mediaPlayer->file();
+    qint64 duration = mediaPlayer->mediaStopPosition();
+
+    qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(url));
+    playlist->updateItems(row, duration, format);
 }
 
 

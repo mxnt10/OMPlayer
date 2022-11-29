@@ -18,12 +18,15 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     setModal(true);
     setFocus();
 
+
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
     worker = new Worker();
     worker->moveToThread(thread);
     connect(worker, &Worker::valueMD5, this, &StatisticsView::setMd5);
     connect(thread, &QThread::started, worker, &Worker::doHash);
+    connect(worker, &Worker::valueFormat, this, &StatisticsView::setFormat);
+    connect(thread, &QThread::started, worker, &Worker::doFormat);
     connect(worker, &Worker::workRequested, [this](){ thread->start(); });
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
 
@@ -41,6 +44,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     CTIME = baseItems[5];
     FPS = videoItems[6];
     MD5 = baseItems[6];
+    FORMAT = baseItems[3];
 
 
     /** Botão para fechar a janela */
@@ -116,6 +120,13 @@ StatisticsView::~StatisticsView() {
 void StatisticsView::setMd5(const QString &md5) { MD5->setData(1, Qt::DisplayRole, md5); }
 
 
+/** setar nas informações o hash MD5 dos arquivos multimídia */
+void StatisticsView::setFormat(const QString &format) {
+    FORMAT->setData(1, Qt::DisplayRole, format);
+    if (QString::compare(FORMAT->text(1), "") != 0) emit emitFormat(format);
+}
+
+
 /** Emissão para fechar a janela */
 void StatisticsView::onClose() {
     qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
@@ -179,7 +190,7 @@ QVariantList StatisticsView::getBaseInfoValues(const QtAV::Statistics& s) {
         << QString(s.url).remove(QRegExp("\\/(?:.(?!\\/))+$"))
         << QString(s.url).remove(QRegExp("\\/.+\\/"))
         << fsize
-        << s.format
+        << QString()
         << rate
         << duration
         << QString();
@@ -235,6 +246,9 @@ void StatisticsView::initItems(QList<QTreeWidgetItem *> *items, const QStringLis
 void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
+
+    QList<QTreeWidgetItem*> item = {FORMAT, FPS, MD5, CTIME};
+    for(QTreeWidgetItem* i : item) i->setData(1, Qt::DisplayRole, "");
 
     int i = 0;
     ctime = "00:00:00";
@@ -301,8 +315,11 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     this->setMinimumSize(csize, 340);
     this->resize(csize, this->height());
 
+    /** Buscando informações em segundo plano */
     worker->setFile(s.url);
     MD5->setData(1, Qt::DisplayRole, tr("Calculating..."));
+    FORMAT->setData(1, Qt::DisplayRole, tr("Searching..."));
+
     if (thread->isRunning()) thread->quit();
     worker->requestWork();
 }

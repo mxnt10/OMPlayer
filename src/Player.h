@@ -12,10 +12,9 @@
 #include <QStackedWidget>
 #include <QTimer>
 
-#include <MediaInfoDLL.h>
-#include <ScreenSaver>
 #include <Button>
 #include <Label>
+#include <ScreenSaver>
 #include <Slider>
 
 #include "About.h"
@@ -66,6 +65,7 @@ private Q_SLOTS:
     void onPaused(bool p);
     void onStart();
     void onStop();
+    void changePlaylist(const QString &format);
     void setRepeat();
     void setReplay();
     void setShuffle();
@@ -109,7 +109,6 @@ private:
     Button *volumeBtn{};
     EventFilter *filter{};
     Label *logo{}, *current{}, *end{};
-    MediaInfoDLL::MediaInfo MI{};
     PlayList *playlist{};
     QAction *channelAction{}, *aspectAction{}, *trackAction{};
     QActionGroup *ta{};

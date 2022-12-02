@@ -23,6 +23,8 @@ protected:
     void hideEvent(QHideEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
 
 Q_SIGNALS:
     void emitFormat(const QString &format);
@@ -39,23 +41,27 @@ private:
     static QStringList getBaseInfoKeys();
     static QStringList getVideoInfoKeys();
     static QStringList getAudioInfoKeys();
+    static QStringList getMetaDataKeys();
     QVariantList getBaseInfoValues(const QtAV::Statistics &s);
     static QVariantList getVideoInfoValues(const QtAV::Statistics &s);
     static QVariantList getAudioInfoValues(const QtAV::Statistics &s);
+    static QVariantList getMetaDataValues(const QtAV::Statistics &s);
     static void initItems(QList<QTreeWidgetItem*> *items, const QStringList &itemlist);
 
 private:
     Button *closebtn{};
     Button *ratio{}, *screen{};
     QTabWidget *tab{};
-    TreeView *view1{}, *view2{}, *view3{};
+    TreeView *view1{}, *view2{}, *view3{}, *view4{};
     QList<QTreeWidgetItem*> baseItems{};
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
+    QList<QTreeWidgetItem*> metadata{};
     QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{}, *FORMAT{};
     QString ctime{}, fsize{}, url{};
     QtAV::Statistics statistics{};
     int timer{0};
+    bool onclose{false};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with
     QList<int> fuhdh{5120, 4320};        //8k heith

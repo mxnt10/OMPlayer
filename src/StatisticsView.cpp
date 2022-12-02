@@ -1,6 +1,8 @@
+#include <QCloseEvent>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QLayout>
+#include <QTimer>
 #include <QTimerEvent>
 #include <Utils>
 
@@ -34,12 +36,14 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     initItems(&baseItems, getBaseInfoKeys());
     initItems(&videoItems, getVideoInfoKeys());
     initItems(&audioItems, getAudioInfoKeys());
+    initItems(&metadata, getMetaDataKeys());
 
 
     /** Criando visualizador para as informações */
     view1 = new TreeView(baseItems);
     view2 = new TreeView(videoItems);
     view3 = new TreeView(audioItems);
+    view4 = new TreeView(metadata);
     CTIME = baseItems[5];
     FPS = videoItems[6];
     MD5 = baseItems[6];
@@ -56,18 +60,21 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     auto *geral= new QVBoxLayout(infogeral);
     geral->addWidget(view1);
     auto *infovideo = new QWidget();
-    auto *video = new QGridLayout(infovideo);
+    auto *video = new QVBoxLayout(infovideo);
     video->addWidget(view2);
     auto *infoaudio = new QWidget();
-    auto *audio = new QGridLayout(infoaudio);
+    auto *audio = new QVBoxLayout(infoaudio);
     audio->addWidget(view3);
-
+    auto *metadataw = new QWidget();
+    auto *mdata = new QVBoxLayout(metadataw);
+    mdata->addWidget(view4);
 
     /** Organização por abas */
     tab = new QTabWidget();
     tab->addTab(infogeral, tr("General"));
     tab->addTab(infovideo, tr("Video"));
     tab->addTab(infoaudio, tr("Audio"));
+    tab->addTab(metadataw, tr("MedaData"));
     tab->setStyleSheet(Utils::setStyle("tab"));
 
 
@@ -128,8 +135,9 @@ void StatisticsView::setFormat(const QString &format) {
 
 /** Emissão para fechar a janela */
 void StatisticsView::onClose() {
-    qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
+    qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de informações ...\033[0m", GRE, RED, GRE, RED, CYA);
     Q_EMIT emitclose();
+    onclose = true;
     this->close();
 }
 
@@ -174,6 +182,19 @@ QStringList StatisticsView::getAudioInfoKeys() {
         << tr("Frames")
         << tr("Frame Size")
         << tr("Frame Rate");
+}
+
+
+/** Especificações para informações de metadados */
+QStringList StatisticsView::getMetaDataKeys() {
+    return QStringList()
+            << tr("Title")
+            << tr("Artist")
+            << tr("Album")
+            << tr("Genre")
+            << tr("Track")
+            << tr("Date")
+            << tr("Link");
 }
 
 
@@ -230,6 +251,37 @@ QVariantList StatisticsView::getAudioInfoValues(const QtAV::Statistics& s) {
 }
 
 
+/** Informações de metadados */
+QVariantList StatisticsView::getMetaDataValues(const QtAV::Statistics& s) {
+    QStringList infos{"title", "artist", "album", "genre", "track", "date", "purl"};
+    QVariantList values{};
+    QStringList keys{s.metadata.keys()};
+
+    for(const QString &inf : infos) {
+        if (keys.contains(inf, Qt::CaseInsensitive)) {
+            if (inf == "date") {
+                QDate dt = QDate::fromString(s.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]), "yyyyMMdd");
+                values.append(dt.toString("yyyy-MM-dd"));
+            } else if (inf == "track") {
+                QStringList tm = keys.filter("track", Qt::CaseInsensitive);
+                if (tm.contains("tracktotal", Qt::CaseInsensitive)) {
+
+                    QString tot = s.metadata.value(tm.filter("tracktotal", Qt::CaseInsensitive)[0]);
+                    tm.removeOne(keys.filter("tracktotal", Qt::CaseInsensitive)[0]);
+                    QString tr = s.metadata.value(tm.filter("track", Qt::CaseInsensitive)[0]);
+
+                    if (tot == "") values.append(s.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]));
+                    else values.append(QString::fromLatin1("%1 / %2").arg(tr, tot));
+
+                } else values.append(s.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]));
+            } else values.append(s.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]));
+        } else values.append("");
+    }
+
+    return values;
+}
+
+
 /** Função para coletar as informações básicas dos items */
 void StatisticsView::initItems(QList<QTreeWidgetItem *> *items, const QStringList &itemlist) {
     QTreeWidgetItem *item;
@@ -245,6 +297,8 @@ void StatisticsView::initItems(QList<QTreeWidgetItem *> *items, const QStringLis
 void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
+
+    qDebug() << s.metadata.keys();
 
     QList<QTreeWidgetItem*> item = {FORMAT, FPS, MD5, CTIME};
     for(QTreeWidgetItem* i : item) i->setData(1, Qt::DisplayRole, "");
@@ -292,20 +346,32 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
         ++i;
     }
 
+    v = getMetaDataValues(s);
+    i = 0;
+
+    /** Atualizando informações de metadados */
+    foreach(QTreeWidgetItem* it, metadata) {
+        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
+        ++i;
+    }
+
     /** Buscando o maior comprimento para a janela */
     view1->header()->setStretchLastSection(false);
     view2->header()->setStretchLastSection(false);
     view3->header()->setStretchLastSection(false);
+    view4->header()->setStretchLastSection(false);
 
     settaginfos();
     visibility();
     int csize = view1->size();
     if (csize < view2->size()) csize = view2->size();
     if (csize < view3->size()) csize = view3->size();
+    if (csize < view4->size()) csize = view4->size();
 
     view1->header()->setStretchLastSection(true);
     view2->header()->setStretchLastSection(true);
     view3->header()->setStretchLastSection(true);
+    view4->header()->setStretchLastSection(true);
 
     csize = csize + 40;
     qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
@@ -333,10 +399,11 @@ void StatisticsView::setCurrentTime(int current) {
 /** Verificar o que precisa ser oculto */
 void StatisticsView::visibility(){
     /** Redefinindo visualização */
-    for (int i = 0; i < 3; i++) tab->setTabVisible(i, false);
-    for (int i = 0; i < 3; i++) tab->setTabVisible(i, true);
+    for (int i = 0; i < 4; i++) tab->setTabVisible(i, false);
+    for (int i = 0; i < 4; i++) tab->setTabVisible(i, true);
     for (int i = 0; i < view2->topLevelItemCount(); ++i) view2->topLevelItem(i)->setHidden(false);
     for (int i = 0; i < view3->topLevelItemCount(); ++i) view3->topLevelItem(i)->setHidden(false);
+    for (int i = 0; i < view4->topLevelItemCount(); ++i) view4->topLevelItem(i)->setHidden(false);
 
     /** Verificando status de vídeo e áudio e o que precisa ser oculto */
     if (!statistics.video.available) tab->setTabVisible(1, false);
@@ -351,6 +418,22 @@ void StatisticsView::visibility(){
         if (statistics.audio.frames == 0) view3->topLevelItem(6)->setHidden(true);
         if (statistics.audio_only.frame_size == 0) view3->topLevelItem(7)->setHidden(true);
         if (statistics.audio.frame_rate == 0) view3->topLevelItem(8)->setHidden(true);
+    }
+
+    /** Verificando visibilidade dos metadados */
+    if (statistics.metadata.isEmpty()) tab->setTabVisible(3, false);
+    else {
+        bool visibility{false};
+        QVariantList v = getMetaDataValues(statistics);
+        int i = 0;
+
+        foreach(QVariant var, v) {
+            if (QString::compare(var.toString(), "") != 0) visibility = true;
+            else view4->topLevelItem(i)->setHidden(true);
+            ++i;
+        }
+
+        if (!visibility) tab->setTabVisible(3, false);
     }
 }
 
@@ -450,6 +533,7 @@ void StatisticsView::hideEvent(QHideEvent *event) {
 
 /** Evento para iniciar o temporizador */
 void StatisticsView::showEvent(QShowEvent *event) {
+    onclose = false;
     visibility();
     settaginfos();
     timer = startTimer(1000);
@@ -469,4 +553,24 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
     if (CTIME && !statistics.url.isEmpty())
         CTIME->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 ctime, statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
+}
+
+
+/** Prevenindo fechamento sem onClose() */
+void StatisticsView::closeEvent(QCloseEvent *event) {
+    if (!onclose) {
+        event->ignore();
+        QTimer::singleShot(300, this, &StatisticsView::onClose);
+        return;
+    } else event->accept();
+}
+
+
+/** Corrigindo fechamento do diálogo com Escape */
+void StatisticsView::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+        onClose();
+        return;
+    }
+    QDialog::keyPressEvent(event);
 }

@@ -1,6 +1,7 @@
 #include <QComboBox>
 #include <QGroupBox>
 #include <QLayout>
+#include <QTimer>
 #include <Label>
 #include <Utils>
 
@@ -134,6 +135,7 @@ Settings::~Settings() = default;
 void Settings::onClose() {
     qDebug("%s(%sSettings%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
     Q_EMIT emitclose();
+    onclose = true;
     this->close();
 }
 
@@ -189,4 +191,34 @@ QString Settings::changeIconsStyle() {
     if(!rs.isEmpty()) str.replace(QRegExp("/\\* _RADIO_CHECKED_ \\*/"), "image: url(" + rs + ");");
 
     return str;
+}
+
+
+/**********************************************************************************************************************/
+
+
+/** Prevenindo fechamento sem onClose() */
+void Settings::closeEvent(QCloseEvent *event) {
+    if (!onclose) {
+        event->ignore();
+        QTimer::singleShot(300, this, &Settings::onClose);
+        return;
+    } else event->accept();
+}
+
+
+/** Corrigindo fechamento do diálogo com Escape */
+void Settings::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+        onClose();
+        return;
+    }
+    QDialog::keyPressEvent(event);
+}
+
+
+/** Apenas para redefinir a variável onclose */
+void Settings::showEvent(QShowEvent *event) {
+    onclose = false;
+    QDialog::showEvent(event);
 }

@@ -25,6 +25,11 @@ public:
         QRadioButton *btn;
     };
 
+protected:
+    void showEvent(QShowEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+
 private:
     static QString changeIconsStyle();
 
@@ -45,6 +50,7 @@ private:
     Decoder *decoder{};
     QtAV::VideoRenderer *vo{};
     struct Render *vid_map{};
+    bool onclose{false};
 };
 
 #endif //OMPLAYER_SETTINGS_H

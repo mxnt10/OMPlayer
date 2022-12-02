@@ -410,14 +410,6 @@ void PlayList::clearItems() {
 }
 
 
-/** Setando a duração do item atual */
-qint64 PlayList::setDuration() {
-    QModelIndex index = listView->currentIndex();
-    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
-    return pli.duration();
-}
-
-
 /** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
     Q_EMIT aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());

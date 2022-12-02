@@ -9,9 +9,6 @@
 
 /** Construtor do modelo da playlist */
 PlayListModel::PlayListModel(QObject *parent) : QAbstractListModel(parent) {}
-
-
-/** Destrutor */
 PlayListModel::~PlayListModel() = default;
 
 
@@ -19,9 +16,7 @@ PlayListModel::~PlayListModel() = default;
 
 
 /** Retorna os itens da playlist */
-QList<PlayListItem> PlayListModel::items() const {
-    return mediaItems;
-}
+QList<PlayListItem> PlayListModel::items() const { return mediaItems; }
 
 
 /** Retorna o número de itens da playlist */
@@ -34,8 +29,7 @@ int PlayListModel::rowCount(const QModelIndex &parent) const {
 /** Usado para emissão na função onAboutToPlay */
 QVariant PlayListModel::data(const QModelIndex &index, int role) const {
     QVariant var;
-    if (index.row() < 0 || index.row() >= mediaItems.size())
-        return var;
+    if (index.row() < 0 || index.row() >= mediaItems.size()) return var;
 
     if (role == Qt::DisplayRole || role == Qt::EditRole)
         var.setValue(mediaItems.at(index.row()));
@@ -57,11 +51,10 @@ bool PlayListModel::setData(const QModelIndex &index, const QVariant &value, int
 
 /** Função para inserir itens na playlist */
 bool PlayListModel::insertRows(int row, int count, const QModelIndex &parent) {
-    if (count < 1 || row < 0 || row > rowCount(parent))
-        return false;
+    if (count < 1 || row < 0 || row > rowCount(parent)) return false;
+
     beginInsertRows(QModelIndex(), row, row + count - 1);
-    for (int r = 0; r < count; ++r)
-        mediaItems.insert(row, PlayListItem());
+    for (int r = 0; r < count; ++r) mediaItems.insert(row, PlayListItem());
     endInsertRows();
     return true;
 }
@@ -69,17 +62,14 @@ bool PlayListModel::insertRows(int row, int count, const QModelIndex &parent) {
 
 /** Função para remover itens da playlist */
 bool PlayListModel::removeRows(int row, int count, const QModelIndex &parent) {
-    if (count <= 0 || row < 0 || (row + count) > rowCount(parent))
-        return false;
+    if (count <= 0 || row < 0 || (row + count) > rowCount(parent)) return false;
+
     beginRemoveRows(QModelIndex(), row, row + count - 1);
-    for (int r = 0; r < count; ++r)
-        mediaItems.removeAt(row);
+    for (int r = 0; r < count; ++r) mediaItems.removeAt(row);
     endRemoveRows();
     return true;
 }
 
 
 /** Atualização do layout da playlist */
-void PlayListModel::updateLayout() {
-    emit layoutChanged();
-}
+void PlayListModel::updateLayout() { emit layoutChanged(); }

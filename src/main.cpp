@@ -8,6 +8,7 @@
  * Dependências:
  *      - Qt5
  *      - QtAV
+ *      - libnotify
  *
  * Dependências incluídas:
  *      - libmediainfo

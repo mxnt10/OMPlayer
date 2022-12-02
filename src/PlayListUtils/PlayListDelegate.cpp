@@ -38,7 +38,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     painter->setRenderHint(QPainter::Antialiasing, true);
     auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
     if (pli.title().size() * 8 > width) width = pli.title().size() * 8;
-    bool detail = false;
+    bool detail{false};
 
 
     /** Itens selecionados - Clicados */
@@ -46,9 +46,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
         detail = true;
         selectedRows.append(index.row());
         painter->fillRect(QRect(0, 0, width, height), QColor(0, 100, 200, 150));
-    } else {
-        selectedRows.removeAll(index.row());
-    }
+    } else selectedRows.removeAll(index.row());
 
 
     /** Itens com o mouse posicionado e destaque das linhas uma das outras */

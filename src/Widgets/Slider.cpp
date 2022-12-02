@@ -93,10 +93,8 @@ void Slider::mousePressEvent(QMouseEvent *event) {
              * qualquer lugar do QSlider. */
             emit sliderMoved(value);
             emit sliderPressed();
-        } else
-            QSlider::mousePressEvent(event);
-    } else
-        QSlider::mousePressEvent(event);
+        } else QSlider::mousePressEvent(event);
+    } else QSlider::mousePressEvent(event);
 }
 
 

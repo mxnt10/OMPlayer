@@ -1,4 +1,5 @@
 #include <QLayout>
+#include <QTimer>
 #include <QtAVWidgets>
 #include <Label>
 #include <Utils>
@@ -82,6 +83,7 @@ About::~About() = default;
 void About::onClose() {
     qDebug("%s(%sAbout%s)%s::%sFechando o diálogo sobre ...\033[0m", GRE, RED, GRE, RED, CYA);
     Q_EMIT emitclose();
+    onclose = true;
     this->close();
 }
 
@@ -105,4 +107,34 @@ QString About::getDescription() {
 void About::changeIcons() {
     Utils::changeIcon(closebtn, "apply");
     Utils::changeIcon(qtavbtn, "info");
+}
+
+
+/**********************************************************************************************************************/
+
+
+/** Prevenindo fechamento sem onClose() */
+void About::closeEvent(QCloseEvent *event) {
+    if (!onclose) {
+        event->ignore();
+        QTimer::singleShot(300, this, &About::onClose);
+        return;
+    } else event->accept();
+}
+
+
+/** Corrigindo fechamento do diálogo com Escape */
+void About::keyPressEvent(QKeyEvent *event) {
+    if(event->key() == Qt::Key_Escape) {
+        onClose();
+        return;
+    }
+    QDialog::keyPressEvent(event);
+}
+
+
+/** Apenas para redefinir a variável onclose */
+void About::showEvent(QShowEvent *event) {
+    onclose = false;
+    QDialog::showEvent(event);
 }

@@ -18,6 +18,11 @@ public:
     ~About() override;
     void changeIcons();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+    void closeEvent(QCloseEvent *event) override;
+
 Q_SIGNALS:
     void emitclose();
 
@@ -28,6 +33,7 @@ private:
     static QString getTextMaintainer();
     static QString getDescription();
     Button *closebtn{}, *qtavbtn{};
+    bool onclose{false};
 };
 
 #endif //OMPLAYER_ABOUT_H

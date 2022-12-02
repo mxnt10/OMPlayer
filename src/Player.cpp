@@ -26,7 +26,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Fundo preto */
-    QPalette pal = QPalette();
+    QPalette pal{};
     pal.setColor(QPalette::Window, Qt::black);
     this->setPalette(pal);
 

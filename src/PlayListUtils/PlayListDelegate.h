@@ -1,5 +1,5 @@
-#ifndef PLAYLISTDELEGATE_H
-#define PLAYLISTDELEGATE_H
+#ifndef OMPLAYER_PLAYLISTDELEGATE_H
+#define OMPLAYER_PLAYLISTDELEGATE_H
 
 #include <QStyledItemDelegate>
 
@@ -19,4 +19,4 @@ private:
     mutable int width{260};
 };
 
-#endif // PLAYLISTDELEGATE_H
+#endif // OMPLAYER_PLAYLISTDELEGATE_H

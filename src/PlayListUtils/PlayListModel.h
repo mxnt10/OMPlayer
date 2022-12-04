@@ -1,5 +1,5 @@
-#ifndef PLAYLISTMODEL_H
-#define PLAYLISTMODEL_H
+#ifndef OMPLAYER_PLAYLISTMODEL_H
+#define OMPLAYER_PLAYLISTMODEL_H
 
 #include <QAbstractListModel>
 
@@ -24,4 +24,4 @@ private:
     QList<PlayListItem> mediaItems;
 };
 
-#endif // PLAYLISTMODEL_H
+#endif // OMPLAYER_PLAYLISTMODEL_H

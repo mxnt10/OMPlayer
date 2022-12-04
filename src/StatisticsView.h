@@ -1,5 +1,5 @@
-#ifndef STATISTICSVIEW_H
-#define STATISTICSVIEW_H
+#ifndef OMPLAYER_STATISTICSVIEW_H
+#define OMPLAYER_STATISTICSVIEW_H
 
 #include <QDialog>
 #include <QThread>
@@ -75,4 +75,4 @@ private:
     Worker *worker;
 };
 
-#endif // STATISTICSVIEW_H
+#endif // OMPLAYER_STATISTICSVIEW_H

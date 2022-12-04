@@ -1,5 +1,5 @@
-#ifndef PLAYLIST_H
-#define PLAYLIST_H
+#ifndef OMPLAYER_PLAYLIST_H
+#define OMPLAYER_PLAYLIST_H
 
 #include <QDir>
 #include <QFileDialog>
@@ -80,4 +80,4 @@ private:
     bool isshow{false}, resize{false};
 };
 
-#endif // PLAYLIST_H
+#endif // OMPLAYER_PLAYLIST_H

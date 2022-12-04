@@ -1,7 +1,7 @@
 #include <QThread>
 #include <Utils>
 
-#include "Worker.h"
+#include "LoopButton.h"
 
 #define DG_T qDebug().nospace() << GRE << "(" << RED << "Thread" << GRE << ")" << RED << "::" << RDL
 
@@ -9,37 +9,38 @@
 /**********************************************************************************************************************/
 
 
-/** Construtor
- *
- * QThread::HighestPriority
- * QThread::LowestPriority
- *
- * */
-Worker::Worker(QObject *parent) : QObject(parent) {}
+/** Construtor */
+Loop::Loop(QObject *parent) : QObject(parent) {}
 
 
 /**********************************************************************************************************************/
 
 
 /** Função para chamar o thread */
-void Worker::requestWork() {
+void Loop::requestWork() {
+    end = false;
+
     DG_T << "Solicitando início do thread " << QThread::currentThreadId();
     Q_EMIT workRequested();
 }
 
 
-/** Thread para obter o hash md5 de um arquivo */
-void Worker::doWork() {
+/** Thread para obter o loop do botão */
+void Loop::doLoop() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
-    MI.Open(file.toStdWString());
-    QString format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"),
-                                                    MediaInfoDLL::Info_Text, MediaInfoDLL::Info_Name));
-    MI.Close();
-    Q_EMIT valueFormat(format);
+    Q_EMIT looping();
+    QThread::msleep(500);
+    while (!end) {
+        Q_EMIT looping();
+        QThread::msleep(200);
+    }
+}
 
-    QString hash{Utils::setHash(file)};
-    Q_EMIT valueMD5(hash);
+
+/** Finalizando Thread de loop */
+void Loop::End() {
+    end = true;
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
     Q_EMIT finished();

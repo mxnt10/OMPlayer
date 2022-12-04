@@ -57,9 +57,9 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para o painel da playlist */
-    addBtn = new Button(Button::Default, "add", 32);
-    removeBtn = new Button(Button::Default, "remove", 32);
-    clearBtn = new Button(Button::Default, "clean", 32);
+    addBtn = new Button(Button::Default, 32, "add");
+    removeBtn = new Button(Button::Default, 32, "remove");
+    clearBtn = new Button(Button::Default, 32, "clean");
     connect(addBtn, &Button::clicked, this, &PlayList::getFiles);
     connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
     connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);

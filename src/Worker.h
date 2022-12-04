@@ -1,5 +1,5 @@
-#ifndef WORKER_H
-#define WORKER_H
+#ifndef OMPLAYER_WORKER_H
+#define OMPLAYER_WORKER_H
 
 #include <QObject>
 #include <MediaInfoDLL.h>
@@ -27,4 +27,4 @@ private:
     MediaInfoDLL::MediaInfo MI{};
 };
 
-#endif // WORKER_H
+#endif // OMPLAYER_WORKER_H

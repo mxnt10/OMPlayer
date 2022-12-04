@@ -1,5 +1,5 @@
-#ifndef CLICKABLEMENU_H
-#define CLICKABLEMENU_H
+#ifndef OMPLAYER_CLICKABLEMENU_H
+#define OMPLAYER_CLICKABLEMENU_H
 
 #include <QMenu>
 
@@ -21,4 +21,4 @@ public:
     ~CMenu() override;
 };
 
-#endif // CLICKABLEMENU_H
+#endif // OMPLAYER_CLICKABLEMENU_H

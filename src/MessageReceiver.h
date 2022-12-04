@@ -1,5 +1,5 @@
-#ifndef MESSAGERECEIVER_H
-#define MESSAGERECEIVER_H
+#ifndef OMPLAYER_MESSAGERECEIVER_H
+#define OMPLAYER_MESSAGERECEIVER_H
 
 #include <QObject>
 
@@ -16,4 +16,4 @@ Q_SIGNALS:
     void parms(const QStringList &lst);
 };
 
-#endif // MESSAGERECEIVER_H
+#endif // OMPLAYER_MESSAGERECEIVER_H

@@ -16,8 +16,37 @@ Button::Button(Button::BUTTONTYPE btn, int size, const QString &ico, const QStri
     setFocusPolicy(Qt::NoFocus);
     setFixedSize(num, num);
     setMouseTracking(true);
+    secondIcon(ico, ico2);
 
-    /** Definindo ícone */
+    /** Definindo thread para o loop do clique */
+    if (type == Button::LoopBtn) {
+        thread = new QThread();
+        loop = new Loop();
+        loop->moveToThread(thread);
+
+        connect(thread, &QThread::started, loop, &Loop::doLoop);
+        connect(loop, &Loop::looping, [this]() { Q_EMIT loopPress(); });
+        connect(loop, &Loop::workRequested, [this]() { thread->start(); });
+        connect(loop, &Loop::finished, [this]() { thread->quit(); });
+    }
+
+    /** Apenas para o Debug */
+    std::string upper = ico.toStdString();
+    std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
+    upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
+    icon = QString::fromStdString(upper);
+}
+
+
+/** Destrutor */
+Button::~Button() = default;
+
+
+/**********************************************************************************************************************/
+
+
+/** Setando o ícones primário e secundário */
+void Button::secondIcon(const QString &ico, const QString &ico2) {
     QString theme = JsonTools::stringJson("theme");
     if (Utils::setIconTheme(theme, ico) == nullptr)
         setIcon(QIcon::fromTheme(Utils::defaultIcon(ico)));
@@ -38,16 +67,6 @@ Button::Button(Button::BUTTONTYPE btn, int size, const QString &ico, const QStri
     }
 
     if (!ico2.isEmpty()) {
-        multi = true;
-
-        thread = new QThread();
-        loop = new Loop();
-        loop->moveToThread(thread);
-        connect(thread, &QThread::started, loop, &Loop::doLoop);
-        connect(loop, &Loop::looping, [this]() { Q_EMIT loopPress(); });
-        connect(loop, &Loop::workRequested, [this](){ thread->start(); });
-        connect(loop, &Loop::finished, [this](){ thread->quit(); });
-
         if (Utils::setIconTheme(theme, ico2) == nullptr)
             icon2 = QIcon::fromTheme(Utils::defaultIcon(ico2));
         else {
@@ -65,17 +84,7 @@ Button::Button(Button::BUTTONTYPE btn, int size, const QString &ico, const QStri
             icon2 = img;
         }
     }
-
-    /** Apenas para o Debug */
-    std::string upper = ico.toStdString();
-    std::transform(upper.begin(), upper.end(), upper.begin(), ::tolower);
-    upper[0] = static_cast<char>(std::toupper(static_cast<unsigned char>(upper[0]))); /** C++ 17 */
-    icon = QString::fromStdString(upper);
 }
-
-
-/** Destrutor */
-Button::~Button() = default;
 
 
 /**********************************************************************************************************************/
@@ -83,36 +92,39 @@ Button::~Button() = default;
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent(QEvent *event) {
-    if (type == Button::Default) {
-        qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
-        setIconSize(QSize(num + 2, num + 2));
-    }
+    if (type == Button::Tag) return;
+    qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
+    setIconSize(QSize(num + 2, num + 2));
     QPushButton::enterEvent(event);
 }
 
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    if (type == Button::Default) setIconSize(QSize(num, num));
+    if (type == Button::Tag) return;
+    setIconSize(QSize(num, num));
     QPushButton::leaveEvent(event);
 }
 
 
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
-    if (type == Button::Default) {
-        qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
-        setIconSize(QSize(num - 2, num - 2));
-        if (multi) {
-            block = looping = false;
-            QTimer::singleShot(500, this, [this]() {
-                if (!block) {
-                    looping = true;
-                    loop->requestWork();
-                    setIcon(icon2);
+    if (type == Button::Tag) return;
+    qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
+    setIconSize(QSize(num - 2, num - 2));
+
+    if (type == Button::LoopBtn || type == Button::DoubleBtn) {
+        block = emitted = false;
+        QTimer::singleShot(400, this, [this]() {
+            if (!block) {
+                setIcon(icon2);
+                if (type == Button::LoopBtn) loop->requestWork();
+                else {
+                    Q_EMIT longPress();
+                    emitted = true;
                 }
-            });
-        }
+            }
+        });
     }
     QPushButton::mousePressEvent(event);
 }
@@ -120,14 +132,19 @@ void Button::mousePressEvent(QMouseEvent *event) {
 
 /** Finalizando o efeito do botão */
 void Button::mouseReleaseEvent(QMouseEvent *event) {
-    if (type == Button::Default) setIconSize(QSize(num + 2, num + 2));
-    if (multi) {
+    if (type == Button::Tag) return;
+    setIconSize(QSize(num + 2, num + 2));
+
+    if (type == Button::LoopBtn || type == Button::DoubleBtn) {
         block = true;
-        if (looping) {
-            loop->End();
-            setIcon(icon1);
-            return;
-        } else Q_EMIT customPress();
+        if (type == Button::LoopBtn) {
+            if (thread->isRunning()) {
+                loop->End();
+                setIcon(icon1);
+                return;
+            } else Q_EMIT customPress();
+        } else if (emitted && type == Button::DoubleBtn) return;
+        else Q_EMIT customPress();
     }
     QPushButton::mouseReleaseEvent(event);
 }

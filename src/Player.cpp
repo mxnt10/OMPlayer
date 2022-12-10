@@ -105,9 +105,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Botões para os controles de reprodução */
     playBtn = new Button(Button::Default, 48, "play");
     stopBtn = new Button(Button::Default, 32, "stop");
-    nextBtn = new Button(Button::Default, 32, "next", "forward");
-    previousBtn = new Button(Button::Default, 32, "previous", "backward");
-    replayBtn = new Button(Button::Default, 32, "replay");
+    nextBtn = new Button(Button::LoopBtn, 32, "next", "forward");
+    previousBtn = new Button(Button::LoopBtn, 32, "previous", "backward");
+    replayBtn = new Button(Button::DoubleBtn, 32, "replay", "replay-one");
     shuffleBtn = new Button(Button::Default, 32, "shuffle");
     volumeBtn = new Button(Button::Default, 32, "volume_high");
     connect(playBtn, &Button::clicked, this, &OMPlayer::playPause);
@@ -116,12 +116,14 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(previousBtn, &Button::customPress, this, &OMPlayer::Previous);
     connect(nextBtn, &Button::loopPress, mediaPlayer, &QtAV::AVPlayer::seekForward);
     connect(previousBtn, &Button::loopPress, mediaPlayer, &QtAV::AVPlayer::seekBackward);
-    connect(replayBtn, &Button::clicked, this, &OMPlayer::setReplay);
+    connect(replayBtn, &Button::customPress, this, &OMPlayer::setReplay);
+    connect(replayBtn, &Button::longPress, this, &OMPlayer::setRepeat);
     connect(shuffleBtn, &Button::clicked, this, &OMPlayer::setShuffle);
     connect(volumeBtn, &Button::clicked, this, &OMPlayer::setMute);
 
 
     /** Verificando se as opções de replay e aleatório estão ativas */
+    if (JsonTools::boolJson("on_replayone")) setRepeat();
     if (JsonTools::boolJson("on_replay")) setReplay();
     if (JsonTools::boolJson("on_shuffle")) setShuffle();
 
@@ -312,6 +314,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Menu dos dimensões de tela para o menu de contexto */
     subMenu = new ClickableMenu(tr("Aspect Ratio"));
+    Utils::changeMenuIcon(subMenu, "aspectratio");
     aspectratio = new QMenu(this);
     aspectratio = subMenu;
     aspectAction = subMenu->addAction(Utils::aspectStr(Utils::AspectVideo));
@@ -343,6 +346,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Menu de velocidade para o menu de contexto */
     subMenu = new ClickableMenu(tr("Speed"));
+    Utils::changeMenuIcon(subMenu, "speed");
     speed = new QMenu(this);
     speed = subMenu;
     speedBox = new QDoubleSpinBox();
@@ -715,13 +719,27 @@ void OMPlayer::changePlaylist(const QString &format) {
 
 /** Ativação do modo de repetição da mídia */
 void OMPlayer::setRepeat() {
-    if (mediaPlayer->repeat() == 0) mediaPlayer->setRepeat(-1);
-    else mediaPlayer->setRepeat(0);
+    restart = false;
+    JsonTools::boolJson("on_replay", false);
+
+    if (mediaPlayer->repeat() == 0) {
+        mediaPlayer->setRepeat(-1);
+        Utils::changeIcon(replayBtn, "replay-one");
+        if (!JsonTools::boolJson("on_replayone")) JsonTools::boolJson("on_replayone", true);
+    } else {
+        mediaPlayer->setRepeat(0);
+        Utils::changeIcon(replayBtn, "replay");
+        JsonTools::boolJson("on_replayone", false);
+    }
 }
 
 
 /** Ativação do modo de repetição da playlist */
 void OMPlayer::setReplay() {
+    if (mediaPlayer->repeat() != 0) {
+        setRepeat();
+        return;
+    }
     if (!restart) {
         restart = true;
         Utils::changeIcon(replayBtn, "replay-on");
@@ -1209,6 +1227,7 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         else Utils::changeIcon(playBtn, "play");
 
         if (restart) Utils::changeIcon(replayBtn, "replay-on");
+        else if (mediaPlayer->repeat() != 0) Utils::changeIcon(replayBtn, "replay-one");
         else Utils::changeIcon(replayBtn, "replay");
         if (randplay) Utils::changeIcon(shuffleBtn, "shuffle-on");
         else Utils::changeIcon(shuffleBtn, "shuffle");
@@ -1217,10 +1236,17 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         Utils::changeIcon(nextBtn, "next");
         Utils::changeIcon(previousBtn, "previous");
 
+        nextBtn->secondIcon("next", "forward");
+        previousBtn->secondIcon("previous", "backward");
+        replayBtn->secondIcon("replay", "replay-one");
+
         /** Alterando os ícones dos diálogos */
         playlist->changeIcons();
         infoview->changeIcons();
         about->changeIcons();
+
+        Utils::changeMenuIcon(aspectratio, "aspectratio");
+        Utils::changeMenuIcon(speed, "speed");
     }
 }
 
@@ -1396,8 +1422,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         /** Modo repetição */
         QAction repeat(tr("Repeat Mode"), this);
         repeat.setShortcut(QKeySequence(CTRL | ALT | Qt::Key_T));
-        if (mediaPlayer->repeat() == 0) Utils::changeMenuIcon(repeat, "repeat");
-        else Utils::changeMenuIcon(repeat, "repeat-on");
+        Utils::changeMenuIcon(repeat, "replay-one-menu");
         connect(&repeat, SIGNAL(triggered()), SLOT(setRepeat()));
 
         /** Dimensão de exibição */

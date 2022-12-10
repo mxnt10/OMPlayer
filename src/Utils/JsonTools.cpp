@@ -14,6 +14,7 @@ QString JsonTools::defaultJson() {
     return "{"
            "    \"maximized\": false,"
            "    \"on_replay\": false,"
+           "    \"on_replayone\": false,"
            "    \"on_shuffle\": false,"
            "    \"pls_listsize\": 280,"
            "    \"pls_size\": 295,"

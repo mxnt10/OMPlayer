@@ -164,24 +164,23 @@ QString Utils::defaultIcon(const QString &icon) {
     }
 
     qDebug("%s(%sUtils%s)%s::%sUsando ícone do sistema: %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(icon));
-    if (icon == "play")           return "media-playback-start";
-    if (icon == "pause")          return "media-playback-pause";
-    if (icon == "stop")           return "media-playback-stop";
-    if (icon == "next")           return "media-skip-forward";
-    if (icon == "previous")       return "media-skip-backward";
-    if (icon == "repeat-on")      return "media-repeat-single";
-    if (icon == "repeat")         return "media-repeat-none";
-    if (icon == "volume_high")    return "audio-volume-high";
-    if (icon == "volume_medium")  return "audio-volume-medium";
-    if (icon == "volume_low")     return "audio-volume-low";
-    if (icon == "add")            return "list-add";
-    if (icon == "remove")         return "list-remove";
-    if (icon == "clean")          return "im-ban-kick-user";
-    if (icon == "apply")          return "dialog-ok-apply";
-    if (icon == "folder")         return "document-open-folder";
-    if (icon == "fullscreen")     return "view-fullscreen";
-    if (icon == "settings")       return "configure";
+    if (icon == "play")            return "media-playback-start";
+    if (icon == "pause")           return "media-playback-pause";
+    if (icon == "stop")            return "media-playback-stop";
+    if (icon == "replay-one-menu") return "media-repeat-single";
+    if (icon == "volume_high")     return "audio-volume-high";
+    if (icon == "volume_medium")   return "audio-volume-medium";
+    if (icon == "volume_low")      return "audio-volume-low";
+    if (icon == "add")             return "list-add";
+    if (icon == "remove")          return "list-remove";
+    if (icon == "clean")           return "im-ban-kick-user";
+    if (icon == "apply")           return "dialog-ok-apply";
+    if (icon == "folder")          return "document-open-folder";
+    if (icon == "fullscreen")      return "view-fullscreen";
+    if (icon == "settings")        return "configure";
 
+    if (QRegExp("next|forward").indexIn(icon) != -1)          return "media-skip-forward";
+    if (QRegExp("previous|backward").indexIn(icon) != -1)     return "media-skip-backward";
     if (QRegExp("mute|nosound").indexIn(icon) != -1)          return "audio-volume-muted";
     if (QRegExp("replay($|-(on|menu))").indexIn(icon) != -1)  return "media-playlist-repeat";
     if (QRegExp("shuffle($|-(on|menu))").indexIn(icon) != -1) return "media-playlist-shuffle";
@@ -208,6 +207,14 @@ void Utils::changeMenuIcon(QAction &btn, const QString &thm) {
     if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
         btn.setIcon(QIcon::fromTheme(defaultIcon(thm)));
     else btn.setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
+}
+
+
+/** Definição dos ícones do menu */
+void Utils::changeMenuIcon(QMenu *btn, const QString &thm) {
+    if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
+        btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
+    else btn->setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
 }
 
 
@@ -301,7 +308,7 @@ double Utils::aspectNum(Utils::ASPECTRATIO aspect) {
 /** Retorna o texto das dimensões de tela */
 QString Utils::aspectStr(Utils::ASPECTRATIO aspect) {
     switch (aspect) {
-        case Utils::AspectVideo:  return QApplication::tr("Video");
+        case Utils::AspectVideo:  return QObject::tr("Video");
         case Utils::Aspect21:     return "2:1";
         case Utils::Aspect43:     return "4:3";
         case Utils::Aspect169:    return "16:9";
@@ -314,7 +321,7 @@ QString Utils::aspectStr(Utils::ASPECTRATIO aspect) {
         case Utils::Aspect1410:   return "14:10";
         case Utils::Aspect118:    return "11:8";
         case Utils::AspectAuto:   return QObject::tr("Window");
-        default: return QApplication::tr("Unknown");
+        default: return QObject::tr("Unknown");
     }
 }
 

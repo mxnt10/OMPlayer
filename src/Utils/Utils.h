@@ -3,6 +3,7 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QMenu>
 #include <Button>
 
 #define VERSION "2.0.1"
@@ -73,6 +74,7 @@ public:
     static QString setHash(const QString &url);
     static void changeIcon(Button *btn, const QString &thm);
     static void changeMenuIcon(QAction &btn, const QString &thm);
+    static void changeMenuIcon(QMenu *btn, const QString &thm);
     static void rm_nl(string &s);
     static QStringList subdirIcons();
     static double aspectNum(Utils::ASPECTRATIO aspect);

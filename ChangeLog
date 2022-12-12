@@ -3,6 +3,51 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
+## [ 2.0.1 ] - 2022-11-28 ################################################
+
+### Added / Adicionado
+ - Adicionado informações de metadados.
+ - Adicionado fontes LoopButton.{h/cpp} em src/Utils.
+ - Adicionado recursos de forward e backward.
+ - Adicionado icones freepik, iyahblue e iyahorange em icons.
+ - Adicionado a licença dos ícones.
+ - Adicionado estilos combo.qss e radio.qss em qss.
+ - Recursos:
+    - Adicionado funções de forward e backward.
+    - Adicionado botões de loop e clique longo para replay com replay-one,
+      next com forward e previous e backward.
+###
+
+### Upgraded / Atualizado
+ - Atualizado arquivo README.md do projeto.
+ - Atualizado os temas de ícones.
+ - Tradução atualizada.
+###
+
+### Changed / Modificado
+ - Otimização do uso do libmediainfo, colocado em multithread.
+ - Modificado a classe dos botões para possibilitar botões com
+   emissão de sinais em loop.
+###
+
+### Removed / Removido
+ - Removido Notify.h em scr/Utils, agora embutido em Utils.{cpp/h}
+   em src/Utils.
+ - Removido função SetDuration() da classe praylist.
+###
+
+### Fixed / Corrigido
+ - Corrigido possíveis problemas de compilação com signals ao definir
+   a biblioteca do libnotify.
+ - Pequenos ajustes em CMakeLists.txt em funções de globbings.
+ - Corrigido problemas ao fechar diálogos com teclas de atalho,
+   interceptando os eventos para o fechamento com a função desejada.
+ - Corrigido problemas com estilos em widgets QRadioButton e QComboBox.
+###
+
+##########################################################################
+
+
 ## [ 2.0 ] - 2022-11-20 ##################################################
 
 ### Added / Adicionado

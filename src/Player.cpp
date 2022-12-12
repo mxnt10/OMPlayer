@@ -293,6 +293,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Menu dos canais de áudio para o menu de contexto */
     auto *subMenu = new ClickableMenu(tr("Channel"));
+    Utils::changeMenuIcon(subMenu, "channel");
     channel = new QMenu(this);
     channel = subMenu;
     connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::changeChannel);
@@ -361,6 +362,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Menu de saídas de áudio para o menu de contexto */
     subMenu = new ClickableMenu(tr("Audio Track"));
+    Utils::changeMenuIcon(subMenu, "track");
     audiotrack = new QMenu(this);
     audiotrack = subMenu;
     connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeAudioTrack(QAction*)));
@@ -1245,8 +1247,10 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         infoview->changeIcons();
         about->changeIcons();
 
+        Utils::changeMenuIcon(channel, "channel");
         Utils::changeMenuIcon(aspectratio, "aspectratio");
         Utils::changeMenuIcon(speed, "speed");
+        Utils::changeMenuIcon(audiotrack, "track");
     }
 }
 

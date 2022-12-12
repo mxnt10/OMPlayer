@@ -28,7 +28,7 @@ Q_SIGNALS:
 
 private:
     int num{0};
-    bool emitted{false}, block{false};
+    bool emitted{false}, prevent{true}, block{false};
     Button::BUTTONTYPE type{Button::Default};
     QString icon{};
     QIcon icon1{}, icon2{};

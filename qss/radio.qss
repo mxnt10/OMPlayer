@@ -1,0 +1,9 @@
+/** Opções para o RadioButton */
+QRadioButton { width: 100px; }
+
+QRadioButton::indicator       { width: 20px; height: 20px; }
+QRadioButton::indicator:hover { margin-right: 4px; }
+
+QRadioButton::indicator:unchecked       { /* _RADIO_UNCHECKED__ */      }
+QRadioButton::indicator:unchecked:hover { /* _RADIO_UNCHECKED_HOVER_ */ }
+QRadioButton::indicator:checked         { /* _RADIO_CHECKED_ */         }

@@ -50,6 +50,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
         if (vo && vo->isAvailable()) {
             vid_map[i].btn = new QRadioButton(vid_map[i].name);
             vid_map[i].btn->setFocusPolicy(Qt::NoFocus);
+            vid_map[i].btn->setStyleSheet(changeIconsStyle());
 
             if (i == 0) connect(vid_map[0].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[0]); });
             else if (i == 1) connect(vid_map[1].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[1]); });
@@ -71,6 +72,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     auto *combotheme = new QComboBox();
     combotheme->addItems(Utils::subdirIcons());
     combotheme->setCurrentText(JsonTools::stringJson("theme"));
+    combotheme->setStyleSheet(Utils::setStyle("combo"));
     connect(combotheme, &QComboBox::currentTextChanged, this, &Settings::setIcon);
 
     auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");
@@ -95,7 +97,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     tab->addTab(general, tr("General"));
     tab->addTab(decoder, tr("Decoder"));
     tab->addTab(renderer, tr("Renderer"));
-    tab->setStyleSheet(changeIconsStyle());
+    tab->setStyleSheet(Utils::setStyle("tab"));
 
 
     /** Botão para fechar a janela */
@@ -157,8 +159,12 @@ void Settings::setIcon(const QString &index) {
 
     Utils::initUtils(Utils::Theme);
     Utils::changeIcon(closebtn, "apply");
-    tab->setStyleSheet(changeIconsStyle());
     decoder->changeIcons();
+
+    for (int i = 0; i < 8; ++i) {
+        vo = VideoRenderer::create(vid_map[i].id);
+        if (vo && vo->isAvailable()) vid_map[i].btn->setStyleSheet(changeIconsStyle());
+    }
 
     Q_EMIT changethemeicon();
 }
@@ -178,7 +184,7 @@ QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() {
 
 /** Mudando o ícone nos estilos */
 QString Settings::changeIconsStyle() {
-    QString str{Utils::setStyle("tab")};
+    QString str{Utils::setStyle("radio")};
     QString theme{Utils::setThemeName()};
 
     QString ru{Utils::setIconTheme(theme, "radio-unselect")};
@@ -190,6 +196,7 @@ QString Settings::changeIconsStyle() {
     QString rs{Utils::setIconTheme(theme, "radio-select")};
     if(!rs.isEmpty()) str.replace(QRegExp("/\\* _RADIO_CHECKED_ \\*/"), "image: url(" + rs + ");");
 
+    if(ru.isEmpty() && rh.isEmpty() && rs.isEmpty()) return{};
     return str;
 }
 

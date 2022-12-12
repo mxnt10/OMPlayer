@@ -109,13 +109,14 @@ void Button::leaveEvent(QEvent *event) {
 
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
-    if (type == Button::Tag) return;
+    if (type == Button::Tag || !prevent) return;
     qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
     setIconSize(QSize(num - 2, num - 2));
 
     if (type == Button::LoopBtn || type == Button::DoubleBtn) {
-        block = emitted = false;
-        QTimer::singleShot(400, this, [this]() {
+        block = emitted = prevent = false;
+        QTimer::singleShot(300, this, [this]() {
+            prevent = true;
             if (!block) {
                 setIcon(icon2);
                 if (type == Button::LoopBtn) loop->requestWork();

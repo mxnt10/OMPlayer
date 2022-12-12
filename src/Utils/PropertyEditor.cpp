@@ -132,6 +132,7 @@ QWidget* PropertyEditor::createWidgetForEnum(const QString& name, const QVariant
     if (!detail.isEmpty()) box->setToolTip(detail);
     box->setObjectName(name);
     box->setEditable(false);
+    box->setStyleSheet(Utils::setStyle("combo"));
 
     for (int i = 0; i < me.keyCount(); ++i) box->addItem(QString::fromLatin1(me.key(i)), me.value(i));
 

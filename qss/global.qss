@@ -1,2 +1,16 @@
 /* Definição geral */
 * { color: white; }
+
+/* Definições globais para o setTollTip() */
+QToolTip {
+    background: rgba(0, 0, 0, 200);
+    border: 2px ridge #cccccc;
+    border-radius: 10px;
+}
+
+/* Personalizar abstract item view dos widgets */
+QAbstractItemView {
+     background-color: black;
+     border: 1px solid #333;
+     border-radius: 4px;
+ }

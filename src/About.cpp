@@ -19,6 +19,13 @@ About::About(QWidget *parent) : QDialog(parent) {
     setModal(true);
 
 
+    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(0);
+    setGraphicsEffect(effect);
+    animation = new QPropertyAnimation(effect, "opacity");
+
+
     /** Nome do programa e descrição e ícone */
     auto *iconlogo = new Label(CENTER, Utils::setIcon());
     auto *description = new Label(TOP, 0, getDescription());
@@ -82,9 +89,13 @@ About::~About() = default;
 /** Emissão para fechar a janela */
 void About::onClose() {
     qDebug("%s(%sAbout%s)%s::%sFechando o diálogo sobre ...\033[0m", GRE, RED, GRE, RED, CYA);
-    Q_EMIT emitclose();
     onclose = true;
-    this->close();
+    Utils::fadeDiag(animation, 1, 0);
+    connect(animation, &QPropertyAnimation::finished, [this](){
+        if (!onclose) return;
+        Q_EMIT emitclose();
+        this->close();
+    });
 }
 
 
@@ -117,7 +128,7 @@ void About::changeIcons() {
 void About::closeEvent(QCloseEvent *event) {
     if (!onclose) {
         event->ignore();
-        QTimer::singleShot(300, this, &About::onClose);
+        QTimer::singleShot(100, this, &About::onClose);
         return;
     } else event->accept();
 }
@@ -136,5 +147,6 @@ void About::keyPressEvent(QKeyEvent *event) {
 /** Apenas para redefinir a variável onclose */
 void About::showEvent(QShowEvent *event) {
     onclose = false;
+    Utils::fadeDiag(animation, 0, 1);
     QDialog::showEvent(event);
 }

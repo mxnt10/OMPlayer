@@ -439,7 +439,7 @@ void PlayList::hideFade() {
 /** Efeito fade bacana para a playlist */
 void PlayList::fadePls(PLS option) {
     auto *animation = new QPropertyAnimation(effect, "opacity");
-    animation->setDuration(120);
+    animation->setDuration(FADE_VAL);
 
     if (option == Show) {
         animation->setStartValue(0);

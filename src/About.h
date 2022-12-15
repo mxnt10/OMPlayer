@@ -2,6 +2,8 @@
 #define OMPLAYER_ABOUT_H
 
 #include <QDialog>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #include <Button>
 
 #define PRG_NAME "Open Multimedia Player"
@@ -33,6 +35,8 @@ private:
     static QString getTextMaintainer();
     static QString getDescription();
     Button *closebtn{}, *qtavbtn{};
+    QGraphicsOpacityEffect *effect{};
+    QPropertyAnimation *animation{};
     bool onclose{false};
 };
 

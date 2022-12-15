@@ -132,7 +132,7 @@ QWidget* PropertyEditor::createWidgetForEnum(const QString& name, const QVariant
     if (!detail.isEmpty()) box->setToolTip(detail);
     box->setObjectName(name);
     box->setEditable(false);
-    box->setStyleSheet(Utils::setStyle("combo"));
+    box->setStyleSheet(Utils::setStyle("global"));
 
     for (int i = 0; i < me.keyCount(); ++i) box->addItem(QString::fromLatin1(me.key(i)), me.value(i));
 
@@ -152,6 +152,7 @@ QWidget* PropertyEditor::createWidgetForInt(const QString& name, int value, cons
     if (!detail.isEmpty()) box->setToolTip(detail);
     box->setObjectName(name);
     box->setValue(value);
+    box->setStyleSheet(Utils::setStyle("global"));
 
     connect(box, QOverload<int>::of(&QSpinBox::valueChanged), this, &PropertyEditor::onIntChange);
     return box;
@@ -190,6 +191,7 @@ QWidget* PropertyEditor::createWidgetForBool(const QString& name, bool value, co
     box->setObjectName(name);
     box->setChecked(value);
     box->setFocusPolicy(Qt::NoFocus);
+    box->setStyleSheet(Utils::setStyle("global"));
 
     connect(box, &QCheckBox::clicked, this, &PropertyEditor::onBoolChange);
     return box;

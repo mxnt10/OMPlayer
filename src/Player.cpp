@@ -826,8 +826,8 @@ void OMPlayer::leaveFullScreen() {
 void OMPlayer::fadeWctl(OMPlayer::FADE option) {
     auto *animation = new QPropertyAnimation(effect, "opacity");
     auto *animation2 = new QPropertyAnimation(effect2, "opacity");
-    animation->setDuration(120);
-    animation2->setDuration(120);
+    animation->setDuration(FADE_VAL);
+    animation2->setDuration(FADE_VAL);
 
     if (option == Show) {
         animation->setStartValue(0);
@@ -1348,7 +1348,7 @@ void OMPlayer::moveEvent(QMoveEvent *event) {
 /** Evento que mapeia o redirecionamento da interface para o ajuste dos controles */
 void OMPlayer::resizeEvent(QResizeEvent *event) {
     size = event->size();
-    wctl->setFixedSize(event->size());
+    wctl->setFixedSize(size);
     QWidget::resizeEvent(event);
 }
 

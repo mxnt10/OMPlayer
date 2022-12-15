@@ -1,6 +1,0 @@
-/* Personalizar abstract item view dos widgets */
-QAbstractItemView {
-     background-color: black;
-     border: 1px solid #333;
-     border-radius: 4px;
- }

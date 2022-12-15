@@ -27,6 +27,13 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     decoder = new Decoder(this);
 
 
+    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(0);
+    setGraphicsEffect(effect);
+    animation = new QPropertyAnimation(effect, "opacity");
+
+
     /** Estrutura das renderizações */
     vid_map = new Render[8];
     vid_map[0] = {"OpenGL",     VideoRendererId_OpenGLWidget, opengl      };
@@ -136,9 +143,13 @@ Settings::~Settings() = default;
 /** Emissão para fechar a janela */
 void Settings::onClose() {
     qDebug("%s(%sSettings%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    Q_EMIT emitclose();
     onclose = true;
-    this->close();
+    Utils::fadeDiag(animation, 1, 0);
+    connect(animation, &QPropertyAnimation::finished, [this](){
+        if (!onclose) return;
+        Q_EMIT emitclose();
+        this->close();
+    });
 }
 
 
@@ -208,7 +219,7 @@ QString Settings::changeIconsStyle() {
 void Settings::closeEvent(QCloseEvent *event) {
     if (!onclose) {
         event->ignore();
-        QTimer::singleShot(300, this, &Settings::onClose);
+        QTimer::singleShot(100, this, &Settings::onClose);
         return;
     } else event->accept();
 }
@@ -227,5 +238,6 @@ void Settings::keyPressEvent(QKeyEvent *event) {
 /** Apenas para redefinir a variável onclose */
 void Settings::showEvent(QShowEvent *event) {
     onclose = false;
+    Utils::fadeDiag(animation, 0, 1);
     QDialog::showEvent(event);
 }

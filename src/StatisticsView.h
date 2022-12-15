@@ -2,6 +2,7 @@
 #define OMPLAYER_STATISTICSVIEW_H
 
 #include <QDialog>
+#include <QGraphicsOpacityEffect>
 #include <QThread>
 #include <QtAV/Statistics.h>
 #include <Button>
@@ -51,6 +52,8 @@ private:
 private:
     Button *closebtn{};
     Button *ratio{}, *screen{};
+    QGraphicsOpacityEffect *effect{};
+    QPropertyAnimation *animation{};
     QTabWidget *tab{};
     TreeView *view1{}, *view2{}, *view3{}, *view4{};
     QList<QTreeWidgetItem*> baseItems{};

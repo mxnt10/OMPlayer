@@ -331,3 +331,12 @@ QString Utils::setThemeName() {
     if(def.definedTheme.isEmpty()) def.definedTheme = JsonTools::stringJson("theme");
     return def.definedTheme;
 }
+
+
+/** Efeito fade para os diálogos */
+void Utils::fadeDiag(QPropertyAnimation *animation, int x, int y) {
+    animation->setDuration(FADE_VAL);
+    animation->setStartValue(x);
+    animation->setEndValue(y);
+    animation->start();
+}

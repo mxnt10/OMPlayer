@@ -4,10 +4,12 @@
 #include <QAction>
 #include <QApplication>
 #include <QMenu>
+#include <QPropertyAnimation>
 #include <Button>
 
 #define VERSION "2.0.1"
 #define STR qUtf8Printable
+#define FADE_VAL 200
 
 #define GRE "\x1b[38;2;000;255;000m" //Debug
 #define RED "\x1b[38;2;255;050;050m" //Debug
@@ -81,6 +83,7 @@ public:
     static QString aspectStr(Utils::ASPECTRATIO aspect);
     static QString setThemeName();
     static QStringList setLocals();
+    static void fadeDiag(QPropertyAnimation *animation, int x, int y);
     static int calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 
 private:

@@ -21,6 +21,13 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     setFocus();
 
 
+    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(0);
+    setGraphicsEffect(effect);
+    animation = new QPropertyAnimation(effect, "opacity");
+
+
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
     worker = new Worker();
@@ -136,9 +143,13 @@ void StatisticsView::setFormat(const QString &format) {
 /** Emissão para fechar a janela */
 void StatisticsView::onClose() {
     qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de informações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    Q_EMIT emitclose();
     onclose = true;
-    this->close();
+    Utils::fadeDiag(animation, 1, 0);
+    connect(animation, &QPropertyAnimation::finished, [this](){
+        if (!onclose) return;
+        Q_EMIT emitclose();
+        this->close();
+    });
 }
 
 
@@ -537,6 +548,7 @@ void StatisticsView::showEvent(QShowEvent *event) {
     visibility();
     settaginfos();
     timer = startTimer(1000);
+    Utils::fadeDiag(animation, 0, 1);
     QDialog::showEvent(event);
 }
 
@@ -560,7 +572,7 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
 void StatisticsView::closeEvent(QCloseEvent *event) {
     if (!onclose) {
         event->ignore();
-        QTimer::singleShot(300, this, &StatisticsView::onClose);
+        QTimer::singleShot(100, this, &StatisticsView::onClose);
         return;
     } else event->accept();
 }

@@ -4,8 +4,9 @@
 #include <QtAV>
 #include <QtAVWidgets>
 #include <QDialog>
-#include <QTabWidget>
+#include <QGraphicsOpacityEffect>
 #include <QRadioButton>
+#include <QTabWidget>
 #include <Button>
 
 #include "Decoder.h"
@@ -44,6 +45,8 @@ private Q_SLOTS:
     void setIcon(const QString &index);
 
 private:
+    QGraphicsOpacityEffect *effect{};
+    QPropertyAnimation *animation{};
     QTabWidget *tab{};
     QRadioButton *opengl{}, *qglwidget2{}, *x11renderer{}, *xvideo{}, *direct2d{}, *gdi{}, *qglwidget{}, *widget{};
     Button *closebtn{};

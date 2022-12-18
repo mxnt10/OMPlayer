@@ -80,4 +80,4 @@ private:
     bool isshow{false}, resize{false};
 };
 
-#endif // OMPLAYER_PLAYLIST_H
+#endif //OMPLAYER_PLAYLIST_H

@@ -45,4 +45,4 @@ private:
     UITYPE option{EventFilter::Defaut};
 };
 
-#endif // OMPLAYER_EVENTFILTER_H
+#endif //OMPLAYER_EVENTFILTER_H

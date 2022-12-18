@@ -27,4 +27,4 @@ private:
     MediaInfoDLL::MediaInfo MI{};
 };
 
-#endif // OMPLAYER_WORKER_H
+#endif //OMPLAYER_WORKER_H

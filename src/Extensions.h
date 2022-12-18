@@ -31,4 +31,4 @@ protected:
 	ExtensionList _multimedia, _all_playable;
 };
 
-#endif // OMPLAYER_EXTENSIONS_H
+#endif //OMPLAYER_EXTENSIONS_H

@@ -16,4 +16,4 @@ Q_SIGNALS:
     void parms(const QStringList &lst);
 };
 
-#endif // OMPLAYER_MESSAGERECEIVER_H
+#endif //OMPLAYER_MESSAGERECEIVER_H

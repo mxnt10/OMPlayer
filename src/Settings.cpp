@@ -79,7 +79,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     auto *combotheme = new QComboBox();
     combotheme->addItems(Utils::subdirIcons());
     combotheme->setCurrentText(JsonTools::stringJson("theme"));
-    combotheme->setStyleSheet(Utils::setStyle("combo"));
+    combotheme->setStyleSheet(Utils::setStyle("global"));
     connect(combotheme, &QComboBox::currentTextChanged, this, &Settings::setIcon);
 
     auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");

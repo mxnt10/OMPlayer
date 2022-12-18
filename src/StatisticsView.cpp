@@ -55,6 +55,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     FPS = videoItems[6];
     MD5 = baseItems[6];
     FORMAT = baseItems[3];
+    VUMETER = audioItems[9];
 
 
     /** Botão para fechar a janela */
@@ -192,7 +193,8 @@ QStringList StatisticsView::getAudioInfoKeys() {
         << tr("Channels")
         << tr("Frames")
         << tr("Frame Size")
-        << tr("Frame Rate");
+        << tr("Frame Rate")
+        << tr("VU Meter");
 }
 
 
@@ -258,7 +260,8 @@ QVariantList StatisticsView::getAudioInfoValues(const QtAV::Statistics& s) {
         << QString::fromLatin1("%1 (Layout: %2)").arg(QString::number(s.audio_only.channels), s.audio_only.channel_layout)
         << s.audio.frames
         << s.audio_only.frame_size
-        << s.audio.frame_rate;
+        << s.audio.frame_rate
+        << QString();
 }
 
 
@@ -388,7 +391,7 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
            GRE, RED, GRE, RED, BLU, csize);
 
-    this->setMinimumSize(csize, 340);
+    this->setMinimumSize(csize, 350);
     this->resize(csize, this->height());
 
     /** Buscando informações em segundo plano */
@@ -530,6 +533,20 @@ void StatisticsView::settaginfos() {
 
 /** Função para alterar o ícone do botão */
 void StatisticsView::changeIcons() { Utils::changeIcon(closebtn, "apply"); }
+
+
+/** Setando informações do dB direito */
+void StatisticsView::setRightDB(int value) {
+    vuright = value;
+    VUMETER->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+}
+
+
+/** Setando informações do dB esquerdo */
+void StatisticsView::setLeftDB(int value) {
+    vuleft = value;
+    VUMETER->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+}
 
 
 /**********************************************************************************************************************/

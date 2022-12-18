@@ -20,6 +20,10 @@ public:
     void setCurrentTime(int current);
     void changeIcons();
 
+public Q_SLOTS:
+    void setRightDB(int value);
+    void setLeftDB(int value);
+
 protected:
     void hideEvent(QHideEvent *event) override;
     void showEvent(QShowEvent *event) override;
@@ -60,10 +64,10 @@ private:
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
     QList<QTreeWidgetItem*> metadata{};
-    QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{}, *FORMAT{};
+    QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{}, *FORMAT{}, *VUMETER{};
     QString ctime{}, fsize{}, url{};
     QtAV::Statistics statistics{};
-    int timer{0};
+    int timer{0}, vuleft{0}, vuright{0};
     bool onclose{false};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with
@@ -78,4 +82,4 @@ private:
     Worker *worker;
 };
 
-#endif // OMPLAYER_STATISTICSVIEW_H
+#endif //OMPLAYER_STATISTICSVIEW_H

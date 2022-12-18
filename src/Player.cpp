@@ -5,7 +5,9 @@
 #include <ClickableMenu>
 #include <Utils>
 
+#include "VUMeterFilter.h"
 #include "Player.h"
+
 #define ClickableMenu(x) ClickableMenu(x + "\t\t")
 
 
@@ -75,6 +77,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(mediaPlayer, &QtAV::AVPlayer::stopped, [this](){ if(!prevent) onStop(); });
     connect(mediaPlayer, &QtAV::AVPlayer::paused, this, &OMPlayer::onPaused);
     connect(mediaPlayer, &QtAV::AVPlayer::error, this, &OMPlayer::handleError);
+
+
+    /** Filtro de áudio */
+    auto vu = new VUMeterFilter();
+    mediaPlayer->installFilter(vu);
+    connect(vu, &VUMeterFilter::leftLevelChanged, infoview, &StatisticsView::setLeftDB);
+    connect(vu, &VUMeterFilter::rightLevelChanged, infoview, &StatisticsView::setRightDB);
 
 
     /** Playlist do reprodutor */

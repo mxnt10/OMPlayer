@@ -7,15 +7,17 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Added / Adicionado
  - Adicionado informações de metadados.
- - Adicionado fontes LoopButton.{h/cpp} em src/Utils.
+ - Adicionado sources LoopButton.{h/cpp} em src/Utils.
+ - Adicionado sources VuMeterFilter.{h/cpp} em src.
  - Adicionado recursos de forward e backward.
  - Adicionado icones freepik, iyahblue e iyahorange em icons.
  - Adicionado a licença dos ícones.
- - Adicionado estilos combo.qss e radio.qss em qss.
+ - Adicionado estilo radio.qss em qss.
  - Recursos:
     - Adicionado funções de forward e backward.
     - Adicionado botões de loop e clique longo para replay com replay-one,
       next com forward e previous e backward.
+    - Adicionado filtro de eventos para futuro suporte a visualização.
 ###
 
 ### Upgraded / Atualizado
@@ -28,6 +30,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Otimização do uso do libmediainfo, colocado em multithread.
  - Modificado a classe dos botões para possibilitar botões com
    emissão de sinais em loop.
+ - Modificação nos efeitos de esmaecimento.
 ###
 
 ### Removed / Removido

@@ -2,7 +2,7 @@
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
 #include <QWidgetAction>
-#include <ClickableMenu>
+#include <CustomMenu>
 #include <Utils>
 
 #include "VUMeterFilter.h"
@@ -144,8 +144,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(volume, &Slider::onHover, this, &OMPlayer::onTimeVolume);
     connect(volume, &Slider::sliderMoved, this, &OMPlayer::setVolume);
     connect(volume, &Slider::sliderPressed, [this](){ setVolume(volume->value()); });
-    connect(volume, &Slider::emitLeave, [this](){ wvol->close(); });
-
+    connect(volume, &Slider::emitLeave, wvol, &QWidget::close);
 
     /** Plano de fundo semitransparente dos controles de reprodução */
     qDebug("%s(%sInterface%s)%s::%sPreparando o layout da interface ...\033[0m", GRE, RED, GRE, RED, CYA);
@@ -374,7 +373,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     Utils::changeMenuIcon(subMenu, "track");
     audiotrack = new QMenu(this);
     audiotrack = subMenu;
-    connect(subMenu, SIGNAL(triggered(QAction*)), SLOT(changeAudioTrack(QAction*)));
+    connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::changeAudioTrack);
     ta = new QActionGroup(subMenu);
     ta->setExclusive(true);
     initAudioTrackMenu();
@@ -905,9 +904,13 @@ void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
 
 /** Função para executar operações ao fachar os diálogos */
 void OMPlayer::closeDialog() {
+    wctl->close();
     this->setMaximumSize(screen);
     this->setMinimumSize(min);
-    showsett = false;
+    this->activateWindow();
+    this->setFocus();
+    showsett = contmenu = nomousehide = control = false;
+    filter->setMove(false);
     filter->setSett(showsett);
 }
 

@@ -83,7 +83,7 @@ public:
     static QString aspectStr(Utils::ASPECTRATIO aspect);
     static QString setThemeName();
     static QStringList setLocals();
-    static void fadeDiag(QPropertyAnimation *animation, int x, int y);
+    static void fadeDiag(QPropertyAnimation *animation, float x, float y);
     static int calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 
 private:

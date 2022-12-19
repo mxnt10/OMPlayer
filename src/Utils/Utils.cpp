@@ -334,7 +334,7 @@ QString Utils::setThemeName() {
 
 
 /** Efeito fade para os diálogos */
-void Utils::fadeDiag(QPropertyAnimation *animation, int x, int y) {
+void Utils::fadeDiag(QPropertyAnimation *animation, float x, float y) {
     animation->setDuration(FADE_VAL);
     animation->setStartValue(x);
     animation->setEndValue(y);

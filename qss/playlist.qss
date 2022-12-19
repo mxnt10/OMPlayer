@@ -13,6 +13,7 @@ QScrollBar { background-color: transparent; }
 QScrollBar::handle {
     border: 2px solid #cccccc;
     border-radius: 8px;
+    min-height: 12px;
 }
 
 

@@ -9,7 +9,12 @@
 
 /** Construtor que possibilita colocar o título do menu */
 ClickableMenu::ClickableMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {
-    setWindowOpacity(0.8);
+
+    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
+    effect = new QGraphicsOpacityEffect(this);
+    effect->setOpacity(0.8);
+    setGraphicsEffect(effect);
+
     setStyleSheet(Utils::setStyle("action"));
 }
 
@@ -33,15 +38,27 @@ void ClickableMenu::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 
-/**********************************************************************************************************************/
-
-
-/** Construtor que possibilita colocar o título do menu */
-CMenu::CMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {
-    setWindowOpacity(0.8);
-    setStyleSheet(Utils::setStyle("contextmenu"));
+/** Interceptação ao fechar o menu de contexto */
+void ClickableMenu::closeEvent(QCloseEvent *event) {
+    if (onclose) {
+        event->accept();
+        return;
+    }
+    Utils::fadeDiag(animation, 0.8, 0);
+    connect(animation, &QPropertyAnimation::finished, [this](){
+        onclose = true;
+        this->close();
+    });
+    event->ignore();
 }
 
 
-/** Destrutor */
-CMenu::~CMenu() = default;
+/** Interceptação ao abrir o menu de contexto */
+void ClickableMenu::showEvent(QShowEvent *event) {
+    animation = nullptr;
+    delete animation;
+    animation = new QPropertyAnimation(effect, "opacity");
+    onclose = false;
+    Utils::fadeDiag(animation, 0, 0.8);
+    QWidget::showEvent(event);
+}

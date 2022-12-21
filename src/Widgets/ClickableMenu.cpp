@@ -55,7 +55,6 @@ void ClickableMenu::closeEvent(QCloseEvent *event) {
 
 /** Interceptação ao abrir o menu de contexto */
 void ClickableMenu::showEvent(QShowEvent *event) {
-    animation = nullptr;
     delete animation;
     animation = new QPropertyAnimation(effect, "opacity");
     onclose = false;

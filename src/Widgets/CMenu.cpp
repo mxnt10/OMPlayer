@@ -26,27 +26,10 @@ CMenu::~CMenu() = default;
 /**********************************************************************************************************************/
 
 
-/** Interceptação ao fechar o menu de contexto */
-void CMenu::closeEvent(QCloseEvent *event) {
-    if (onclose) {
-        event->accept();
-        return;
-    }
-    Utils::fadeDiag(animation, 0.8, 0);
-    connect(animation, &QPropertyAnimation::finished, [this](){
-        onclose = true;
-        this->close();
-    });
-    event->ignore();
-}
-
-
 /** Interceptação ao abrir o menu de contexto */
 void CMenu::showEvent(QShowEvent *event) {
-    animation = nullptr;
     delete animation;
     animation = new QPropertyAnimation(effect, "opacity");
-    onclose = false;
     Utils::fadeDiag(animation, 0, 0.8);
     QWidget::showEvent(event);
 }

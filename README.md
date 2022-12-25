@@ -12,7 +12,7 @@
     <a href="https://github.com/mxnt10/OMPlayer/stargazers">
         <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mxnt10/OMPlayer?color=blue&label=GitHub%20Stars&style=flat-square">
     </a><br/><br/>
-    <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/preview/preview.png" alt=""></a>
+    <a><img src="https://raw.githubusercontent.com/mxnt10/OMPlayer/master/docs/preview.png" alt=""></a>
     <br/><br/>
     Multimediɑ plɑγeɾ developed in C++ using Qt5 ɑs ɑn inteɾfɑce.
     To plɑγ multimediɑ files, the pɾogɾɑm uses the QtAV fɾɑmewoɾk,
@@ -88,7 +88,7 @@ Theɾefoɾe, theγ cɑn be distɾibuted ɑnd/oɾ modified within the teɾms of t
 The themes icons "dɾeɑmstale", "fɾeepik", "iγɑhblue" ɑnd "iγɑhoɾɑnge" ɑɾe undeɾ the 𝙁𝙡𝙖𝙩𝙞𝙘𝙤𝙣 𝙇𝙞𝙘𝙚𝙣𝙨𝙚.
 
 >
->[Flɑticon License](https://github.com/mxnt10/OMPlayer/blob/master/flaticon-license.pdf)
+>[Flɑticon License](https://github.com/mxnt10/OMPlayer/blob/master/docs/flaticon-license.pdf)
 >
 > - Icons Theme Dɾeɑmstɑle: designed bγ Dɾeɑmstɑle fɾom Flɑticon.<br/>
 > - Icons Menu Theme Dɾeɑmstɑle: designed bγ Fɾeepik fɾom Flɑticon.<br/>

@@ -445,10 +445,7 @@ void OMPlayer::setRenderer(const QString &op) {
 /** Alterando a dimensão de tela */
 void OMPlayer::switchAspectRatio(QAction *action) {
     Utils::ASPECTRATIO r = Utils::ASPECTRATIO(action->data().toInt());
-    if (action == aspectAction) {
-        action->toggle();
-        return;
-    }
+    if (action == aspectAction) return;
 
     qDebug("%s(%sMenu%s)%s::%sSetando aspect ratio %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(Utils::aspectStr(r)));
     if (r == Utils::AspectVideo) mediaPlayer->renderer()->setOutAspectRatioMode(QtAV::VideoRenderer::VideoAspectRatio);
@@ -702,6 +699,7 @@ void OMPlayer::onStop() {
         slider->setDisabled(true);
         current->setText("-- -- : -- --");
         end->setText("-- -- : -- --");
+        infoview->resetValues();
 
         onTimeSliderLeave(IsPlay);
         changeIcons(IsPlay);
@@ -1141,11 +1139,18 @@ void OMPlayer::initAudioTrackMenu() {
     int track = mediaPlayer->currentAudioStream();
     int tracks = mediaPlayer->audioStreamCount();
 
+    /** Redefinindo o menu de contexto */
+    while (tracks < as.count()) {
+        a = as.takeLast();
+        ta->removeAction(a);
+        delete a;
+    }
+
     if (as.count() == 0 || tracks == 0) {
         /** Definindo o menu de contexto na inicialização */
         a = audiotrack->addAction(tr("No sound"));
         a->setData(as.size());
-        a->setCheckable(true);
+        a->setCheckable(false);
         a->setChecked(false);
         audiotrack->addAction(a);
         return;
@@ -1156,18 +1161,11 @@ void OMPlayer::initAudioTrackMenu() {
         delete a;
     }
 
-    /** Redefinindo o menu de contexto */
-    while (tracks < as.count()) {
-        a = as.takeLast();
-        ta->removeAction(a);
-        delete a;
-    }
-
     /** Redefinindo o menu de contexto ao parar */
     if (!playing) {
         a = audiotrack->addAction(tr("No sound"));
         a->setData(as.size());
-        a->setCheckable(true);
+        a->setCheckable(false);
         a->setChecked(false);
         audiotrack->addAction(a);
         return;
@@ -1192,10 +1190,7 @@ void OMPlayer::initAudioTrackMenu() {
 /** Função para alterar canais de áudio */
 void OMPlayer::changeAudioTrack(QAction *action){
     int track = action->data().toInt();
-    if (trackAction == action) {
-        action->toggle();
-        return;
-    }
+    if (trackAction == action) return;
 
     /** Verificando e mudando o canal de áudio */
     if (!mediaPlayer->setAudioStream(track)) {

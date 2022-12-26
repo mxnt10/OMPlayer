@@ -1,5 +1,4 @@
 #include <QCloseEvent>
-#include <QFileInfo>
 #include <QHeaderView>
 #include <QLayout>
 #include <QTimer>
@@ -588,8 +587,7 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
 /** Prevenindo fechamento sem onClose() */
 void StatisticsView::closeEvent(QCloseEvent *event) {
     if (!onclose) {
-        event->ignore();
-        QTimer::singleShot(100, this, &StatisticsView::onClose);
+        QTimer::singleShot(10, this, &StatisticsView::onClose);
         return;
     } else event->accept();
 }

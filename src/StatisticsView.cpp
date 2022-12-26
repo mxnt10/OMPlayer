@@ -38,6 +38,16 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
 
 
+    /** Buscando estatísticas com mediainfolib */
+    thread2 = new QThread();
+    statisticsworker = new StatisticsWorker();
+    statisticsworker->moveToThread(thread2);
+    connect(statisticsworker, &StatisticsWorker::baseValues, this, &StatisticsView::setItemValues);
+    connect(thread2, &QThread::started, statisticsworker, &StatisticsWorker::doWork);
+    connect(statisticsworker, &StatisticsWorker::workRequested, [this](){ thread2->start(); });
+    connect(statisticsworker, &StatisticsWorker::finished, [this](){ thread2->quit(); });
+
+
     /** Iniciando as informações dos itens */
     initItems(&baseItems, getBaseInfoKeys());
     initItems(&videoItems, getVideoInfoKeys());
@@ -50,11 +60,6 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     view2 = new TreeView(videoItems);
     view3 = new TreeView(audioItems);
     view4 = new TreeView(metadata);
-    CTIME = baseItems[5];
-    FPS = videoItems[6];
-    MD5 = baseItems[6];
-    FORMAT = baseItems[3];
-    VUMETER = audioItems[9];
 
 
     /** Botão para fechar a janela */
@@ -115,14 +120,22 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     layout->addWidget(found, 0, 0);
     layout->addLayout(fore, 0, 0);
     setLayout(layout);
+
+
+    /** Ajuste inicial */
+    visibility();
+    setSize();
 }
 
 
 /** Destrutor */
 StatisticsView::~StatisticsView() {
     thread->quit();
+    thread2->quit();
     delete thread;
+    delete thread2;
     delete worker;
+    delete statisticsworker;
 }
 
 
@@ -313,10 +326,8 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
 
     qDebug() << s.metadata.keys();
 
-    QList<QTreeWidgetItem*> item = {FORMAT, FPS, MD5, CTIME};
-    for(QTreeWidgetItem* i : item) i->setData(1, Qt::DisplayRole, "");
-
-    int i = 0;
+    /** Redefinindo informações */
+    resetValues();
     ctime = "00:00:00";
     statistics = s;
     QString byte{"B"};
@@ -421,9 +432,11 @@ void StatisticsView::visibility(){
     /** Verificando status de vídeo e áudio e o que precisa ser oculto */
     if (!statistics.video.available) tab->setTabVisible(1, false);
     else {
-        if (statistics.video.bit_rate == 0) view2->topLevelItem(2)->setHidden(true);
-        if (statistics.video.frames == 0) view2->topLevelItem(5)->setHidden(true);
-        if (statistics.video.frame_rate == 0) view2->topLevelItem(6)->setHidden(true);
+        int i = 0;
+        foreach(QTreeWidgetItem* it, videoItems) {
+            if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view2->topLevelItem(i)->setHidden(true);
+            i++;
+        }
     }
     if (!statistics.audio.available) tab->setTabVisible(2, false);
     else {
@@ -441,7 +454,7 @@ void StatisticsView::visibility(){
         int i = 0;
 
         foreach(QVariant var, v) {
-            if (QString::compare(var.toString(), "") != 0) visibility = true;
+            if (!var.toString().isEmpty()) visibility = true;
             else view4->topLevelItem(i)->setHidden(true);
             ++i;
         }
@@ -487,8 +500,11 @@ void StatisticsView::visibility(){
  * Função que seta as informações de mídia em ícones */
 void StatisticsView::settaginfos() {
     ratio->setVisible(true);
-    if (videoItems[3]->data(1, Qt::DisplayRole) == 1.77778) Utils::changeIcon(ratio, "ratio169");
-    else if (videoItems[3]->data(1, Qt::DisplayRole) == 1.33333) Utils::changeIcon(ratio, "ratio43");
+
+    if (videoItems[3]->data(1, Qt::DisplayRole).toString().split(' ')[0] == "16:9")
+        Utils::changeIcon(ratio, "ratio169");
+    else if (videoItems[3]->data(1, Qt::DisplayRole).toString().split(' ')[0] == "4:3")
+        Utils::changeIcon(ratio, "ratio43");
     else ratio->setVisible(false);
 
     int w = statistics.video_only.width;
@@ -530,21 +546,50 @@ void StatisticsView::settaginfos() {
 }
 
 
+/** Buscando o maior comprimento para a janela */
+void StatisticsView::setSize() {
+    view1->header()->setStretchLastSection(false);
+    view2->header()->setStretchLastSection(false);
+    view3->header()->setStretchLastSection(false);
+    view4->header()->setStretchLastSection(false);
+
+    int csize = view1->size();
+    if (csize < view2->size()) csize = view2->size();
+    if (csize < view3->size()) csize = view3->size();
+    if (csize < view4->size()) csize = view4->size();
+
+    view1->header()->setStretchLastSection(true);
+    view2->header()->setStretchLastSection(true);
+    view3->header()->setStretchLastSection(true);
+    view4->header()->setStretchLastSection(true);
+
+    csize = csize + 40;
+    qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
+           GRE, RED, GRE, RED, BLU, csize);
+
+    this->setMinimumSize(csize, 350);
+    this->resize(csize, this->height());
+}
+
+
 /** Função para alterar o ícone do botão */
-void StatisticsView::changeIcons() { Utils::changeIcon(closebtn, "apply"); }
+void StatisticsView::changeIcons() {
+    Utils::changeIcon(closebtn, "apply");
+    settaginfos();
+}
 
 
 /** Setando informações do dB direito */
 void StatisticsView::setRightDB(int value) {
     vuright = value;
-    VUMETER->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    audioItems[9]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
 }
 
 
 /** Setando informações do dB esquerdo */
 void StatisticsView::setLeftDB(int value) {
     vuleft = value;
-    VUMETER->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    audioItems[9]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
 }
 
 
@@ -561,8 +606,6 @@ void StatisticsView::hideEvent(QHideEvent *event) {
 /** Evento para iniciar o temporizador */
 void StatisticsView::showEvent(QShowEvent *event) {
     onclose = false;
-    visibility();
-    settaginfos();
     timer = startTimer(1000);
     Utils::fadeDiag(animation, 0, 1);
     QDialog::showEvent(event);
@@ -573,13 +616,13 @@ void StatisticsView::showEvent(QShowEvent *event) {
 void StatisticsView::timerEvent(QTimerEvent *event) {
     if (event->timerId() != timer) return;
 
-    if (FPS && statistics.video.frame_rate != 0)
-        FPS->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
+    if (statistics.video.frame_rate != 0)
+        videoItems[6]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 QString::number(statistics.video.frame_rate, 'f', 2),
                 QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
 
-    if (CTIME && !statistics.url.isEmpty())
-        CTIME->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
+    if (!statistics.url.isEmpty())
+        baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 ctime, statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
 }
 

@@ -8,6 +8,7 @@
 #include <Button>
 #include <TreeView>
 
+#include "StatisticsWorker.h"
 #include "Worker.h"
 
 class StatisticsView : public QDialog {
@@ -23,6 +24,7 @@ public:
 public Q_SLOTS:
     void setRightDB(int value);
     void setLeftDB(int value);
+    void resetValues();
 
 protected:
     void hideEvent(QHideEvent *event) override;
@@ -43,6 +45,7 @@ private Q_SLOTS:
 private:
     void visibility();
     void settaginfos();
+    void setSize();
     static QStringList getBaseInfoKeys();
     static QStringList getVideoInfoKeys();
     static QStringList getAudioInfoKeys();
@@ -64,7 +67,6 @@ private:
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
     QList<QTreeWidgetItem*> metadata{};
-    QTreeWidgetItem *FPS{}, *CTIME{}, *MD5{}, *FORMAT{}, *VUMETER{};
     QString ctime{}, fsize{}, url{};
     QtAV::Statistics statistics{};
     int timer{0}, vuleft{0}, vuright{0};
@@ -78,8 +80,9 @@ private:
     QList<int> uhdh{2160, 2664, 1714};       // 4k heith
 
     /** Suporte multithread */
-    QThread *thread;
+    QThread *thread, *thread2;
     Worker *worker;
+    StatisticsWorker *statisticsworker;
 };
 
 #endif //OMPLAYER_STATISTICSVIEW_H

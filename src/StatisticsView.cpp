@@ -582,14 +582,14 @@ void StatisticsView::changeIcons() {
 /** Setando informações do dB direito */
 void StatisticsView::setRightDB(int value) {
     vuright = value;
-    audioItems[9]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
 }
 
 
 /** Setando informações do dB esquerdo */
 void StatisticsView::setLeftDB(int value) {
     vuleft = value;
-    audioItems[9]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
 }
 
 
@@ -621,6 +621,7 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
                 QString::number(statistics.video.frame_rate, 'f', 2),
                 QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
 
+    /** Duração atual */
     if (!statistics.url.isEmpty())
         baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 ctime, statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));

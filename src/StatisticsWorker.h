@@ -15,7 +15,7 @@ public:
     void setFile(const QString &val, const QtAV::Statistics &s) { file = val; statistics = s; };
 
 Q_SIGNALS:
-    void baseValues(const QStringList &values, const QStringList &valuesVideo);
+    void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio);
     void workRequested();
     void finished();
 
@@ -27,12 +27,11 @@ private:
     static QString convertByte(auto byte);
     static QString convertBit(auto bit);
     static QString convertAspectRatio(int x, int y);
+    static QString convertHz(auto hz);
 
     QString file{};
     QtAV::Statistics statistics{};
     MediaInfoDLL::MediaInfo MI{};
-
-
 };
 
 #endif //OMPLAYER_STATISTICSWORKER_H

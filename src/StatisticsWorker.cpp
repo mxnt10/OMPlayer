@@ -1,7 +1,6 @@
+#include <QFileInfo>
 #include <QThread>
 #include <Utils>
-#include <iostream>
-#include <QFileInfo>
 
 #include "Hash.hpp"
 #include "StatisticsWorker.h"
@@ -51,6 +50,12 @@ void StatisticsWorker::doWork() {
         int w = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Width"))).toInt();
         int h = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"))).toInt();
         auto videobitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("BitRate")));
+        auto framerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("FrameRate"))).toFloat();
+        auto audiobitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("BitRate")));
+        auto samplerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("SamplingRate")));
+        auto channel = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("Channels")));
+        auto channellayout = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("ChannelLayout")));
+        auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("FrameRate")));
 
         values << setFormat(QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"))))
                << convertBit(bitrate.toFloat())
@@ -63,8 +68,20 @@ void StatisticsWorker::doWork() {
         else valuesVideo << convertBit(videobitrate.toFloat());
 
         valuesVideo << convertAspectRatio(w, h)
-                    << QString::fromLatin1("%1x%2").arg(w).arg(h);
+                    << QString::fromLatin1("%1x%2").arg(w).arg(h) << "" // Frames não informado
+                    << QString::number(framerate, 'f', 2);
 
+        /** Informações de áudio */
+        valuesAudio << "" << ""; // Codec e Decoder não informados
+
+        if (audiobitrate.isEmpty()) valuesAudio << "";
+        else valuesAudio << convertBit(audiobitrate.toFloat());
+
+        valuesAudio << convertHz(samplerate.toFloat()) << "" // Sample format não informado
+                    << QString::fromLatin1("%1 (Layout %2)").arg(channel, channellayout) << ""; // Frames não informado
+
+        if (audioframerate.isEmpty()) valuesAudio << "";
+        else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
     } else {
         int w = statistics.video_only.width;
         int h = statistics.video_only.height;
@@ -72,6 +89,7 @@ void StatisticsWorker::doWork() {
         int ch = statistics.video_only.coded_height;
         auto sizev = QString::fromLatin1("%1x%2").arg(w).arg(h);
         auto sizec = QString::fromLatin1("%1x%2").arg(cw).arg(ch);
+        auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("FrameRate")));
 
         /** Informações básicas */
         if (QString::compare(statistics.format.split(' ')[0], "mp3") == 0) values << "mp3 - MP3 (MPEG Audio Layer 3)";
@@ -99,32 +117,43 @@ void StatisticsWorker::doWork() {
         if (statistics.video.frame_rate == 0) valuesVideo << "";
         else valuesVideo << QString::fromLatin1("%1 / %2").arg(QString::number(statistics.video.frame_rate, 'f', 2),
                                                                QString::number(statistics.video.frame_rate, 'f', 2));
+
+        /** Informações de áudio */
+        valuesAudio << QString::fromLatin1("%1 (%2)").arg(statistics.audio.codec, statistics.audio.codec_long)
+                    << QString::fromLatin1("%1 (%2)").arg(statistics.audio.decoder, statistics.audio.decoder_detail);
+
+        if (statistics.audio.bit_rate == 0) valuesAudio << "";
+        else valuesAudio << convertBit((float)statistics.audio.bit_rate);
+
+        valuesAudio << convertHz((float)statistics.audio_only.sample_rate)
+                    << statistics.audio_only.sample_fmt
+                    << QString::fromLatin1("%1 (Layout %2)").arg(QString::number(statistics.audio_only.channels),
+                                                                 statistics.audio_only.channel_layout);
+
+        if (statistics.audio.frames == 0) valuesAudio << "";
+        else valuesAudio << QString::number(statistics.audio.frames);
+
+        if (statistics.audio_only.frame_size == 0) valuesAudio << "";
+        else valuesAudio << QString::number(statistics.audio_only.frame_size);
+
+        if (statistics.audio.frame_rate == 0) {
+            if(audioframerate.isEmpty()) valuesAudio << "";
+            else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
+        } else valuesAudio << QString::number(statistics.video.frame_rate, 'f', 2);
     }
 
+    /** Outras informações */
     auto bitdepth = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("BitDepth")));
     if (bitdepth.isEmpty()) valuesVideo << "";
     else valuesVideo << bitdepth + " bits";
 
     valuesVideo << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("ChromaSubsampling")));
 
-    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("BitDepth")));
-    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("SamplingRate")));
+    bitdepth = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("BitDepth")));
+    if (bitdepth.isEmpty()) valuesAudio << "";
+    else valuesAudio << bitdepth + " bits";
 
-
-    Q_EMIT baseValues(values, valuesVideo);
-
-//    std::cout << QString::fromStdWString(MI.Inform()).toStdString();
-
-
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-//    qDebug() << QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
-
-
+    Q_EMIT baseValues(values, valuesVideo, valuesAudio);
     MI.Close();
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
@@ -218,4 +247,20 @@ QString StatisticsWorker::convertAspectRatio(int x, int y) {
     }
 }
 
+
+/** Definição da frequência */
+QString StatisticsWorker::convertHz(auto hz) {
+    int i = 0;
+    QString herts{"Hz"};
+    QStringList hertsit{"kHz", "mHz", "gHz"};
+
+    auto hert = hz;
+    while (hert > 1000) {
+        hert = hert / 1000;
+        herts = hertsit[i];
+        i++;
+    }
+
+    return QString::number(hert) + " " + herts;
+}
 #undef DG_T

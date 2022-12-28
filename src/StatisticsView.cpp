@@ -143,13 +143,117 @@ StatisticsView::~StatisticsView() {
 
 
 /** setar nas informações o hash MD5 dos arquivos multimídia */
-void StatisticsView::setMd5(const QString &md5) { MD5->setData(1, Qt::DisplayRole, md5); }
+void StatisticsView::setMd5(const QString &md5) { baseItems[6]->setData(1, Qt::DisplayRole, md5); }
 
 
-/** setar nas informações o hash MD5 dos arquivos multimídia */
-void StatisticsView::setFormat(const QString &format) {
-    FORMAT->setData(1, Qt::DisplayRole, format);
-    if (QString::compare(FORMAT->text(1), "") != 0) emit emitFormat(format);
+/** setar nas informações do formato dos arquivos multimídia */
+void StatisticsView::setFormat(const QString &format) { emit emitFormat(format); }
+
+
+/** Especificações das informações básicas */
+QStringList StatisticsView::getBaseInfoKeys() {
+    return { tr("File Path"),     // 0
+             tr("File Name"),      // 1
+             tr("File Size"),       // 2
+             tr("Format"),           // 3
+             tr("Overall Bit Rate"), // 4
+             tr("Duration"),         // 5
+             tr("Md5Sum") };         // 6
+}
+
+
+/** Especificações para informações de vídeo */
+QStringList StatisticsView::getVideoInfoKeys() {
+    return { tr("Codec"),        // 0
+             tr("Decoder"),      // 1
+             tr("Bit Rate"),     // 2
+             tr("Aspect Ratio"),  // 3
+             tr("Size"),           // 4
+             tr("Frames"),          // 5
+             tr("Frame Rate"),       // 6
+             tr("Bit Depth"),         // 7
+             tr("Chroma Subsampling"), // 8
+             tr("Pixel Format") };     // 9
+}
+
+
+/** Especificações para informações de áudio */
+QStringList StatisticsView::getAudioInfoKeys() {
+    return { tr("Codec"),      // 0
+             tr("Decoder"),     // 1
+             tr("Bit Rate"),     // 2
+             tr("Sample Rate"),   // 3
+             tr("Sample Format"), // 4
+             tr("Channels"),      // 5
+             tr("Frames"),        // 6
+             tr("Frame Size"),    // 7
+             tr("Frame Rate"),    // 8
+             tr("Bit Depth"),     // 9
+             tr("VU Meter") };    // 10
+}
+
+
+/** Especificações para informações de metadados */
+QStringList StatisticsView::getMetaDataKeys() {
+    return { tr("Title"),  // 0
+             tr("Artist"), // 1
+             tr("Album"),  // 2
+             tr("Genre"),  // 3
+             tr("Track"),  // 4
+             tr("Date"),   // 5
+             tr("Link") }; // 6
+}
+
+
+/** Setando as informações de mídia */
+void StatisticsView::setItemValues(const QStringList &values, const QStringList &valuesVideo,
+                                   const QStringList &valuesAudio) {
+    QStringList v = values;
+    int i = 0;
+
+    /** Atualizando informações gerais */
+    foreach(QTreeWidgetItem* it, baseItems) {
+        if (i == v.count()) break; // Evita erros de segmentação
+        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
+        ++i;
+    }
+
+    v = valuesVideo;
+    i = 0;
+
+    /** Atualizando informações de vídeo */
+    foreach(QTreeWidgetItem* it, videoItems) {
+        if (i == v.count()) break; // Evita erros de segmentação
+        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
+        ++i;
+    }
+
+    v = valuesAudio;
+    i = 0;
+
+    /** Atualizando informações de áudio */
+    foreach(QTreeWidgetItem* it, audioItems) {
+        if (i == v.count()) break; // Evita erros de segmentação
+        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
+        ++i;
+    }
+
+    settaginfos();
+    visibility();
+    setSize();
+}
+
+
+/** Resetando as informações de estatísticas */
+void StatisticsView::resetValues() {
+    foreach(QTreeWidgetItem* it, baseItems) it->setData(1, Qt::DisplayRole, "");
+    foreach(QTreeWidgetItem* it, videoItems) it->setData(1, Qt::DisplayRole, "");
+    foreach(QTreeWidgetItem* it, audioItems) it->setData(1, Qt::DisplayRole, "");
+    foreach(QTreeWidgetItem* it, metadata) it->setData(1, Qt::DisplayRole, "");
+    statistics = QtAV::Statistics();
+    settaginfos();
+    visibility();
+    setSize();
 }
 
 
@@ -163,117 +267,6 @@ void StatisticsView::onClose() {
         Q_EMIT emitclose();
         this->close();
     });
-}
-
-
-/** Especificações das informações básicas */
-QStringList StatisticsView::getBaseInfoKeys() {
-    return QStringList()
-        << tr("File Path")
-        << tr("File Name")
-        << tr("File Size")
-        << tr("Format")
-        << tr("Bit Rate")
-        << tr("Duration")
-        << tr("Md5Sum");
-}
-
-
-/** Especificações para informações de vídeo */
-QStringList StatisticsView::getVideoInfoKeys() {
-    return QStringList()
-        << tr("Codec")
-        << tr("Decoder")
-        << tr("Bit Rate")
-        << tr("Aspect Ratio")
-        << tr("Size")
-        << tr("Frames")
-        << tr("Frame Rate")
-        << tr("Pixel Format")
-        << tr("GOP Size");
-}
-
-
-/** Especificações para informações de áudio */
-QStringList StatisticsView::getAudioInfoKeys() {
-    return QStringList()
-        << tr("Codec")
-        << tr("Decoder")
-        << tr("Bit Rate")
-        << tr("Sample Rate")
-        << tr("Sample Format")
-        << tr("Channels")
-        << tr("Frames")
-        << tr("Frame Size")
-        << tr("Frame Rate")
-        << tr("VU Meter");
-}
-
-
-/** Especificações para informações de metadados */
-QStringList StatisticsView::getMetaDataKeys() {
-    return QStringList()
-            << tr("Title")
-            << tr("Artist")
-            << tr("Album")
-            << tr("Genre")
-            << tr("Track")
-            << tr("Date")
-            << tr("Link");
-}
-
-
-/** Informações básicas de mídia */
-QVariantList StatisticsView::getBaseInfoValues(const QtAV::Statistics& s) {
-    QString rate, duration;
-    if (!s.url.isEmpty()) {
-        rate = QString::number(s.bit_rate/1000).append(QString::fromLatin1(" Kb/s"));
-        duration = QString::fromLatin1("%1 / %2").arg(ctime, s.duration.toString(QString::fromLatin1("HH:mm:ss")));
-    }
-
-    return QVariantList()
-        << QString(s.url).remove(QRegExp("\\/(?:.(?!\\/))+$"))
-        << QString(s.url).remove(QRegExp("\\/.+\\/"))
-        << fsize
-        << QString()
-        << rate
-        << duration
-        << QString();
-}
-
-
-/** Informações de vídeo */
-QVariantList StatisticsView::getVideoInfoValues(const QtAV::Statistics& s) {
-    QString sizev = QString::fromLatin1("%1x%2").arg(s.video_only.width).arg(s.video_only.height);
-    QString sizec = QString::fromLatin1("%1x%2").arg(s.video_only.coded_width).arg(s.video_only.coded_height);
-
-    return QVariantList()
-        << QString::fromLatin1("%1 (%2)").arg(s.video.codec, s.video.codec_long)
-        << QString::fromLatin1("%1 (%2)").arg(s.video.decoder, s.video.decoder_detail)
-        << QString::number(s.video.bit_rate/1000).append(QString::fromLatin1(" Kb/s"))
-        << QString::number(((double)s.video_only.width / s.video_only.height))
-        << QString::fromLatin1("%1 (Codec: %2)").arg(sizev, sizec)
-        << s.video.frames
-        << QString::fromLatin1("%1 / %2").arg(QString::number(s.video.frame_rate, 'f', 2),
-                                              QString::number(s.video.frame_rate, 'f', 2))
-        << s.video_only.pix_fmt
-        << s.video_only.gop_size;
-}
-
-
-/** Informações de áudio */
-QVariantList StatisticsView::getAudioInfoValues(const QtAV::Statistics& s) {
-    return QVariantList()
-        << QString::fromLatin1("%1 (%2)").arg(s.audio.codec, s.audio.codec_long)
-        << QString::fromLatin1("%1 (%2)").arg(s.audio.decoder, s.audio.decoder_detail)
-        << QString::number(s.audio.bit_rate/1000).append(QString::fromLatin1(" Kb/s"))
-        << QString::number(s.audio_only.sample_rate).append(QString::fromLatin1(" Hz"))
-        << s.audio_only.sample_fmt
-        << QString::fromLatin1("%1 (Layout: %2)").arg(QString::number(s.audio_only.channels), s.audio_only.channel_layout)
-        << s.audio.frames
-        << s.audio_only.frame_size
-        << s.audio.frame_rate
-        << QString();
 }
 
 
@@ -303,7 +296,6 @@ QVariantList StatisticsView::getMetaDataValues(const QtAV::Statistics& s) {
             } else values.append(s.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]));
         } else values.append("");
     }
-
     return values;
 }
 
@@ -330,48 +322,9 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     resetValues();
     ctime = "00:00:00";
     statistics = s;
-    QString byte{"B"};
-    QStringList byteit{"KiB", "MiB", "GiB"};
-    QFileInfo file{s.url};
-    auto size = (double)file.size();
 
-    /** Definindo o tamanho do arquivo de mídia */
-    while (size > 1024) {
-        size = size / 1024;
-        byte = byteit[i];
-        i++;
-    }
-
-    fsize = QString::fromLatin1("%1 %2 (%3)").arg(QString::number(size, 'f', 2), byte).arg(file.size());
-    QVariantList v = getBaseInfoValues(s);
-    i = 0;
-
-    /** Atualizando informações gerais */
-    foreach(QTreeWidgetItem* it, baseItems) {
-        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
-        ++i;
-    }
-
-    v = getVideoInfoValues(s);
-    i = 0;
-
-    /** Atualizando informações de vídeo */
-    foreach(QTreeWidgetItem* it, videoItems) {
-        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
-        ++i;
-    }
-
-    v = getAudioInfoValues(s);
-    i = 0;
-
-    /** Atualizando informações de áudio */
-    foreach(QTreeWidgetItem* it, audioItems) {
-        if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
-        ++i;
-    }
-
-    v = getMetaDataValues(s);
-    i = 0;
+    QVariantList v = getMetaDataValues(s);
+    int i = 0;
 
     /** Atualizando informações de metadados */
     foreach(QTreeWidgetItem* it, metadata) {
@@ -379,37 +332,14 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
         ++i;
     }
 
-    /** Buscando o maior comprimento para a janela */
-    view1->header()->setStretchLastSection(false);
-    view2->header()->setStretchLastSection(false);
-    view3->header()->setStretchLastSection(false);
-    view4->header()->setStretchLastSection(false);
-
-    settaginfos();
-    visibility();
-    int csize = view1->size();
-    if (csize < view2->size()) csize = view2->size();
-    if (csize < view3->size()) csize = view3->size();
-    if (csize < view4->size()) csize = view4->size();
-
-    view1->header()->setStretchLastSection(true);
-    view2->header()->setStretchLastSection(true);
-    view3->header()->setStretchLastSection(true);
-    view4->header()->setStretchLastSection(true);
-
-    csize = csize + 40;
-    qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
-           GRE, RED, GRE, RED, BLU, csize);
-
-    this->setMinimumSize(csize, 350);
-    this->resize(csize, this->height());
-
-    /** Buscando informações em segundo plano */
-    worker->setFile(s.url);
-    MD5->setData(1, Qt::DisplayRole, tr("Calculating..."));
-    FORMAT->setData(1, Qt::DisplayRole, tr("Searching..."));
+    if(!s.video_only.pix_fmt.isEmpty()) videoItems[9]->setData(1, Qt::DisplayRole, s.video_only.pix_fmt);
+    baseItems[6]->setData(1, Qt::DisplayRole, tr("Calculating..."));
 
     if (thread->isRunning()) thread->quit();
+    if (thread2->isRunning()) thread2->quit();
+    statisticsworker->setFile(s.url, s);
+    statisticsworker->requestWork();
+    worker->setFile(s.url);
     worker->requestWork();
 }
 
@@ -440,13 +370,12 @@ void StatisticsView::visibility(){
     }
     if (!statistics.audio.available) tab->setTabVisible(2, false);
     else {
-        if (statistics.audio.bit_rate == 0) view3->topLevelItem(2)->setHidden(true);
-        if (statistics.audio.frames == 0) view3->topLevelItem(6)->setHidden(true);
-        if (statistics.audio_only.frame_size == 0) view3->topLevelItem(7)->setHidden(true);
-        if (statistics.audio.frame_rate == 0) view3->topLevelItem(8)->setHidden(true);
+        int i = 0;
+        foreach(QTreeWidgetItem* it, audioItems) {
+            if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view3->topLevelItem(i)->setHidden(true);
+            i++;
+        }
     }
-
-    /** Verificando visibilidade dos metadados */
     if (statistics.metadata.isEmpty()) tab->setTabVisible(3, false);
     else {
         bool visibility{false};
@@ -581,15 +510,15 @@ void StatisticsView::changeIcons() {
 
 /** Setando informações do dB direito */
 void StatisticsView::setRightDB(int value) {
-    vuright = value;
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    vuright = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
 }
 
 
 /** Setando informações do dB esquerdo */
 void StatisticsView::setLeftDB(int value) {
-    vuleft = value;
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 dB\n%2 dB").arg(vuleft).arg(vuright));
+    vuleft = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
 }
 
 

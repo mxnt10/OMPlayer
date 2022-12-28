@@ -40,6 +40,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void setMd5(const QString &md5);
     void setFormat(const QString &format);
+    void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio);
     void onClose();
 
 private:
@@ -50,9 +51,6 @@ private:
     static QStringList getVideoInfoKeys();
     static QStringList getAudioInfoKeys();
     static QStringList getMetaDataKeys();
-    QVariantList getBaseInfoValues(const QtAV::Statistics &s);
-    static QVariantList getVideoInfoValues(const QtAV::Statistics &s);
-    static QVariantList getAudioInfoValues(const QtAV::Statistics &s);
     static QVariantList getMetaDataValues(const QtAV::Statistics &s);
     static void initItems(QList<QTreeWidgetItem*> *items, const QStringList &itemlist);
 
@@ -69,7 +67,8 @@ private:
     QList<QTreeWidgetItem*> metadata{};
     QString ctime{}, fsize{}, url{};
     QtAV::Statistics statistics{};
-    int timer{0}, vuleft{0}, vuright{0};
+    int timer{0};
+    QString vuleft{}, vuright{};
     bool onclose{false};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with

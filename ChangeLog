@@ -3,18 +3,23 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 2.0.1 ] - 2022-11-28 ################################################
+## [ 2.0.1 ] - 2022-12-28 ################################################
 
 ### Added / Adicionado
+ - Adicionado sources:
+    - Adicionado LoopButton.{h/cpp} em src/Utils.
+    - Adicionado VuMeterFilter.{h/cpp} em src.
+    - Adicionado CMenu.{h/cpp} em src/Widgets.
+    - Adicionado StatisticsWorker.{h/cpp} em src.
+    - Adicionado Hash.hpp em src.
  - Adicionado informações de metadados.
- - Adicionado sources LoopButton.{h/cpp} em src/Utils.
- - Adicionado sources VuMeterFilter.{h/cpp} em src.
- - Adicionado recursos de forward e backward.
  - Adicionado icones freepik, iyahblue e iyahorange em icons.
  - Adicionado a licença dos ícones.
  - Adicionado estilo radio.qss em qss.
+ - Adicionado vídeos para testes.
+ - Adicionado efeitos de esmaecimento do menu de contexto.
  - Recursos:
-    - Adicionado funções de forward e backward.
+    - Adicionado recursos de forward e backward.
     - Adicionado botões de loop e clique longo para replay com replay-one,
       next com forward e previous e backward.
     - Adicionado filtro de eventos para futuro suporte a visualização.
@@ -31,6 +36,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Modificado a classe dos botões para possibilitar botões com
    emissão de sinais em loop.
  - Modificação nos efeitos de esmaecimento.
+ - Refatoração no código das estatísticas.
 ###
 
 ### Removed / Removido
@@ -46,6 +52,10 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Corrigido problemas ao fechar diálogos com teclas de atalho,
    interceptando os eventos para o fechamento com a função desejada.
  - Corrigido problemas com estilos em widgets QRadioButton e QComboBox.
+ - Pequenas correções no estilo da playlist.
+ - Pequenos ajustes nos menus clicáveis do menu de contexto.
+ - Corrigido a função que define as opções de saída de áudio no menu.
+ - Estatísticas redefinidas ao parar a reprodução.
 ###
 
 ##########################################################################

@@ -127,7 +127,8 @@ void About::changeIcons() {
 /** Prevenindo fechamento sem onClose() */
 void About::closeEvent(QCloseEvent *event) {
     if (!onclose) {
-        QTimer::singleShot(10, this, &About::onClose);
+        event->ignore();
+        onClose();
         return;
     } else event->accept();
 }

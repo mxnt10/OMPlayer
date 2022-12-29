@@ -132,8 +132,4 @@ QVector<QtAV::VideoDecoderId> Decoder::idsFromNames(const QStringList& names) {
 
 
 /** Alterando os ícones dos botões do widgets de decodificação */
-void Decoder::changeIcons() {
-    foreach (DecoderItemWidget* diw, decItems) {
-        diw->changeIcons();
-    }
-}
+void Decoder::changeIcons() { foreach (DecoderItemWidget* diw, decItems) diw->changeIcons(); }

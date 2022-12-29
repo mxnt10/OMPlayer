@@ -218,7 +218,8 @@ QString Settings::changeIconsStyle() {
 /** Prevenindo fechamento sem onClose() */
 void Settings::closeEvent(QCloseEvent *event) {
     if (!onclose) {
-        QTimer::singleShot(10, this, &Settings::onClose);
+        event->ignore();
+        onClose();
         return;
     } else event->accept();
 }

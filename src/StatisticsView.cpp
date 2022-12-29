@@ -246,10 +246,9 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
 /** Resetando as informações de estatísticas */
 void StatisticsView::resetValues() {
-    foreach(QTreeWidgetItem* it, baseItems) it->setData(1, Qt::DisplayRole, "");
-    foreach(QTreeWidgetItem* it, videoItems) it->setData(1, Qt::DisplayRole, "");
-    foreach(QTreeWidgetItem* it, audioItems) it->setData(1, Qt::DisplayRole, "");
-    foreach(QTreeWidgetItem* it, metadata) it->setData(1, Qt::DisplayRole, "");
+    QList<QList<QTreeWidgetItem*>> item = {baseItems, videoItems, audioItems, metadata};
+    foreach(QList<QTreeWidgetItem *> list, item)
+    foreach(QTreeWidgetItem* it, list) it->setData(1, Qt::DisplayRole, "");
     statistics = QtAV::Statistics();
     settaginfos();
     visibility();
@@ -355,9 +354,8 @@ void StatisticsView::visibility(){
     /** Redefinindo visualização */
     for (int i = 0; i < 4; i++) tab->setTabVisible(i, false);
     for (int i = 0; i < 4; i++) tab->setTabVisible(i, true);
-    for (int i = 0; i < view2->topLevelItemCount(); ++i) view2->topLevelItem(i)->setHidden(false);
-    for (int i = 0; i < view3->topLevelItemCount(); ++i) view3->topLevelItem(i)->setHidden(false);
-    for (int i = 0; i < view4->topLevelItemCount(); ++i) view4->topLevelItem(i)->setHidden(false);
+    QList<TreeView*> view = {view2, view3, view4};
+    foreach(TreeView *t, view) for (int i = 0; i < t->topLevelItemCount(); ++i) t->topLevelItem(i)->setHidden(false);
 
     /** Verificando status de vídeo e áudio e o que precisa ser oculto */
     if (!statistics.video.available) tab->setTabVisible(1, false);
@@ -477,20 +475,15 @@ void StatisticsView::settaginfos() {
 
 /** Buscando o maior comprimento para a janela */
 void StatisticsView::setSize() {
-    view1->header()->setStretchLastSection(false);
-    view2->header()->setStretchLastSection(false);
-    view3->header()->setStretchLastSection(false);
-    view4->header()->setStretchLastSection(false);
+    QList<TreeView*> view = {view1, view2, view3, view4};
+    foreach(TreeView *it, view) it->header()->setStretchLastSection(false);
 
     int csize = view1->size();
     if (csize < view2->size()) csize = view2->size();
     if (csize < view3->size()) csize = view3->size();
     if (csize < view4->size()) csize = view4->size();
 
-    view1->header()->setStretchLastSection(true);
-    view2->header()->setStretchLastSection(true);
-    view3->header()->setStretchLastSection(true);
-    view4->header()->setStretchLastSection(true);
+    foreach(TreeView *it, view) it->header()->setStretchLastSection(true);
 
     csize = csize + 40;
     qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
@@ -560,7 +553,8 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
 /** Prevenindo fechamento sem onClose() */
 void StatisticsView::closeEvent(QCloseEvent *event) {
     if (!onclose) {
-        QTimer::singleShot(10, this, &StatisticsView::onClose);
+        event->ignore();
+        onClose();
         return;
     } else event->accept();
 }

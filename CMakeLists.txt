@@ -174,6 +174,8 @@ install(FILES appdata/run
                     WORLD_EXECUTE WORLD_WRITE WORLD_READ
         DESTINATION share/${PROJECT_NAME})
 
+file(GLOB DOCS ${PROJECT_SOURCE_DIR}/docs/*)
+install(FILES ${DOCS} DESTINATION doc/${PROJECT_NAME}-${PROJECT_VERSION})
 install(FILES ChangeLog LICENSE README.md DESTINATION doc/${PROJECT_NAME}-${PROJECT_VERSION})
 install(FILES appdata/notify.png appdata/logo.png DESTINATION share/${PROJECT_NAME}/appdata)
 install(FILES appdata/OMPlayer.desktop DESTINATION share/applications)

@@ -246,8 +246,8 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
 /** Resetando as informações de estatísticas */
 void StatisticsView::resetValues() {
-    QList<QList<QTreeWidgetItem*>> item = {baseItems, videoItems, audioItems, metadata};
-    foreach(QList<QTreeWidgetItem *> list, item)
+    QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, metadata};
+    foreach(QList<QTreeWidgetItem*> list, item)
     foreach(QTreeWidgetItem* it, list) it->setData(1, Qt::DisplayRole, "");
     statistics = QtAV::Statistics();
     settaginfos();
@@ -354,7 +354,7 @@ void StatisticsView::visibility(){
     /** Redefinindo visualização */
     for (int i = 0; i < 4; i++) tab->setTabVisible(i, false);
     for (int i = 0; i < 4; i++) tab->setTabVisible(i, true);
-    QList<TreeView*> view = {view2, view3, view4};
+    QList<TreeView*> view{view2, view3, view4};
     foreach(TreeView *t, view) for (int i = 0; i < t->topLevelItemCount(); ++i) t->topLevelItem(i)->setHidden(false);
 
     /** Verificando status de vídeo e áudio e o que precisa ser oculto */

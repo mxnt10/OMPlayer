@@ -3,31 +3,25 @@ QMenu {
     background-color: black;
     border: 1px solid #333;
     border-radius: 4px;
-    padding-left: 5px;
     color: white;
 }
 
 
 /* Definição dos itens do menu */
-QMenu::item { padding: 5px; }
+QMenu::item {
+    padding-left: 5px;
+    border: 5px solid black;
+    border-radius: 8px;
+}
 
 
 /* Definindo os indicadores do menu */
 QMenu::indicator {
-    border: 1px solid #666;
-    border-radius: 2px;
-    width: 14px;
-    height: 14px;
+    border: 8px solid transparent;
+    border-radius: 11px;
+    height: 6px;
+    width: 6px;
 }
 
-
-/* Indicadores não checados e selecionados */
-QMenu::indicator:non-exclusive:unchecked:selected { border-color: #3daee9; }
-
-
-/* Menu não exclusivo pressionado */
-QMenu::indicator:non-exclusive:checked {
-    background-image: url(/usr/share/icons/breeze-dark/actions/16/dialog-ok-apply.svg);
-    border-color: #3daee9;
-    background-color: #13384b;
-}
+QMenu::indicator:non-exclusive:unchecked { background-color: #202020; }
+QMenu::indicator:non-exclusive:checked { background-color: white;}

@@ -1,0 +1,8 @@
+/* Opções para o CheckBox */
+QCheckBox { width: 100px; }
+
+QCheckBox::indicator       { width: 50px; height: 20px; }
+QCheckBox::indicator:hover { margin-right: 4px; }
+
+QCheckBox::indicator:unchecked { /* _RADIO_UNCHECKED__ */ }
+QCheckBox::indicator:checked   { /* _RADIO_CHECKED_ */    }

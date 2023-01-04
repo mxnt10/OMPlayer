@@ -13,9 +13,6 @@
 /** Construtor */
 DecoderItemWidget::DecoderItemWidget(QWidget *parent): QFrame(parent) {
     setLineWidth(2);
-
-
-    /** Verificação de Propriedades e Descrição */
     editor = new PropertyEditor();
     desc = new QLabel();
 

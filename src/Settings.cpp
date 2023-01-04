@@ -95,7 +95,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
     /** Itens gerais */
     auto *general = new QWidget();
-    auto *opgeneral = new QGridLayout(general);
+    auto *opgeneral = new QVBoxLayout(general);
     opgeneral->addWidget(themebox);
 
 
@@ -181,16 +181,9 @@ void Settings::setIcon(const QString &index) {
 }
 
 
-/** Retorna as opções de decodificação */
-QVariantHash Settings::videoDecoderOptions() const {
-    return decoder->videoDecoderOptions();
-}
-
-
-/** Retorna a prioridade de execução */
-QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() {
-    return decoder->decoderPriorityNames();
-}
+/** Retorna as opções de decodificação e a prioridade de execução */
+QVariantHash Settings::videoDecoderOptions() const { return decoder->videoDecoderOptions(); }
+QVector<QtAV::VideoDecoderId> Settings::decoderPriorityNames() { return decoder->decoderPriorityNames(); }
 
 
 /** Mudando o ícone nos estilos */
@@ -200,14 +193,12 @@ QString Settings::changeIconsStyle() {
 
     QString ru{Utils::setIconTheme(theme, "radio-unselect")};
     if(!ru.isEmpty()) str.replace(QRegExp("/\\* _RADIO_UNCHECKED__ \\*/"), "image: url(" + ru + ");");
-
-    QString rh{Utils::setIconTheme(theme, "radio-hover")};
-    if(!rh.isEmpty()) str.replace(QRegExp("/\\* _RADIO_UNCHECKED_HOVER_ \\*/"), "image: url(" + rh + ");");
+    else return{};
 
     QString rs{Utils::setIconTheme(theme, "radio-select")};
     if(!rs.isEmpty()) str.replace(QRegExp("/\\* _RADIO_CHECKED_ \\*/"), "image: url(" + rs + ");");
+    else return{};
 
-    if(ru.isEmpty() && rh.isEmpty() && rs.isEmpty()) return{};
     return str;
 }
 

@@ -344,7 +344,7 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
 
 /** Função para setar a duração atual da mídia reproduzida */
 void StatisticsView::setCurrentTime(int current) {
-    if (baseItems[0]->data(1, Qt::DisplayRole).isNull()) return;
+    if (baseItems[0]->data(1, Qt::DisplayRole).toString().isEmpty()) return;
 
     baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
             QTime(0, 0, 0).addMSecs(current).toString(QString::fromLatin1("HH:mm:ss")),

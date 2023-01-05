@@ -47,8 +47,9 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Layout da renderização */
-    auto *renderer = new QWidget();
-    auto *oprenderer = new QGridLayout(renderer);
+    auto *performance = new QWidget();
+    auto *oprenderer = new QGridLayout();
+    oprenderer->setContentsMargins(0, 20, 0, 0);
 
 
     /** Selecionar renderizações existentes */
@@ -73,6 +74,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
             oprenderer->addWidget(vid_map[i].btn, i, 0, LEFT);
         }
     }
+    oprenderer->addItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding), 8, 0);
 
 
     /** Configurações de tema */
@@ -84,13 +86,22 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
     auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");
     auto *themes = new QGridLayout();
+    themes->setContentsMargins(0, 50, 0, 0);
     themes->addWidget(labeltheme, 0, 0);
     themes->addWidget(combotheme, 0, 1);
+    themes->addItem(new QSpacerItem(1, 1, QSizePolicy::Minimum, QSizePolicy::Expanding), 1, 0);
 
 
     /** Definição dos grupos */
     auto *themebox = new QGroupBox(tr("Themes"));
     themebox->setLayout(themes);
+    auto *rendererbox = new QGroupBox(tr("Renderer"));
+    rendererbox->setLayout(oprenderer);
+
+
+    /** Opções de performance */
+    auto *renderer = new QVBoxLayout(performance);
+    renderer->addWidget(rendererbox);
 
 
     /** Itens gerais */
@@ -103,7 +114,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     tab = new QTabWidget();
     tab->addTab(general, tr("General"));
     tab->addTab(decoder, tr("Decoder"));
-    tab->addTab(renderer, tr("Renderer"));
+    tab->addTab(performance, tr("Performance"));
     tab->setStyleSheet(Utils::setStyle("tab"));
 
 

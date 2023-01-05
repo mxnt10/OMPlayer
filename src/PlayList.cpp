@@ -50,8 +50,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     listView->setStyleSheet(Utils::setStyle("playlist"));
     listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listView->installEventFilter(filter);
-    connect(listView, SIGNAL(doubleClicked(QModelIndex)), SLOT(onAboutToPlay(QModelIndex)));
-    connect(listView, SIGNAL(clicked(QModelIndex)), SLOT(onSelect(QModelIndex)));
+    connect(listView, &QListView::doubleClicked, this, &PlayList::onAboutToPlay);
+    connect(listView, &QListView::clicked, this, &PlayList::onSelect);
     connect(filter, &EventFilter::emitEnter, [this](){ Q_EMIT enterListView(); });
     connect(filter, &EventFilter::emitLeave, [this](){ Q_EMIT leaveListView(); });
 

@@ -3,7 +3,6 @@
 
 #include <QCheckBox>
 #include <QFrame>
-#include <QLabel>
 #include <Button>
 #include <Utils>
 
@@ -17,11 +16,11 @@ public:
 
     [[nodiscard]] QVariantHash getOptions() const { return editor->exportAsHash(); }
     [[nodiscard]] bool isChecked() const { return check->isChecked(); }
-    [[nodiscard]] QString name() const { return check->text();}
-    [[nodiscard]] QString description() const { return desc->text();}
+    [[nodiscard]] QString name() const { return check->text().split(' ')[0]; }
+    [[nodiscard]] QString description() const { return check->text().split(' ')[2]; }
     void setChecked(bool c) { check->setChecked(c); }
-    void setName(const QString& name) { check->setText(name);}
-    void setDescription(const QString& des) { desc->setText(des); }
+    void setName(const QString& name) { check->setText(name); }
+    void setDescription(const QString& des) { check->setText(check->text() + " - " + des); }
 
 Q_SIGNALS:
     void enableChanged();
@@ -31,10 +30,11 @@ private Q_SLOTS:
     void toggleEditorVisible();
 
 private:
+    static QString changeIconsStyle();
+
     Button *expandBtn{};
     PropertyEditor *editor{};
     QCheckBox *check{};
-    QLabel *desc{};
     QString iconName{};
     QWidget *editorWidget{};
 };

@@ -65,7 +65,7 @@ private:
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
     QList<QTreeWidgetItem*> metadata{};
-    QString ctime{}, fsize{}, url{};
+    QString fsize{}, url{};
     QtAV::Statistics statistics{};
     int timer{0};
     QString vuleft{}, vuright{};

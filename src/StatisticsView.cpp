@@ -238,6 +238,10 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
         ++i;
     }
 
+    baseItems[6]->setData(1, Qt::DisplayRole, tr("Calculating..."));
+    worker->setFile(statistics.url);
+    worker->requestWork();
+
     settaginfos();
     visibility();
     setSize();
@@ -319,7 +323,6 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
 
     /** Redefinindo informações */
     resetValues();
-    ctime = "00:00:00";
     statistics = s;
 
     QVariantList v = getMetaDataValues(s);
@@ -332,20 +335,20 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     }
 
     if(!s.video_only.pix_fmt.isEmpty()) videoItems[9]->setData(1, Qt::DisplayRole, s.video_only.pix_fmt);
-    baseItems[6]->setData(1, Qt::DisplayRole, tr("Calculating..."));
-
     if (thread->isRunning()) thread->quit();
     if (thread2->isRunning()) thread2->quit();
     statisticsworker->setFile(s.url, s);
     statisticsworker->requestWork();
-    worker->setFile(s.url);
-    worker->requestWork();
 }
 
 
 /** Função para setar a duração atual da mídia reproduzida */
 void StatisticsView::setCurrentTime(int current) {
-    ctime = QTime(0, 0, 0).addMSecs(current).toString(QString::fromLatin1("HH:mm:ss"));
+    if (baseItems[0]->data(1, Qt::DisplayRole).isNull()) return;
+
+    baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
+            QTime(0, 0, 0).addMSecs(current).toString(QString::fromLatin1("HH:mm:ss")),
+            statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
 }
 
 
@@ -436,40 +439,32 @@ void StatisticsView::settaginfos() {
 
     int w = statistics.video_only.width;
     int h = statistics.video_only.height;
-    screen->setVisible(true);
-    bool change = false;
+    screen->setVisible(false);
 
-    for (int i : fuhdw) if (i == w) for (int j : fuhdh) if (j == h) {
-        Utils::changeIcon(screen, "screen8k");
-        change = true;
+    QList<QList<int>> itw{fuhdw, uhdpw, uhdw};
+    QList<QList<int>> ith{fuhdh, uhdph, uhdh};
+    QStringList scr{"screen8k", "screen5k", "screen4k"};
+
+    int n = 0;
+    foreach (QList<int> iw, itw) {
+        for (int i : iw) if (i == w) for (int j : ith[n]) if (j == h) {
+            Utils::changeIcon(screen, scr[n]);
+            screen->setVisible(true);
+            return;
+        }
+        n++;
     }
 
-    if (!change) for (int i : uhdpw) if (i == w) for (int j : uhdph) if (j == h) {
-        Utils::changeIcon(screen, "screen5k");
-        change = true;
-    }
-
-    if (!change) for (int i : uhdw) if (i == w) for (int j : uhdh) if (j == h) {
-        Utils::changeIcon(screen, "screen4k");
-        change = true;
-    }
-
-    if (!change && w == 2560 && h == 1440) {
+    if (w == 2560 && h == 1440) {
         Utils::changeIcon(screen, "screenqhd");
-        change = true;
-    }
-
-    if (!change && w == 1920 && h == 1080) {
+        screen->setVisible(true);
+    } else if (w == 1920 && h == 1080) {
         Utils::changeIcon(screen, "screenfhd");
-        change = true;
-    }
-
-    if (!change && w == 1280 && h == 720) {
+        screen->setVisible(true);
+    } else if (w == 1280 && h == 720) {
         Utils::changeIcon(screen, "screenhd");
-        change = true;
+        screen->setVisible(true);
     }
-
-    if (!change) screen->setVisible(false);
 }
 
 
@@ -542,11 +537,6 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
         videoItems[6]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 QString::number(statistics.video.frame_rate, 'f', 2),
                 QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
-
-    /** Duração atual */
-    if (!statistics.url.isEmpty())
-        baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
-                ctime, statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
 }
 
 

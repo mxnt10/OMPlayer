@@ -10,6 +10,7 @@ Q_OBJECT
 public:
     explicit CMenu(const QString& title, QWidget *parent = nullptr);
     ~CMenu() override;
+    void setOpacity(float val) { opacy = val; };
 
 protected:
     void showEvent(QShowEvent *event) override;
@@ -17,6 +18,7 @@ protected:
 private:
     QGraphicsOpacityEffect *effect{};
     QPropertyAnimation *animation{};
+    float opacy{0.8};
 };
 
 #endif // OMPLAYER_CMENU_H

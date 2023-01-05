@@ -12,7 +12,7 @@ CMenu::CMenu(const QString &title, QWidget *parent) : QMenu(title, parent) {
 
     /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
     effect = new QGraphicsOpacityEffect(this);
-    effect->setOpacity(0.8);
+    effect->setOpacity(opacy);
     setGraphicsEffect(effect);
 
     setStyleSheet(Utils::setStyle("contextmenu"));
@@ -30,6 +30,6 @@ CMenu::~CMenu() = default;
 void CMenu::showEvent(QShowEvent *event) {
     delete animation;
     animation = new QPropertyAnimation(effect, "opacity");
-    Utils::fadeDiag(animation, 0, 0.8);
+    Utils::fadeDiag(animation, 0, opacy);
     QWidget::showEvent(event);
 }

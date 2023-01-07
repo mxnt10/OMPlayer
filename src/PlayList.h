@@ -5,10 +5,10 @@
 #include <QFileDialog>
 #include <QGraphicsOpacityEffect>
 #include <QLabel>
-#include <QListView>
 #include <QModelIndex>
 #include <PlayListUtils>
 #include <Button>
+#include <ListView>
 
 #define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 
@@ -67,14 +67,13 @@ private Q_SLOTS:
     void onAboutToPlay(const QModelIndex &index);
 
 private:
-    QFileDialog *diag{};
-    Button *clearBtn{};
-    Button *addBtn{}, *removeBtn{};
+    Button *clearBtn{}, *addBtn{}, *removeBtn{};
+    ListView *listView{};
     PlayListDelegate *delegate{};
     PlayListModel *model{};
+    QFileDialog *diag{};
     QGraphicsOpacityEffect *effect{};
     QLabel *cleanlist{};
-    QListView *listView{};
     QWidget *wpls{};
     int startsize{0}, startlistsize{0}, startpos{0}, rmRows{0};
     bool isshow{false}, resize{false};

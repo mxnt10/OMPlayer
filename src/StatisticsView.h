@@ -17,8 +17,9 @@ Q_OBJECT
 public:
     explicit StatisticsView(QWidget *parent = nullptr);
     ~StatisticsView() override;
-    void setStatistics(const QtAV::Statistics &s);
+    void setStatistics(const QtAV::Statistics &s = QtAV::Statistics());
     void setCurrentTime(int current);
+    void setFile(const QString &file);
     void changeIcons();
 
 public Q_SLOTS:
@@ -65,11 +66,10 @@ private:
     QList<QTreeWidgetItem*> videoItems{};
     QList<QTreeWidgetItem*> audioItems{};
     QList<QTreeWidgetItem*> metadata{};
-    QString fsize{}, url{};
-    QtAV::Statistics statistics{};
-    int timer{0};
-    QString vuleft{}, vuright{};
+    QtAV::Statistics statistics{}, currentStatistics{};
+    QString vuleft{}, vuright{}, url{};
     bool onclose{false};
+    int timer{0};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with
     QList<int> fuhdh{5120, 4320};        //8k heith

@@ -42,16 +42,13 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Lista para visualização da playlist */
     auto *filter = new EventFilter(this, EventFilter::Control);
-    listView = new QListView();
+    listView = new ListView();
     listView->setModel(model);
     listView->setItemDelegate(delegate);
-    listView->setSelectionMode(QAbstractItemView::ExtendedSelection); /** Uso com CTRL/SHIF */
-    listView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    listView->setStyleSheet(Utils::setStyle("playlist"));
-    listView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     listView->installEventFilter(filter);
-    connect(listView, &QListView::doubleClicked, this, &PlayList::onAboutToPlay);
-    connect(listView, &QListView::clicked, this, &PlayList::onSelect);
+    connect(listView, &ListView::doubleClicked, this, &PlayList::onAboutToPlay);
+    connect(listView, &ListView::clicked, this, &PlayList::onSelect);
+    connect(listView, &ListView::clickedRight, this, &PlayList::onSelect);
     connect(filter, &EventFilter::emitEnter, [this](){ Q_EMIT enterListView(); });
     connect(filter, &EventFilter::emitLeave, [this](){ Q_EMIT leaveListView(); });
 
@@ -61,7 +58,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     removeBtn = new Button(Button::Default, 32, "remove");
     clearBtn = new Button(Button::Default, 32, "clean");
     connect(addBtn, &Button::clicked, this, &PlayList::getFiles);
-    connect(removeBtn, &Button::clicked, [this](){ removeSelectedItems(); });
+    connect(removeBtn, &Button::clicked, this, &PlayList::removeSelectedItems);
     connect(clearBtn, &Button::clicked, this, &PlayList::clearItems);
 
 
@@ -410,13 +407,13 @@ void PlayList::clearItems() {
 }
 
 
-/** Função para emitir o intem selecionado na playlist para execução com um duplo clique */
+/** Função para emitir o item selecionado na playlist para execução com um duplo clique */
 void PlayList::onAboutToPlay(const QModelIndex &index) {
     Q_EMIT aboutToPlay(index.data(Qt::DisplayRole).value<PlayListItem>().url());
 }
 
 
-/** Função para emitir o intem selecionado na playlist */
+/** Função para emitir o item selecionado na playlist */
 void PlayList::onSelect(const QModelIndex &index) { Q_EMIT selected(int(index.row())); }
 
 

@@ -515,6 +515,7 @@ void OMPlayer::setSelect(int item) {
         qDebug("%s(%sPlaylist%s)%s::%sSelecionando item %s manualmente ...\033[0m",
                GRE, RED, GRE, RED, ORA, STR(Utils::mediaTitle(playlist->getItems(item))));
     }
+    infoview->setFile(playlist->getItems(item));
 }
 
 
@@ -1409,10 +1410,10 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
 
     if (listmenu && enterpos) {
         control = true;
-        contextMenu->setWindowOpacity(0.9);
+        contextMenu->setOpacity(0.9);
 
         /** Menu de informação de mídia */
-        QAction mediainfo(tr("Current Media Info"), this);
+        QAction mediainfo(tr("Multimedia Info"), this);
         Utils::changeMenuIcon(mediainfo, "about");
         connect(&mediainfo, &QAction::triggered, [this](){ setDialog(InfoD); });
 

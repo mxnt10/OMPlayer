@@ -143,11 +143,19 @@ StatisticsView::~StatisticsView() {
 
 
 /** setar nas informações o hash MD5 dos arquivos multimídia */
-void StatisticsView::setMd5(const QString &md5) { baseItems[6]->setData(1, Qt::DisplayRole, md5); }
+void StatisticsView::setMd5(const QString &md5) {
+    baseItems[6]->setData(1, Qt::DisplayRole, md5);
+
+    /** O hash MD5 pode passar do comprimento do diálogo de informações.
+     * Por isso, o ajuste precisa ser feito. */
+    setSize();
+}
 
 
 /** setar nas informações do formato dos arquivos multimídia */
-void StatisticsView::setFormat(const QString &format) { emit emitFormat(format); }
+void StatisticsView::setFormat(const QString &format) {
+    if (QString::compare(statistics.url, url) == 0) emit emitFormat(format);
+}
 
 
 /** Especificações das informações básicas */
@@ -165,15 +173,14 @@ QStringList StatisticsView::getBaseInfoKeys() {
 /** Especificações para informações de vídeo */
 QStringList StatisticsView::getVideoInfoKeys() {
     return { tr("Codec"),        // 0
-             tr("Decoder"),      // 1
-             tr("Bit Rate"),     // 2
-             tr("Aspect Ratio"),  // 3
-             tr("Size"),           // 4
-             tr("Frames"),          // 5
-             tr("Frame Rate"),       // 6
-             tr("Bit Depth"),         // 7
-             tr("Chroma Subsampling"), // 8
-             tr("Pixel Format") };     // 9
+             tr("Decoder"),       // 1
+             tr("Bit Rate"),       // 2
+             tr("Aspect Ratio"),    // 3
+             tr("Size"),             // 4
+             tr("Frames"),            // 5
+             tr("Frame Rate"),         // 6
+             tr("Bit Depth"),           // 7
+             tr("Chroma Subsampling") }; // 8
 }
 
 
@@ -239,7 +246,8 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
     }
 
     baseItems[6]->setData(1, Qt::DisplayRole, tr("Calculating..."));
-    worker->setFile(statistics.url);
+    if (!statistics.url.isEmpty()) worker->setFile(statistics.url);
+    else worker->setFile(url);
     worker->requestWork();
 
     settaginfos();
@@ -323,7 +331,10 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
 
     /** Redefinindo informações */
     resetValues();
-    statistics = s;
+    if (!s.url.isEmpty()) {
+        statistics = s;
+        currentStatistics = statistics;
+    }
 
     QVariantList v = getMetaDataValues(s);
     int i = 0;
@@ -334,17 +345,18 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
         ++i;
     }
 
-    if(!s.video_only.pix_fmt.isEmpty()) videoItems[9]->setData(1, Qt::DisplayRole, s.video_only.pix_fmt);
     if (thread->isRunning()) thread->quit();
     if (thread2->isRunning()) thread2->quit();
-    statisticsworker->setFile(s.url, s);
+    if (!s.url.isEmpty()) statisticsworker->setFile(s.url, s);
+    else statisticsworker->setFile(url);
     statisticsworker->requestWork();
 }
 
 
 /** Função para setar a duração atual da mídia reproduzida */
 void StatisticsView::setCurrentTime(int current) {
-    if (baseItems[0]->data(1, Qt::DisplayRole).toString().isEmpty()) return;
+    if (baseItems[0]->data(1, Qt::DisplayRole).toString().isEmpty() ||
+        statistics.url.isEmpty()) return;
 
     baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
             QTime(0, 0, 0).addMSecs(current).toString(QString::fromLatin1("HH:mm:ss")),
@@ -361,25 +373,27 @@ void StatisticsView::visibility(){
     foreach(TreeView *t, view) for (int i = 0; i < t->topLevelItemCount(); ++i) t->topLevelItem(i)->setHidden(false);
 
     /** Verificando status de vídeo e áudio e o que precisa ser oculto */
-    if (!statistics.video.available) tab->setTabVisible(1, false);
-    else {
-        int i = 0;
-        foreach(QTreeWidgetItem* it, videoItems) {
-            if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view2->topLevelItem(i)->setHidden(true);
-            i++;
-        }
+    bool visibility{false};
+    int j = 0;
+    foreach(QTreeWidgetItem* it, videoItems) {
+        if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view2->topLevelItem(j)->setHidden(true);
+        else visibility = true;
+        j++;
     }
-    if (!statistics.audio.available) tab->setTabVisible(2, false);
-    else {
-        int i = 0;
-        foreach(QTreeWidgetItem* it, audioItems) {
-            if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view3->topLevelItem(i)->setHidden(true);
-            i++;
-        }
+    if (!visibility) tab->setTabVisible(1, false);
+
+    visibility = false;
+    j = 0;
+    foreach(QTreeWidgetItem* it, audioItems) {
+        if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view3->topLevelItem(j)->setHidden(true);
+        else visibility = true;
+        j++;
     }
+    if (!visibility) tab->setTabVisible(2, false);
+
     if (statistics.metadata.isEmpty()) tab->setTabVisible(3, false);
     else {
-        bool visibility{false};
+        visibility = false;
         QVariantList v = getMetaDataValues(statistics);
         int i = 0;
 
@@ -498,6 +512,7 @@ void StatisticsView::changeIcons() {
 
 /** Setando informações do dB direito */
 void StatisticsView::setRightDB(int value) {
+    if (statistics.url.isEmpty()) return;
     vuright = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
     audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
 }
@@ -505,8 +520,17 @@ void StatisticsView::setRightDB(int value) {
 
 /** Setando informações do dB esquerdo */
 void StatisticsView::setLeftDB(int value) {
+    if (statistics.url.isEmpty()) return;
     vuleft = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
     audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
+}
+
+
+/** Função para setar um arquivo para buscar as informações */
+void StatisticsView::setFile(const QString &file) {
+    url = file;
+    if (QString::compare(currentStatistics.url, url) == 0) setStatistics(currentStatistics);
+    else setStatistics();
 }
 
 

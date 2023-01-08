@@ -74,7 +74,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(mediaPlayer, &QtAV::AVPlayer::positionChanged, this, &OMPlayer::updateSlider);
     connect(mediaPlayer, &QtAV::AVPlayer::notifyIntervalChanged, this, &OMPlayer::updateSliderUnit);
     connect(mediaPlayer, &QtAV::AVPlayer::started, this, &OMPlayer::onStart);
-    connect(mediaPlayer, &QtAV::AVPlayer::stopped, [this](){ if(!prevent) onStop(); });
     connect(mediaPlayer, &QtAV::AVPlayer::paused, this, &OMPlayer::onPaused);
     connect(mediaPlayer, &QtAV::AVPlayer::error, this, &OMPlayer::handleError);
 
@@ -515,7 +514,7 @@ void OMPlayer::setSelect(int item) {
         qDebug("%s(%sPlaylist%s)%s::%sSelecionando item %s manualmente ...\033[0m",
                GRE, RED, GRE, RED, ORA, STR(Utils::mediaTitle(playlist->getItems(item))));
     }
-    infoview->setFile(playlist->getItems(item));
+    if(item > (-1)) infoview->setFile(playlist->getItems(item));
 }
 
 
@@ -640,6 +639,7 @@ void OMPlayer::setStop() {
     actualitem = playlist->selectItems();
     mediaPlayer->stop();
     if (playlist->setListSize() == 0) listnum.clear();
+    if(!prevent) onStop();
 }
 
 
@@ -717,11 +717,11 @@ void OMPlayer::onStop() {
 
 /** Atualização dos itens da playlist */
 void OMPlayer::changePlaylist(const QString &format) {
-    int row = playlist->selectItems();
-    QString url = mediaPlayer->file();
-    qint64 duration = mediaPlayer->mediaStopPosition();
+    if (playlist->setDuration() != 0) return;
+    qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(mediaPlayer->file()));
 
-    qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(url));
+    int row = playlist->selectItems();
+    qint64 duration = mediaPlayer->mediaStopPosition();
     playlist->updateItems(row, duration, format);
 }
 

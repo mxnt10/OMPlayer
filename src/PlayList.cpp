@@ -378,6 +378,14 @@ QString PlayList::getItems(int s) {
 }
 
 
+/** Setando a duração do item atual */
+qint64 PlayList::setDuration() {
+    QModelIndex index = listView->currentIndex();
+    auto pli = qvariant_cast<PlayListItem>(index.data(Qt::DisplayRole));
+    return pli.duration();
+}
+
+
 /** Função para retornar o número total de itens da playlist */
 int PlayList::setListSize() { return model->rowCount(QModelIndex()); }
 

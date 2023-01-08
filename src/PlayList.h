@@ -23,6 +23,7 @@ public:
     void load(PlayList::STATUS load = PlayList::Default, const QString &url = DefDIR);
     void save(const QString &url = DefDIR);
     QString getItems(int s);
+    qint64 setDuration();
     int setListSize();
     int selectItems();
     void selectClean();

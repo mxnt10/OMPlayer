@@ -246,8 +246,7 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
     }
 
     baseItems[6]->setData(1, Qt::DisplayRole, tr("Calculating..."));
-    if (!statistics.url.isEmpty()) worker->setFile(statistics.url);
-    else worker->setFile(url);
+    worker->setFile(url);
     worker->requestWork();
 
     settaginfos();
@@ -334,6 +333,7 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     if (!s.url.isEmpty()) {
         statistics = s;
         currentStatistics = statistics;
+        url = s.url;
     }
 
     QVariantList v = getMetaDataValues(s);
@@ -347,8 +347,7 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
 
     if (thread->isRunning()) thread->quit();
     if (thread2->isRunning()) thread2->quit();
-    if (!s.url.isEmpty()) statisticsworker->setFile(s.url, s);
-    else statisticsworker->setFile(url);
+    statisticsworker->setFile(url, s);
     statisticsworker->requestWork();
 }
 
@@ -528,6 +527,7 @@ void StatisticsView::setLeftDB(int value) {
 
 /** Função para setar um arquivo para buscar as informações */
 void StatisticsView::setFile(const QString &file) {
+    if (QString::compare(file, url) == 0) return; /** Não precisa gastar recurso se a url é a mesma */
     url = file;
     if (QString::compare(currentStatistics.url, url) == 0) setStatistics(currentStatistics);
     else setStatistics();

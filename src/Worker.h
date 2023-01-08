@@ -16,7 +16,6 @@ public:
 Q_SIGNALS:
     void workRequested();
     void valueMD5(const QString &value);
-    void valueFormat(const QString &value);
     void finished();
 
 public Q_SLOTS:

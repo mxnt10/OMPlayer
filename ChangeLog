@@ -6,7 +6,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 ## [ 2.0.2 ] - 2023-01-10 ################################################
 
 ### Added / Adicionado
- -
+ - Adicionado a fonte ListView.{cpp/h} em src/Widgets.
+ - Adicionado checkbox.qss em qss.
 ###
 
 ### Upgraded / Atualizado
@@ -17,14 +18,17 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Ajustes nos ícones em "circle" e "dreamstale".
  - Ajustes nos estilos.
  - Ajustes no layout das configurações.
-###
-
-### Removed / Removido
- -
+ - Modificado as informações de mídia para exibir informações das mídias
+   selecionadas e não só a que está em reprodução.
+ - Modificado ações ao pressionar o botão stop. As emissões do onStop
+   falha em muitos casos, sendo optado por chamar a função onStop()
+   diretamente sem precisar da emissão.
 ###
 
 ### Fixed / Corrigido
  - Ajustes na visualização das informações.
+ - Ajustes na opacidade do menu da playlist.
+ - Pequenas correções nas atualizações das informações.
 ###
 
 ##########################################################################

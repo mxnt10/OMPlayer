@@ -32,10 +32,6 @@ void Worker::requestWork() {
 void Worker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
-    MI.Open(file.toStdWString());
-    Q_EMIT valueFormat(QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"))));
-    MI.Close();
-
     QString hash{Utils::setHash(file)};
     Q_EMIT valueMD5(hash);
 

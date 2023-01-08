@@ -38,6 +38,7 @@ void StatisticsWorker::doWork() {
     QStringList values, valuesVideo, valuesAudio, valuesDual;
     QFileInfo mfile{file};
     MI.Open(file.toStdWString());
+    auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
 
     values << QString(file).remove(QRegExp("\\/(?:.(?!\\/))+$"))
            << QString(file).remove(QRegExp("\\/.+\\/"))
@@ -57,7 +58,7 @@ void StatisticsWorker::doWork() {
         auto channellayout = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("ChannelLayout")));
         auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("FrameRate")));
 
-        values << setFormat(QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"))))
+        values << setFormat(format)
                << convertBit(bitrate.toFloat())
                << QTime(0, 0, 0).addMSecs(duration).toString(QString::fromLatin1("HH:mm:ss"));
 
@@ -95,7 +96,7 @@ void StatisticsWorker::doWork() {
         if (QString::compare(statistics.format.split(' ')[0], "mp3") == 0) values << "mp3 - MP3 (MPEG Audio Layer 3)";
         else if (QString::compare(statistics.format.split(' ')[2], "QuickTime") == 0 ||
                  QString::compare(statistics.format.split(' ')[2], "Matroska" ) == 0 ) {
-            values << setFormat(QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format"))));
+            values << setFormat(format);
         } else values << statistics.format;
 
         values << convertBit(statistics.bit_rate)
@@ -153,7 +154,7 @@ void StatisticsWorker::doWork() {
     if (bitdepth.isEmpty()) valuesAudio << "";
     else valuesAudio << bitdepth + " bits";
 
-    Q_EMIT baseValues(values, valuesVideo, valuesAudio);
+    Q_EMIT baseValues(values, valuesVideo, valuesAudio, format);
     MI.Close();
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();

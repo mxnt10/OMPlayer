@@ -14,7 +14,8 @@ public:
     void setFile(const QString &val, const QtAV::Statistics &s = QtAV::Statistics()) { file = val; statistics = s; };
 
 Q_SIGNALS:
-    void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio);
+    void baseValues(const QStringList &values, const QStringList &valuesVideo,
+                    const QStringList &valuesAudio, const QString &format);
     void workRequested();
     void finished();
 

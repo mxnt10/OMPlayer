@@ -40,8 +40,8 @@ Q_SIGNALS:
 
 private Q_SLOTS:
     void setMd5(const QString &md5);
-    void setFormat(const QString &format);
-    void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio);
+    void setItemValues(const QStringList &values, const QStringList &valuesVideo,
+                       const QStringList &valuesAudio, const QString &format);
     void onClose();
 
 private:

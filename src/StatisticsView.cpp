@@ -32,7 +32,6 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     worker = new Worker();
     worker->moveToThread(thread);
     connect(worker, &Worker::valueMD5, this, &StatisticsView::setMd5);
-    connect(worker, &Worker::valueFormat, this, &StatisticsView::setFormat);
     connect(thread, &QThread::started, worker, &Worker::doWork);
     connect(worker, &Worker::workRequested, [this](){ thread->start(); });
     connect(worker, &Worker::finished, [this](){ thread->quit(); });
@@ -152,12 +151,6 @@ void StatisticsView::setMd5(const QString &md5) {
 }
 
 
-/** setar nas informações do formato dos arquivos multimídia */
-void StatisticsView::setFormat(const QString &format) {
-    if (QString::compare(statistics.url, url) == 0) emit emitFormat(format);
-}
-
-
 /** Especificações das informações básicas */
 QStringList StatisticsView::getBaseInfoKeys() {
     return { tr("File Path"),     // 0
@@ -214,7 +207,8 @@ QStringList StatisticsView::getMetaDataKeys() {
 
 /** Setando as informações de mídia */
 void StatisticsView::setItemValues(const QStringList &values, const QStringList &valuesVideo,
-                                   const QStringList &valuesAudio) {
+                                   const QStringList &valuesAudio, const QString &format) {
+    Q_EMIT emitFormat(format);
     QStringList v = values;
     int i = 0;
 
@@ -527,7 +521,8 @@ void StatisticsView::setLeftDB(int value) {
 
 /** Função para setar um arquivo para buscar as informações */
 void StatisticsView::setFile(const QString &file) {
-    if (QString::compare(file, url) == 0) return; /** Não precisa gastar recurso se a url é a mesma */
+    /** Não precisa gastar recurso se a url é a mesma */
+    if (QString::compare(file, url) == 0 && !statistics.url.isEmpty()) return;
     url = file;
     if (QString::compare(currentStatistics.url, url) == 0) setStatistics(currentStatistics);
     else setStatistics();

@@ -26,7 +26,7 @@ Label::Label(const QFlag &align, int w, int h, QWidget *parent) : QLabel(parent)
 /** Construtor para a imagem */
 Label::Label(const QFlag& align, const QString &local) {
     setAlignment(align);
-    setPixmap(QPixmap(local));
+    setPixmap(QPixmap(local).scaled(256, 256, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 

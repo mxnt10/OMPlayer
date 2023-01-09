@@ -236,8 +236,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Definição da logo */
     auto *wlogo = new QWidget();
     wlogo->setMouseTracking(true);
-    logo = new Label(CENTER, 0, 0);
-    logo->setPixmap(QPixmap(Utils::setIcon(Utils::Logo)));
+    logo = new Label(CENTER, Utils::setIcon());
 
 
     /** Layout da logo */

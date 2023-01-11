@@ -11,8 +11,8 @@
 #include <QScreen>
 #include <QStackedWidget>
 #include <QTimer>
-
 #include <Button>
+#include <CWidget>
 #include <Label>
 #include <ScreenSaver>
 #include <Slider>
@@ -103,18 +103,16 @@ private Q_SLOTS:
 private:
     About *about{};
     QtAV::AVPlayer *mediaPlayer{};
-    Button *playBtn{}, *stopBtn{};
-    Button *nextBtn{}, *previousBtn{};
-    Button *replayBtn{}, *shuffleBtn{};
-    Button *volumeBtn{};
+    Button *playBtn{}, *stopBtn{}, *nextBtn{}, *previousBtn{};
+    Button *replayBtn{}, *shuffleBtn{}, *volumeBtn{};
+    CWidget *wctl{}, *wvol{}, *prev{};
     EventFilter *filter{};
-    Label *logo{}, *current{}, *end{};
+    Label *logo{}, *current{}, *end{}, *lvol{}, *ltime{};
     PlayList *playlist{};
     QAction *channelAction{}, *aspectAction{}, *trackAction{};
     QActionGroup *ta{};
     QDoubleSpinBox *speedBox{};
     QGraphicsOpacityEffect *effect{}, *effect2{};
-    QLabel *ltime{}, *lvol{};
     QMenu *channel{}, *aspectratio{}, *speed{}, *audiotrack{};
     QHBoxLayout *layout{};
     QSize min{906, 510}, size{};
@@ -122,7 +120,7 @@ private:
     QStackedWidget *stack{};
     QStringList listnum{};
     QTimer *click{};
-    QWidget *wctl{}, *prev{}, *pv{}, *wvol{}, *wlayout{};
+    QWidget *pv{}, *wlayout{};
     ScreenSaver *screensaver;
     Settings *sett{};
     StatisticsView *infoview{};
@@ -136,9 +134,8 @@ private:
     bool invalid{false}, ispreview{false};
     bool maximize{false}, fade{false}, contmenu{false};
     bool prevent{false}, powersaving{false};
-    int Width{192}, Height{108};
+    int Width{192}, Height{108}, count{0}, unit{500};
     int previousitem{0}, actualitem{0}, nextitem{0};
-    int count{0}, unit{500};
 };
 
 #endif //OMPLAYER_PLAYER_H

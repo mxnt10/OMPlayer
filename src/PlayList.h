@@ -4,11 +4,11 @@
 #include <QDir>
 #include <QFileDialog>
 #include <QGraphicsOpacityEffect>
-#include <QLabel>
 #include <QModelIndex>
-#include <PlayListUtils>
 #include <Button>
+#include <Label>
 #include <ListView>
+#include <PlayListUtils>
 
 #define DefDIR QDir::homePath() + "/.config/OMPlayer/playlist.qds"
 
@@ -74,7 +74,7 @@ private:
     PlayListModel *model{};
     QFileDialog *diag{};
     QGraphicsOpacityEffect *effect{};
-    QLabel *cleanlist{};
+    EmptyList *cleanlist{};
     QWidget *wpls{};
     int startsize{0}, startlistsize{0}, startpos{0}, rmRows{0};
     bool isshow{false}, resize{false};

@@ -30,6 +30,13 @@ Label::Label(const QFlag& align, const QString &local) {
 }
 
 
+/** Construtor com atributos */
+Label::Label(QWidget *parent) : QLabel(parent) {
+    setAttribute(Qt::WA_NoSystemBackground, true);
+    setAttribute(Qt::WA_TranslucentBackground, true);
+}
+
+
 /** Destrutor */
 Label::~Label() = default;
 
@@ -37,8 +44,23 @@ Label::~Label() = default;
 /**********************************************************************************************************************/
 
 
-/** Ação ao posicionar o mouse sobre o label */
-void Label::enterEvent(QEvent *event) {
-    qDebug("%s(%sLabel%s)%s::%sMouse posicionado em um label ...\033[0m", GRE, RED, GRE, RED, VIO);
-    QLabel::enterEvent(event);
+/** Construtor EmptyList */
+EmptyList::EmptyList(const QString &text, QWidget *parent) : QLabel(text, parent){
+
+    /** Paleta de cor */
+    QPalette palete;
+    palete.setColor(QPalette::WindowText, QColor(150, 150, 150));
+
+    /** Fonte do texto */
+    QFont font;
+    font.setItalic(true);
+    font.setPixelSize(16);
+
+    /** Definindo propriedades */
+    setFont(font);
+    setPalette(palete);
 }
+
+
+/** Destrutor */
+EmptyList::~EmptyList() = default;

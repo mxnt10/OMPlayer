@@ -8,6 +8,7 @@
 #include <QStandardPaths>
 #include <QTextCodec>
 #include <QTimer>
+#include <Frame>
 #include <Utils>
 
 #include "EventFilter.h"
@@ -76,13 +77,6 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     hbtn->addWidget(clearBtn);
 
 
-    /** Gerando uma linha */
-    auto line = new QFrame();
-    line->setFixedHeight(2);
-    line->setFrameShadow(QFrame::Sunken);
-    line->setStyleSheet("background: #cccccc");
-
-
     /** Gerando uma linha vertical transparente */
     auto *filter2 = new EventFilter(this, EventFilter::Control);
     auto size = new QFrame();
@@ -90,6 +84,11 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     size->installEventFilter(filter2);
     connect(filter2, &EventFilter::emitEnter, [](){ resizeMouse(); });
     connect(filter2, &EventFilter::emitLeave, [](){ arrowMouse(); });
+
+
+    /** Mensagem para a playlist vazia e uma linha horizontal */
+    cleanlist = new EmptyList(tr("Empty List"), wpls);
+    auto line = new Line::Frame(Line::Frame::Horizontal);
 
 
     /** Layout da playlist */
@@ -101,17 +100,6 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     vbl->addWidget(line);
     vbl->addSpacing(5);
     vbl->addWidget(listView);
-
-
-    /** Mensagem para a playlist vazia */
-    QPalette palete;
-    palete.setColor(QPalette::WindowText, QColor(150, 150, 150));
-    QFont font;
-    font.setItalic(true);
-    font.setPixelSize(16);
-    cleanlist = new QLabel(tr("Empty List"), wpls);
-    cleanlist->setFont(font);
-    cleanlist->setPalette(palete);
 
 
     /** Layout com a barra de redirecionamento */

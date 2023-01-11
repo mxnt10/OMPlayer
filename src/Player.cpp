@@ -3,6 +3,7 @@
 #include <QRandomGenerator>
 #include <QWidgetAction>
 #include <CustomMenu>
+#include <Frame>
 #include <Utils>
 
 #include "VUMeterFilter.h"
@@ -34,21 +35,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Preview do reprodutor */
-    prev = new QWidget();
-    prev->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
-    prev->setAttribute(Qt::WA_NoSystemBackground, true);
-    prev->setAttribute(Qt::WA_TranslucentBackground, true);
+    prev = new CWidget((Qt::Tool | Qt::FramelessWindowHint));
     pv = new QWidget(prev);
     pv->setStyleSheet(Utils::setStyle("widget"));
     preview = new QtAV::VideoPreviewWidget(pv);
     preview->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
-    ltime = new QLabel(pv);
-    ltime->setAttribute(Qt::WA_NoSystemBackground, true);
-    ltime->setAttribute(Qt::WA_TranslucentBackground, true);
-    wvol = new QWidget();
-    wvol->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint);
-    wvol->setAttribute(Qt::WA_NoSystemBackground, true);
-    wvol->setAttribute(Qt::WA_TranslucentBackground, true);
+    ltime = new Label(pv);
+    wvol = new CWidget((Qt::Tool | Qt::FramelessWindowHint));
     lvol = new Label(CENTER, 42, 22, wvol);
     lvol->setStyleSheet(Utils::setStyle("label"));
 
@@ -158,15 +151,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     bgctl->addWidget(bgcontrol, 0, 0);
 
 
-    /** Gerando uma linha */
-    auto line = new QFrame();
-    line->setFixedWidth(2);
-    line->setFixedHeight(25);
-    line->setFrameShadow(QFrame::Sunken);
-    line->setStyleSheet("background: #cccccc");
-
-
     /** Layout dos botões */
+    auto line = new Line::Frame(Line::Frame::Vertical, 25);
     auto *buttons = new QHBoxLayout();
     buttons->setSpacing(5);
     buttons->addStretch(1);
@@ -207,14 +193,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     fgctl->addLayout(buttons);
 
 
-    /** Widget separado do pai para os controles e a playlist */
-    wctl = new QWidget(this);
-    wctl->setWindowFlags(Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);
-    wctl->setAttribute(Qt::WA_NoSystemBackground, true);
-    wctl->setAttribute(Qt::WA_TranslucentBackground, true);
-
-
     /** Layout dos controles de reprodução */
+    wctl = new CWidget(this, (Qt::Tool | Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint));
     auto *controls = new QGridLayout(wctl);
     controls->setMargin(0);
     controls->setSpacing(0);

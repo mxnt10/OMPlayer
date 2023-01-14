@@ -85,13 +85,10 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     connect(filter2, &EventFilter::emitLeave, [](){ arrowMouse(); });
 
 
-    /** Mensagem para a playlist vazia e uma linha horizontal */
-    cleanlist = new EmptyList(tr("Empty List"), wpls);
-    auto line = new Line::Frame(Line::Frame::Horizontal);
-
-
     /** Layout da playlist */
     wpls = new TrackWidget();
+    cleanlist = new EmptyList(tr("Empty List"), wpls);
+    auto line = new Line::Frame(Line::Frame::Horizontal);
     auto *vbl = new QVBoxLayout();
     vbl->addLayout(hbtn);
     vbl->addSpacing(5);

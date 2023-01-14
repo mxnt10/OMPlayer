@@ -6,6 +6,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QModelIndex>
 #include <Button>
+#include <CWidget>
 #include <Label>
 #include <ListView>
 #include <PlayListUtils>
@@ -75,7 +76,7 @@ private:
     QFileDialog *diag{};
     QGraphicsOpacityEffect *effect{};
     EmptyList *cleanlist{};
-    QWidget *wpls{};
+    TrackWidget *wpls{};
     int startsize{0}, startlistsize{0}, startpos{0}, rmRows{0};
     bool isshow{false}, resize{false};
 };

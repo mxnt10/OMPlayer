@@ -1,3 +1,4 @@
+#include <Utils>
 #include "CWidget.h"
 
 
@@ -20,5 +21,5 @@ CWidget::CWidget(QFlags<Qt::WindowType> type) {
 }
 
 
-/** Destrutor */
-CWidget::~CWidget() = default;
+/** Outros construtores */
+TrackWidget::TrackWidget(QWidget *parent) : QWidget(parent) { setMouseTracking(true); }

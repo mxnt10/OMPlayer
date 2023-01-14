@@ -2,12 +2,13 @@
 #define OMPLAYER_LISTVIEW_H
 
 #include <QListView>
+#include <QStyledItemDelegate>
 
 class ListView : public QListView {
 Q_OBJECT
 
 public:
-    explicit ListView(QWidget *parent = nullptr);
+    explicit ListView(QStyledItemDelegate *delegate, QWidget *parent = nullptr);
     ~ListView() override;
 
 protected:

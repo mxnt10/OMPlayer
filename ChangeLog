@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 2.0.2 ] - 2023-01-10 ################################################
+## [ 2.0.2 ] - 2023-01-11 ################################################
 
 ### Added / Adicionado
- - Adicionado a fonte ListView.{cpp/h} em src/Widgets.
+ - Adicionado os códigos fonte:
+    - ListView.{cpp/h} em src/Widgets.
+    - Frame.{cpp/h} em src/Widgets.
+    - CWidget.{cpp/h} em src/Widgets.
  - Adicionado checkbox.qss em qss.
 ###
 
@@ -23,12 +26,20 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Modificado ações ao pressionar o botão stop. As emissões do onStop
    falha em muitos casos, sendo optado por chamar a função onStop()
    diretamente sem precisar da emissão.
+ - Modificado o ícone do programa por um próprio do projeto.
+ - Incrementado código na classe Label e criado a classe EmptyList.
+ - Pequenos ajustes e modificações.
+###
+
+### Removed / Removido
+ - Removido o ícone logo.png em appdata.
 ###
 
 ### Fixed / Corrigido
  - Ajustes na visualização das informações.
  - Ajustes na opacidade do menu da playlist.
  - Pequenas correções nas atualizações das informações.
+ - Corrigido a visualização das imagens na classe label.
 ###
 
 ##########################################################################

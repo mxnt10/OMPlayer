@@ -43,9 +43,8 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
     /** Lista para visualização da playlist */
     auto *filter = new EventFilter(this, EventFilter::Control);
-    listView = new ListView();
+    listView = new ListView(delegate);
     listView->setModel(model);
-    listView->setItemDelegate(delegate);
     listView->installEventFilter(filter);
     connect(listView, &ListView::doubleClicked, this, &PlayList::onAboutToPlay);
     connect(listView, &ListView::clicked, this, &PlayList::onSelect);
@@ -92,8 +91,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Layout da playlist */
-    wpls = new QWidget();
-    wpls->setMouseTracking(true);
+    wpls = new TrackWidget();
     auto *vbl = new QVBoxLayout();
     vbl->addLayout(hbtn);
     vbl->addSpacing(5);

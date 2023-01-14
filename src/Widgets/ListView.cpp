@@ -8,11 +8,13 @@
 
 
 /** Construtor */
-ListView::ListView(QWidget *parent) : QListView(parent) {
+ListView::ListView(QStyledItemDelegate *delegate, QWidget *parent) : QListView(parent) {
     setSelectionMode(QAbstractItemView::ExtendedSelection); /** Uso com CTRL/SHIF */
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setStyleSheet(Utils::setStyle("playlist"));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    setItemDelegate(delegate);
 }
 
 

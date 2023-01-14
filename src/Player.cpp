@@ -143,9 +143,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *bgcontrol = new QWidget();
     bgcontrol->setMaximumHeight(120);
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
-
-
-    /** Ajuste do plano de fundo dos controles */
     auto *bgctl = new QGridLayout();
     bgctl->setMargin(10);
     bgctl->addWidget(bgcontrol, 0, 0);
@@ -213,15 +210,10 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     fctl->setGraphicsEffect(effect2);
 
 
-    /** Definição da logo */
-    auto *wlogo = new QWidget();
-    wlogo->setMouseTracking(true);
-    logo = new Label(CENTER, Utils::setIcon());
-
-
-    /** Layout da logo */
-    wlayout = new QWidget();
-    wlayout->setMouseTracking(true);
+    /** Definição e Layout da logo */
+    auto *wlogo = new TrackWidget();
+    auto logo = new Label(CENTER, Utils::setIcon());
+    auto wlayout = new TrackWidget();
     auto *llogo = new QGridLayout(wlayout);
     llogo->setMargin(0);
     llogo->addWidget(logo, 0, 0);
@@ -237,7 +229,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Layout principal para os widgets */
-    layout = new QHBoxLayout();
+    auto layout = new QHBoxLayout();
     layout->setMargin(0);
     layout->addWidget(stack);
     this->setLayout(layout);

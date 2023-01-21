@@ -139,7 +139,6 @@ QString Utils::setStyle(const QString &style) {
     if (!file.open(QFile::ReadOnly)) return {};
     QString styleSheet{QLatin1String(file.readAll())};
     file.close();
-    qDebug("%s(%sUtils%s)%s::%sUsando estilo: %s%s ...\033[0m", GRE, RED, GRE, RED, EST, SHW, STR(style));
     return styleSheet;
 }
 

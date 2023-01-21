@@ -21,13 +21,6 @@ Worker::Worker(QObject *parent) : QObject(parent) {}
 /**********************************************************************************************************************/
 
 
-/** Função para chamar o thread */
-void Worker::requestWork() {
-    DG_T << "Solicitando início do thread " << QThread::currentThreadId();
-    Q_EMIT workRequested();
-}
-
-
 /** Thread para obter o hash md5 de um arquivo */
 void Worker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();

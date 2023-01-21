@@ -9,8 +9,8 @@ Q_OBJECT
 
 public:
     explicit Worker(QObject *parent = nullptr);
-    void requestWork();
 
+    void requestWork() { Q_EMIT workRequested(); };
     void setFile(const QString &val) { file = val; };
 
 Q_SIGNALS:

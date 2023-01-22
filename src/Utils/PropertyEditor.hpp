@@ -13,7 +13,7 @@ public:
     explicit PropertyEditor(QObject *parent = nullptr);
     void getProperties(QObject *obj);
     QWidget* buildUi(QObject* obj = nullptr);
-    QVariantHash exportAsHash();
+    QVariantHash exportAsHash() { return properties; };
 
 private:
     QWidget* createWidgetForFlags(const QString& name,

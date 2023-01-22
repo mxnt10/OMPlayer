@@ -4,8 +4,8 @@
 
 #include <cstdlib>
 
-#include "JsonTools.h"
-#include "Utils.h"
+#include "JsonTools.hpp"
+#include "Utils.hpp"
 
 
 /**********************************************************************************************************************/
@@ -20,7 +20,7 @@
         NotifyNotification *n;
         notify_init("Open Multimedia Player");
 
-        n = notify_notification_new(title, msg, Utils::setIcon(Utils::Notify).toStdString().c_str());
+        n = notify_notification_new(title, msg, nullptr);
         notify_notification_set_timeout(n, 5000);
 
         if (!notify_notification_show(n, nullptr)) return;
@@ -33,12 +33,12 @@
 
 
 /** Para otimização de performance. Seta os locais padrão para a busca por recursos para o programa. */
-void Utils::initUtils(Utils::STATUS option) {
-    if (option == Default) {
+void Utils::initUtils(Utils::Init option) {
+    if (option == Utils::DefineDir) {
         qDebug("%s(%sUtils%s)%s::%sDefinição de locais padrão ...\033[0m", GRE, RED, GRE, RED, ORA);
-        def.defaultDir = defaultDir();
+        def.defaultDir = scanXDGData() + "/usr/share/OMPlayer";
         def.localDir = getLocal();
-        def.currentDir = getLocal(Current);
+        def.currentDir = getLocal(Utils::Current);
     }
     def.definedTheme = JsonTools::stringJson("theme");
 }
@@ -48,41 +48,27 @@ void Utils::initUtils(Utils::STATUS option) {
  * O currentPath() pega o diretório corrente do binário do reprodutor, o que não é tão conveniente. Por isso, é usado
  * expressão regular para voltar um diretório que é o que desejamos. Esse recurso está disponível à caráter
  * de testes de execução e depuração do reprodutor e em caso de portabilizar o reprodutor. */
-QString Utils::getLocal(Utils::STATUS option) {
-    if (option == Current) return QDir::currentPath();
+QString Utils::getLocal(Utils::Locals option) {
+    if (option == Utils::Current) return QDir::currentPath();
     return QDir::currentPath().remove(QRegExp("\\/(?:.(?!\\/))+$"));
 }
 
 
 /** Diretórios padrão do programa */
-QString Utils::defaultDir() { return scanXDGData() + "/usr/share/OMPlayer"; }
 QStringList Utils::setLocals() { return {def.defaultDir, def.localDir, def.currentDir}; }
 
 
 /** Retorna o ícone do programa */
-QString Utils::setIcon(Utils::STATUS logo) {
-    QStringList locals;
-    QString iconfile, icon;
+QString Utils::setIcon() {
+    qDebug("%s(%sUtils%s)%s::%sSetando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
+    if (!def.definedIcon.isEmpty() && QFileInfo::exists(def.definedIcon)) return def.definedIcon;
 
-    if (logo != Utils::Default) {
-        if (logo == Utils::Notify && !def.definedNotify.isEmpty() && QFileInfo::exists(def.definedNotify))
-            return def.definedNotify;
-        qDebug("%s(%sUtils%s)%s::%sSetando uma logo ...\033[0m", GRE, RED, GRE, RED, BLU);
-        locals.append({def.defaultDir + "/appdata", def.localDir + "/appdata", def.currentDir + "/appdata"});
-        if (logo == Utils::Notify) icon = "/notify.png";
-    } else {
-        if (!def.definedIcon.isEmpty() && QFileInfo::exists(def.definedIcon)) return def.definedIcon;
-        qDebug("%s(%sUtils%s)%s::%sSetando o ícone do programa ...\033[0m", GRE, RED, GRE, RED, BLU);
-        locals.append({def.definedXDG + "/usr/share/pixmaps", def.localDir + "/appdata", def.currentDir + "/appdata"});
-        icon = "/OMPlayer.png";
-    }
+    QStringList locals{def.definedXDG + "/usr/share/pixmaps", def.localDir + "/appdata", def.currentDir + "/appdata"};
 
     for (int i = 0; i < 3; i++) {
-        iconfile = locals[i] + icon;
-        if (QFileInfo::exists(iconfile)) {
-            if (logo == Utils::Default) def.definedIcon = iconfile;
-            else if (logo == Utils::Notify) def.definedNotify = iconfile;
-            return iconfile;
+        if (QFileInfo::exists(locals[i] + "/OMPlayer.png")) {
+            def.definedIcon = locals[i] + "/OMPlayer.png";
+            return def.definedIcon;
         }
     }
     return {};
@@ -280,8 +266,8 @@ QString Utils::scanXDGData() {
 
 
 /** Retorno das dimensões de tela */
-double Utils::aspectNum(Utils::ASPECTRATIO aspect) {
-    switch (aspect) {
+double Utils::aspectNum(Utils::AspectRatio option) {
+    switch (option) {
         case Utils::AspectVideo:  return 0;
         case Utils::Aspect21:     return (double) 2 / 1;
         case Utils::Aspect43:     return (double) 4 / 3;
@@ -301,8 +287,8 @@ double Utils::aspectNum(Utils::ASPECTRATIO aspect) {
 
 
 /** Retorna o texto das dimensões de tela */
-QString Utils::aspectStr(Utils::ASPECTRATIO aspect) {
-    switch (aspect) {
+QString Utils::aspectStr(Utils::AspectRatio option) {
+    switch (option) {
         case Utils::AspectVideo:  return QObject::tr("Video");
         case Utils::Aspect21:     return "2:1";
         case Utils::Aspect43:     return "4:3";

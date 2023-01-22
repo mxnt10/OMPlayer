@@ -1,3 +1,3 @@
-#include "JsonTools.h"
-#include "PropertyEditor.h"
-#include "Utils.h"
+#include "JsonTools.hpp"
+#include "PropertyEditor.hpp"
+#include "Utils.hpp"

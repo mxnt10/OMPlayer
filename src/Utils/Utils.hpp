@@ -21,7 +21,6 @@
 #define BLU "\x1b[38;2;000;120;255m" //Outros
 #define VIO "\x1b[38;2;120;070;255m" //Posicionamentos
 #define ORA "\x1b[38;2;255;100;000m" //Ações
-#define EST "\x1b[38;2;180;125;000m" //Estilo
 #define HID "\x1b[38;2;170;255;000m" //Ocultação
 #define SHW "\x1b[38;2;085;255;050m" //Ocultação
 #define UPD "\x1b[38;2;100;100;255m" //Atualizar
@@ -54,20 +53,21 @@ struct { /** Criado com objetivo de otimização de performance */
     QString currentDir;
     QString definedXDG;
     QString definedIcon;
-    QString definedNotify;
     QString definedTheme;
 } def;
 
 class Utils {
 
 public:
-    enum ASPECTRATIO {
-        AspectAuto = 1, Aspect43 = 2, Aspect54 = 3, Aspect149 = 4, Aspect169 = 5, Aspect1610 = 6, Aspect235 = 7,
-        Aspect11 = 8, Aspect32 = 9, Aspect1410 = 10, Aspect118 = 11, Aspect21 = 12, AspectVideo = 0
+    enum AspectRatio {
+        AspectVideo = 0, AspectAuto = 1, Aspect43 = 2, Aspect54 = 3, Aspect149 = 4, Aspect169 = 5, Aspect1610 = 6,
+        Aspect235 = 7, Aspect11 = 8, Aspect32 = 9, Aspect1410 = 10, Aspect118 = 11, Aspect21 = 12
     };
-    enum STATUS {Default = 0, Notify = 1, Current = 2, Theme = 3};
-    static void initUtils(Utils::STATUS option = Utils::Default);
-    static QString setIcon(Utils::STATUS logo = Utils::Default);
+    enum Init {DefineDir = 0, UpdateTheme = 2};
+    enum Locals {OldDir = 0, Current = 1};
+
+    static void initUtils(Utils::Init option = Utils::DefineDir);
+    static QString setIcon();
     static QString setIconTheme(const QString &theme, const QString &icon);
     static QString setStyle(const QString &style);
     static QString mediaTitle(const QString &mediafile);
@@ -78,16 +78,15 @@ public:
     static void changeMenuIcon(QMenu *btn, const QString &thm);
     static void rm_nl(string &s);
     static QStringList subdirIcons();
-    static double aspectNum(Utils::ASPECTRATIO aspect);
-    static QString aspectStr(Utils::ASPECTRATIO aspect);
+    static double aspectNum(Utils::AspectRatio option);
+    static QString aspectStr(Utils::AspectRatio option);
     static QString setThemeName();
     static QStringList setLocals();
     static void fadeDiag(QPropertyAnimation *animation, float x, float y);
     static int calcX(int z, int x, int y) { return int(x / ((double)y / z)); }
 
 private:
-    static QString getLocal(Utils::STATUS option = Utils::Default);
-    static QString defaultDir();
+    static QString getLocal(Utils::Locals option = Utils::OldDir);
     static QString scanXDGData();
 };
 

@@ -8,9 +8,9 @@
 #include <QSpinBox>
 #include <QToolButton>
 
-#include "ClickableMenu.h"
-#include "PropertyEditor.h"
-#include "Utils.h"
+#include <CustomMenu>
+#include "PropertyEditor.hpp"
+#include "Utils.hpp"
 
 
 /**********************************************************************************************************************/
@@ -238,7 +238,3 @@ void PropertyEditor::onTextChange(const QString& value) { updatePropertyValue(se
 
 /** Envia um valor booleano para o updatePropertyValue */
 void PropertyEditor::onBoolChange(bool value) { updatePropertyValue(sender()->objectName(), value); }
-
-
-/** Função que retorna as configurações de decodificação */
-QVariantHash PropertyEditor::exportAsHash() { return properties; }

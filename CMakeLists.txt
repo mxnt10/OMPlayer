@@ -177,7 +177,6 @@ install(FILES appdata/run
 file(GLOB DOCS ${PROJECT_SOURCE_DIR}/docs/*)
 install(FILES ${DOCS} DESTINATION doc/${PROJECT_NAME}-${PROJECT_VERSION})
 install(FILES ChangeLog LICENSE README.md DESTINATION doc/${PROJECT_NAME}-${PROJECT_VERSION})
-install(FILES appdata/notify.png DESTINATION share/${PROJECT_NAME}/appdata)
 install(FILES appdata/OMPlayer.desktop DESTINATION share/applications)
 install(FILES appdata/OMPlayer.png DESTINATION share/pixmaps)
 

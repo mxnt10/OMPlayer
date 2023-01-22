@@ -12,7 +12,7 @@ Q_DISABLE_COPY(PlayListModel)
 public:
     explicit PlayListModel(QObject *parent = nullptr);
     ~PlayListModel() override;
-    [[nodiscard]] QList<PlayListItem> items() const;
+    [[nodiscard]] QList<PlayListItem> items() const { return mediaItems; };
     [[nodiscard]] int rowCount(const QModelIndex &parent) const override;
     [[nodiscard]] QVariant data(const QModelIndex &index, int role) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;

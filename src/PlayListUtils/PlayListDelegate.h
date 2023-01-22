@@ -9,7 +9,9 @@ Q_OBJECT
 public:
     explicit PlayListDelegate(QObject *parent = nullptr);
     ~PlayListDelegate() override;
-    void setWith(int w);
+    void setWith(int w) { width = w; };
+
+protected:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 

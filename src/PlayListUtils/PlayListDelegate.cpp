@@ -17,10 +17,6 @@ PlayListDelegate::PlayListDelegate(QObject *parent): QStyledItemDelegate(parent)
 PlayListDelegate::~PlayListDelegate() = default;
 
 
-/** Definindo um tamanho específico */
-void PlayListDelegate::setWith(int w) { width = w; }
-
-
 /**********************************************************************************************************************/
 
 

@@ -15,10 +15,6 @@ PlayListModel::~PlayListModel() = default;
 /**********************************************************************************************************************/
 
 
-/** Retorna os itens da playlist */
-QList<PlayListItem> PlayListModel::items() const { return mediaItems; }
-
-
 /** Retorna o número de itens da playlist */
 int PlayListModel::rowCount(const QModelIndex &parent) const {
     if (parent.isValid()) return 0;

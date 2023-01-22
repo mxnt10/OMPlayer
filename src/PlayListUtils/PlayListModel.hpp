@@ -3,7 +3,7 @@
 
 #include <QAbstractListModel>
 
-#include "PlayListItem.h"
+#include "PlayListItem.hpp"
 
 class PlayListModel : public QAbstractListModel {
 Q_OBJECT

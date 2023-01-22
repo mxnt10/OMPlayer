@@ -1,9 +1,9 @@
 #include <QApplication>
 #include <QPainter>
 
-#include "PlayListModel.h"
-#include "PlayListDelegate.h"
-#include "PlayListItem.h"
+#include "PlayListModel.hpp"
+#include "PlayListDelegate.hpp"
+#include "PlayListItem.hpp"
 
 #define margin 5
 #define height 28

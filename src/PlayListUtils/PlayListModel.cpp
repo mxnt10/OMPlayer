@@ -1,7 +1,7 @@
 #include <QVector>
 
-#include "PlayListModel.h"
-#include "PlayListItem.h"
+#include "PlayListModel.hpp"
+#include "PlayListItem.hpp"
 
 
 /**********************************************************************************************************************/

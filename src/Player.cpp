@@ -61,6 +61,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new QtAV::AVPlayer(this);
+    mediaPlayer->setBufferMode(QtAV::BufferMode::BufferPackets);
+    mediaPlayer->setBufferValue(1);
     connect(mediaPlayer->audio(), &QtAV::AudioOutput::volumeChanged, this, &OMPlayer::volumeFinished);
     connect(mediaPlayer, &QtAV::AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
     connect(mediaPlayer, &QtAV::AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
@@ -151,9 +153,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Layout dos botões */
     auto line = new Line::Frame(Line::Frame::Vertical, 25);
     auto *buttons = new QHBoxLayout();
-    buttons->setSpacing(5);
     buttons->addStretch(1);
-    buttons->addSpacing(30);
+    buttons->addSpacing(35);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
     buttons->addSpacing(5);
@@ -414,7 +415,7 @@ void OMPlayer::setRenderer(const QString &op) {
 
 /** Alterando a dimensão de tela */
 void OMPlayer::switchAspectRatio(QAction *action) {
-    Utils::ASPECTRATIO r = Utils::ASPECTRATIO(action->data().toInt());
+    Utils::AspectRatio r = Utils::AspectRatio(action->data().toInt());
     if (action == aspectAction) return;
 
     qDebug("%s(%sMenu%s)%s::%sSetando aspect ratio %s ...\033[0m", GRE, RED, GRE, RED, BLU, STR(Utils::aspectStr(r)));
@@ -687,12 +688,11 @@ void OMPlayer::onStop() {
 
 
 /** Atualização dos itens da playlist */
-void OMPlayer::changePlaylist(const QString &format) {
+void OMPlayer::changePlaylist(const QString &format, int duration) {
     if (playlist->setDuration() != 0) return;
     qDebug("%s(%sPlayer%s)%s::%sAtualizando %s ...\033[0m", GRE, RED, GRE, RED, UPD, STR(mediaPlayer->file()));
 
     int row = playlist->selectItems();
-    qint64 duration = mediaPlayer->mediaStopPosition();
     playlist->updateItems(row, duration, format);
 }
 
@@ -744,10 +744,6 @@ void OMPlayer::setShuffle() {
         JsonTools::boolJson("on_shuffle", false);
     }
 }
-
-
-/** Função para ativar a função pause com um clique */
-void OMPlayer::enablePause() { if (!enterpos) pausing = true; }
 
 
 /** Contador para mapear o clique único */
@@ -860,10 +856,16 @@ void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
     if (dialog == AboutD) {
         qDebug("%s(%sInterface%s)%s::%sIniciando o diálogo sobre ...\033[0m", GRE, RED, GRE, RED, CYA);
         about->show();
-    } else if (dialog == SettingsD) {
+        return;
+    }
+
+    if (dialog == SettingsD) {
         qDebug("%s(%sInterface%s)%s::%sIniciando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
         sett->show();
-    } else if (dialog == InfoD) {
+        return;
+    }
+
+    if (dialog == InfoD) {
         qDebug("%s(%sInterface%s)%s::%sIniciando o diálogo de informações ...\033[0m", GRE, RED, GRE, RED, CYA);
         playlist->hideFade();
         setHide();
@@ -903,17 +905,6 @@ void OMPlayer::hideFalse() {
     }
     filter->setFixed(enterpos);
 }
-
-
-/** Mouse sobre os itens da playlist */
-void OMPlayer::enterList() {
-    hideFalse();
-    listmenu = true;
-}
-
-
-/** Mouse fora dos itens da playlist */
-void OMPlayer::leaveList() { listmenu = false; }
 
 
 /** Pré-visualização ao posicionar o mouse no slider */
@@ -1004,7 +995,7 @@ void OMPlayer::setMute() {
 
 /** Altera o volume do reprodutor ao pressionar ou mover a barra de volume */
 void OMPlayer::setVolume(int value) {
-    /** O volume do reprodutor é definido com um valor do tipo double que vai de 0.0 a 1.0, portanto o valor
+    /** O volume do reprodutor é definido com um valor do tipo double que vai de 0.0 a 2.0, portanto o valor
      * do tipo int a ser recebido, precisa ser reajustado e convertido. */
     mediaPlayer->audio()->setVolume((double)value / 100);
 }
@@ -1261,6 +1252,7 @@ void OMPlayer::onMediaStatusChanged() {
             if (actualitem == playlist->setListSize() - 1 && !restart && !randplay) {
                 playing = false;
                 playlist->selectClean();
+                onStop();
                 previousitem = playlist->setListSize() - 1;
                 actualitem = 0;
                 nextitem = 1;
@@ -1386,7 +1378,7 @@ void OMPlayer::ShowContextMenu(const QPoint &pos) {
         /** Menu de informação de mídia */
         QAction mediainfo(tr("Multimedia Info"), this);
         Utils::changeMenuIcon(mediainfo, "about");
-        connect(&mediainfo, &QAction::triggered, [this](){ setDialog(InfoD); });
+        connect(&mediainfo, &QAction::triggered, [this](){ setDialog(DIALOG::InfoD); });
 
         QAction saveplaylist(tr("Save Playlist"), this);
 

@@ -207,8 +207,8 @@ QStringList StatisticsView::getMetaDataKeys() {
 
 /** Setando as informações de mídia */
 void StatisticsView::setItemValues(const QStringList &values, const QStringList &valuesVideo,
-                                   const QStringList &valuesAudio, const QString &format) {
-    Q_EMIT emitFormat(format);
+                                   const QStringList &valuesAudio, const QString &format, int duration) {
+    Q_EMIT emitFormat(format, duration);
     QStringList v = values;
     int i = 0;
 

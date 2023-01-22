@@ -25,13 +25,6 @@ StatisticsWorker::StatisticsWorker(QObject *parent) : QObject(parent) {}
 /**********************************************************************************************************************/
 
 
-/** Função para chamar o thread */
-void StatisticsWorker::requestWork() {
-    DG_T << "Solicitando início do thread " << QThread::currentThreadId();
-    Q_EMIT workRequested();
-}
-
-
 /** Thread para obter o hash md5 de um arquivo */
 void StatisticsWorker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
@@ -39,6 +32,7 @@ void StatisticsWorker::doWork() {
     QFileInfo mfile{file};
     MI.Open(file.toStdWString());
     auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
+    int duration = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Duration"))).toInt();
 
     values << QString(file).remove(QRegExp("\\/(?:.(?!\\/))+$"))
            << QString(file).remove(QRegExp("\\/.+\\/"))
@@ -46,7 +40,6 @@ void StatisticsWorker::doWork() {
 
     if (statistics.url.isEmpty()) {
         /** Usando MediaInfoDLL para buscar as informações */
-        int duration = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Duration"))).toInt();
         auto bitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("OverallBitRate")));
         int w = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Width"))).toInt();
         int h = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height"))).toInt();
@@ -58,6 +51,13 @@ void StatisticsWorker::doWork() {
         auto channellayout = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("ChannelLayout")));
         auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("FrameRate")));
 
+        if (QString::compare(channellayout, "L R") == 0) channellayout = "stereo";
+        else if(QString::compare(channellayout, "C") == 0) channellayout ="mono";
+        else if (channellayout.isEmpty()) {
+            if (channel.toInt() == 2) channellayout = "stereo";
+            else if (channel.toInt() == 1) channellayout ="mono";
+        }
+
         values << setFormat(format)
                << convertBit(bitrate.toFloat())
                << QTime(0, 0, 0).addMSecs(duration).toString(QString::fromLatin1("HH:mm:ss"));
@@ -68,9 +68,15 @@ void StatisticsWorker::doWork() {
         if (videobitrate.isEmpty()) valuesVideo << "";
         else valuesVideo << convertBit(videobitrate.toFloat());
 
-        valuesVideo << convertAspectRatio(w, h)
-                    << QString::fromLatin1("%1x%2").arg(w).arg(h) << "" // Frames não informado
-                    << QString::number(framerate, 'f', 2);
+        valuesVideo << convertAspectRatio(w, h);
+
+        if (w == 0 || h == 0) valuesVideo << "";
+        else valuesVideo << QString::fromLatin1("%1x%2").arg(w).arg(h);
+
+        valuesVideo << ""; // Frames não informado
+
+        if (framerate == 0) valuesVideo << "";
+        else valuesVideo << QString::number(framerate, 'f', 2);
 
         /** Informações de áudio */
         valuesAudio << "" << ""; // Codec e Decoder não informados
@@ -78,8 +84,13 @@ void StatisticsWorker::doWork() {
         if (audiobitrate.isEmpty()) valuesAudio << "";
         else valuesAudio << convertBit(audiobitrate.toFloat());
 
-        valuesAudio << convertHz(samplerate.toFloat()) << "" // Sample format não informado
-                    << QString::fromLatin1("%1 (Layout %2)").arg(channel, channellayout) << ""; // Frames não informado
+        valuesAudio << convertHz(samplerate.toFloat()) << ""; // Sample format não informado
+
+        if (channel.isEmpty()) valuesAudio << "";
+        else if (channellayout.isEmpty()) valuesAudio << channel;
+        else valuesAudio << QString::fromLatin1("%1 (layout %2)").arg(channel, channellayout);
+
+        valuesAudio << "" << ""; // Frames e tamanho do frame não informado
 
         if (audioframerate.isEmpty()) valuesAudio << "";
         else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
@@ -103,44 +114,57 @@ void StatisticsWorker::doWork() {
                << "00:00:00 / " + statistics.duration.toString(QString::fromLatin1("HH:mm:ss"));
 
         /** Informações de vídeo */
-        valuesVideo << QString::fromLatin1("%1 (%2)").arg(statistics.video.codec, statistics.video.codec_long)
-                    << QString::fromLatin1("%1 (%2)").arg(statistics.video.decoder, statistics.video.decoder_detail);
+        if (statistics.video.available) {
+            valuesVideo << QString::fromLatin1("%1 (%2)").arg(statistics.video.codec, statistics.video.codec_long)
+                        << QString::fromLatin1("%1 (%2)").arg(statistics.video.decoder,
+                                                              statistics.video.decoder_detail);
 
-        if (statistics.video.bit_rate == 0) valuesVideo << "";
-        else valuesVideo << convertBit((float)statistics.video.bit_rate);
+            if (statistics.video.bit_rate == 0) valuesVideo << "";
+            else valuesVideo << convertBit((float) statistics.video.bit_rate);
 
-        valuesVideo << convertAspectRatio(w, h)
-                    << QString::fromLatin1("%1 (Codec %2)").arg(sizev, sizec);
+            valuesVideo << convertAspectRatio(w, h)
+                        << QString::fromLatin1("%1 (Codec %2)").arg(sizev, sizec);
 
-        if (statistics.video.frames == 0) valuesVideo << "";
-        else valuesVideo << QString::number(statistics.video.frames);
+            if (statistics.video.frames == 0) valuesVideo << "";
+            else valuesVideo << QString::number(statistics.video.frames);
 
-        if (statistics.video.frame_rate == 0) valuesVideo << "";
-        else valuesVideo << QString::fromLatin1("%1 / %2").arg(QString::number(statistics.video.frame_rate, 'f', 2),
-                                                               QString::number(statistics.video.frame_rate, 'f', 2));
+            if (statistics.video.frame_rate == 0) valuesVideo << "";
+            else
+                valuesVideo << QString::fromLatin1("%1 / %2").arg(QString::number(statistics.video.frame_rate, 'f', 2),
+                                                                  QString::number(statistics.video.frame_rate, 'f', 2));
+        }
 
         /** Informações de áudio */
-        valuesAudio << QString::fromLatin1("%1 (%2)").arg(statistics.audio.codec, statistics.audio.codec_long)
-                    << QString::fromLatin1("%1 (%2)").arg(statistics.audio.decoder, statistics.audio.decoder_detail);
+        if (statistics.audio.available) {
+            valuesAudio << QString::fromLatin1("%1 (%2)").arg(statistics.audio.codec, statistics.audio.codec_long)
+                        << QString::fromLatin1("%1 (%2)").arg(statistics.audio.decoder,
+                                                              statistics.audio.decoder_detail);
 
-        if (statistics.audio.bit_rate == 0) valuesAudio << "";
-        else valuesAudio << convertBit((float)statistics.audio.bit_rate);
+            if (statistics.audio.bit_rate == 0) valuesAudio << "";
+            else valuesAudio << convertBit((float) statistics.audio.bit_rate);
 
-        valuesAudio << convertHz((float)statistics.audio_only.sample_rate)
-                    << statistics.audio_only.sample_fmt
-                    << QString::fromLatin1("%1 (Layout %2)").arg(QString::number(statistics.audio_only.channels),
-                                                                 statistics.audio_only.channel_layout);
+            valuesAudio << convertHz((float) statistics.audio_only.sample_rate)
+                        << statistics.audio_only.sample_fmt;
 
-        if (statistics.audio.frames == 0) valuesAudio << "";
-        else valuesAudio << QString::number(statistics.audio.frames);
+            if (statistics.audio_only.channels < 1) valuesAudio << "";
+            else if (statistics.audio_only.channel_layout.isEmpty())
+                valuesAudio << QString::number(statistics.audio_only.channels);
+            else
+                valuesAudio
+                        << QString::fromLatin1("%1 (layout %2)").arg(QString::number(statistics.audio_only.channels),
+                                                                     statistics.audio_only.channel_layout);
 
-        if (statistics.audio_only.frame_size == 0) valuesAudio << "";
-        else valuesAudio << QString::number(statistics.audio_only.frame_size);
+            if (statistics.audio.frames == 0) valuesAudio << "";
+            else valuesAudio << QString::number(statistics.audio.frames);
 
-        if (statistics.audio.frame_rate == 0) {
-            if(audioframerate.isEmpty()) valuesAudio << "";
-            else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
-        } else valuesAudio << QString::number(statistics.video.frame_rate, 'f', 2);
+            if (statistics.audio_only.frame_size == 0) valuesAudio << "";
+            else valuesAudio << QString::number(statistics.audio_only.frame_size);
+
+            if (statistics.audio.frame_rate == 0) {
+                if (audioframerate.isEmpty()) valuesAudio << "";
+                else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
+            } else valuesAudio << QString::number(statistics.video.frame_rate, 'f', 2);
+        }
     }
 
     /** Outras informações */
@@ -154,7 +178,7 @@ void StatisticsWorker::doWork() {
     if (bitdepth.isEmpty()) valuesAudio << "";
     else valuesAudio << bitdepth + " bits";
 
-    Q_EMIT baseValues(values, valuesVideo, valuesAudio, format);
+    Q_EMIT baseValues(values, valuesVideo, valuesAudio, format, duration);
     MI.Close();
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
@@ -165,9 +189,11 @@ void StatisticsWorker::doWork() {
 /** Reescrevendo o texto de alguns formatos */
 QString StatisticsWorker::setFormat(const QString &format) {
     switch (Hash::hash(format.toStdString())) {
+        case "MPEG-PS"_hash:  return "mpeg - MPEG-PS (MPEG-2 Program Stream)";
         case "MPEG-4"_hash:   return "mp4 - MPEG-4 (Moving Picture Expert Group 4)";
         case "Matroska"_hash: return "mkv - Matroska (Matroska Video)";
         case "WebM"_hash:     return "webm - WebM (Web Media)";
+        case "DV"_hash:       return "dv - DV (Digital Video)";
         default:              return format;
     }
 }
@@ -193,6 +219,8 @@ QString StatisticsWorker::convertByte(auto byte) {
 
 /** Definindo a taxa de bits */
 QString StatisticsWorker::convertBit(auto bit) {
+    if (bit == 0) return {};
+
     int i = 0;
     QString bits{"b/s"};
     QStringList bitit{"Kb/s", "Mb/s", "Gb/s"};
@@ -210,6 +238,8 @@ QString StatisticsWorker::convertBit(auto bit) {
 
 /** Definindo as opções de aspect ratio */
 QString StatisticsWorker::convertAspectRatio(int x, int y) {
+    if (x == 0 || y == 0) return {};
+
     int w = x;
     int h = y;
     int dividend, divisor;
@@ -251,6 +281,8 @@ QString StatisticsWorker::convertAspectRatio(int x, int y) {
 
 /** Definição da frequência */
 QString StatisticsWorker::convertHz(auto hz) {
+    if (hz == 0) return {};
+
     int i = 0;
     QString herts{"Hz"};
     QStringList hertsit{"kHz", "mHz", "gHz"};

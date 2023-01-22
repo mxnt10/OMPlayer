@@ -35,13 +35,13 @@ protected:
     void closeEvent(QCloseEvent *event) override;
 
 Q_SIGNALS:
-    void emitFormat(const QString &format);
+    void emitFormat(const QString &format, int duration);
     void emitclose();
 
 private Q_SLOTS:
     void setMd5(const QString &md5);
-    void setItemValues(const QStringList &values, const QStringList &valuesVideo,
-                       const QStringList &valuesAudio, const QString &format);
+    void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
+                       const QString &format, int duration);
     void onClose();
 
 private:

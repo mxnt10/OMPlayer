@@ -179,7 +179,7 @@ void Settings::setIcon(const QString &index) {
     qDebug("%s(%sSettings%s)%s::%sTema de ícones %s ...\033[0m", GRE, RED, GRE, RED, ORA, STR(index));
     JsonTools::stringJson("theme", index);
 
-    Utils::initUtils(Utils::Theme);
+    Utils::initUtils(Utils::UpdateTheme);
     Utils::changeIcon(closebtn, "apply");
     decoder->changeIcons();
 

@@ -10,12 +10,13 @@ Q_OBJECT
 
 public:
     explicit StatisticsWorker(QObject *parent = nullptr);
-    void requestWork();
+
     void setFile(const QString &val, const QtAV::Statistics &s = QtAV::Statistics()) { file = val; statistics = s; };
+    void requestWork() { Q_EMIT workRequested(); };
 
 Q_SIGNALS:
     void baseValues(const QStringList &values, const QStringList &valuesVideo,
-                    const QStringList &valuesAudio, const QString &format);
+                    const QStringList &valuesAudio, const QString &format, int duration);
     void workRequested();
     void finished();
 

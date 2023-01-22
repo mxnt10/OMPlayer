@@ -65,7 +65,7 @@ private Q_SLOTS:
     void onPaused(bool p);
     void onStart();
     void onStop();
-    void changePlaylist(const QString &format);
+    void changePlaylist(const QString &format, int duration);
     void setRepeat();
     void setReplay();
     void setShuffle();
@@ -82,7 +82,6 @@ private Q_SLOTS:
     void onTimeSliderLeave(OMPlayer::STATUS status = Default);
     void updateSlider(qint64 value);
     void updateSliderUnit();
-    void enablePause();
     void clickCount();
     void detectClick();
     void seekBySlider(int value);
@@ -93,12 +92,14 @@ private Q_SLOTS:
     void onTimeVolume(int pos, int value);
     void changeChannel(QAction *action);
     void changeAudioTrack(QAction *action);
-    void enterList();
-    void leaveList();
     void changeIcons(OMPlayer::STATUS change = Default);
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);
+
+    void enablePause() { if (!enterpos) pausing = true; };
+    void enterList() { listmenu = true; hideFalse(); };
+    void leaveList() { listmenu = false; };
 
 private:
     About *about{};
@@ -120,7 +121,7 @@ private:
     QStringList listnum{};
     QTimer *click{};
     QWidget *pv{};
-    ScreenSaver *screensaver;
+    ScreenSaver *screensaver{};
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer VERSION 2.0.1)
+project(OMPlayer VERSION 2023.01.23)
 
 
 # Para adicionar módulos extras

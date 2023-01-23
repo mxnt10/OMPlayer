@@ -3,14 +3,14 @@
 #include <QStyleOption>
 #include <Utils>
 
-#include "Slider.h"
+#include "Slider.hpp"
 
 
 /**********************************************************************************************************************/
 
 
 /** Construtor principal do Slider. */
-Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum, const QString &style) :
+Slider::Slider(QWidget *parent, bool disable, int w, int h, int max, const QString &style, const QString &hover) :
     QSlider(parent) {
     setOrientation(Qt::Horizontal);
     setFocusPolicy(Qt::NoFocus);
@@ -20,10 +20,11 @@ Slider::Slider(QWidget *parent, bool disable, int wsize, int hsize, int maximum,
     setStyleSheet(Utils::setStyle(style));
     connect(this, &Slider::valueChanged, this, &Slider::getValue);
     stl = style;
+    hvr = hover;
 
-    if (wsize > (-1)) setFixedWidth(wsize);
-    if (hsize > (-1)) setFixedHeight(hsize);
-    if (maximum > (-1)) setMaximum(maximum);
+    if (w > null) setFixedWidth(w);
+    if (h > null) setFixedHeight(h);
+    if (max > null) setMaximum(max);
 }
 
 
@@ -60,12 +61,6 @@ int Slider::pixelPosToRangeValue(int pos) const {
 
     return QStyle::sliderValueFromPosition(
             minimum(), maximum(), pos - sliderMin, sliderMax - sliderMin, opt.upsideDown);
-}
-
-
-/** Função para coletar o valor atual do slider */
-void Slider::getValue(int value) {
-    val = value;
 }
 
 
@@ -110,7 +105,7 @@ void Slider::mouseMoveEvent(QMouseEvent *event) {
 /** Ação ao posicionar o mouse sobre o botão */
 void Slider::enterEvent(QEvent *event) {
     qDebug("%s(%sSlider%s)%s::%sMouse posicionado no %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(stl));
-    if (stl == "slider") setStyleSheet(Utils::setStyle("slider-hover"));
+    if (!hvr.isEmpty()) setStyleSheet(Utils::setStyle(hvr));
     emit emitEnter();
     QSlider::enterEvent(event);
 }
@@ -118,7 +113,7 @@ void Slider::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Slider::leaveEvent(QEvent *event) {
-    if (stl == "slider") setStyleSheet(Utils::setStyle("slider"));
+    if (!hvr.isEmpty()) setStyleSheet(Utils::setStyle(stl));
     emit emitLeave();
     QSlider::leaveEvent(event);
 }
@@ -126,7 +121,7 @@ void Slider::leaveEvent(QEvent *event) {
 
 /** Evento que mapeia a movimentação do mouse */
 void Slider::wheelEvent(QWheelEvent *event) {
-    if (stl == "slider") {
+    if (!hvr.isEmpty()) {
         if (event->angleDelta().y() > 0) emit sliderMoved(val + 5);
         else emit sliderMoved(val - 5);
     } else emit sliderMoved(val);

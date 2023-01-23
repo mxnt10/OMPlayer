@@ -97,7 +97,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     /** Barra de progresso de execução e Labels */
     current = new Label(CENTER, 70, "-- -- : -- --");
     end = new Label(CENTER, 70, "-- -- : -- --");
-    slider = new Slider(this, true, (-1), 28, 0);
+    slider = new Slider(this, true, null, 28, 0, "slider", "slider-hover");
     connect(slider, &Slider::onHover, this, &OMPlayer::onTimeSliderHover);
     connect(slider, &Slider::sliderMoved, this, &OMPlayer::seekBySlider);
     connect(slider, &Slider::emitEnter, this, &OMPlayer::onTimeSliderEnter);
@@ -132,7 +132,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Controle do volume */
-    volume = new Slider(this, false, 90, (-1), 100, "volume");
+    volume = new Slider(this, false, 90, null, 100, "volume");
     volume->setValue(int(vol * 100));
     mediaPlayer->audio()->setVolume(vol);
     connect(volume, &Slider::onHover, this, &OMPlayer::onTimeVolume);
@@ -145,9 +145,9 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto *bgcontrol = new QWidget();
     bgcontrol->setMaximumHeight(120);
     bgcontrol->setStyleSheet(Utils::setStyle("widget"));
-    auto *bgctl = new QGridLayout();
+    auto *bgctl = new QVBoxLayout();
     bgctl->setMargin(10);
-    bgctl->addWidget(bgcontrol, 0, 0);
+    bgctl->addWidget(bgcontrol);
 
 
     /** Layout dos botões */

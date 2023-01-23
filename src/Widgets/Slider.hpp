@@ -1,18 +1,17 @@
 #ifndef OMPLAYER_SLIDER_H
 #define OMPLAYER_SLIDER_H
 
+#define null (-1)
+
 #include <QSlider>
 
 class Slider : public QSlider {
 Q_OBJECT
 
 public:
-    explicit Slider(QWidget *parent = nullptr,
-                    bool disable = false,
-                    int wsize = (-1),
-                    int hsize = (-1),
-                    int maximum = (-1),
-                    const QString &style = "slider");
+    explicit Slider(QWidget *parent = nullptr, bool disable = false,
+                    int w = null, int h = null, int max = null,
+                    const QString &style = nullptr, const QString &hover = nullptr);
     ~Slider() override;
 
 protected:
@@ -28,13 +27,13 @@ Q_SIGNALS:
     void onHover(int pos, int value);
 
 private Q_SLOTS:
-    void getValue(int value);
+    void getValue(int value) { val = value; };
 
 private:
     [[nodiscard]] inline int pick(const QPoint &pt) const;
     [[nodiscard]] int pixelPosToRangeValue(int pos) const;
     int val{0};
-    QString stl{};
+    QString stl{}, hvr{};
 };
 
 #endif //OMPLAYER_SLIDER_H

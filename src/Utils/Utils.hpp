@@ -7,7 +7,7 @@
 #include <QPropertyAnimation>
 #include <Button>
 
-#define VERSION "2.0.1"
+#define VERSION "2023.01.23"
 #define STR qUtf8Printable
 #define FADE_VAL 200
 

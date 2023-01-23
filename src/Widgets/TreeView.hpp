@@ -9,7 +9,8 @@ Q_OBJECT
 public:
     explicit TreeView(const QList<QTreeWidgetItem*>& item, QWidget *parent = nullptr);
     ~TreeView() override;
-    int size();
+    int ItemHeight();
+    int ItemWith();
 };
 
 #endif //OMPLAYER_TREEVIEW_H

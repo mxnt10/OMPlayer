@@ -214,7 +214,7 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
     /** Atualizando informações gerais */
     foreach(QTreeWidgetItem* it, baseItems) {
-        if (i == v.count()) break; // Evita erros de segmentação
+        if (i == v.count()) break; /** Evita erros de segmentação */
         if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
         ++i;
     }
@@ -224,7 +224,7 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
     /** Atualizando informações de vídeo */
     foreach(QTreeWidgetItem* it, videoItems) {
-        if (i == v.count()) break; // Evita erros de segmentação
+        if (i == v.count()) break; /** Evita erros de segmentação */
         if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
         ++i;
     }
@@ -234,7 +234,7 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
     /** Atualizando informações de áudio */
     foreach(QTreeWidgetItem* it, audioItems) {
-        if (i == v.count()) break; // Evita erros de segmentação
+        if (i == v.count()) break; /** Evita erros de segmentação */
         if (it->data(1, Qt::DisplayRole) != v.at(i)) it->setData(1, Qt::DisplayRole, v.at(i));
         ++i;
     }
@@ -478,21 +478,33 @@ void StatisticsView::settaginfos() {
 /** Buscando o maior comprimento para a janela */
 void StatisticsView::setSize() {
     QList<TreeView*> view = {view1, view2, view3, view4};
+    QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, metadata};
     foreach(TreeView *it, view) it->header()->setStretchLastSection(false);
 
-    int csize = view1->size();
-    if (csize < view2->size()) csize = view2->size();
-    if (csize < view3->size()) csize = view3->size();
-    if (csize < view4->size()) csize = view4->size();
+    /** Cálculo do comprimento */
+    int width = 0;
+    foreach(TreeView *it, view) if (it->ItemWith() > width) width = it->ItemWith();
+    width += 40;
 
     foreach(TreeView *it, view) it->header()->setStretchLastSection(true);
 
-    csize = csize + 40;
-    qDebug("%s(%sStatisticsView%s)%s::%sAjustando comprimento de infoview em %i ...\033[0m",
-           GRE, RED, GRE, RED, BLU, csize);
+    /** Cálculo da altura */
+    int j = 0;
+    int height = 0;
+    foreach(TreeView *it, view) {
+        int t = 0;
+        for (int i = 0; i < it->topLevelItemCount(); i++)
+            if (!item.at(j)[i]->data(1, Qt::DisplayRole).toString().isEmpty()) t++;
+        if (t > height) height = t;
+        j++;
+    }
+    height = view1->ItemHeight() * height + 110;
 
-    this->setMinimumSize(csize, 350);
-    this->resize(csize, this->height());
+    qDebug("%s(%sStatisticsView%s)%s::%sAjustando o tamanho de infoview em %i x %i...\033[0m",
+           GRE, RED, GRE, RED, BLU, width, height);
+
+    this->setMinimumSize(width, height);
+    this->resize(width, height);
 }
 
 

@@ -1,7 +1,7 @@
 #include <QHeaderView>
 #include <Utils>
 
-#include "TreeView.h"
+#include "TreeView.hpp"
 
 
 /**********************************************************************************************************************/
@@ -11,6 +11,7 @@
 TreeView::TreeView(const QList<QTreeWidgetItem *>& item, QWidget *parent) : QTreeWidget(parent) {
     setStyleSheet(Utils::setStyle("infoview"));
     setHeaderHidden(true);
+    setUniformRowHeights(true);
     setColumnCount(2);
     addTopLevelItems(item);
 
@@ -31,5 +32,6 @@ TreeView::~TreeView() = default;
 /**********************************************************************************************************************/
 
 
-/** Retorna o tamanho das linhas do treeview */
-int TreeView::size() { return header()->sectionSize(0) + header()->sectionSize(1); }
+/** Funções que retornam o tamanho das linhas do treeview */
+int TreeView::ItemWith() { return header()->sectionSize(0) + header()->sectionSize(1); }
+int TreeView::ItemHeight() { return visualRect(model()->index(0, 0, rootIndex())).height(); }

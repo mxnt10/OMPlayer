@@ -3,7 +3,7 @@
 
 #include <QThread>
 #include <QPushButton>
-#include "LoopButton.h"
+#include "LoopButton.hpp"
 
 class Button : public QPushButton {
 Q_OBJECT

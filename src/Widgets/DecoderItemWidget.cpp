@@ -4,7 +4,7 @@
 #include <Button>
 #include <Utils>
 
-#include "DecoderItemWidget.h"
+#include "DecoderItemWidget.hpp"
 
 
 /**********************************************************************************************************************/

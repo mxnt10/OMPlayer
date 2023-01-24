@@ -1,7 +1,7 @@
 #include <QMouseEvent>
 #include <Utils>
 
-#include "ListView.h"
+#include "ListView.hpp"
 
 
 /**********************************************************************************************************************/
@@ -13,7 +13,6 @@ ListView::ListView(QStyledItemDelegate *delegate, QWidget *parent) : QListView(p
     setEditTriggers(QAbstractItemView::NoEditTriggers);
     setStyleSheet(Utils::setStyle("playlist"));
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
     setItemDelegate(delegate);
 }
 

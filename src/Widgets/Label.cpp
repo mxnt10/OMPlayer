@@ -1,7 +1,7 @@
 #include <QDebug>
 #include <Utils>
 
-#include "Label.h"
+#include "Label.hpp"
 
 
 /**********************************************************************************************************************/
@@ -10,7 +10,7 @@
 /** Contrutor para o Label */
 Label::Label(const QFlag& align, int w, const QString& text) {
     setAlignment(align);
-    if (w > 0) setFixedWidth(w);
+    if (w > null) setFixedWidth(w);
     if (!text.isEmpty()) setText(text);
 }
 
@@ -18,8 +18,8 @@ Label::Label(const QFlag& align, int w, const QString& text) {
 /** Contrutor com parent */
 Label::Label(const QFlag &align, int w, int h, QWidget *parent) : QLabel(parent) {
     setAlignment(align);
-    if (w > 0) setFixedWidth(w);
-    if (h > 0) setFixedHeight(h);
+    if (w > null) setFixedWidth(w);
+    if (h > null) setFixedHeight(h);
 }
 
 
@@ -60,7 +60,3 @@ EmptyList::EmptyList(const QString &text, QWidget *parent) : QLabel(text, parent
     setFont(font);
     setPalette(palete);
 }
-
-
-/** Destrutor */
-EmptyList::~EmptyList() = default;

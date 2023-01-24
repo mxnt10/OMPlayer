@@ -10,6 +10,9 @@
 /**********************************************************************************************************************/
 
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NullDereference"
+
 /** construtor */
 Decoder::Decoder(QWidget *parent): QWidget(parent) {
 
@@ -75,6 +78,8 @@ Decoder::Decoder(QWidget *parent): QWidget(parent) {
         if(scrollBar) scrollBar->setContextMenuPolicy(Qt::NoContextMenu);
     }
 }
+
+#pragma clang diagnostic pop
 
 
 /** Destrutor */

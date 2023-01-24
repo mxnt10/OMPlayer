@@ -28,15 +28,15 @@ About::About(QWidget *parent) : QDialog(parent) {
 
     /** Nome do programa e descrição e ícone */
     auto *iconlogo = new Label(CENTER, Utils::setIcon());
-    auto *description = new Label(TOP, 0, getDescription());
-    auto *name = new Label(TOP, 0, PRG_DESC);
-    name->setStyleSheet("font-size: 24pt");
+    auto *description = new Label(TOP, null, getDescription());
+    auto *name = new Label(TOP, null, PRG_DESC);
+    name->setStyleSheet("font-size: 22pt");
 
 
     /** Versão do programa e demais informações*/
     auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, STR(VERSION));
-    auto *maintainer = new Label(BOTTON, 0, getTextMaintainer());
-    version->setStyleSheet("font-size: 11pt");
+    auto *maintainer = new Label(BOTTON, null, getTextMaintainer());
+    version->setStyleSheet("font-size: 12pt");
     maintainer->setStyleSheet("font-size: 11pt");
 
 
@@ -108,9 +108,9 @@ QString About::getTextMaintainer() {
 
 /** Descrição do programa */
 QString About::getDescription() {
-    return "\n" + tr("Multimedia player developed in C++ using Qt5 as an interface.") + " " + \
+    return tr("Multimedia player developed in C++ using Qt5 as an interface.") + " " + \
     tr("To play multimedia files, the program uses the") + " \n" + \
-    tr("QtAV framework, which uses ffmpeg for handling multimedia files.");
+    tr("QtAV framework, which uses ffmpeg for handling multimedia files.") + "\n";
 }
 
 

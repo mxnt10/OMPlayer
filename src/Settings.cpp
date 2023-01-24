@@ -84,7 +84,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
     combotheme->setStyleSheet(Utils::setStyle("global"));
     connect(combotheme, &QComboBox::currentTextChanged, this, &Settings::setIcon);
 
-    auto *labeltheme = new Label(RIGHT, 0, tr("Icon Themes") + ": ");
+    auto *labeltheme = new Label(RIGHT, null, tr("Icon Themes") + ": ");
     auto *themes = new QGridLayout();
     themes->setContentsMargins(0, 50, 0, 0);
     themes->addWidget(labeltheme, 0, 0);

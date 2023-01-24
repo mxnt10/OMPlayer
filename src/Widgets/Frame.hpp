@@ -2,16 +2,18 @@
 #define OMPLAYER_FRAME_H
 
 #include <QFrame>
+#define null (-1)
 
 namespace Line {
     class Frame : public QFrame {
     Q_OBJECT
 
     public:
-        enum ORIENTATION {Vertical = 0, Horizontal = 1};
+        enum Orientation {Vertical = 0, Horizontal = 1};
 
-        explicit Frame(Frame::ORIENTATION pos, int size = (-1));
+        explicit Frame(Frame::Orientation pos, int size = null);
         ~Frame() override;
     };
 }
+
 #endif //OMPLAYER_FRAME_H

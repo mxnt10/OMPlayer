@@ -1,20 +1,20 @@
-#include "Frame.h"
+#include "Frame.hpp"
 
 
 /**********************************************************************************************************************/
 
 
 /** Construtor para definir as propriedades */
-Line::Frame::Frame(Frame::ORIENTATION pos, int size) : QFrame() {
+Line::Frame::Frame(Frame::Orientation pos, int size) : QFrame() {
     setFrameShadow(QFrame::Sunken);
     setStyleSheet("background: #cccccc");
 
     if (pos == Frame::Vertical) {
         setFixedWidth(2);
-        if (size > (-1)) setFixedHeight(size);
+        if (size > null) setFixedHeight(size);
     } else if (pos == Frame::Horizontal) {
         setFixedHeight(2);
-        if (size > (-1)) setFixedWidth(size);
+        if (size > null) setFixedWidth(size);
     }
 }
 

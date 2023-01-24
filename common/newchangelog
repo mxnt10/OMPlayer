@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# OMPlayer ChangeLog Generator - By Mauricio Ferrari
+
+DATE=$(date +"%Y.%m.%d")
+mv ../ChangeLog ChangeLog-Bak 2>&-
+
+printf "# ChangeLog
+All notable changes to this project will be documented in this file.
+Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
+
+
+## [ Release %s ] ################################################
+
+### Added / Adicionado
+ -
+###
+
+### Upgraded / Atualizado
+ -
+###
+
+### Changed / Modificado
+ -
+###
+
+### Removed / Removido
+ -
+###
+
+### Fixed / Corrigido
+ -
+###
+
+##########################################################################\n" "$DATE"> ../ChangeLog
+
+sed '1,3d' ChangeLog-Bak >> ../ChangeLog 2>&-
+rm ChangeLog-Bak
+exit 0

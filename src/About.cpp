@@ -34,7 +34,7 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Versão do programa e demais informações*/
-    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, tr("Version") + " " + STR(VERSION));
+    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, STR(VERSION));
     auto *maintainer = new Label(BOTTON, 0, getTextMaintainer());
     version->setStyleSheet("font-size: 11pt");
     maintainer->setStyleSheet("font-size: 11pt");

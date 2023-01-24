@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DATE=$(date +"%Y.%m.%d")
+
+sed -i "10s/#define.*\"/#define VERSION \"$DATE\"/" ../src/Utils/Utils.hpp
+sed -i "2s/VERSION.*)/VERSION $DATE)/" ../CMakeLists.txt
+sed -i "6s/#.*]/## [ Release $DATE ]/" ../ChangeLog

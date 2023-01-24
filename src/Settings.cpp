@@ -119,7 +119,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button(Button::Default, 32, "apply");
+    closebtn = new Button(Button::NormalBtn, 32, "apply");
     connect(closebtn, &Button::pressed, this, &Settings::onClose);
 
 

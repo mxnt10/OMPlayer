@@ -22,7 +22,7 @@ DecoderItemWidget::DecoderItemWidget(QWidget *parent): QFrame(parent) {
 
 
     /** Botão de expansão */
-    expandBtn = new Button(Button::Default, 28, "add");
+    expandBtn = new Button(Button::NormalBtn, 28, "add");
     connect(expandBtn, &Button::clicked, this, &DecoderItemWidget::toggleEditorVisible);
 
 

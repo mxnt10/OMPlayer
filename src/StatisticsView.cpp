@@ -62,7 +62,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
 
     /** Botão para fechar a janela */
-    closebtn = new Button(Button::Default, 32, "apply");
+    closebtn = new Button(Button::NormalBtn, 32, "apply");
     connect(closebtn, &Button::pressed, this, &StatisticsView::onClose);
 
 
@@ -89,9 +89,9 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     tab->setStyleSheet(Utils::setStyle("tab"));
 
 
-    /** Botões que servirão de tag info */
-    screen = new Button(Button::Tag, 36);
-    ratio = new Button(Button::Tag, 36);
+    /** Ícones que servirão de tag info */
+    screen = new Label(LEFT, 36, 36);
+    ratio = new Label(LEFT, 36, 36);
 
 
     /** Layout para as tag infos */

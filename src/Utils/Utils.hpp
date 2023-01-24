@@ -3,11 +3,12 @@
 
 #include <QAction>
 #include <QApplication>
+#include <QLabel>
 #include <QMenu>
 #include <QPropertyAnimation>
-#include <Button>
+#include <QPushButton>
 
-#define VERSION "2023.01.23"
+#define VERSION "2023.01.24"
 #define STR qUtf8Printable
 #define FADE_VAL 200
 
@@ -73,7 +74,8 @@ public:
     static QString mediaTitle(const QString &mediafile);
     static QString defaultIcon(const QString &icon);
     static QString setHash(const QString &url);
-    static void changeIcon(Button *btn, const QString &thm);
+    static void changeIcon(QPushButton *btn, const QString &thm);
+    static void changeIcon(QLabel *btn, const QString &thm);
     static void changeMenuIcon(QAction &btn, const QString &thm);
     static void changeMenuIcon(QMenu *btn, const QString &thm);
     static void rm_nl(string &s);

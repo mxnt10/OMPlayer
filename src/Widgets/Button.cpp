@@ -3,14 +3,14 @@
 #include <string>
 #include <Utils>
 
-#include "Button.h"
+#include "Button.hpp"
 
 
 /**********************************************************************************************************************/
 
 
 /** Construtor que define a classe dos botões do reprodutor */
-Button::Button(Button::BUTTONTYPE btn, int size, const QString &ico, const QString &ico2) : num(size), type(btn) {
+Button::Button(Button::ButtonType btn, int size, const QString &ico, const QString &ico2) : num(size), type(btn) {
     setStyleSheet("QPushButton {border: 0; background-color: transparent;}");
     setIconSize(QSize(num, num));
     setFocusPolicy(Qt::NoFocus);
@@ -92,7 +92,6 @@ void Button::secondIcon(const QString &ico, const QString &ico2) {
 
 /** Ação ao posicionar o mouse sobre o botão */
 void Button::enterEvent(QEvent *event) {
-    if (type == Button::Tag) return;
     qDebug("%s(%sButton%s)%s::%sMouse posicionado no botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
     setIconSize(QSize(num + 2, num + 2));
     QPushButton::enterEvent(event);
@@ -101,7 +100,6 @@ void Button::enterEvent(QEvent *event) {
 
 /** Ação ao desposicionar o mouse sobre o botão */
 void Button::leaveEvent(QEvent *event) {
-    if (type == Button::Tag) return;
     setIconSize(QSize(num, num));
     QPushButton::leaveEvent(event);
 }
@@ -109,7 +107,7 @@ void Button::leaveEvent(QEvent *event) {
 
 /** Iniciando o efeito do botão */
 void Button::mousePressEvent(QMouseEvent *event) {
-    if (type == Button::Tag || !prevent) return;
+    if (!prevent) return;
     qDebug("%s(%sButton%s)%s::%sPressioando o botão %s ...\033[0m", GRE, RED, GRE, RED, VIO, STR(icon));
     setIconSize(QSize(num - 2, num - 2));
 
@@ -133,7 +131,6 @@ void Button::mousePressEvent(QMouseEvent *event) {
 
 /** Finalizando o efeito do botão */
 void Button::mouseReleaseEvent(QMouseEvent *event) {
-    if (type == Button::Tag) return;
     setIconSize(QSize(num + 2, num + 2));
 
     if (type == Button::LoopBtn || type == Button::DoubleBtn) {

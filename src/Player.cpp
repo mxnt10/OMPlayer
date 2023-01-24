@@ -106,13 +106,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Botões para os controles de reprodução */
-    playBtn = new Button(Button::Default, 48, "play");
-    stopBtn = new Button(Button::Default, 32, "stop");
+    playBtn = new Button(Button::NormalBtn, 48, "play");
+    stopBtn = new Button(Button::NormalBtn, 32, "stop");
     nextBtn = new Button(Button::LoopBtn, 32, "next", "forward");
     previousBtn = new Button(Button::LoopBtn, 32, "previous", "backward");
     replayBtn = new Button(Button::DoubleBtn, 32, "replay", "replay-one");
-    shuffleBtn = new Button(Button::Default, 32, "shuffle");
-    volumeBtn = new Button(Button::Default, 32, "volume_high");
+    shuffleBtn = new Button(Button::NormalBtn, 32, "shuffle");
+    volumeBtn = new Button(Button::NormalBtn, 32, "volume_high");
     connect(playBtn, &Button::clicked, this, &OMPlayer::playPause);
     connect(stopBtn, &Button::clicked, this, &OMPlayer::setStop);
     connect(nextBtn, &Button::customPress, this, &OMPlayer::Next);

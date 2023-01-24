@@ -176,10 +176,19 @@ void Utils::rm_nl(string &s) { for (uint p = s.find('\n'); p != (uint) string::n
 
 
 /** Alteração dos botões */
-void Utils::changeIcon(Button *btn, const QString &thm) {
+void Utils::changeIcon(QPushButton *btn, const QString &thm) {
     if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
         btn->setIcon(QIcon::fromTheme(defaultIcon(thm)));
     else btn->setIcon(QIcon(Utils::setIconTheme(def.definedTheme, thm)));
+}
+
+
+/** Alteração dos botões */
+void Utils::changeIcon(QLabel *btn, const QString &thm) {
+    if (Utils::setIconTheme(def.definedTheme, thm) == nullptr)
+        btn->setPixmap(QPixmap(defaultIcon(thm)).scaled(36, 36, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    else btn->setPixmap(QPixmap(Utils::setIconTheme(def.definedTheme, thm)).scaled(
+            36, 36, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 }
 
 

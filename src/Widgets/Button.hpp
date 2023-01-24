@@ -9,8 +9,8 @@ class Button : public QPushButton {
 Q_OBJECT
 
 public:
-    enum BUTTONTYPE{ Default = 0, Tag = 1 , LoopBtn = 2, DoubleBtn = 3};
-    explicit Button(Button::BUTTONTYPE btn, int size = 0, const QString &ico = nullptr, const QString &ico2 = nullptr);
+    enum ButtonType{ NormalBtn = 0, LoopBtn = 1, DoubleBtn = 2 };
+    explicit Button(Button::ButtonType btn, int size = 0, const QString &ico = nullptr, const QString &ico2 = nullptr);
     ~Button() override;
 
     void secondIcon(const QString &ico, const QString &ico2);
@@ -29,7 +29,7 @@ Q_SIGNALS:
 private:
     int num{0};
     bool emitted{false}, prevent{true}, block{false};
-    Button::BUTTONTYPE type{Button::Default};
+    Button::ButtonType type{Button::NormalBtn};
     QString icon{};
     QIcon icon1{}, icon2{};
     QString txt{};

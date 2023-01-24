@@ -6,6 +6,7 @@
 #include <QThread>
 #include <QtAV/Statistics.h>
 #include <Button>
+#include <Label>
 #include <TreeView>
 
 #include "StatisticsWorker.h"
@@ -57,15 +58,12 @@ private:
 
 private:
     Button *closebtn{};
-    Button *ratio{}, *screen{};
+    Label *ratio{}, *screen{};
     QGraphicsOpacityEffect *effect{};
     QPropertyAnimation *animation{};
     QTabWidget *tab{};
     TreeView *view1{}, *view2{}, *view3{}, *view4{};
-    QList<QTreeWidgetItem*> baseItems{};
-    QList<QTreeWidgetItem*> videoItems{};
-    QList<QTreeWidgetItem*> audioItems{};
-    QList<QTreeWidgetItem*> metadata{};
+    QList<QTreeWidgetItem*> baseItems{}, videoItems{}, audioItems{}, metadata{};
     QtAV::Statistics statistics{}, currentStatistics{};
     QString vuleft{}, vuright{}, url{};
     bool onclose{false};

@@ -1,1 +1,1 @@
-#include "CWidget.h"
+#include "CWidget.hpp"

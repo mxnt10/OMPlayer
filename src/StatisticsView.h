@@ -10,7 +10,7 @@
 #include <TreeView>
 
 #include "StatisticsWorker.h"
-#include "Worker.h"
+#include "Worker.hpp"
 
 class StatisticsView : public QDialog {
 Q_OBJECT

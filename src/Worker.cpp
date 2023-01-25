@@ -1,7 +1,7 @@
 #include <QThread>
 #include <Utils>
 
-#include "Worker.h"
+#include "Worker.hpp"
 
 #define DG_T qDebug().nospace() << GRE << "(" << RED << "Thread" << GRE << ")" << RED << "::" << RDL
 

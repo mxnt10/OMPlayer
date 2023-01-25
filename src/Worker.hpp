@@ -2,7 +2,6 @@
 #define OMPLAYER_WORKER_H
 
 #include <QObject>
-#include <MediaInfoDLL.h>
 
 class Worker : public QObject {
 Q_OBJECT
@@ -23,7 +22,6 @@ public Q_SLOTS:
 
 private:
     QString file{};
-    MediaInfoDLL::MediaInfo MI{};
 };
 
 #endif //OMPLAYER_WORKER_H

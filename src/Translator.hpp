@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_TRANSLATOR_H
-#define OMPLAYER_TRANSLATOR_H
+#ifndef OMPLAYER_TRANSLATOR_HPP
+#define OMPLAYER_TRANSLATOR_HPP
 
 #include <QTranslator>
 
@@ -16,4 +16,4 @@ private:
     QString local{};
 };
 
-#endif //OMPLAYER_TRANSLATOR_H
+#endif //OMPLAYER_TRANSLATOR_HPP

@@ -28,9 +28,9 @@
 #include <SingleApplication>
 #include <Utils>
 
-#include "MessageReceiver.h"
+#include "MessageReceiver.hpp"
 #include "Player.h"
-#include "Translator.h"
+#include "Translator.hpp"
 
 #define DEBUG true
 

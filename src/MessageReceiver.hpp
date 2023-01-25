@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_MESSAGERECEIVER_H
-#define OMPLAYER_MESSAGERECEIVER_H
+#ifndef OMPLAYER_MESSAGERECEIVER_HPP
+#define OMPLAYER_MESSAGERECEIVER_HPP
 
 #include <QObject>
 
@@ -10,10 +10,10 @@ public:
     explicit MessageReceiver(QObject *parent = nullptr);
 
 public slots:
-    void receivedMessage( int instanceId, const QByteArray& message );
+    void receivedMessage(int instanceId, const QByteArray& message);
 
 Q_SIGNALS:
     void parms(const QStringList &lst);
 };
 
-#endif //OMPLAYER_MESSAGERECEIVER_H
+#endif //OMPLAYER_MESSAGERECEIVER_HPP

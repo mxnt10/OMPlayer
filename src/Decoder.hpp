@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_DECODER_H
-#define OMPLAYER_DECODER_H
+#ifndef OMPLAYER_DECODER_HPP
+#define OMPLAYER_DECODER_HPP
 
 #include <QLayout>
 #include <QToolButton>
@@ -28,4 +28,4 @@ private:
 
 };
 
-#endif //OMPLAYER_DECODER_H
+#endif //OMPLAYER_DECODER_HPP

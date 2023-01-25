@@ -9,7 +9,7 @@
 #include <QTabWidget>
 #include <Button>
 
-#include "Decoder.h"
+#include "Decoder.hpp"
 
 class Settings : public QDialog {
 Q_OBJECT

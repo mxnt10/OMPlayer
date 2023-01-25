@@ -3,7 +3,7 @@
 #include <QLocale>
 #include <Utils>
 
-#include "Translator.h"
+#include "Translator.hpp"
 
 
 /**********************************************************************************************************************/

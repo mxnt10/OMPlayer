@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_FRAME_H
-#define OMPLAYER_FRAME_H
+#ifndef OMPLAYER_FRAME_HPP
+#define OMPLAYER_FRAME_HPP
 
 #include <QFrame>
 #define null (-1)
@@ -16,4 +16,4 @@ namespace Line {
     };
 }
 
-#endif //OMPLAYER_FRAME_H
+#endif //OMPLAYER_FRAME_HPP

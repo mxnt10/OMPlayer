@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_CLICKABLEMENU_H
-#define OMPLAYER_CLICKABLEMENU_H
+#ifndef OMPLAYER_CLICKABLEMENU_HPP
+#define OMPLAYER_CLICKABLEMENU_HPP
 
 #include <QMenu>
 #include <QGraphicsOpacityEffect>
@@ -23,4 +23,4 @@ private:
     bool onclose{false};
 };
 
-#endif // OMPLAYER_CLICKABLEMENU_H
+#endif // OMPLAYER_CLICKABLEMENU_HPP

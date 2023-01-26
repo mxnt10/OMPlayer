@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_JSONTOOLS_H
-#define OMPLAYER_JSONTOOLS_H
+#ifndef OMPLAYER_JSONTOOLS_HPP
+#define OMPLAYER_JSONTOOLS_HPP
 
 #include <QJsonValue>
 
@@ -23,4 +23,4 @@ private:
     static void valueJson(const QString &key, const QJsonValue &value);
 };
 
-#endif //OMPLAYER_JSONTOOLS_H
+#endif //OMPLAYER_JSONTOOLS_HPP

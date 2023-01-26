@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_CMENU_H
-#define OMPLAYER_CMENU_H
+#ifndef OMPLAYER_CMENU_HPP
+#define OMPLAYER_CMENU_HPP
 
 #include <QMenu>
 #include <QGraphicsOpacityEffect>
@@ -21,4 +21,4 @@ private:
     float opacy{0.8};
 };
 
-#endif // OMPLAYER_CMENU_H
+#endif // OMPLAYER_CMENU_HPP

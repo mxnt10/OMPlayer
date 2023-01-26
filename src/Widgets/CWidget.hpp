@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_CWIDGET_H
-#define OMPLAYER_CWIDGET_H
+#ifndef OMPLAYER_CWIDGET_HPP
+#define OMPLAYER_CWIDGET_HPP
 
 #include <QWidget>
 
@@ -16,4 +16,4 @@ public:
     explicit TrackWidget(QWidget *parent = nullptr);
 };
 
-#endif // OMPLAYER_CWIDGET_H
+#endif // OMPLAYER_CWIDGET_HPP

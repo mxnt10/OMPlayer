@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_BUTTON_H
-#define OMPLAYER_BUTTON_H
+#ifndef OMPLAYER_BUTTON_HPP
+#define OMPLAYER_BUTTON_HPP
 
 #include <QThread>
 #include <QPushButton>
@@ -39,4 +39,4 @@ private:
     Loop *loop;
 };
 
-#endif //OMPLAYER_BUTTON_H
+#endif //OMPLAYER_BUTTON_HPP

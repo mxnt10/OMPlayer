@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_LABEL_H
-#define OMPLAYER_LABEL_H
+#ifndef OMPLAYER_LABEL_HPP
+#define OMPLAYER_LABEL_HPP
 
 #include <QLabel>
 
@@ -23,4 +23,4 @@ public:
     explicit EmptyList(const QString& text, QWidget *parent = nullptr);
 };
 
-#endif //OMPLAYER_LABEL_H
+#endif //OMPLAYER_LABEL_HPP

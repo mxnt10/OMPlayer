@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_LISTVIEW_H
-#define OMPLAYER_LISTVIEW_H
+#ifndef OMPLAYER_LISTVIEW_HPP
+#define OMPLAYER_LISTVIEW_HPP
 
 #include <QListView>
 #include <QStyledItemDelegate>
@@ -19,4 +19,4 @@ Q_SIGNALS:
 
 };
 
-#endif //OMPLAYER_LISTVIEW_H
+#endif //OMPLAYER_LISTVIEW_HPP

@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_SLIDER_H
-#define OMPLAYER_SLIDER_H
+#ifndef OMPLAYER_SLIDER_HPP
+#define OMPLAYER_SLIDER_HPP
 
 #define null (-1)
 
@@ -36,4 +36,4 @@ private:
     QString stl{}, hvr{};
 };
 
-#endif //OMPLAYER_SLIDER_H
+#endif //OMPLAYER_SLIDER_HPP

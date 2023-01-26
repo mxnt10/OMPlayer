@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_LOOPBUTTON_H
-#define OMPLAYER_LOOPBUTTON_H
+#ifndef OMPLAYER_LOOPBUTTON_HPP
+#define OMPLAYER_LOOPBUTTON_HPP
 
 #include <QObject>
 
@@ -24,4 +24,4 @@ private:
 };
 
 
-#endif //OMPLAYER_LOOPBUTTON_H
+#endif //OMPLAYER_LOOPBUTTON_HPP

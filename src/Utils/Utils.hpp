@@ -1,9 +1,9 @@
-#ifndef OMPLAYER_UTILS_H
-#define OMPLAYER_UTILS_H
+#ifndef OMPLAYER_UTILS_HPP
+#define OMPLAYER_UTILS_HPP
 
 #include <QAction>
 #include <QApplication>
-#include <QLabel>
+#include <Label>
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QPushButton>
@@ -92,4 +92,4 @@ private:
     static QString scanXDGData();
 };
 
-#endif //OMPLAYER_UTILS_H
+#endif //OMPLAYER_UTILS_HPP

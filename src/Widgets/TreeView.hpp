@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_TREEVIEW_H
-#define OMPLAYER_TREEVIEW_H
+#ifndef OMPLAYER_TREEVIEW_HPP
+#define OMPLAYER_TREEVIEW_HPP
 
 #include <QTreeWidget>
 
@@ -13,4 +13,4 @@ public:
     int ItemWith();
 };
 
-#endif //OMPLAYER_TREEVIEW_H
+#endif //OMPLAYER_TREEVIEW_HPP

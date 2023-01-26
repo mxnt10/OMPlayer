@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_PLAYLISTITEM_H
-#define OMPLAYER_PLAYLISTITEM_H
+#ifndef OMPLAYER_PLAYLISTITEM_HPP
+#define OMPLAYER_PLAYLISTITEM_HPP
 
 #include <QVariant>
 
@@ -31,4 +31,4 @@ Q_DECLARE_METATYPE(PlayListItem);
 QDataStream &operator>>(QDataStream & s, PlayListItem & p);
 QDataStream &operator<<(QDataStream & s, const PlayListItem &p);
 
-#endif // OMPLAYER_PLAYLISTITEM_H
+#endif // OMPLAYER_PLAYLISTITEM_HPP

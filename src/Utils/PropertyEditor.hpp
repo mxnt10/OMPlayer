@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_PROPERTYEDITOR_H
-#define OMPLAYER_PROPERTYEDITOR_H
+#ifndef OMPLAYER_PROPERTYEDITOR_HPP
+#define OMPLAYER_PROPERTYEDITOR_HPP
 
 #include <QAction>
 #include <QObject>
@@ -59,4 +59,4 @@ private:
     QVariantHash propertyDetails;
 };
 
-#endif // OMPLAYER_PROPERTYEDITOR_H
+#endif // OMPLAYER_PROPERTYEDITOR_HPP

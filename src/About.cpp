@@ -11,19 +11,9 @@
 
 
 /** Construtor que define a interface */
-About::About(QWidget *parent) : QDialog(parent) {
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_NoSystemBackground, true);
-    setAttribute(Qt::WA_TranslucentBackground, true);
+About::About(QWidget *parent) : Dialog(parent) {
     setMaximumSize(0, 0);
-    setModal(true);
-
-
-    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
-    effect = new QGraphicsOpacityEffect(this);
-    effect->setOpacity(0);
-    setGraphicsEffect(effect);
-    animation = new QPropertyAnimation(effect, "opacity");
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
 
 
     /** Nome do programa e descrição e ícone */
@@ -34,7 +24,7 @@ About::About(QWidget *parent) : QDialog(parent) {
 
 
     /** Versão do programa e demais informações*/
-    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), 0, STR(VERSION));
+    auto *version = new Label(static_cast<const QFlag>(RIGHT | CENTER), null, VERSION);
     auto *maintainer = new Label(BOTTON, null, getTextMaintainer());
     version->setStyleSheet("font-size: 12pt");
     maintainer->setStyleSheet("font-size: 11pt");
@@ -43,7 +33,7 @@ About::About(QWidget *parent) : QDialog(parent) {
     /** Botão para fechar a janela e para o sobre do QtAV */
     closebtn = new Button(Button::NormalBtn, 32, "apply");
     qtavbtn = new Button(Button::NormalBtn, 32, "info");
-    connect(closebtn, &Button::clicked, this, &About::onClose);
+    connect(closebtn, &Button::clicked, this, &Dialog::onClose);
     connect(qtavbtn, &Button::clicked, this, &QtAV::about);
 
 
@@ -86,23 +76,10 @@ About::~About() = default;
 /**********************************************************************************************************************/
 
 
-/** Emissão para fechar a janela */
-void About::onClose() {
-    qDebug("%s(%sAbout%s)%s::%sFechando o diálogo sobre ...\033[0m", GRE, RED, GRE, RED, CYA);
-    onclose = true;
-    Utils::fadeDiag(animation, 1, 0);
-    connect(animation, &QPropertyAnimation::finished, [this](){
-        if (!onclose) return;
-        Q_EMIT emitclose();
-        this->close();
-    });
-}
-
-
 /** Informações adicionais */
 QString About::getTextMaintainer() {
-    return tr("Maintainer") + ": " + STR(MAINTAINER) + "\n" + \
-    tr("E-Mail") + ": " + STR(EMAIL) + "\n\n" + tr("License") + ": " + STR(LICENSE);
+    return tr("Maintainer") + ": " + MAINTAINER + "\n" + \
+    tr("E-Mail") + ": " + EMAIL + "\n\n" + tr("License") + ": " + LICENSE;
 }
 
 
@@ -118,35 +95,4 @@ QString About::getDescription() {
 void About::changeIcons() {
     Utils::changeIcon(closebtn, "apply");
     Utils::changeIcon(qtavbtn, "info");
-}
-
-
-/**********************************************************************************************************************/
-
-
-/** Prevenindo fechamento sem onClose() */
-void About::closeEvent(QCloseEvent *event) {
-    if (!onclose) {
-        event->ignore();
-        onClose();
-        return;
-    } else event->accept();
-}
-
-
-/** Corrigindo fechamento do diálogo com Escape */
-void About::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
-        onClose();
-        return;
-    }
-    QDialog::keyPressEvent(event);
-}
-
-
-/** Apenas para redefinir a variável onclose */
-void About::showEvent(QShowEvent *event) {
-    onclose = false;
-    Utils::fadeDiag(animation, 0, 1);
-    QDialog::showEvent(event);
 }

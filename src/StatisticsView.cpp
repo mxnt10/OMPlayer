@@ -1,8 +1,6 @@
 #include <QCloseEvent>
 #include <QHeaderView>
 #include <QLayout>
-#include <QTimer>
-#include <QTimerEvent>
 #include <Utils>
 
 #include "StatisticsView.h"
@@ -12,20 +10,8 @@
 
 
 /** Interface principal para visualizar as informações de mídia */
-StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_NoSystemBackground, true);
-    setAttribute(Qt::WA_TranslucentBackground, true);
-    setModal(true);
-    setFocus();
-
-
-    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
-    effect = new QGraphicsOpacityEffect(this);
-    effect->setOpacity(0);
-    setGraphicsEffect(effect);
-    animation = new QPropertyAnimation(effect, "opacity");
-
+StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
 
     /** Usando multithread para buscar arquivos */
     thread = new QThread();
@@ -63,7 +49,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
 
     /** Botão para fechar a janela */
     closebtn = new Button(Button::NormalBtn, 32, "apply");
-    connect(closebtn, &Button::pressed, this, &StatisticsView::onClose);
+    connect(closebtn, &Button::pressed, this, &Dialog::onClose);
 
 
     /** Layout para as abas */
@@ -79,6 +65,7 @@ StatisticsView::StatisticsView(QWidget *parent) : QDialog(parent) {
     auto *metadataw = new QWidget();
     auto *mdata = new QVBoxLayout(metadataw);
     mdata->addWidget(view4);
+
 
     /** Organização por abas */
     tab = new QTabWidget();
@@ -261,19 +248,6 @@ void StatisticsView::resetValues() {
 }
 
 
-/** Emissão para fechar a janela */
-void StatisticsView::onClose() {
-    qDebug("%s(%sStatisticsView%s)%s::%sFechando o diálogo de informações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    onclose = true;
-    Utils::fadeDiag(animation, 1, 0);
-    connect(animation, &QPropertyAnimation::finished, [this](){
-        if (!onclose) return;
-        Q_EMIT emitclose();
-        this->close();
-    });
-}
-
-
 /** Informações de metadados */
 QVariantList StatisticsView::getMetaDataValues(const QtAV::Statistics& s) {
     QStringList infos{"title", "artist", "album", "genre", "track", "date", "purl"};
@@ -437,6 +411,7 @@ void StatisticsView::visibility(){
  * Função que seta as informações de mídia em ícones */
 void StatisticsView::settaginfos() {
     ratio->setVisible(true);
+    screen->setVisible(false);
 
     if (videoItems[3]->data(1, Qt::DisplayRole).toString().split(' ')[0] == "16:9")
         Utils::changeIcon(ratio, "ratio169");
@@ -444,9 +419,10 @@ void StatisticsView::settaginfos() {
         Utils::changeIcon(ratio, "ratio43");
     else ratio->setVisible(false);
 
-    int w = statistics.video_only.width;
-    int h = statistics.video_only.height;
-    screen->setVisible(false);
+    QStringList size = videoItems[4]->data(1, Qt::DisplayRole).toString().split(' ')[0].split('x');
+    if (size[0].toInt() == 0) return;
+    int w = size[0].toInt();
+    int h = size[1].toInt();
 
     QList<QList<int>> itw{fuhdw, uhdpw, uhdw};
     QList<QList<int>> ith{fuhdh, uhdph, uhdh};
@@ -498,6 +474,8 @@ void StatisticsView::setSize() {
         if (t > height) height = t;
         j++;
     }
+
+    if (height < 7) height = 7;
     height = view1->ItemHeight() * height + 110;
 
     qDebug("%s(%sStatisticsView%s)%s::%sAjustando o tamanho de infoview em %i x %i...\033[0m",
@@ -553,10 +531,8 @@ void StatisticsView::hideEvent(QHideEvent *event) {
 
 /** Evento para iniciar o temporizador */
 void StatisticsView::showEvent(QShowEvent *event) {
-    onclose = false;
     timer = startTimer(1000);
-    Utils::fadeDiag(animation, 0, 1);
-    QDialog::showEvent(event);
+    Dialog::showEvent(event);
 }
 
 
@@ -568,24 +544,4 @@ void StatisticsView::timerEvent(QTimerEvent *event) {
         videoItems[6]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
                 QString::number(statistics.video.frame_rate, 'f', 2),
                 QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
-}
-
-
-/** Prevenindo fechamento sem onClose() */
-void StatisticsView::closeEvent(QCloseEvent *event) {
-    if (!onclose) {
-        event->ignore();
-        onClose();
-        return;
-    } else event->accept();
-}
-
-
-/** Corrigindo fechamento do diálogo com Escape */
-void StatisticsView::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
-        onClose();
-        return;
-    }
-    QDialog::keyPressEvent(event);
 }

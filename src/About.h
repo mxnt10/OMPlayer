@@ -1,10 +1,8 @@
 #ifndef OMPLAYER_ABOUT_H
 #define OMPLAYER_ABOUT_H
 
-#include <QDialog>
-#include <QGraphicsOpacityEffect>
-#include <QPropertyAnimation>
 #include <Button>
+#include <Dialog>
 
 #define PRG_NAME "Open Multimedia Player"
 #define PRG_DESC "OMPlayer - Open Multimedia Player"
@@ -12,7 +10,7 @@
 #define EMAIL "m10ferrari1200@gmail.com"
 #define LICENSE "GNU General Public License Version 3 (GLPv3)"
 
-class About : public QDialog {
+class About : public Dialog {
 Q_OBJECT
 
 public:
@@ -20,24 +18,13 @@ public:
     ~About() override;
     void changeIcons();
 
-protected:
-    void showEvent(QShowEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
-
 Q_SIGNALS:
     void emitclose();
-
-private Q_SLOTS:
-    void onClose();
 
 private:
     static QString getTextMaintainer();
     static QString getDescription();
     Button *closebtn{}, *qtavbtn{};
-    QGraphicsOpacityEffect *effect{};
-    QPropertyAnimation *animation{};
-    bool onclose{false};
 };
 
 #endif //OMPLAYER_ABOUT_H

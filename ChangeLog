@@ -3,13 +3,15 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ 2.0.2 ] - 2023-01-11 ################################################
+## [ Release 2023.01.25 ] ################################################
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
+    - Dialog.{cpp/h} em src/Widgets.
     - ListView.{cpp/h} em src/Widgets.
     - Frame.{cpp/h} em src/Widgets.
     - CWidget.{cpp/h} em src/Widgets.
+ - Adicionado scripts new_version e newchangelog em common.
  - Adicionado checkbox.qss em qss.
 ###
 
@@ -29,16 +31,19 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Modificado o ícone do programa por um próprio do projeto.
  - Incrementado código na classe Label e criado a classe EmptyList.
  - Pequenos ajustes e modificações.
+ - Ajustes e modificações em PlayListUtils, Utils e Widgets.
+ - Modificado visualizações dos ícones em infoview.
+ - Refatoração de código nos diálogos.
 ###
 
 ### Removed / Removido
- - Removido o ícone logo.png em appdata.
+ - Removido os ícones {notify/logo}.png em appdata.
 ###
 
 ### Fixed / Corrigido
  - Ajustes na visualização das informações.
  - Ajustes na opacidade do menu da playlist.
- - Pequenas correções nas atualizações das informações.
+ - Correções nas atualizações das informações.
  - Corrigido a visualização das imagens na classe label.
 ###
 

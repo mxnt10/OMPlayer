@@ -1,18 +1,17 @@
 #ifndef OMPLAYER_STATISTICSVIEW_H
 #define OMPLAYER_STATISTICSVIEW_H
 
-#include <QDialog>
-#include <QGraphicsOpacityEffect>
 #include <QThread>
 #include <QtAV/Statistics.h>
 #include <Button>
+#include <Dialog>
 #include <Label>
 #include <TreeView>
 
 #include "StatisticsWorker.h"
 #include "Worker.hpp"
 
-class StatisticsView : public QDialog {
+class StatisticsView : public Dialog {
 Q_OBJECT
 
 public:
@@ -32,8 +31,6 @@ protected:
     void hideEvent(QHideEvent *event) override;
     void showEvent(QShowEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
-    void keyPressEvent(QKeyEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
 
 Q_SIGNALS:
     void emitFormat(const QString &format, int duration);
@@ -43,7 +40,6 @@ private Q_SLOTS:
     void setMd5(const QString &md5);
     void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
                        const QString &format, int duration);
-    void onClose();
 
 private:
     void visibility();
@@ -59,14 +55,11 @@ private:
 private:
     Button *closebtn{};
     Label *ratio{}, *screen{};
-    QGraphicsOpacityEffect *effect{};
-    QPropertyAnimation *animation{};
-    QTabWidget *tab{};
     TreeView *view1{}, *view2{}, *view3{}, *view4{};
     QList<QTreeWidgetItem*> baseItems{}, videoItems{}, audioItems{}, metadata{};
     QtAV::Statistics statistics{}, currentStatistics{};
+    QTabWidget *tab{};
     QString vuleft{}, vuright{}, url{};
-    bool onclose{false};
     int timer{0};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with

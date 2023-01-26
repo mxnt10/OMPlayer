@@ -1,7 +1,6 @@
 #include <QComboBox>
 #include <QGroupBox>
 #include <QLayout>
-#include <QTimer>
 #include <Label>
 #include <Utils>
 
@@ -14,24 +13,10 @@ using namespace QtAV;
 
 
 /** Classe principal das configurações */
-Settings::Settings(QWidget *parent) : QDialog(parent) {
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
-    setAttribute(Qt::WA_NoSystemBackground, true);
-    setAttribute(Qt::WA_TranslucentBackground, true);
+Settings::Settings(QWidget *parent) : Dialog(parent) {
     setFixedWidth(400);
-    setModal(true);
-    setFocus();
-
-
-    /** Opções de decodificação */
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
     decoder = new Decoder(this);
-
-
-    /** Efeito de transparência funcional. O setWindowOpacity() não rola. */
-    effect = new QGraphicsOpacityEffect(this);
-    effect->setOpacity(0);
-    setGraphicsEffect(effect);
-    animation = new QPropertyAnimation(effect, "opacity");
 
 
     /** Estrutura das renderizações */
@@ -120,7 +105,7 @@ Settings::Settings(QWidget *parent) : QDialog(parent) {
 
     /** Botão para fechar a janela */
     closebtn = new Button(Button::NormalBtn, 32, "apply");
-    connect(closebtn, &Button::pressed, this, &Settings::onClose);
+    connect(closebtn, &Button::pressed, this, &Dialog::onClose);
 
 
     /** Layout para organização das configurações */
@@ -149,19 +134,6 @@ Settings::~Settings() = default;
 
 
 /**********************************************************************************************************************/
-
-
-/** Emissão para fechar a janela */
-void Settings::onClose() {
-    qDebug("%s(%sSettings%s)%s::%sFechando o diálogo de configurações ...\033[0m", GRE, RED, GRE, RED, CYA);
-    onclose = true;
-    Utils::fadeDiag(animation, 1, 0);
-    connect(animation, &QPropertyAnimation::finished, [this](){
-        if (!onclose) return;
-        Q_EMIT emitclose();
-        this->close();
-    });
-}
 
 
 /** Resetando os botões */
@@ -211,35 +183,4 @@ QString Settings::changeIconsStyle() {
     else return{};
 
     return str;
-}
-
-
-/**********************************************************************************************************************/
-
-
-/** Prevenindo fechamento sem onClose() */
-void Settings::closeEvent(QCloseEvent *event) {
-    if (!onclose) {
-        event->ignore();
-        onClose();
-        return;
-    } else event->accept();
-}
-
-
-/** Corrigindo fechamento do diálogo com Escape */
-void Settings::keyPressEvent(QKeyEvent *event) {
-    if(event->key() == Qt::Key_Escape) {
-        onClose();
-        return;
-    }
-    QDialog::keyPressEvent(event);
-}
-
-
-/** Apenas para redefinir a variável onclose */
-void Settings::showEvent(QShowEvent *event) {
-    onclose = false;
-    Utils::fadeDiag(animation, 0, 1);
-    QDialog::showEvent(event);
 }

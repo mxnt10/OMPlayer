@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_EVENTFILTER_H
-#define OMPLAYER_EVENTFILTER_H
+#ifndef OMPLAYER_EVENTFILTER_HPP
+#define OMPLAYER_EVENTFILTER_HPP
 
 #include <QObject>
 
@@ -7,8 +7,8 @@ class EventFilter : public QObject{
 Q_OBJECT
 
 public:
-    enum UITYPE {Defaut = 0, General = 1, Control = 2};
-    explicit EventFilter(QWidget *parent, EventFilter::UITYPE i = EventFilter::Defaut);
+    enum Type {NormalEvent = 0, ControlEvent = 1};
+    explicit EventFilter(QWidget *parent, EventFilter::Type i = EventFilter::NormalEvent);
     ~EventFilter() override;
     void setMove(bool var);
     void setFixed(bool var);
@@ -36,13 +36,8 @@ Q_SIGNALS:
     void emitPrevious();
 
 private:
-    bool contextmenu{false};
-    bool first{false};
-    bool fixed{false};
-    bool moving{false};
-    bool start{false};
-    bool sett{false};
-    UITYPE option{EventFilter::Defaut};
+    bool contextmenu{false}, fixed{false}, moving{false}, sett{false};
+    Type option{EventFilter::NormalEvent};
 };
 
-#endif //OMPLAYER_EVENTFILTER_H
+#endif //OMPLAYER_EVENTFILTER_HPP

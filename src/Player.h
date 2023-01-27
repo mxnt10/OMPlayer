@@ -17,8 +17,8 @@
 #include <ScreenSaver>
 #include <Slider>
 
-#include "About.h"
-#include "EventFilter.h"
+#include "About.hpp"
+#include "EventFilter.hpp"
 #include "PlayList.h"
 #include "Settings.h"
 #include "StatisticsView.h"

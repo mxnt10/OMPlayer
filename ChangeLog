@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Release 2023.01.25 ] ################################################
+## [ Release 2023.01.27 ] ################################################
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
@@ -45,6 +45,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Ajustes na opacidade do menu da playlist.
  - Correções nas atualizações das informações.
  - Corrigido a visualização das imagens na classe label.
+ - Corrigido a visualização do ponteiro do mouse ao abrir as
+   configurações pela tecla de atalho.
 ###
 
 ##########################################################################

@@ -11,7 +11,7 @@
 #include <Frame>
 #include <Utils>
 
-#include "EventFilter.h"
+#include "EventFilter.hpp"
 #include "Extensions.h"
 #include "PlayList.h"
 
@@ -24,7 +24,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
     this->setMouseTracking(true);
     model = new PlayListModel(this);
     delegate = new PlayListDelegate(this);
-    load(First);
+    load(PlayList::First);
 
 
     /** Criação do diálogo para abrir arquivos de mídia */
@@ -42,7 +42,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Lista para visualização da playlist */
-    auto *filter = new EventFilter(this, EventFilter::Control);
+    auto *filter = new EventFilter(this, EventFilter::ControlEvent);
     listView = new ListView(delegate);
     listView->setModel(model);
     listView->installEventFilter(filter);
@@ -77,7 +77,7 @@ PlayList::PlayList(QWidget *parent) : QWidget(parent) {
 
 
     /** Gerando uma linha vertical transparente */
-    auto *filter2 = new EventFilter(this, EventFilter::Control);
+    auto *filter2 = new EventFilter(this, EventFilter::ControlEvent);
     auto size = new QFrame();
     size->setFixedWidth(10);
     size->installEventFilter(filter2);

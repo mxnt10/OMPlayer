@@ -1,20 +1,16 @@
 #include <QContextMenuEvent>
 #include <QEvent>
 #include <QTimer>
-#include <QWidget>
 #include <Utils>
 
-#include "EventFilter.h"
+#include "EventFilter.hpp"
 
 
 /**********************************************************************************************************************/
 
 
-/** Construtor do filtro de eventos */
-EventFilter::EventFilter(QWidget *parent, EventFilter::UITYPE i) : QObject(parent), option(i) {}
-
-
-/** Destrutor */
+/** Construtor e destrutor do filtro de eventos */
+EventFilter::EventFilter(QWidget *parent, EventFilter::Type i) : QObject(parent), option(i) {}
 EventFilter::~EventFilter() = default;
 
 
@@ -31,10 +27,7 @@ void EventFilter::setSett(bool var)  { sett = var;   }
 bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     Q_UNUSED(object)
 
-    if (option == EventFilter::General) {
-        /** O widget filho pode abrir mais rápido que o pai, por isso o delay */
-        if (!first) QTimer::singleShot(200, [this](){ start = true; first = true; });
-
+    if (option == EventFilter::NormalEvent) {
         /** Método para criar as teclas de atalho */
         if (event->type() == QEvent::KeyPress) {
             auto *ke = dynamic_cast<QKeyEvent *>(event);
@@ -80,7 +73,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
         }
 
         /** Mapeando o movimento do mouse */
-        if (event->type() == QEvent::MouseMove && !moving && start) {
+        if (event->type() == QEvent::MouseMove && !moving) {
             qDebug("%s(%sEventFilter%s)%s::%sMouse com Movimentação ...\033[0m", GRE, RED, GRE, RED, DGR);
             arrowMouse();
             Q_EMIT emitMouseMove();
@@ -126,7 +119,7 @@ bool EventFilter::eventFilter(QObject *object, QEvent *event) {
     }
 
     /** Emissão para os controles e demais */
-    if (option == EventFilter::Control) {
+    if (option == EventFilter::ControlEvent) {
         if (event->type() == QEvent::Enter) Q_EMIT emitEnter();
         if (event->type() == QEvent::Leave) Q_EMIT emitLeave();
     }

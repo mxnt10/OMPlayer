@@ -178,7 +178,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Conteiner dos controles */
     auto *fctl = new QWidget();
-    auto *ffilter = new EventFilter(this, EventFilter::Control);
+    auto *ffilter = new EventFilter(this, EventFilter::ControlEvent);
     fctl->installEventFilter(ffilter);
     connect(ffilter, &EventFilter::emitLeave, this, &OMPlayer::hideTrue);
     connect(ffilter, &EventFilter::emitEnter, this, &OMPlayer::hideFalse);
@@ -237,8 +237,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Filtro de eventos */
-    filter = new EventFilter(this, EventFilter::General);
-    auto *cfilter = new EventFilter(this, EventFilter::Control);
+    filter = new EventFilter(this);
+    auto *cfilter = new EventFilter(this, EventFilter::ControlEvent);
     this->installEventFilter(filter);
     wctl->installEventFilter(filter);
     wctl->installEventFilter(cfilter);
@@ -256,7 +256,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     connect(filter, &EventFilter::emitPrevious, this, &OMPlayer::Previous);
     connect(filter, &EventFilter::emitLeave, this, &OMPlayer::setHide);
     connect(filter, &EventFilter::emitOpen, [this](){ openMedia(); });
-    connect(filter, &EventFilter::emitSettings, [this](){ setDialog(SettingsD); });
+    connect(filter, &EventFilter::emitSettings, [this](){ setDialog(OMPlayer::SettingsD); });
     connect(cfilter, &EventFilter::emitLeave, [this](){
         if (!contmenu) playlist->hideFade();
         setHide();
@@ -848,7 +848,8 @@ void OMPlayer::setShow() {
 
 /** Função que abre os diálogos */
 void OMPlayer::setDialog(OMPlayer::DIALOG dialog) {
-    showsett = true;
+    showsett = nomousehide = true;
+    arrowMouse();
     filter->setSett(showsett);
     this->setMaximumSize(size);
     this->setMinimumSize(size);

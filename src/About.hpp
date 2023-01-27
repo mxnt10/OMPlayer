@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_ABOUT_H
-#define OMPLAYER_ABOUT_H
+#ifndef OMPLAYER_ABOUT_HPP
+#define OMPLAYER_ABOUT_HPP
 
 #include <Button>
 #include <Dialog>
@@ -27,4 +27,4 @@ private:
     Button *closebtn{}, *qtavbtn{};
 };
 
-#endif //OMPLAYER_ABOUT_H
+#endif //OMPLAYER_ABOUT_HPP

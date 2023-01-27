@@ -9,7 +9,7 @@ class Button : public QPushButton {
 Q_OBJECT
 
 public:
-    enum ButtonType{ NormalBtn = 0, LoopBtn = 1, DoubleBtn = 2 };
+    enum ButtonType{NormalBtn = 0, LoopBtn = 1, DoubleBtn = 2};
     explicit Button(Button::ButtonType btn, int size = 0, const QString &ico = nullptr, const QString &ico2 = nullptr);
     ~Button() override;
 
@@ -30,9 +30,8 @@ private:
     int num{0};
     bool emitted{false}, prevent{true}, block{false};
     Button::ButtonType type{Button::NormalBtn};
-    QString icon{};
+    QString icon{}, txt{};
     QIcon icon1{}, icon2{};
-    QString txt{};
 
     /** Loop do botão pressionado em multithread */
     QThread *thread;

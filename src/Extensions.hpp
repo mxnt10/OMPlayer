@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_EXTENSIONS_H
-#define OMPLAYER_EXTENSIONS_H
+#ifndef OMPLAYER_EXTENSIONS_HPP
+#define OMPLAYER_EXTENSIONS_HPP
 
 #include <QStringList>
 
@@ -31,4 +31,4 @@ protected:
 	ExtensionList _multimedia, _all_playable;
 };
 
-#endif //OMPLAYER_EXTENSIONS_H
+#endif //OMPLAYER_EXTENSIONS_HPP

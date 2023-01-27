@@ -20,7 +20,7 @@
 #include "About.hpp"
 #include "EventFilter.hpp"
 #include "PlayList.h"
-#include "Settings.h"
+#include "Settings.hpp"
 #include "StatisticsView.h"
 
 class OMPlayer : public QWidget {

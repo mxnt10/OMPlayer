@@ -4,7 +4,7 @@
 #include <Label>
 #include <Utils>
 
-#include "Settings.h"
+#include "Settings.hpp"
 
 using namespace QtAV;
 
@@ -45,14 +45,9 @@ Settings::Settings(QWidget *parent) : Dialog(parent) {
             vid_map[i].btn->setFocusPolicy(Qt::NoFocus);
             vid_map[i].btn->setStyleSheet(changeIconsStyle());
 
-            if (i == 0) connect(vid_map[0].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[0]); });
-            else if (i == 1) connect(vid_map[1].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[1]); });
-            else if (i == 2) connect(vid_map[2].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[2]); });
-            else if (i == 3) connect(vid_map[3].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[3]); });
-            else if (i == 4) connect(vid_map[4].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[4]); });
-            else if (i == 5) connect(vid_map[5].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[5]); });
-            else if (i == 6) connect(vid_map[6].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[6]); });
-            else if (i == 7) connect(vid_map[7].btn, &QRadioButton::toggled, [this](){ rendererSelect(vid_map[7]); });
+            /** Tenque usar essa array com os números explícitos senão dá erro */
+            int nm[8] = {0, 1, 2, 3, 4, 5, 6, 7};
+            connect(vid_map[nm[i]].btn, &QRadioButton::toggled, [this, nm, i](){ rendererSelect(vid_map[nm[i]]); });
 
             if (QString::compare(JsonTools::stringJson("renderer"), vid_map[i].name) == 0)
                 vid_map[i].btn->setChecked(true);

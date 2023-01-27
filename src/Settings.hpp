@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_SETTINGS_H
-#define OMPLAYER_SETTINGS_H
+#ifndef OMPLAYER_SETTINGS_HPP
+#define OMPLAYER_SETTINGS_HPP
 
 #include <QtAV>
 #include <QtAVWidgets>
@@ -46,4 +46,4 @@ private:
     struct Render *vid_map{};
 };
 
-#endif //OMPLAYER_SETTINGS_H
+#endif //OMPLAYER_SETTINGS_HPP

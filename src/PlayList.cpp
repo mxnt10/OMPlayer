@@ -12,7 +12,7 @@
 #include <Utils>
 
 #include "EventFilter.hpp"
-#include "Extensions.h"
+#include "Extensions.hpp"
 #include "PlayList.h"
 
 

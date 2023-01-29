@@ -28,7 +28,8 @@ StatisticsWorker::StatisticsWorker(QObject *parent) : QObject(parent) {}
 /** Thread para obter o hash md5 de um arquivo */
 void StatisticsWorker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
-    QStringList values, valuesVideo, valuesAudio, valuesDual;
+    QStringList infos{"title", "artist", "album", "genre", "track", "date", "purl"};
+    QStringList values, valuesVideo, valuesAudio, valuesDual, metadata;
     QFileInfo mfile{file};
     MI.Open(file.toStdWString());
     auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
@@ -165,6 +166,32 @@ void StatisticsWorker::doWork() {
                 else valuesAudio << QString::number(audioframerate.toFloat(), 'f', 2);
             } else valuesAudio << QString::number(statistics.video.frame_rate, 'f', 2);
         }
+
+        if (!statistics.metadata.isEmpty()) {
+            QStringList keys{statistics.metadata.keys()};
+            for (const QString &inf: infos) {
+                if (keys.contains(inf, Qt::CaseInsensitive)) {
+                    if (inf == "date") {
+                        QDate dt = QDate::fromString(statistics.metadata.value(
+                                keys.filter(inf, Qt::CaseInsensitive)[0]), "yyyyMMdd");
+                        metadata << dt.toString("yyyy-MM-dd");
+                    } else if (inf == "track") {
+                        QStringList tm = keys.filter("track", Qt::CaseInsensitive);
+                        if (tm.contains("tracktotal", Qt::CaseInsensitive)) {
+
+                            QString tot = statistics.metadata.value(tm.filter("tracktotal", Qt::CaseInsensitive)[0]);
+                            tm.removeOne(keys.filter("tracktotal", Qt::CaseInsensitive)[0]);
+                            QString tr = statistics.metadata.value(tm.filter("track", Qt::CaseInsensitive)[0]);
+
+                            if (tot == "")
+                                metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
+                            else metadata << QString::fromLatin1("%1 / %2").arg(tr, tot);
+
+                        } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
+                    } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
+                } else metadata << "";
+            }
+        }
     }
 
     /** Outras informações */
@@ -178,7 +205,7 @@ void StatisticsWorker::doWork() {
     if (bitdepth.isEmpty()) valuesAudio << "";
     else valuesAudio << bitdepth + " bits";
 
-    Q_EMIT baseValues(values, valuesVideo, valuesAudio, format, duration);
+    Q_EMIT baseValues(values, valuesVideo, valuesAudio, metadata, format, duration);
     MI.Close();
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();

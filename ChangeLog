@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Release 2023.01.27 ] ################################################
+## [ Release 2023.01.28 ] ################################################
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
@@ -48,6 +48,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Corrigido a visualização das imagens na classe label.
  - Corrigido a visualização do ponteiro do mouse ao abrir as
    configurações pela tecla de atalho.
+ - Correções e refatoração no código de infoview.
 ###
 
 ##########################################################################

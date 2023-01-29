@@ -634,7 +634,8 @@ void OMPlayer::onStart() {
     Utils::changeIcon(playBtn, "pause");
     stack->setCurrentIndex(1);
     slider->setDisabled(false);
-    infoview->setStatistics(mediaPlayer->statistics());
+    if (!showsett) infoview->setStatistics(mediaPlayer->statistics());
+    infoview->setCurrentStatistics(mediaPlayer->statistics());
 
     /** Definindo dimensões para o preview */
     Width = mediaPlayer->statistics().video_only.width;

@@ -18,14 +18,15 @@ public:
     explicit StatisticsView(QWidget *parent = nullptr);
     ~StatisticsView() override;
     void setStatistics(const QtAV::Statistics &s = QtAV::Statistics());
+    void setCurrentStatistics(const QtAV::Statistics &s) { currentStatistics = s; };
     void setCurrentTime(int current);
     void setFile(const QString &file);
     void changeIcons();
+    void resetValues();
 
 public Q_SLOTS:
     void setRightDB(int value);
     void setLeftDB(int value);
-    void resetValues();
 
 protected:
     void hideEvent(QHideEvent *event) override;
@@ -39,17 +40,17 @@ Q_SIGNALS:
 private Q_SLOTS:
     void setMd5(const QString &md5);
     void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
-                       const QString &format, int duration);
+                       const QStringList &metadataval, const QString &format, int duration);
 
 private:
+    enum TypeSize{NormalSize = 0, InitialSize = 1, HeaderSize = 2};
     void visibility();
     void settaginfos();
-    void setSize();
+    void setSize(TypeSize size);
     static QStringList getBaseInfoKeys();
     static QStringList getVideoInfoKeys();
     static QStringList getAudioInfoKeys();
     static QStringList getMetaDataKeys();
-    static QVariantList getMetaDataValues(const QtAV::Statistics &s);
     static void initItems(QList<QTreeWidgetItem*> *items, const QStringList &itemlist);
 
 private:
@@ -69,7 +70,6 @@ private:
     QList<int> uhdw{3840, 4096, 3996, 3656}; // 4k with
     QList<int> uhdh{2160, 2664, 1714};       // 4k heith
 
-    /** Suporte multithread */
     QThread *thread, *thread2;
     Worker *worker;
     StatisticsWorker *statisticsworker;

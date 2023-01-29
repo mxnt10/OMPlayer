@@ -15,8 +15,8 @@ public:
     void requestWork() { Q_EMIT workRequested(); };
 
 Q_SIGNALS:
-    void baseValues(const QStringList &values, const QStringList &valuesVideo,
-                    const QStringList &valuesAudio, const QString &format, int duration);
+    void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
+                    const QStringList &metadataval, const QString &format, int duration);
     void workRequested();
     void finished();
 

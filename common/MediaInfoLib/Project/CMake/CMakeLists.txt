@@ -5,7 +5,7 @@ project(MediaInfoLib)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/modules")
 
 set(MediaInfoLib_MAJOR_VERSION 22)
-set(MediaInfoLib_MINOR_VERSION 06)
+set(MediaInfoLib_MINOR_VERSION 12)
 set(MediaInfoLib_PATCH_VERSION 0)
 set(MediaInfoLib_VERSION ${MediaInfoLib_MAJOR_VERSION}.${MediaInfoLib_MINOR_VERSION})
 
@@ -38,15 +38,19 @@ if(NOT TARGET uninstall)
    "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake")
 endif()
 
-set(_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
-set(BUILD_SHARED_LIBS OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../../ZenLib/Project/CMake ${CMAKE_CURRENT_BINARY_DIR}/ZenLib)
-set(BUILD_SHARED_LIBS ${_BUILD_SHARED_LIBS})
-set(ZenLib_LIBRARY zen)
-unset(_BUILD_SHARED_LIBS)
-if(UNIX AND BUILD_SHARED_LIBS)
+#if (NOT BUILD_ZENLIB)
+#  find_package(ZenLib REQUIRED)
+#else()
+  set(_BUILD_SHARED_LIBS ${BUILD_SHARED_LIBS})
+  set(BUILD_SHARED_LIBS OFF)
+  add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../../ZenLib/Project/CMake ${CMAKE_CURRENT_BINARY_DIR}/ZenLib)
+  set(BUILD_SHARED_LIBS ${_BUILD_SHARED_LIBS})
+  set(ZenLib_LIBRARY zen)
+  unset(_BUILD_SHARED_LIBS)
+  if(UNIX AND BUILD_SHARED_LIBS)
     target_compile_options(zen PRIVATE -fPIC)
-endif()
+  endif()
+#endif()
 
 if (NOT BUILD_ZLIB)
   find_package(ZLIB REQUIRED)
@@ -77,6 +81,9 @@ if(WIN32)
 elseif(APPLE)
   set(CMAKE_DEBUG_POSTFIX "_debug")
 endif()
+
+# use bundled tinyxml only if no system
+find_package(TinyXML)
 
 # use system curl if is present
 find_package(CURL)
@@ -350,8 +357,10 @@ if(WIN32)
   set(MediaInfoLib_SRCS ${MediaInfoLib_SRCS} ${MediaInfoLib_SOURCES_PATH}/ThirdParty/aes-gladman/aes_ni.c)
 endif()
 
-include_directories(${MediaInfoLib_SOURCES_PATH}/ThirdParty/tinyxml2/)
-list(APPEND MediaInfoLib_SRCS ${MediaInfoLib_SOURCES_PATH}/ThirdParty/tinyxml2/tinyxml2.cpp)
+if(NOT TinyXML_FOUND)
+  include_directories(${MediaInfoLib_SOURCES_PATH}/ThirdParty/tinyxml2/)
+  list(APPEND MediaInfoLib_SRCS ${MediaInfoLib_SOURCES_PATH}/ThirdParty/tinyxml2/tinyxml2.cpp)
+endif()
 
 add_library(mediainfo ${MediaInfoLib_SRCS})
 target_include_directories(mediainfo INTERFACE ${INCLUDE_INSTALL_DIR})
@@ -387,12 +396,15 @@ else()
   target_link_libraries(mediainfo "${TinyXML_LIBRARIES}")
 endif()
 
-target_include_directories(mediainfo PRIVATE ${ZLIB_INCLUDE_DIRS})
+if(BUILD_ZENLIB)
+  target_include_directories(mediainfo PRIVATE ${ZLIB_INCLUDE_DIRS})
+endif()
+
 target_link_libraries(mediainfo ${ZenLib_LIBRARY} ${ZLIB_LIBRARIES})
 
-if(MSVC AND BUILD_SHARED_LIBS)
-  install(FILES $<TARGET_PDB_FILE:mediainfo> DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
-endif()
+#if(MSVC AND BUILD_SHARED_LIBS)
+  #install(FILES $<TARGET_PDB_FILE:mediainfo> DESTINATION ${BIN_INSTALL_DIR} OPTIONAL)
+#endif()
 
 if (APPLE)
   set_target_properties(mediainfo PROPERTIES
@@ -411,16 +423,16 @@ set_target_properties(mediainfo PROPERTIES
 )
 
 #install(TARGETS mediainfo EXPORT mediainfo-export
-#  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-#  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-#  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+  #RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  #ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+  #LIBRARY DESTINATION ${LIB_INSTALL_DIR})
 
 #install(EXPORT mediainfo-export DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR} FILE MediaInfoLibTargets.cmake)
 
 foreach(HEADER ${MediaInfoLib_PUBLIC_HDRS})
   string(REPLACE ${MediaInfoLib_SOURCES_PATH} "" DIR ${HEADER})
   string(REGEX REPLACE "/[^/]*$" "" DIR ${DIR})
-#  install(FILES ${HEADER} DESTINATION include/${DIR})
+  #install(FILES ${HEADER} DESTINATION include/${DIR})
 endforeach(HEADER ${MediaInfoLib_PUBLIC_HDRS})
 
 # pkg-config
@@ -429,8 +441,8 @@ if(PKG_CONFIG_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libmediainfo.pc.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
                  @ONLY)
-#  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
-#          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+  #install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libmediainfo.pc
+          #DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
 # cmake-modules
@@ -446,6 +458,6 @@ configure_package_config_file(
 write_basic_config_version_file(MediaInfoLibConfigVersion.cmake VERSION ${MediaInfoLib_VERSION} COMPATIBILITY AnyNewerVersion)
 
 #install(FILES
-#  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfig.cmake
-#  ${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfigVersion.cmake
-#  DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR})
+  #${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfig.cmake
+  #${CMAKE_CURRENT_BINARY_DIR}/MediaInfoLibConfigVersion.cmake
+  #DESTINATION ${MediaInfoLib_CONFIG_INSTALL_DIR})

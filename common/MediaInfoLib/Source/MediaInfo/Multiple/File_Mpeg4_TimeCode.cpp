@@ -24,6 +24,8 @@
 #include "MediaInfo/Multiple/File_Mpeg4_TimeCode.h"
 #include "MediaInfo/TimeCode.h"
 #include "MediaInfo/MediaInfo_Config_MediaInfo.h"
+#include <limits>
+using namespace std;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -38,7 +40,7 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
 :File__Analyze()
 {
     //Out
-    Pos=(int32u)-1;
+    Pos=numeric_limits<int64s>::max();
 
     FirstEditOffset=0;
     FirstEditDuration=(int64u)-1;
@@ -48,6 +50,9 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
     NegativeTimes=false;
     tkhd_Duration=0;
     mvhd_Duration_TimeScale=0;
+
+    //Temp
+    FrameMultiplier_Pos=0;
 }
 
 //***************************************************************************
@@ -55,28 +60,76 @@ File_Mpeg4_TimeCode::File_Mpeg4_TimeCode()
 //***************************************************************************
 
 //---------------------------------------------------------------------------
+void File_Mpeg4_TimeCode::Streams_Accept()
+{
+    Stream_Prepare(Stream_Other);
+    Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
+}
+
+//---------------------------------------------------------------------------
 void File_Mpeg4_TimeCode::Streams_Fill()
 {
-    if (Pos!=(int32u)-1 && NumberOfFrames)
+    if (Pos!=numeric_limits<int64s>::max())
     {
-        int64s  Pos_Temp=Pos;
-        float64 FrameRate_WithDF=NumberOfFrames;
-        if (DropFrame)
+        float64 FrameRate_WithDF;
+        if (tmcd_Duration && tmcd_Duration_TimeScale)
         {
-            int FramesToRemove=0;
-            int NumberOfFramesMultiplier=0;
-            while (NumberOfFrames>NumberOfFramesMultiplier)
+            FrameRate_WithDF=(float64)tmcd_Duration_TimeScale/(float64)tmcd_Duration;
+            if (!NumberOfFrames)
+                NumberOfFrames=(int8u)float64_int64s(FrameRate_WithDF)/FrameMultiplier;
+        }
+        else
+        {
+            FrameRate_WithDF=NumberOfFrames;
+            if (DropFrame)
             {
-                FramesToRemove+=108;
-                NumberOfFramesMultiplier+=30;
+                int FramesToRemove=0;
+                int NumberOfFramesMultiplier=0;
+                while (NumberOfFrames>NumberOfFramesMultiplier)
+                {
+                    FramesToRemove+=108;
+                    NumberOfFramesMultiplier+=30;
+                }
+                float64 FramesPerHour_NDF=FrameRate_WithDF*60*60;
+                FrameRate_WithDF*=(FramesPerHour_NDF-FramesToRemove)/FramesPerHour_NDF;
             }
-            float64 FramesPerHour_NDF=FrameRate_WithDF*60*60;
-            FrameRate_WithDF*=(FramesPerHour_NDF-FramesToRemove)/FramesPerHour_NDF;
+
+        }
+        Fill(Stream_General, 0, "Delay", Pos*FrameMultiplier*1000/FrameRate_WithDF, 0);
+    }
+}
+
+//---------------------------------------------------------------------------
+void File_Mpeg4_TimeCode::Streams_Finish()
+{
+    if (Pos!=numeric_limits<int64s>::max())
+    {
+        float64 FrameRate_WithDF;
+        if (tmcd_Duration && tmcd_Duration_TimeScale)
+        {
+            FrameRate_WithDF=(float64)tmcd_Duration_TimeScale/(float64)tmcd_Duration;
+            if (!NumberOfFrames)
+                NumberOfFrames=(int8u)float64_int64s(FrameRate_WithDF)/FrameMultiplier;
+        }
+        else
+        {
+            FrameRate_WithDF=NumberOfFrames;
+            if (DropFrame)
+            {
+                int FramesToRemove=0;
+                int NumberOfFramesMultiplier=0;
+                while (NumberOfFrames>NumberOfFramesMultiplier)
+                {
+                    FramesToRemove+=108;
+                    NumberOfFramesMultiplier+=30;
+                }
+                float64 FramesPerHour_NDF=FrameRate_WithDF*60*60;
+                FrameRate_WithDF*=(FramesPerHour_NDF-FramesToRemove)/FramesPerHour_NDF;
+            }
+
         }
 
-        Fill(Stream_General, 0, "Delay", Pos_Temp*1000/FrameRate_WithDF, 0);
-
-        TimeCode TC(Pos_Temp, NumberOfFrames-1, DropFrame);
+        TimeCode TC(Pos, NumberOfFrames-1, DropFrame);
         if (FrameMultiplier>1)
         {
             int64s Frames=TC.GetFrames();
@@ -84,35 +137,46 @@ void File_Mpeg4_TimeCode::Streams_Fill()
             TC=TimeCode(TC.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
             TC+=Frames*FrameMultiplier;
         }
-        Stream_Prepare(Stream_Other);
-        Fill(Stream_Other, StreamPos_Last, Other_Type, "Time code");
         Fill(Stream_Other, StreamPos_Last, Other_TimeCode_FirstFrame, TC.ToString().c_str());
-        if (Frame_Count==1)
+        int64s FrameCount;
+        if (NumberOfFrames==mdhd_Duration_TimeScale) // Prioritize mdhd or edit list for in case there are drop frame and integer frame rate
         {
-            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Striped, "Yes");
-            int64s FrameCount;
-            if (NumberOfFrames==mdhd_Duration_TimeScale) // Prioritize mdhd or edit list for in case there are drop frame and integer frame rate
+            if (FirstEditDuration!=(int64u)-1)
             {
-                if (FirstEditDuration!=(int64u)-1)
-                {
-                    float64 FrameCountF=(float64)FirstEditDuration/mvhd_Duration_TimeScale*FrameRate_WithDF;
-                    FrameCount=(int64u)FrameCountF;
-                    if (FrameCount!=FrameCountF)
-                        FrameCount++;
-                }
-                else
-                    FrameCount=mdhd_Duration-FirstEditOffset;
-            }
-            else
-            {
-                float64 FrameCountF=(float64)tkhd_Duration/mvhd_Duration_TimeScale*FrameRate_WithDF*FrameMultiplier;
-                FrameCount=(int64u)FrameCountF;
-                if (FrameCount!=FrameCountF && FrameCount*1000!=float64_int64s(FrameCountF*1000000/1001)) // TODO: better catch of 1/1.001
+                float64 FrameCountF=(float64)FirstEditDuration/mvhd_Duration_TimeScale*FrameRate_WithDF*FrameMultiplier;
+                FrameCount=(int64u)float64_int64s(FrameCountF);
+                if (FrameCountF-FrameCount>0.01) // TODO: avoid rouding issues and better way to manage partial frames
                     FrameCount++;
             }
-            Fill(Stream_Other, StreamPos_Last, Other_FrameCount, FrameCount);
+            else
+                FrameCount=mdhd_Duration-FirstEditOffset;
+        }
+        else
+        {
+            float64 FrameCountF=(float64)tkhd_Duration/mvhd_Duration_TimeScale*FrameRate_WithDF*FrameMultiplier;
+            FrameCount=(int64u)float64_int64s(FrameCountF);
+            if (FrameCountF-FrameCount>0.01) // TODO: avoid rouding issues and better way to manage partial frames
+                FrameCount++;
+        }
+        Fill(Stream_Other, StreamPos_Last, Other_FrameCount, FrameCount);
+        if (Frame_Count==1)
+        {
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "Yes");
             if (FrameCount)
                 Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, (TC+(FrameCount-1)).ToString().c_str());
+        }
+        else
+        {
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_Stripped, "No");
+            TimeCode TC_Last(Pos_Last, NumberOfFrames-1, DropFrame);
+            if (FrameMultiplier>1)
+            {
+                int64s Frames=TC_Last.GetFrames();
+                TC_Last-=TC_Last.GetFrames();
+                TC_Last=TimeCode(TC_Last.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                TC_Last+=Frames*FrameMultiplier+(Config->ParseSpeed<=0.5?(FrameMultiplier-1):FrameMultiplier_Pos);
+            }
+            Fill(Stream_Other, StreamPos_Last, Other_TimeCode_LastFrame, TC_Last.ToString().c_str());
         }
     }
 }
@@ -137,18 +201,65 @@ void File_Mpeg4_TimeCode::Read_Buffer_Init()
 void File_Mpeg4_TimeCode::Read_Buffer_Continue()
 {
     //Parsing
-    int32u Position=0;
     while (Element_Offset<Element_Size)
     {
+        int32u Position=0;
         Get_B4 (Position,                                       "Position");
-        if (Pos==(int32u)-1) //First time code
+        int64s Pos_Last_Temp;
+        if (NegativeTimes)
+            Pos_Last_Temp=(int32s)Position;
+        else
+            Pos_Last_Temp=Position;
+        Pos_Last_Temp+=FirstEditOffset;
+        if (Pos==numeric_limits<int64s>::max()) //First time code
         {
-            Pos=Position + FirstEditOffset;
-            if (NegativeTimes)
-                Pos=(int32s)Position;
-            if (Config->ParseSpeed<=1.0 && Element_Offset!=Element_Size)
+            Pos=Pos_Last_Temp;
+            if (Config->ParseSpeed<=0.5 && Element_Offset!=Element_Size)
                 Skip_XX(Element_Size-Element_Offset,            "Other positions");
         }
+        else if (Config->ParseSpeed>0.5)
+        {
+            FrameMultiplier_Pos++;
+            if (FrameMultiplier_Pos>=FrameMultiplier)
+            {
+                FrameMultiplier_Pos=0;
+                Pos_Last++;
+            }
+            if (Pos_Last!=Pos_Last_Temp)
+            {
+                const Ztring& Discontinuities=Retrieve_Const(Stream_Other, 0, "Discontinuities");
+                if (Discontinuities.size()>25*10)
+                {
+                    if (Discontinuities[Discontinuities.size()-1]!=']')
+                        Fill(Stream_Other, 0, "Discontinuities", "[...]");
+                }
+                else
+                {
+                    Pos_Last--;
+                    TimeCode TC_Last1(Pos_Last, NumberOfFrames-1, DropFrame);
+                    if (FrameMultiplier>1)
+                    {
+                        int64s Frames=TC_Last1.GetFrames();
+                        TC_Last1-=TC_Last1.GetFrames();
+                        TC_Last1=TimeCode(TC_Last1.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                        TC_Last1+=Frames*FrameMultiplier;
+                    }
+                    string Discontinuity=TC_Last1.ToString();
+                    TimeCode TC_Last2(Pos_Last_Temp, NumberOfFrames-1, DropFrame);
+                    if (FrameMultiplier>1)
+                    {
+                        int64s Frames=TC_Last2.GetFrames();
+                        TC_Last2-=TC_Last2.GetFrames();
+                        TC_Last2=TimeCode(TC_Last2.ToFrames()*FrameMultiplier, NumberOfFrames*FrameMultiplier-1, DropFrame);
+                        TC_Last2+=(Frames+1)*FrameMultiplier-1;
+                    }
+                    Discontinuity+='-';
+                    Discontinuity+=TC_Last2.ToString();
+                    Fill(Stream_Other, 0, "Discontinuities", Discontinuity);
+                }
+            }
+        }
+        Pos_Last=Pos_Last_Temp;
     }
 
     FILLING_BEGIN();

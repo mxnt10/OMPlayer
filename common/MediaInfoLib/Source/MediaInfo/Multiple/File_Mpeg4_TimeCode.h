@@ -34,16 +34,22 @@ public :
     int64u  mvhd_Duration_TimeScale;
     int64u  mdhd_Duration;
     int64u  mdhd_Duration_TimeScale;
+    int64u  tmcd_Duration;
+    int64u  tmcd_Duration_TimeScale;
 
     //Out
     int64s  Pos;
+    int64s  Pos_Last;
+    int64u  FrameMultiplier_Pos;
 
     //Constructor/Destructor
     File_Mpeg4_TimeCode();
 
 protected :
     //Streams management
+    void Streams_Accept();
     void Streams_Fill();
+    void Streams_Finish();
 
     //Buffer - Global
     void Read_Buffer_Init();

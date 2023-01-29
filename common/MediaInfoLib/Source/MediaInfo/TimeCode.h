@@ -10,8 +10,9 @@
 //---------------------------------------------------------------------------
 
 //---------------------------------------------------------------------------
-#include "MediaInfo/File__Analyze.h"
-#include <cstring>
+#include "ZenLib/Conf.h"
+#include <string>
+using namespace ZenLib;
 //---------------------------------------------------------------------------
 
 namespace MediaInfoLib
@@ -63,6 +64,9 @@ public:
         size_t const pos;
     };
 
+    constexpr14 bitset8() : stored(0) {}
+    constexpr14 bitset8(int8u val) : stored(val) {}
+
     constexpr14 bitset8& reset() noexcept
     {
         stored=0;
@@ -101,9 +105,31 @@ public:
         return test(pos);
     }
 
+    constexpr14 int8u to_int8u() const noexcept
+    {
+        return stored;
+    }
+
+    constexpr14 explicit operator bool() const noexcept
+    {
+        return stored;
+    }
+
 private:
     int8u stored=0;
 };
+
+inline int8u operator | (const bitset8 a, const bitset8 b) noexcept
+{
+    return a.to_int8u() | b.to_int8u();
+}
+
+inline int8u operator & (const bitset8 a, const bitset8 b) noexcept
+{
+    return a.to_int8u() & b.to_int8u();
+}
+
+
 
 //***************************************************************************
 // Class TimeCode
@@ -118,7 +144,7 @@ public:
     TimeCode (int64s Frames, int32u FramesMax, bool DropFrame, bool MustUseSecondField=false, bool IsSecondField_=false);
     TimeCode(const char* Value, size_t Length); // return false if all fine
     TimeCode(const char* Value) { *this = TimeCode(Value, strlen(Value)); }
-    TimeCode(const string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
+    TimeCode(const std::string& Value) { *this = TimeCode(Value.c_str(), Value.size()); }
 
     //Operators
     TimeCode& operator +=(const TimeCode& b)
@@ -143,18 +169,18 @@ public:
         Flags.set(IsTime, IsTimeSav);
         return *this;
     }
-    TimeCode& operator +=(const int64s Frames)
+    TimeCode& operator +=(const int64s TotalFrames)
     {
-        FromFrames(ToFrames()+Frames);
+        FromFrames(ToFrames()+TotalFrames);
         return *this;
     }
     TimeCode& operator -=(const TimeCode& b)
     {
         return operator-=(b.ToFrames());
     }
-    TimeCode& operator -=(const int64s)
+    TimeCode& operator -=(const int64s TotalFrames)
     {
-        FromFrames(ToFrames()-Frames);
+        FromFrames(ToFrames()-TotalFrames);
         return *this;
     }
     TimeCode &operator ++()
@@ -254,9 +280,9 @@ public:
     void MinusOne();
     bool FromString(const char* Value, size_t Length); // return false if all fine
     bool FromString(const char* Value) {return FromString(Value, strlen(Value));}
-    bool FromString(const string& Value) {return FromString(Value.c_str(), Value.size());}
+    bool FromString(const std::string& Value) {return FromString(Value.c_str(), Value.size());}
     bool FromFrames(int64s Value);
-    string ToString() const;
+    std::string ToString() const;
     int64s ToFrames() const;
     int64s ToMilliseconds() const;
 
@@ -305,8 +331,8 @@ private:
     bitset8 Flags;
 };
 
-Ztring Date_MJD(int16u Date);
-Ztring Time_BCD(int32u Time);
+std::string Date_MJD(uint16_t Date);
+std::string Time_BCD(uint32_t Time);
 
 } //NameSpace
 

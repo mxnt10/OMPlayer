@@ -230,6 +230,52 @@ void PlayList::addItems(const QStringList &files) {
 }
 
 
+//void Playlist::loadXSPF(const QString & filename) {
+//    qDebug() << "Playlist::loadXSPF:" << filename;
+//
+//    QFile f(filename);
+//    if (!f.open(QIODevice::ReadOnly)) {
+//        return;
+//    }
+//
+//    QDomDocument dom_document;
+//    bool ok = dom_document.setContent(f.readAll());
+//    qDebug() << "Playlist::loadXSPF: success:" << ok;
+//    if (!ok) return;
+//
+//    QDomNode root = dom_document.documentElement();
+//    qDebug() << "Playlist::loadXSPF: tagname:" << root.toElement().tagName();
+//
+//    QDomNode child = root.firstChildElement("trackList");
+//    if (!child.isNull()) {
+//        clear();
+//
+//        qDebug() << "Playlist::loadXSPF: child:" << child.nodeName();
+//        QDomNode track = child.firstChildElement("track");
+//        while (!track.isNull()) {
+//            QString location = QUrl::fromPercentEncoding(track.firstChildElement("location").text().toLatin1());
+//            QString title = track.firstChildElement("title").text();
+//            int duration = track.firstChildElement("duration").text().toInt();
+//
+//            qDebug() << "Playlist::loadXSPF: location:" << location;
+//            qDebug() << "Playlist::loadXSPF: title:" << title;
+//            qDebug() << "Playlist::loadXSPF: duration:" << duration;
+//
+//            addItem( location, title, (double) duration / 1000 );
+//
+//            track = track.nextSiblingElement("track");
+//        }
+//
+//        //list();
+//        setPlaylistFilename(filename);
+//        setModified( false );
+//
+//        if (shuffleAct->isChecked()) shuffle(true);
+//        if (start_play_on_load) startPlay();
+//    }
+//}
+
+
 /** Função para carregar uma playlist no formato m3u/m3u8 */
 void PlayList::load_m3u(const QString& file, M3UFormat format) {
     int i = 0;
@@ -285,6 +331,238 @@ void PlayList::load_m3u(const QString& file, M3UFormat format) {
     }
 }
 
+//bool Playlist::save_m3u(QString file) {
+//    qDebug() << "Playlist::save_m3u:" << file;
+//
+//    QString dir_path = QFileInfo(file).path();
+//    if (!dir_path.endsWith("/")) dir_path += "/";
+//
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
+//        dir_path = Helper::changeSlashes(dir_path);
+//#endif
+//
+//    qDebug() << "Playlist::save_m3u: dir_path:" << dir_path;
+//
+//    bool utf8 = (QFileInfo(file).suffix().toLower() == "m3u8");
+//
+//    QFile f( file );
+//    if ( f.open( QIODevice::WriteOnly ) ) {
+//        QTextStream stream( &f );
+//
+//        if (utf8)
+//            stream.setCodec("UTF-8");
+//        else
+//            stream.setCodec(QTextCodec::codecForLocale());
+//
+//        QString filename;
+//        QString name;
+//
+//        stream << "#EXTM3U" << "\n";
+//        stream << "# Playlist created by SMPlayer " << Version::printable() << " \n";
+//
+//        for (int n = 0; n < count(); n++) {
+//            PLItem * i = itemData(n);
+//            filename = i->filename();
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
+//            filename = Helper::changeSlashes(filename);
+//#endif
+//            name = i->name();
+//            name.replace(",", "&#44;");
+//            QString icon_url = i->iconURL();
+//            stream << "#EXTINF:";
+//            stream << i->duration();
+//            if (!icon_url.isEmpty()) stream << " tvg-logo=\"" + icon_url + "\"";
+//            stream << ",";
+//            stream << name << "\n";
+//
+//            // Save extra params
+//            QStringList params = i->extraParams();
+//                    foreach(QString par, params) {
+//                    stream << "#EXTVLCOPT:" << par << "\n";
+//                }
+//
+//            // Try to save the filename as relative instead of absolute
+//            if (filename.startsWith( dir_path )) {
+//                filename = filename.mid( dir_path.length() );
+//            }
+//            stream << filename << "\n";
+//        }
+//        f.close();
+//
+//        setPlaylistFilename(file);
+//        setModified( false );
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
+//
+//
+//bool Playlist::save_pls(QString file) {
+//    qDebug() << "Playlist::save_pls:" << file;
+//
+//    QString dir_path = QFileInfo(file).path();
+//    if (!dir_path.endsWith("/")) dir_path += "/";
+//
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
+//        dir_path = Helper::changeSlashes(dir_path);
+//#endif
+//
+//    qDebug() << "Playlist::save_pls: dir_path:" << dir_path;
+//
+//    QSettings set(file, QSettings::IniFormat);
+//    set.beginGroup( "playlist");
+//
+//    QString filename;
+//
+//    for (int n = 0; n < count(); n++) {
+//        PLItem * i = itemData(n);
+//        filename = i->filename();
+//#if defined(Q_OS_WIN) || defined(Q_OS_OS2)
+//        filename = Helper::changeSlashes(filename);
+//#endif
+//
+//        // Try to save the filename as relative instead of absolute
+//        if (filename.startsWith( dir_path )) {
+//            filename = filename.mid( dir_path.length() );
+//        }
+//
+//        set.setValue("File"+QString::number(n+1), filename);
+//        set.setValue("Title"+QString::number(n+1), i->name());
+//        set.setValue("Length"+QString::number(n+1), (int) i->duration());
+//    }
+//
+//    set.setValue("NumberOfEntries", count());
+//    set.setValue("Version", 2);
+//
+//    set.endGroup();
+//
+//    set.sync();
+//
+//    bool ok = (set.status() == QSettings::NoError);
+//    if (ok) {
+//        setPlaylistFilename(file);
+//        setModified( false );
+//    }
+//
+//    return ok;
+//}
+//
+//bool Playlist::saveXSPF(const QString & filename) {
+//    qDebug() << "Playlist::saveXSPF:" << filename;
+//
+//    QFile f(filename);
+//    if (f.open( QIODevice::WriteOnly)) {
+//        QTextStream stream(&f);
+//        stream.setCodec("UTF-8");
+//
+//        stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
+//        stream << "<playlist version=\"1\" xmlns=\"http://xspf.org/ns/0/\">\n";
+//        stream << "\t<trackList>\n";
+//
+//        for (int n = 0; n < count(); n++) {
+//            PLItem * i = itemData(n);
+//            QString location = i->filename();
+//            qDebug() << "Playlist::saveXSPF:" << location;
+//
+//            bool is_local = QFile::exists(location);
+//
+//#ifdef Q_OS_WIN
+//            if (is_local) {
+//				location.replace("\\", "/");
+//			}
+//#endif
+//            //qDebug() << "Playlist::saveXSPF:" << location;
+//
+//            QUrl url(location);
+//            location = url.toEncoded();
+//            //qDebug() << "Playlist::saveXSPF:" << location;
+//
+//            if (!location.startsWith("file:") && is_local) {
+//#ifdef Q_OS_WIN
+//                location = "file:///" + location;
+//#else
+//                location = "file://" + location;
+//#endif
+//            }
+//
+//            QString title = i->name();
+//            int duration = i->duration() * 1000;
+//
+//#if QT_VERSION >= 0x050000
+//            location = location.toHtmlEscaped();
+//            title = title.toHtmlEscaped();
+//#else
+//            location = Qt::escape(location);
+//			title = Qt::escape(title);
+//#endif
+//
+//            stream << "\t\t<track>\n";
+//            stream << "\t\t\t<location>" << location << "</location>\n";
+//            stream << "\t\t\t<title>" << title << "</title>\n";
+//            stream << "\t\t\t<duration>" << duration << "</duration>\n";
+//            stream << "\t\t</track>\n";
+//        }
+//
+//        stream << "\t</trackList>\n";
+//        stream << "</playlist>\n";
+//
+//        setPlaylistFilename(filename);
+//        setModified(false);
+//        return true;
+//    } else {
+//        return false;
+//    }
+//}
+
+//bool Playlist::save(const QString & filename) {
+//    qDebug() << "Playlist::save:" << filename;
+//
+//    QString s = filename;
+//
+//    if (s.isEmpty()) {
+//        Extensions e;
+//        s = MyFileDialog::getSaveFileName(
+//                this, tr("Choose a filename"),
+//                lastDir(),
+//                tr("Playlists") + e.playlist().forFilter() + ";;" + tr("All files") +" (*)");
+//    }
+//
+//    if (!s.isEmpty()) {
+//        // If filename has no extension, add it
+//        if (QFileInfo(s).suffix().isEmpty()) {
+//            s = s + ".m3u";
+//        }
+//        if (QFileInfo(s).exists()) {
+//            int res = QMessageBox::question( this,
+//                                             tr("Confirm overwrite?"),
+//                                             tr("The file %1 already exists.\n"
+//                                                "Do you want to overwrite?").arg(s),
+//                                             QMessageBox::Yes,
+//                                             QMessageBox::No,
+//                                             QMessageBox::NoButton);
+//            if (res == QMessageBox::No ) {
+//                return false;
+//            }
+//        }
+//        latest_dir = QFileInfo(s).absolutePath();
+//
+//        QString suffix = QFileInfo(s).suffix().toLower();
+//        if (suffix  == "pls") {
+//            return save_pls(s);
+//        }
+//        else
+//        if (suffix  == "xspf") {
+//            return saveXSPF(s);
+//        }
+//        else {
+//            return save_m3u(s);
+//        }
+//
+//    } else {
+//        return false;
+//    }
+//}
 
 /** Adiciona os itens para salvar na playlist */
 void PlayList::insert(const QString &url, int row, qint64 duration) {

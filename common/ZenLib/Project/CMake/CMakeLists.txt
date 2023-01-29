@@ -4,7 +4,7 @@ project(ZenLib)
 
 set(ZenLib_MAJOR_VERSION 0)
 set(ZenLib_MINOR_VERSION 4)
-set(ZenLib_PATCH_VERSION 39)
+set(ZenLib_PATCH_VERSION 40)
 set(ZenLib_VERSION ${ZenLib_MAJOR_VERSION}.${ZenLib_MINOR_VERSION}.${ZenLib_PATCH_VERSION})
 
 if(WIN32)
@@ -17,7 +17,13 @@ option(ENABLE_UNICODE "Enable unicode support" ON)
 option(LARGE_FILES "Enable large files support" ON)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/Modules/")
-set(ZenLib_SOURCES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../Source)
+if(MINGW)
+  # Work around for cmake generating extra long paths
+  file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../../Source DESTINATION .)
+  set(ZenLib_SOURCES_PATH ${CMAKE_CURRENT_BINARY_DIR}/Source)
+else()
+  set(ZenLib_SOURCES_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../Source)
+endif()
 
 # On Windows debug library should have 'd' postfix.
 if(WIN32)
@@ -105,6 +111,11 @@ set(ZenLib_SRCS
   ${ZenLib_SOURCES_PATH}/ZenLib/Format/Http/Http_Utils.cpp
   )
 
+if(WIN32)
+  set_source_files_properties(${ZenLib_SRCS} ${ZenLib_HDRS} ${ZenLib_format_html_HDRS} ${ZenLib_format_http_HDRS}
+    PROPERTIES GENERATED true)
+endif()
+
 add_library(zen ${ZenLib_SRCS} ${ZenLib_HDRS} ${ZenLib_format_html_HDRS} ${ZenLib_format_http_HDRS})
 if(ENABLE_UNICODE)
   set(ZenLib_Unicode "yes")
@@ -157,14 +168,14 @@ set_target_properties(zen PROPERTIES
   )
 
 #install(TARGETS zen EXPORT zen-export
-#  PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib
-#  RUNTIME DESTINATION ${BIN_INSTALL_DIR}
-#  ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
-#  LIBRARY DESTINATION ${LIB_INSTALL_DIR})
-#
+  #PUBLIC_HEADER DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib
+  #RUNTIME DESTINATION ${BIN_INSTALL_DIR}
+  #ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+  #LIBRARY DESTINATION ${LIB_INSTALL_DIR})
+
 #install(FILES ${ZenLib_format_html_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Html)
 #install(FILES ${ZenLib_format_http_HDRS} DESTINATION ${INCLUDE_INSTALL_DIR}/ZenLib/Format/Http)
-#
+
 #install(EXPORT zen-export DESTINATION ${ZenLib_CONFIG_INSTALL_DIR} FILE ZenLibTargets.cmake)
 
 configure_file(
@@ -178,8 +189,8 @@ if(PKG_CONFIG_FOUND)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/libzen.pc.in
                  ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
                  @ONLY)
-#  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
-#          DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
+  #install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libzen.pc
+          #DESTINATION ${LIB_INSTALL_DIR}/pkgconfig)
 endif()
 
 # cmake-modules
@@ -193,9 +204,9 @@ configure_package_config_file(
 write_basic_config_version_file(ZenLibConfigVersion.cmake VERSION ${ZenLib_VERSION} COMPATIBILITY AnyNewerVersion)
 
 #install(FILES
-#  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfig.cmake
-#  ${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfigVersion.cmake
-#  DESTINATION ${ZenLib_CONFIG_INSTALL_DIR})
+  #${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfig.cmake
+  #${CMAKE_CURRENT_BINARY_DIR}/ZenLibConfigVersion.cmake
+  #DESTINATION ${ZenLib_CONFIG_INSTALL_DIR})
 
 if(NOT TARGET uninstall)
   add_custom_target(uninstall

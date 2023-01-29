@@ -67,6 +67,7 @@ Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name)
 {
     Ztring ToReturn(Name);
     ToReturn.FindAndReplace(__T(" "), __T("_"), 0, Ztring_Recursive);
+    ToReturn.FindAndReplace(__T("-"), Ztring(), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T("/"), __T("_"), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T("("), Ztring(), 0, Ztring_Recursive);
     ToReturn.FindAndReplace(__T(")"), Ztring(), 0, Ztring_Recursive);
@@ -87,7 +88,7 @@ Ztring Xml_Name_Escape_0_7_78 (const Ztring &Name)
             ToReturn_Pos++;
     }
 
-    if (ToReturn.operator()(0)>='0' && ToReturn.operator()(0)<='9')
+    if ((ToReturn.operator()(0)>='0' && ToReturn.operator()(0)<='9') || ToReturn.operator()(0)=='-')
         ToReturn.insert(0, 1, __T('_'));
 
     if (ToReturn.empty())
@@ -147,6 +148,42 @@ Ztring MediaInfo_Internal::Inform()
                 return Ztring();
         }
     #endif //MEDIAINFO_TRACE
+
+    #if MEDIAINFO_ADVANCED
+        if (Config.TimeCode_Dumps)
+        {
+            string Result="<media";
+            if (Config.ParseSpeed<1.0)
+                Result+=" full=\"0\"";
+            Ztring Options=Get(Stream_General, 0, General_CompleteName, Info_Options);
+            if (InfoOption_ShowInInform<Options.size() && Options[InfoOption_ShowInInform]==__T('Y'))
+            {
+                Result+=" ref=\"";
+                Result+=XML_Encode(Get(Stream_General, 0, General_CompleteName)).To_UTF8();
+                Result+='\"';
+            }
+            Result+=" format=\"";
+            Result+=XML_Encode(Get(Stream_General, 0, General_Format)).To_UTF8();
+            Result+="\">\n";
+            for (const auto& TimeCode_Dump : *Config.TimeCode_Dumps)
+            {
+                Result+="  <timecode_stream";
+                Result+=TimeCode_Dump.second.Attributes_First;
+                Result+=" frame_count=\""+std::to_string(TimeCode_Dump.second.FrameCount)+'\"';
+                Result+=TimeCode_Dump.second.Attributes_Last;
+                if (TimeCode_Dump.second.List.empty())
+                    Result+="/>\n";
+                else
+                {
+                    Result+=">\n";
+                    Result+=TimeCode_Dump.second.List;
+                    Result+="  </timecode_stream>\n";
+                }
+            }
+            Result+="</media>";
+            return Ztring().From_UTF8(Result);
+        }
+    #endif //MEDIAINFO_ADVANCED
 
     #if defined(MEDIAINFO_EBUCORE_YES)
         if (MediaInfoLib::Config.Inform_Get()==__T("EBUCore_1.5"))
@@ -717,10 +754,14 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                         size_t Space=SubName.rfind(' ');
                         if (Space!=(size_t)-1)
                             SubName.erase(0, Space+1);
-                        size_t NumbersPos=SubName.find_last_not_of("0123456789");
+                        size_t NumbersPos=SubName.find_first_of("0123456789");
                         if (NumbersPos!=(size_t)-1)
-                            SubName.resize(NumbersPos+1);
-                        bool IsArray=(NextName.size()==Nom.size()+4 && NextName.find(__T(" Pos"), Nom.size())==Nom.size());
+                            SubName.resize(NumbersPos);
+                        if (XML_0_7_78 || JSON)
+                            SubName=Xml_Name_Escape_0_7_78(Ztring().From_UTF8(SubName)).To_UTF8();
+                        else
+                            SubName=Xml_Name_Escape(Ztring().From_UTF8(SubName)).To_UTF8();
+                        bool IsArray=NumbersPos!=(size_t)-1;
                         Node* Node_Sub=new Node(SubName.c_str(), IsArray);
                         Fields_Current->push_back(Node_Sub);
                         Nested.resize(Nested.size()+1);
@@ -944,7 +985,12 @@ Ztring MediaInfo_Internal::Inform (stream_t StreamKind, size_t StreamPos, bool I
                 Elements_Index=2;
         }
         else
-            Elements_Index=2;
+        {
+            if (!Get(StreamKind, StreamPos, Elements(0)).empty())
+                Elements_Index=1;
+            else
+                Elements_Index=2;
+        }
 
         //Replace
         while (Elements(Elements_Index).SubString(__T("%"), __T("%")).size()>0)

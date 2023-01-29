@@ -1,3 +1,6 @@
+#include <QGraphicsProxyWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
@@ -228,6 +231,13 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     setRenderer(JsonTools::stringJson("renderer"));
     stack->setCurrentIndex(0);
 
+    auto *scene = new QGraphicsScene(this);
+    auto graphicsView = new QGraphicsView();
+    QGraphicsProxyWidget *w = scene->addWidget(logo);
+    w->setRotation(180);
+    graphicsView->setScene(scene);
+    graphicsView->setStyleSheet("background-color: transparent;"
+                                "border: 0;");
 
     /** Layout principal para os widgets */
     auto layout = new QHBoxLayout();

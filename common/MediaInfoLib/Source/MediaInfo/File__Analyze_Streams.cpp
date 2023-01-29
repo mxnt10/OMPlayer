@@ -70,7 +70,7 @@ inline void add_dec_2chars(string& In, uint8_t Value)
 
 //---------------------------------------------------------------------------
 #if defined(MEDIAINFO_HEVC_YES) || defined(MEDIAINFO_MPEG4_YES)
-void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance)
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, bool FromAV1)
 {
     //Parsing
     mastering_metadata_2086 Meta;
@@ -86,7 +86,7 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
 
     FILLING_BEGIN();
         if (MasteringDisplay_ColorPrimaries.empty())
-            Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, Meta);
+            Get_MasteringDisplayColorVolume(MasteringDisplay_ColorPrimaries, MasteringDisplay_Luminance, Meta, FromAV1);
     FILLING_END();
 }
 #endif
@@ -158,7 +158,7 @@ Ztring MasteringDisplayColorVolume_Values_Compute(int16u Values[8])
     +__T(", White point: x=")+Ztring::ToZtring(((float64)Values[3*2  ])/50000, 6)
                 +__T(  " y=")+Ztring::ToZtring(((float64)Values[3*2+1])/50000, 6);
 }
-void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta)
+void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_ColorPrimaries, Ztring &MasteringDisplay_Luminance, mastering_metadata_2086 &Meta, bool FromAV1)
 {
     if (!MasteringDisplay_ColorPrimaries.empty())
         return; // Use the first one
@@ -167,13 +167,19 @@ void File__Analyze::Get_MasteringDisplayColorVolume(Ztring &MasteringDisplay_Col
     for (int8u i=0; i<8; i++)
         if (Meta.Primaries[i]==(int16u)-1)
             IsNotValid=true;
+        else if (FromAV1)
+            Meta.Primaries[i]=(int16u)(((int32u)Meta.Primaries[i]*50000+32768)>>16); // 0.16 fixed-point, MPEG values are x50000
     if (!IsNotValid)
         MasteringDisplay_ColorPrimaries=MasteringDisplayColorVolume_Values_Compute(Meta.Primaries);
 
     if (Meta.Luminance[0]!=(int32u)-1 && Meta.Luminance[1]!=(int32u)-1)
-        MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/10000, 4)
-                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/10000, ((float64)Meta.Luminance[1]/10000-Meta.Luminance[1]/10000==0)?0:4)
+    {
+        float32 Luminance_Min_Ratio=FromAV1?16384:10000; // 18.14 fixed-point, MPEG values are x10000
+        float32 Luminance_Max_Ratio=FromAV1?256:10000; // 24.8 fixed-point, MPEG values are x10000
+        MasteringDisplay_Luminance=        __T("min: ")+Ztring::ToZtring(((float64)Meta.Luminance[0])/Luminance_Min_Ratio, 4)
+                                  +__T(" cd/m2, max: ")+Ztring::ToZtring(((float64)Meta.Luminance[1])/Luminance_Max_Ratio, ((float64)Meta.Luminance[1]/Luminance_Max_Ratio-Meta.Luminance[1]/Luminance_Max_Ratio==0)?0:4)
                                   +__T(" cd/m2");
+    }
 }
 #endif
 
@@ -1174,15 +1180,29 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
                             Language_Translated.clear(); //No translation found
                         if (Language_Translated.empty())
                         {
+                            const auto& LanguageSplit=Languages[Pos];
+                            const auto Language=LanguageSplit.Read();
+                            for (const auto C : Language)
+                                if (!isalnum(C) && C!='-')
+                                {
+                                    Language_Translated=Language;
+                                    break;
+                                }
+                        }
+                        if (Language_Translated.empty())
+                        {
                         Language_Translated=MediaInfoLib::Config.Language_Get(__T("Language_")+Languages[Pos][0]);
                         if (Language_Translated.find(__T("Language_"))==0)
                             Language_Translated=Languages[Pos][0]; //No translation found
                         if (Languages[Pos].size()>=2)
                         {
-                            if (Languages[Pos].size()==2 && Languages[Pos][1].size()>=2 && Languages[Pos][1].size()<=3 && (Languages[Pos][1][0]&0xDF)>=__T('A') && (Languages[Pos][1][0]&0xDF)<=__T('Z') && (Languages[Pos][1][1]&0xDF)>=__T('A') && (Languages[Pos][1][1]&0xDF)<=__T('Z'))
+                            if (Languages[Pos].size()==2)
                             {
                                 Language_Translated+=__T(" (");
-                                Language_Translated+=Ztring(Languages[Pos][1]).MakeUpperCase();
+                                if (Languages[Pos][1].size()==2 && Languages[Pos][1][0]>=__T('a') && Languages[Pos][1][0]<=__T('z') && Languages[Pos][1][1]>=__T('a') && Languages[Pos][1][1]<=__T('z'))
+                                    Language_Translated+=Ztring(Languages[Pos][1]).MakeUpperCase(); //Fix some files with countries in lowercase
+                                else
+                                    Language_Translated+=Languages[Pos][1];
                                 Language_Translated+=__T(")");
                             }
                             else
@@ -1308,6 +1328,11 @@ void File__Analyze::Fill (stream_t StreamKind, size_t StreamPos, size_t Paramete
             {
                 Fill(StreamKind, StreamPos, FrameRate_Num,  Value*1000,  0, Replace);
                 Fill(StreamKind, StreamPos, FrameRate_Den,        1000, 10, Replace);
+            }
+            if (!(Value - (int)Value)) // Detection of integer values
+            {
+                Fill(StreamKind, StreamPos, FrameRate_Num, (int)Value, 10, Replace);
+                Fill(StreamKind, StreamPos, FrameRate_Den,          1, 10, Replace);
             }
         }
     }
@@ -1884,6 +1909,13 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
         Channels_Temp[3]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelPositions_String2);
         Channels_Temp[1]=Retrieve(Stream_Audio, StreamPos_To, Audio_ChannelLayout);
     }
+    if (StreamKind==Stream_Text)
+    {
+        FrameRate_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate);
+        FrameRate_Num_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num);
+        FrameRate_Den_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den);
+        FrameRate_Mode_Temp=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Mode);
+    }
     if (ToAdd.Retrieve(StreamKind, StreamPos_From, Fill_Parameter(StreamKind, Generic_Delay_Source))==__T("Container"))
     {
         Fill(StreamKind, StreamPos_To, "Delay_Original", Retrieve(StreamKind, StreamPos_To, "Delay"), true);
@@ -2029,6 +2061,11 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
             {
                 Ztring Container_Value=HDR_Temp[i-Video_HDR_Format];
                 Ztring Stream_Value=ToAdd.Retrieve(Stream_Video, StreamPos_From, i);
+                ZtringList Stream_Values;
+                Stream_Values.Separator_Set(0, __T(" / "));
+                Stream_Values.Write(Stream_Value);
+                if (i==Video_HDR_Format && Stream_Values.Find(Container_Value)!=Error)
+                    break;
                 if (!Container_Value.empty() || !Stream_Value.empty())
                     Container_Value+=__T(" / ");
                 Container_Value+=Stream_Value;
@@ -2075,6 +2112,31 @@ size_t File__Analyze::Merge(File__Analyze &ToAdd, stream_t StreamKind, size_t St
                         Fill_SetOptions(Stream_Audio, StreamPos_To, Original.c_str(), Retrieve_Const(Stream_Audio, StreamPos_To, AudioField[i], Info_Options).To_UTF8().c_str());
                         Fill(Stream_Audio, StreamPos_To, AudioField[i], Channels_Temp[i], true);
                     }
+    }
+    if (StreamKind==Stream_Text)
+    {
+        if (!FrameRate_Temp.empty())
+        {
+            const Ztring& FramesPerContainerBlock=Retrieve(Stream_Text, StreamPos_To, "FramesPerContainerBlock");
+            if (!FramesPerContainerBlock.empty())
+                FrameRate_Temp.From_Number(FrameRate_Temp.To_float64()*FramesPerContainerBlock.To_float64());
+        }
+        if ((!FrameRate_Temp.empty() && FrameRate_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate))
+         || (!FrameRate_Num_Temp.empty() && FrameRate_Num_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num))
+         || (!FrameRate_Den_Temp.empty() && FrameRate_Den_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den)))
+        {
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original_Num, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Num), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Original_Den, ToAdd.Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Den), true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate, FrameRate_Temp, true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Num, FrameRate_Num_Temp, true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Den, FrameRate_Den_Temp, true);
+        }
+        if (!FrameRate_Mode_Temp.empty() && FrameRate_Mode_Temp!=Retrieve(Stream_Text, StreamPos_To, Text_FrameRate_Mode))
+        {
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Mode_Original, (*Stream)[Stream_Text][StreamPos_To][Text_FrameRate_Mode], true);
+            Fill(Stream_Text, StreamPos_To, Text_FrameRate_Mode, FrameRate_Mode_Temp, true);
+        }
     }
     if (!Delay_Source_Temp.empty() && Delay_Source_Temp!=Retrieve(StreamKind, StreamPos_To, "Delay_Source"))
     {
@@ -2909,15 +2971,24 @@ void File__Analyze::Value_Value123(stream_t StreamKind, size_t StreamPos, size_t
             const auto& FrameRate_Den=Retrieve_Const(StreamKind, StreamPos, Fill_Parameter(StreamKind, Generic_FrameRate_Den));
             if (!FrameRate.empty()
              && !FrameRate_Num.empty()
-             && !FrameRate_Den.empty())
+             && !FrameRate_Den.empty()
+             && FrameRate_Den.To_int32u()!=1)
                 List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(FrameRate+__T(" (")+FrameRate_Num+__T("/")+FrameRate_Den+__T(")"), __T(" fps"));
         }
         if (StreamKind==Stream_Video
          && Parameter==Video_FrameRate_Original
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original).empty()
          && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num).empty()
-         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty())
+         && !Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).empty()
+         && Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den).To_int32u()!=1)
             List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Video_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Video_FrameRate_Original_Den)+__T(")"), __T(" fps"));
+        if (StreamKind==Stream_Text
+         && Parameter==Text_FrameRate_Original
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original).empty()
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Num).empty()
+         && !Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den).empty()
+         && Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den).To_int32u()!=1)
+            List2[List2.size()-1]=MediaInfoLib::Config.Language_Get(Retrieve(StreamKind, StreamPos, Text_FrameRate_Original)+__T(" (")+Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Num)+__T("/")+Retrieve(StreamKind, StreamPos, Text_FrameRate_Original_Den)+__T(")"), __T(" fps"));
 
         //Special cases - 120 fps 24/30 mode
         if (StreamKind==Stream_Video

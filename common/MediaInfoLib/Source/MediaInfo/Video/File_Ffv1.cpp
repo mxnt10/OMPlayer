@@ -719,6 +719,9 @@ void File_Ffv1::Skip_Frame()
 //---------------------------------------------------------------------------
 void File_Ffv1::Read_Buffer_Continue()
 {
+    if (!Buffer_Size)
+        return;
+
     if (ConfigurationRecord_IsPresent && !Parameters_IsValid)
     {
         Skip_Frame();
@@ -828,7 +831,7 @@ void File_Ffv1::Read_Buffer_Continue()
 
         //SliceContent
         #if MEDIAINFO_TRACE
-        if (ParseContent && (!Frame_Count || Trace_Activated)) // Parse slice only if trace feature is activated
+        if (ParseContent && (!Frame_Count || Trace_Activated) && current_slice->w && current_slice->h) // Parse slice only if trace feature is activated
         {
             SliceContent(States);
         }

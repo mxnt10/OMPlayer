@@ -128,13 +128,18 @@ public :
     {
         Mode_Unknown,
         Mode_AudioSpecificConfig,
-        Mode_raw_data_block,
+        Mode_payload,
         Mode_ADIF,
         Mode_ADTS,
         Mode_LATM,
     };
     mode   Mode;
     void   AudioSpecificConfig_OutOfBand(int64s sampling_frequency, int8u audioObjectType=(int8u)-1, bool sbrData=false, bool psData=false, bool sbrPresentFlag=false, bool psPresentFlag=false);
+
+    // Conformance
+    #if MEDIAINFO_CONFORMANCE
+        int16u SamplingRate;
+    #endif
 
     //Constructor/Destructor
     File_Aac();
@@ -156,7 +161,7 @@ protected :
     //Buffer - Global
     void Read_Buffer_Continue ();
     void Read_Buffer_Continue_AudioSpecificConfig();
-    void Read_Buffer_Continue_raw_data_block();
+    void Read_Buffer_Continue_payload();
 
     //Buffer - Synchro
     bool Synchronize();
@@ -276,6 +281,7 @@ protected :
     void program_config_element             ();
 
     //Elements - GA bitstream
+    void payload                            ();
     void raw_data_block                     ();
     void single_channel_element             ();
     void channel_pair_element               ();

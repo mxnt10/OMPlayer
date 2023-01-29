@@ -298,6 +298,9 @@ MediaInfo_Config_MediaInfo::MediaInfo_Config_MediaInfo()
     #if MEDIAINFO_FIXITY
         TryToFix=false;
     #endif //MEDIAINFO_SEEK
+    #if MEDIAINFO_ADVANCED
+        TimeCode_Dumps=nullptr;
+    #endif //MEDIAINFO_ADVANCED
 }
 
 MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
@@ -310,6 +313,9 @@ MediaInfo_Config_MediaInfo::~MediaInfo_Config_MediaInfo()
             for (size_t Pos=0; Pos<Event->second.size(); Pos++)
                 delete Event->second[Pos]; //Event->second[Pos]=NULL;
     #endif //MEDIAINFO_EVENTS
+    #if MEDIAINFO_ADVANCED
+        delete TimeCode_Dumps;
+    #endif //MEDIAINFO_ADVANCED
 }
 
 //***************************************************************************
@@ -1569,6 +1575,7 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                             if (Up_Pos!=string::npos && Up_Pos_End==Name.size()-4)
                             {
                                 Ztring Up=Name.substr(Up_Pos);
+                                auto IsComplementary=Up.FindAndReplace(__T("Complementary"), Ztring());
 
                                 //Hide
                                 Ztring ToHide=Name+__T("/String");
@@ -1690,6 +1697,8 @@ void MediaInfo_Config_MediaInfo::File_ExpandSubs_Update(void** Source)
                                                 if (!ID2.empty())
                                                     Temp.back()[Info_Name].insert(ToSearch.size(), __T("-Alt")+ID2);
                                                 Temp.back()[Info_Name].insert(0, SpacesCount, __T(' '));
+                                                if (IsComplementary)
+                                                    Temp.back()[Info_Name].FindAndReplace(__T(" Object"), __T("ComplementaryObject"));
                                                 if (!Found.empty())
                                                     Temp.back()[Info_Text]=Found;;
                                             }

@@ -51,10 +51,11 @@ File_Flac::File_Flac()
     Base=this;
 
     //In
+    NoFileHeader=false;
     VorbisHeader=false;
 
     //Temp
-    Last_metadata_block=false;
+    IsAudioFrames=false;
 }
 
 //***************************************************************************
@@ -64,7 +65,10 @@ File_Flac::File_Flac()
 //---------------------------------------------------------------------------
 bool File_Flac::FileHeader_Begin()
 {
-    if (!File__Tags_Helper::FileHeader_Begin())
+    if (NoFileHeader)
+        return true;
+
+    if (NoFileHeader || !File__Tags_Helper::FileHeader_Begin())
         return false;
 
     //Element_Size
@@ -85,6 +89,8 @@ bool File_Flac::FileHeader_Begin()
 void File_Flac::FileHeader_Parse()
 {
     //Parsing
+    if (NoFileHeader)
+        return;
     if (VorbisHeader)
     {
         Skip_B1(                                                "Signature");
@@ -107,10 +113,29 @@ void File_Flac::Header_Parse()
     int32u Length;
     int8u BLOCK_TYPE;
     BS_Begin();
+    if (IsAudioFrames)
+    {
+        BLOCK_TYPE=(int8u)-1;
+        int16u sync;
+        bool blocking_strategy;
+        Get_S2 (15, sync,                                       "0b111111111111100");
+        Get_SB (    blocking_strategy,                          "blocking strategy");
+        Skip_S1( 4,                                             "Blocksize");
+        Skip_S1( 4,                                             "Sample rate");
+        Skip_S1( 4,                                             "Channels");
+        Skip_S1( 3,                                             "Bit depth");
+        Skip_SB(                                                "Reserved");
+        BS_End();
+        Skip_B1(                                                "Frame header CRC");
+        Length=IsSub?(Element_Size-Element_Offset):0; // Unknown if raw, else full frame
+    }
+    else
+    {
     Get_SB (   Last_metadata_block,                             "Last-metadata-block");
     Get_S1 (7, BLOCK_TYPE,                                      "BLOCK_TYPE");
     BS_End();
     Get_B3 (Length,                                             "Length");
+    }
 
     //Filling
     Header_Fill_Code(BLOCK_TYPE, Ztring().From_CC1(BLOCK_TYPE));
@@ -124,7 +149,7 @@ void File_Flac::Data_Parse()
         case Flac::_NAME : Element_Info1(#_NAME); _NAME(); break;
 
     //Parsing
-    switch ((int16u)Element_Code)
+    switch ((int8u)Element_Code)
     {
         CASE_INFO(STREAMINFO);
         CASE_INFO(PADDING);
@@ -133,10 +158,17 @@ void File_Flac::Data_Parse()
         CASE_INFO(VORBIS_COMMENT);
         CASE_INFO(CUESHEET);
         CASE_INFO(PICTURE);
+        case (int8u)-1: Element_Name("Frame");
+                // Fallthrough
         default : Skip_XX(Element_Size,                         "Data");
     }
 
-    if (Last_metadata_block)
+    if (Element_Code==(int8u)-1)
+    {
+        //No more need data
+        File__Tags_Helper::Finish("Flac");
+    }
+    else if (Last_metadata_block)
     {
         if (!IsSub)
             Fill(Stream_Audio, 0, Audio_StreamSize, File_Size-(File_Offset+Buffer_Offset+Element_Size));
@@ -160,8 +192,7 @@ void File_Flac::Data_Parse()
         }
     }
 
-        //No more need data
-        File__Tags_Helper::Finish("Flac");
+    IsAudioFrames=true;
     }
 }
 
@@ -173,6 +204,7 @@ void File_Flac::Data_Parse()
 void File_Flac::STREAMINFO()
 {
     //Parsing
+    int128u MD5Stored;
     int64u Samples;
     int32u FrameSize_Min, FrameSize_Max, SampleRate;
     int8u  Channels, BitPerSample;
@@ -186,7 +218,7 @@ void File_Flac::STREAMINFO()
     Get_S1 ( 5, BitPerSample,                                   "BitPerSample"); Param_Info2(BitPerSample+1, " bits"); //(bits per sample)-1. FLAC supports from 4 to 32 bits per sample. Currently the reference encoder and decoders only support up to 24 bits per sample.
     Get_S5 (36, Samples,                                        "Samples");
     BS_End();
-    Skip_B16(                                                   "MD5 signature of the unencoded audio data");
+    Get_B16 (   MD5Stored,                                      "MD5 signature of the unencoded audio data");
 
     FILLING_BEGIN();
         if (SampleRate==0)
@@ -207,6 +239,11 @@ void File_Flac::STREAMINFO()
         Fill(Stream_Audio, 0, Audio_BitDepth, BitPerSample+1);
         if (!IsSub)
             Fill(Stream_Audio, 0, Audio_Duration, Samples*1000/SampleRate);
+        Ztring MD5_PerItem;
+        MD5_PerItem.From_UTF8(uint128toString(MD5Stored, 16));
+        while (MD5_PerItem.size()<32)
+            MD5_PerItem.insert(MD5_PerItem.begin(), '0'); //Padding with 0, this must be a 32-byte string
+        Fill(Stream_Audio, 0, "MD5_Unencoded", MD5_PerItem);
     FILLING_END();
 }
 

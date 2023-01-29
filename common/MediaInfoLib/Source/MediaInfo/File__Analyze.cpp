@@ -449,6 +449,10 @@ void File__Analyze::Open_Buffer_Init (int64u File_Size_)
         if (Config_Ibi_Create && !IsSub && IbiStream==NULL)
             IbiStream=new ibi::stream;
     #endif //MEDIAINFO_IBIUSAGE
+    #if MEDIAINFO_ADVANCED
+        if (!IsSub && !Config->TimeCode_Dumps && MediaInfoLib::Config.Inform_Get().MakeLowerCase()==__T("timecodexml"))
+            Config->TimeCode_Dumps=new map<string, MediaInfo_Config_MediaInfo::timecode_dump>;
+    #endif //MEDIAINFO_ADVANCED
 }
 
 void File__Analyze::Open_Buffer_Init (File__Analyze* Sub)
@@ -2915,8 +2919,12 @@ void File__Analyze::Trusted_IsNot (const char* Reason)
 void File__Analyze::Trusted_IsNot ()
 #endif //MEDIAINFO_TRACE
 {
-    Element_Offset=Element_Size;
-    BS->Attach(NULL, 0);
+    if (BS && (BS->Offset_Get() || BS->Remain()))
+        BS->Skip(BS->Remain());
+    else if (BT && (BT->Offset_Get() || BT->Remain()))
+        BT->Skip(BT->Remain());
+    else
+        Element_Offset=Element_Size;
 
     if (!Element[Element_Level].UnTrusted)
     {

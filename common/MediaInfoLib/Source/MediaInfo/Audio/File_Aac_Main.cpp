@@ -162,9 +162,9 @@ const char* Aac_audioObjectType(int8u audioObjectType)
 }
 
 //---------------------------------------------------------------------------
-static const int8u Aac_Channels_Size_Usac=14;
-static const int8u Aac_Channels_Size=21;
-static const int8u Aac_Channels[Aac_Channels_Size]=
+extern const int8u Aac_Channels_Size_Usac=14;
+extern const int8u Aac_Channels_Size=21;
+extern const int8u Aac_Channels[Aac_Channels_Size]=
 {
     0,
     1,
@@ -572,6 +572,10 @@ void File_Aac::AudioSpecificConfig (size_t End)
         Frequency_b=Aac_sampling_frequency[sampling_frequency_index];
     else
         Frequency_b=0;
+    #if MEDIAINFO_CONFORMANCE
+        if (ConformanceFlags && SamplingRate && Frequency_b!=SamplingRate) //TODO: handling of AAC implicit SBR
+            Fill_Conformance("Crosscheck Container+AudioSpecificConfig SamplingRate+samplingFrequency", (to_string(SamplingRate) + " vs " + to_string(Frequency_b) + " are not coherent").c_str());
+    #endif
     Get_S1 (4, channelConfiguration,                            "channelConfiguration"); Param_Info1(Aac_ChannelConfiguration[channelConfiguration]);
     if (audioObjectType==5 || audioObjectType==29)
     {
@@ -832,6 +836,10 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u 
         Infos["ChannelPositions/String2"].From_UTF8(Aac_ChannelConfiguration2_GetString(channelConfiguration));
         Infos["ChannelLayout"].From_UTF8(Aac_ChannelLayout_GetString(channelConfiguration));
     }
+    else if (audioObjectType_==42 && !Conf.IsNotValid && Conf.numOutChannels)
+    {
+        Infos["Channel(s)"].From_Number(Conf.numOutChannels);
+    }
 
     if (sbrPresentFlag || !Infos["Format_Settings_SBR"].empty())
     {
@@ -858,10 +866,6 @@ void File_Aac::AudioSpecificConfig_OutOfBand (int64s sampling_frequency_, int8u 
         FillInfosHEAACv2(psData ? __T("Explicit") : __T("NBC")); // "Not Backward Compatible");
     else if (psData)
         Infos["Format_Settings_PS"]=__T("No (Explicit)");
-
-    //Commercial names
-    if (Infos["Format"]==__T("USAC"))
-        Infos["Format_Commercial_IfAny"]=__T("xHE-AAC");
 }
 
 //---------------------------------------------------------------------------
@@ -1148,7 +1152,7 @@ void File_Aac::PayloadMux()
                                 Frame_Count_Valid=0;
                             }
                             else
-                                raw_data_block();
+                                payload();
                             break;
                     case 1 :
                             Skip_BS(8 * (frameLength[streamID[prog][lay]] + 20),"payload[streamID[prog][lay]]");
@@ -1169,7 +1173,7 @@ void File_Aac::PayloadMux()
             switch(frameLengthType[streamID[prog][lay]])
             {
                 case 0 :
-                        raw_data_block(); //Skip_BS(MuxSlotLengthBytes[streamID[prog][lay]], "payload[streamID[prog][lay]]");
+                        payload(); //Skip_BS(MuxSlotLengthBytes[streamID[prog][lay]], "payload[streamID[prog][lay]]");
                         break;
                 case 1 :
                         Skip_BS(8*(frameLength[streamID[prog][lay]]+20), "payload[streamID[prog][lay]]");

@@ -33,6 +33,7 @@ namespace MediaInfoLib
 
 class File_DolbyVisionMetadata;
 class File_Adm;
+class File_Iab;
 class File_DolbyAudioMetadata;
 
 //***************************************************************************
@@ -790,6 +791,8 @@ protected :
             ShouldCheckAvcHeaders=0;
             FrameInfo.DTS=(int64u)-1;
         }
+        essence(const essence&) = delete;
+        essence(essence&&) = delete;
 
         ~essence()
         {
@@ -932,6 +935,13 @@ protected :
             SoundfieldGroupLinkID.hi=(int64u)-1;
             SoundfieldGroupLinkID.lo=(int64u)-1;
         }
+        descriptor(const descriptor&) = delete;
+        descriptor(descriptor& b)
+        {
+            *this = b;
+            b.Parser = nullptr;
+        }
+
         ~descriptor()
         {
             delete Parser;
@@ -1250,7 +1260,6 @@ protected :
     #endif //MEDIAINFO_ADVANCED
     #if defined(MEDIAINFO_ANCILLARY_YES)
         File_Ancillary* Ancillary;
-        bool            Ancillary_IsBinded;
     #endif //defined(MEDIAINFO_ANCILLARY_YES)
 
     //Hints
@@ -1353,7 +1362,10 @@ protected :
     #if defined(MEDIAINFO_ADM_YES)
     File_Adm* Adm;
     #endif
-
+    #if defined(MEDIAINFO_IAB_YES)
+    File_Iab* Adm_ForLaterMerge;
+    #endif
+        
     //Demux
     #if MEDIAINFO_DEMUX
         bool Demux_HeaderParsed;

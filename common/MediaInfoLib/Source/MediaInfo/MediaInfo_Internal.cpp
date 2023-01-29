@@ -338,7 +338,7 @@ static const char* ChannelLayout_2018[ChannelLayout_2018_Size][2] =
     { "Lv", "Tfl" },
     { "Lvh", "Tfl" },
     { "Lvr", "Tbl" },
-    { "Lvss", "Tll" },
+    { "Lvss", "Tsl" },
     { "Oh", "Tc" },
     { "Rc", "Rscr" },
     { "Rfh", "Tfrr" },
@@ -574,6 +574,8 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
     static const Char* LCSBR=__T("LC SBR");
     static const Char* LCSBRPS=__T("LC SBR PS");
     static const Char* LTP=__T("LTP");
+    static const Char* X=__T("X");
+    static const Char* IMAX=__T("IMAX");
     static const Char* MA=__T("MA");
     static const Char* Main=__T("Main");
     static const Char* MLP=__T("MLP");
@@ -798,7 +800,11 @@ Ztring HighestFormat(stream_t StreamKind, size_t Parameter, const ZtringList& In
             if (Info[Parameter_Format]==DTS)
             {
                 const Ztring& Profile=Info[Parameter_Format_Profile];
-                if (Profile.find(MA)!=string::npos)
+                if (Profile.find(IMAX)!=string::npos)
+                    return "IMAX Enhanced";
+                else if (Profile.find(X)!=string::npos)
+                    return "DTS:X";
+                else if (Profile.find(MA)!=string::npos)
                     return "DTS-HD Master Audio";
                 if (Profile.find(HRA)!=string::npos)
                     return "DTS-HD High Resolution Audio";
@@ -853,7 +859,7 @@ static void CtrlC_Unregister();
 static void Reader_Cin_Add(Reader_Cin_Thread* Thread)
 {
     CriticalSectionLocker ToTerminate_CSL(ToTerminate_CS);
-    if (ToTerminate.empty())
+    if (ToTerminate.empty() && MediaInfoLib::Config.AcceptSignals_Get())
         CtrlC_Register();
     ToTerminate.insert(Thread);
 }
@@ -862,7 +868,7 @@ static void Reader_Cin_Remove(Reader_Cin_Thread* Thread)
 {
     CriticalSectionLocker ToTerminate_CSL(ToTerminate_CS);
     ToTerminate.erase(Thread);
-    if (ToTerminate.empty())
+    if (ToTerminate.empty() && MediaInfoLib::Config.AcceptSignals_Get())
         CtrlC_Unregister();
 }
 
@@ -913,7 +919,7 @@ public:
 
     void Entry()
     {
-        while (!IsTerminating())
+        while (!IsTerminating() && !IsExited())
         {
             if (Buffer_Size[Buffer_Filling]==Buffer_MaxSize) //If end of buffer is reached
             {
@@ -1404,17 +1410,19 @@ void MediaInfo_Internal::Entry()
             {
                 int8u* Buffer_New;
                 size_t Buffer_Size_New;
+                if (Cin.IsExited())
+                    break;
                 Cin.Current(Buffer_New, Buffer_Size_New);
                 if (Buffer_Size_New)
                 {
                     if (Open_Buffer_Continue(Buffer_New, Buffer_Size_New)[File__Analyze::IsFinished])
-                        break;
+                        Reader_Cin_ForceTerminate(&Cin);
+                    if (Config.RequestTerminate)
+                        Cin.RequestTerminate();
                     Cin.IsManaged();
                     if (TimeOut!=-1)
                         LastIn=clock();
                 }
-                else if (Cin.IsExited())
-                    break;
                 else
                 {
                     if (LastIn!=-1)
@@ -2593,6 +2601,32 @@ Ztring MediaInfo_Internal::Inform(std::vector<MediaInfo_Internal*>& Info)
         }
 
         Result+=__T("</MicroMediaTrace>");
+    }
+
+    else if (MediaInfoLib::Config.Inform_Get().MakeLowerCase()==__T("timecodexml"))
+    {
+        Result+=__T("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T('<');
+        Result+=__T("MediaTimecode");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatimecode\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    xsi:schemaLocation=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/mediatimecode http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/xsd/mediatimecode.xsd\"");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("    version=\"0.0\"");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("<creatingLibrary version=\"")+Ztring(MediaInfo_Version).SubString(__T(" - v"), Ztring())+__T("\" url=\"http")+(MediaInfoLib::Config.Https_Get()?Ztring(__T("s")):Ztring())+__T("://mediaarea.net/MediaInfo\">MediaInfoLib</creatingLibrary>");
+        Result+=MediaInfoLib::Config.LineSeparator_Get();
+
+        for (size_t FilePos=0; FilePos<Info.size(); FilePos++)
+            Result+=Info[FilePos]->Inform();
+
+        if (!Result.empty() && Result[Result.size()-1]!=__T('\r') && Result[Result.size()-1]!=__T('\n'))
+            Result+=MediaInfoLib::Config.LineSeparator_Get();
+        Result+=__T("</MediaTimecode");
+        Result+=__T(">")+MediaInfoLib::Config.LineSeparator_Get();
     }
 
     else if (MediaInfoLib::Config.Inform_Get()==__T("XML") || MediaInfoLib::Config.Inform_Get()==__T("MIXML"))

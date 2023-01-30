@@ -16,7 +16,8 @@ public:
 
 Q_SIGNALS:
     void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
-                    const QStringList &metadataval, const QString &format, int duration);
+                    const QStringList &valuesDual, const QStringList &metadataval,
+                    const QString &format, int duration);
     void workRequested();
     void finished();
 

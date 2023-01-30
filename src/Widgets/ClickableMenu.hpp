@@ -15,12 +15,10 @@ public:
 protected:
 	void mouseReleaseEvent(QMouseEvent *event) override;
     void showEvent(QShowEvent *event) override;
-    void closeEvent(QCloseEvent *event) override;
 
 private:
     QGraphicsOpacityEffect *effect{};
     QPropertyAnimation *animation{};
-    bool onclose{false};
 };
 
 #endif // OMPLAYER_CLICKABLEMENU_HPP

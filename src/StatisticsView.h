@@ -40,7 +40,8 @@ Q_SIGNALS:
 private Q_SLOTS:
     void setMd5(const QString &md5);
     void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
-                       const QStringList &metadataval, const QString &format, int duration);
+                       const QStringList &valuesDual, const QStringList &metadataval,
+                       const QString &format, int duration);
 
 private:
     enum TypeSize{NormalSize = 0, InitialSize = 1, HeaderSize = 2};
@@ -56,8 +57,8 @@ private:
 private:
     Button *closebtn{};
     Label *ratio{}, *screen{};
-    TreeView *view1{}, *view2{}, *view3{}, *view4{};
-    QList<QTreeWidgetItem*> baseItems{}, videoItems{}, audioItems{}, metadata{};
+    TreeView *view1{}, *view2{}, *view3{}, *view4{}, *view5{};
+    QList<QTreeWidgetItem*> baseItems{}, videoItems{}, audioItems{}, audioDual{}, metadata{};
     QtAV::Statistics statistics{}, currentStatistics{};
     QTabWidget *tab{};
     QString vuleft{}, vuright{}, url{};

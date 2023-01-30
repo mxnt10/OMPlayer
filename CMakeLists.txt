@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer VERSION 2023.01.28)
+project(OMPlayer VERSION 2023.01.29)
+set(MI_VER 0.2212.0)
+set(ZEN_VER 0.4.40)
 
 
 # Para adicionar módulos extras
@@ -156,14 +158,24 @@ endif ()
 # Instalando o programa
 ########################################################################################################################
 
-install(TARGETS OMPlayer mediainfo DESTINATION share/${PROJECT_NAME})
+install(TARGETS OMPlayer DESTINATION share/${PROJECT_NAME})
 
-set(ZEN_LIBS
-        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0
-        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.0.4.39
+set(LIBS
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/libmediainfo.so.${MI_VER}
+        ${PROJECT_SOURCE_DIR}/common/MediaInfoLib/Source/MediaInfoDLL/ZenLib/libzen.so.${ZEN_VER}
 )
 
-install(FILES ${ZEN_LIBS} DESTINATION share/${PROJECT_NAME})
+install(FILES ${LIBS} DESTINATION share/${PROJECT_NAME})
+
+install(CODE "file(RENAME
+        \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/OMPlayer/libmediainfo.so.${MI_VER}
+        \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/OMPlayer/libmediainfo.so.0)"
+)
+
+install(CODE "file(RENAME
+        \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/OMPlayer/libzen.so.${ZEN_VER}
+        \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/share/OMPlayer/libzen.so.0)"
+)
 
 file(GLOB TRANSLATION ${PROJECT_SOURCE_DIR}/i18n/*.qm)
 install(FILES ${TRANSLATION} DESTINATION share/${PROJECT_NAME}/i18n)
@@ -183,4 +195,8 @@ install(FILES appdata/OMPlayer.png DESTINATION share/pixmaps)
 install(DIRECTORY icons qss DESTINATION share/${PROJECT_NAME})
 
 install(CODE "file(MAKE_DIRECTORY \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin)")
-install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E create_symlink ../share/OMPlayer/run \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/OMPlayer)")
+install(CODE "execute_process(COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ../share/OMPlayer/run
+        \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/bin/OMPlayer)"
+)

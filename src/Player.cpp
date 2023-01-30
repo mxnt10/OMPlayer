@@ -1,6 +1,3 @@
-#include <QGraphicsProxyWidget>
-#include <QGraphicsScene>
-#include <QGraphicsView>
 #include <QMenu>
 #include <QPropertyAnimation>
 #include <QRandomGenerator>
@@ -231,13 +228,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     setRenderer(JsonTools::stringJson("renderer"));
     stack->setCurrentIndex(0);
 
-    auto *scene = new QGraphicsScene(this);
-    auto graphicsView = new QGraphicsView();
-    QGraphicsProxyWidget *w = scene->addWidget(logo);
-    w->setRotation(180);
-    graphicsView->setScene(scene);
-    graphicsView->setStyleSheet("background-color: transparent;"
-                                "border: 0;");
 
     /** Layout principal para os widgets */
     auto layout = new QHBoxLayout();
@@ -787,7 +777,10 @@ void OMPlayer::enterFullScreen() {
 
     if (this->isMaximized()) maximize = true; /** Mapear interface maximizada */
     this->showFullScreen();
-    fadeWctl(Hide);
+
+    /** As vezes o fade nesse caso zica legal, melhor fechar direto */
+    wctl->close();
+
     filter->setMove(false);
     enterpos = false;
 }
@@ -801,7 +794,8 @@ void OMPlayer::leaveFullScreen() {
     /** Precisa caso a interface já estava maximizada antes. Note que showMaximized() só funciona após a execução
      * de showNormal(), a tela não pula direto de fulscreen para maximizado. */
     if (maximize) this->showMaximized();
-    fadeWctl(Hide);
+
+    wctl->close(); /** a zica legal */
     filter->setMove(false);
     enterpos = maximize = false;
 }

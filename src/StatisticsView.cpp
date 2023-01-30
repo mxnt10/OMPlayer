@@ -38,6 +38,7 @@ StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
     initItems(&baseItems, getBaseInfoKeys());
     initItems(&videoItems, getVideoInfoKeys());
     initItems(&audioItems, getAudioInfoKeys());
+    initItems(&audioDual, getAudioInfoKeys());
     initItems(&metadata, getMetaDataKeys());
 
 
@@ -45,7 +46,8 @@ StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
     view1 = new TreeView(baseItems);
     view2 = new TreeView(videoItems);
     view3 = new TreeView(audioItems);
-    view4 = new TreeView(metadata);
+    view4 = new TreeView(audioDual);
+    view5 = new TreeView(metadata);
 
 
     /** Botão para fechar a janela */
@@ -63,9 +65,12 @@ StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
     auto *infoaudio = new QWidget();
     auto *audio = new QVBoxLayout(infoaudio);
     audio->addWidget(view3);
+    auto *infoaudio2 = new QWidget();
+    auto *audio2 = new QVBoxLayout(infoaudio2);
+    audio2->addWidget(view4);
     auto *metadataw = new QWidget();
     auto *mdata = new QVBoxLayout(metadataw);
-    mdata->addWidget(view4);
+    mdata->addWidget(view5);
 
 
     /** Organização por abas */
@@ -73,9 +78,10 @@ StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
     tab->addTab(infogeral, tr("General"));
     tab->addTab(infovideo, tr("Video"));
     tab->addTab(infoaudio, tr("Audio"));
+    tab->addTab(infoaudio2, tr("Audio") + " #2");
     tab->addTab(metadataw, tr("MedaData"));
     tab->setStyleSheet(Utils::setStyle("tab"));
-    for (int i = 1; i < 4; i++) tab->setTabVisible(i, false);
+    for (int i = 1; i < 5; i++) tab->setTabVisible(i, false);
 
 
     /** Ícones que servirão de tag info */
@@ -192,12 +198,13 @@ QStringList StatisticsView::getMetaDataKeys() {
 
 /** Setando as informações de mídia */
 void StatisticsView::setItemValues(const QStringList &values, const QStringList &valuesVideo,
-                                   const QStringList &valuesAudio, const QStringList &metadataval,
+                                   const QStringList &valuesAudio, const QStringList &valuesDual,
+                                   const QStringList &metadataval,
                                    const QString &format, int duration) {
     Q_EMIT emitFormat(format, duration);
 
-    QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, metadata};
-    QList<QStringList> v{values, valuesVideo, valuesAudio, metadataval};
+    QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, audioDual, metadata};
+    QList<QStringList> v{values, valuesVideo, valuesAudio, valuesDual, metadataval};
     int j = 0;
     foreach(QList<QTreeWidgetItem*> list, item) {
         int i = 0;
@@ -221,8 +228,12 @@ void StatisticsView::setItemValues(const QStringList &values, const QStringList 
 
 /** Resetando as informações de estatísticas */
 void StatisticsView::resetValues() {
-    foreach(QTreeWidgetItem* it, baseItems) it->setData(1, Qt::DisplayRole, "");
-    for (int i = 1; i < 4; i++) tab->setTabVisible(i, false);
+    if (this->isVisible()) return;
+
+    QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, audioDual, metadata};
+    foreach(QList<QTreeWidgetItem*> list, item)
+    foreach(QTreeWidgetItem* it, list) it->setData(1, Qt::DisplayRole, "");
+    for (int i = 1; i < 5; i++) tab->setTabVisible(i, false);
 
     statistics = QtAV::Statistics();
     ratio->setVisible(false);
@@ -247,7 +258,7 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
 
-    qDebug() << s.metadata.keys();
+//    qDebug() << s.metadata.keys();
 
     /** Redefinindo informações */
     resetValues();
@@ -281,39 +292,27 @@ void StatisticsView::setCurrentTime(int current) {
 
 /** Verificar o que precisa ser oculto */
 void StatisticsView::visibility(){
+    QList<TreeView*> view{view2, view3, view4, view5};
+    QList<QList<QTreeWidgetItem*>> item{videoItems, audioItems, audioDual, metadata};
+
     /** Redefinindo visualização */
-    for (int i = 0; i < 4; i++) tab->setTabVisible(i, false);
-    for (int i = 0; i < 4; i++) tab->setTabVisible(i, true);
-    QList<TreeView*> view{view2, view3, view4};
+    for (int i = 0; i < 5; i++) tab->setTabVisible(i, false);
+    for (int i = 0; i < 5; i++) tab->setTabVisible(i, true);
     foreach(TreeView *t, view) for (int i = 0; i < t->topLevelItemCount(); ++i) t->topLevelItem(i)->setHidden(false);
 
     /** Verificando status de vídeo, áudio e metadata que precisam ser ocultos */
-    bool visibility{false};
-    int j = 0;
-    foreach(QTreeWidgetItem* it, videoItems) {
-        if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view2->topLevelItem(j)->setHidden(true);
-        else visibility = true;
+    int j = 1;
+    foreach(QList<QTreeWidgetItem*> list, item) {
+        bool visibility{false};
+        int i = 0;
+        foreach(QTreeWidgetItem* it, list) {
+            if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view[j - 1]->topLevelItem(i)->setHidden(true);
+            else visibility = true;
+            i++;
+        }
+        if (!visibility) tab->setTabVisible(j, false);
         j++;
     }
-    if (!visibility) tab->setTabVisible(1, false);
-
-    visibility = false;
-    j = 0;
-    foreach(QTreeWidgetItem* it, audioItems) {
-        if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view3->topLevelItem(j)->setHidden(true);
-        else visibility = true;
-        j++;
-    }
-    if (!visibility) tab->setTabVisible(2, false);
-
-    visibility = false;
-    j = 0;
-    foreach(QTreeWidgetItem* it, metadata) {
-        if (it->data(1, Qt::DisplayRole).toString().isEmpty()) view4->topLevelItem(j)->setHidden(true);
-        else visibility = true;
-        j++;
-    }
-    if (!visibility) tab->setTabVisible(3, false);
 }
 
 
@@ -408,8 +407,8 @@ void StatisticsView::setSize(TypeSize size) {
         this->setMinimumSize(width, height);
         this->resize(width, height);
     } else {
-        QList<TreeView *> view = {view1, view2, view3, view4};
-        QList<QList<QTreeWidgetItem *>> item{baseItems, videoItems, audioItems, metadata};
+        QList<TreeView *> view = {view1, view2, view3, view4, view5};
+        QList<QList<QTreeWidgetItem *>> item{baseItems, videoItems, audioItems, audioDual, metadata};
         foreach(TreeView *it, view) it->header()->setStretchLastSection(false);
 
         /** Cálculo do comprimento */

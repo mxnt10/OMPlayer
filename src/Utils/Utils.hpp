@@ -8,7 +8,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 
-#define VERSION "2023.01.28"
+#define VERSION "2023.01.29"
 #define STR qUtf8Printable
 #define FADE_VAL 200
 

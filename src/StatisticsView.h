@@ -25,8 +25,8 @@ public:
     void resetValues();
 
 public Q_SLOTS:
-    void setRightDB(int value);
-    void setLeftDB(int value);
+    void setRightDB(float value);
+    void setLeftDB(float value);
 
 protected:
     void hideEvent(QHideEvent *event) override;

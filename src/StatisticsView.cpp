@@ -459,18 +459,18 @@ void StatisticsView::changeIcons() {
 
 
 /** Setando informações do dB direito */
-void StatisticsView::setRightDB(int value) {
+void StatisticsView::setRightDB(float value) {
     if (statistics.url.isEmpty()) return;
-    vuright = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
+    vuright = QString::number(value);
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
 }
 
 
 /** Setando informações do dB esquerdo */
-void StatisticsView::setLeftDB(int value) {
+void StatisticsView::setLeftDB(float value) {
     if (statistics.url.isEmpty()) return;
-    vuleft = QStringLiteral("%1").arg(value * (-1), 2, 10, QLatin1Char('0'));
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( -%1 dB ) ( -%2 dB )").arg(vuleft, vuright));
+    vuleft = QString::number(value);
+    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
 }
 
 

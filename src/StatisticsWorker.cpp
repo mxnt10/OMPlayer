@@ -37,24 +37,25 @@ void StatisticsWorker::doWork() {
 
     auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
     int duration = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Duration"))).toInt();
+    auto bitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("OverallBitRate")));
+
+    if (QString::compare(format, "MPEG Audio") == 0) {
+        auto profile = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("Format_Profile")));
+        if (QString::compare(profile, "Layer 3") == 0) format = "MP3";
+        else if (QString::compare(profile, "Layer 2") == 0) format = "MP2";
+    }
+
+//    qDebug() << format << statistics.format;
+//    cout << QString::fromStdWString(MI.Inform()).toStdString();
 
     values << QString(file).remove(QRegExp("\\/(?:.(?!\\/))+$"))
            << QString(file).remove(QRegExp("\\/.+\\/"))
-           << convertByte((float)mfile.size());
+           << convertByte((float)mfile.size())
+           << setFormat(format)
+           << convertBit(bitrate.toFloat())
+           << QTime(0, 0, 0).addMSecs(duration).toString(QString::fromLatin1("HH:mm:ss"));
 
     if (statistics.url.isEmpty()) {
-        /** Usando MediaInfoDLL para buscar as informações */
-        auto bitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("OverallBitRate")));
-
-        values << setFormat(format)
-               << convertBit(bitrate.toFloat())
-               << QTime(0, 0, 0).addMSecs(duration).toString(QString::fromLatin1("HH:mm:ss"));
-
-        auto videoID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("ID")));
-        auto audioID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("ID")));
-        auto dualID = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 1, __T("ID")));
-        QStringList opID{audioID, dualID};
-
         /** Informações de vídeo */
         if (!videoID.isEmpty()) {
             int w = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Width"))).toInt();
@@ -125,16 +126,6 @@ void StatisticsWorker::doWork() {
         auto sizev = QString::fromLatin1("%1x%2").arg(w).arg(h);
         auto sizec = QString::fromLatin1("%1x%2").arg(cw).arg(ch);
         auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("FrameRate")));
-
-        /** Informações básicas */
-        if (QString::compare(statistics.format.split(' ')[0], "mp3") == 0) values << "mp3 - MP3 (MPEG Audio Layer 3)";
-        else if (QString::compare(statistics.format.split(' ')[2], "QuickTime") == 0 ||
-                 QString::compare(statistics.format.split(' ')[2], "Matroska" ) == 0 ) {
-            values << setFormat(format);
-        } else values << statistics.format;
-
-        values << convertBit(statistics.bit_rate)
-               << "00:00:00 / " + statistics.duration.toString(QString::fromLatin1("HH:mm:ss"));
 
         /** Informações de vídeo */
         if (statistics.video.available) {

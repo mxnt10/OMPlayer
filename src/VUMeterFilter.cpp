@@ -2,7 +2,7 @@
 #include <QtAV/AudioFrame.h>
 #include <cmath>
 
-#include "VUMeterFilter.h"
+#include "VUMeterFilter.hpp"
 
 
 /**********************************************************************************************************************/
@@ -32,7 +32,7 @@ void VUMeterFilter::process(Statistics *statistics, AudioFrame *frame) {
 
     /** Coletando os dados com base no formato dos frames */
     if (af.isFloat()) {
-        float max[2] = {0, 0};
+        float max[2] = {-9999, -9999};
         const float *p0 = (float*)data[0];
         const float *p1 = (float*)data[1];
 
@@ -51,7 +51,7 @@ void VUMeterFilter::process(Statistics *statistics, AudioFrame *frame) {
         const int b = af.sampleSize();
 
         if (b == 2) {
-            qint16 max[2] = {0, 0};
+            qint16 max[2] = {-9999, -9999};
             const qint16 *p0 = (qint16*)data[0];
             const qint16 *p1 = (qint16*)data[1];
 
@@ -69,14 +69,14 @@ void VUMeterFilter::process(Statistics *statistics, AudioFrame *frame) {
     }
 
     /** Emitindo vu Esquerdo */
-    if (!qFuzzyCompare(level[0], (float)left)) {
-        left = (int)level[0];
+    if (!qFuzzyCompare(level[0], left)) {
+        left = level[0];
         Q_EMIT leftLevelChanged(left);
     }
 
     /** Emitindo vu direito */
-    if (!qFuzzyCompare(level[1], (float)right)) {
-        right = (int)level[1];
+    if (!qFuzzyCompare(level[1], right)) {
+        right = level[1];
         Q_EMIT rightLevelChanged(right);
     }
 }

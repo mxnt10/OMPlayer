@@ -6,7 +6,7 @@
 #include <Frame>
 #include <Utils>
 
-#include "VUMeterFilter.h"
+#include "VUMeterFilter.hpp"
 #include "Player.h"
 
 #define ClickableMenu(x) ClickableMenu(x + "\t\t")

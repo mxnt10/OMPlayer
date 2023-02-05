@@ -31,8 +31,10 @@ void StatisticsWorker::doWork() {
     QStringList infos{"title", "artist", "album", "genre", "track", "date", "purl"};
     QStringList values, valuesVideo, valuesAudio, valuesDual, metadata;
     QList<QStringList> listAudio{valuesAudio, valuesDual};
+
     QFileInfo mfile{file};
     MI.Open(file.toStdWString());
+
     auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
     int duration = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Duration"))).toInt();
 
@@ -241,6 +243,9 @@ QString StatisticsWorker::setFormat(const QString &format) {
         case "Matroska"_hash: return "mkv - Matroska (Matroska Video)";
         case "WebM"_hash:     return "webm - WebM (Web Media)";
         case "DV"_hash:       return "dv - DV (Digital Video)";
+        case "MP3"_hash:      return "mp3 - MP3 (MPEG Audio Layer 3)";
+        case "MP2"_hash:      return "mp2 - MP2 (MPEG Audio Layer 2)";
+        case "Wave"_hash:     return "wav - WAV / WAVE (Waveform Audio)";
         default:              return format;
     }
 }
@@ -248,6 +253,8 @@ QString StatisticsWorker::setFormat(const QString &format) {
 
 /** Definindo o tamanho do arquivo de mídia */
 QString StatisticsWorker::convertByte(auto byte) {
+    if (byte == 0) return {};
+
     int i = 0;
     auto size = byte;
     QString bytes{"B"};
@@ -343,4 +350,5 @@ QString StatisticsWorker::convertHz(auto hz) {
 
     return QString::number(hert) + " " + herts;
 }
+
 #undef DG_T

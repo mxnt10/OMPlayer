@@ -1178,7 +1178,6 @@ void OMPlayer::changeAudioTrack(QAction *action){
 void OMPlayer::updateSlider(qint64 value) {
     if (mediaPlayer->isSeekable()) slider->setValue(int(value / unit));
     current->setText(QTime(0, 0, 0).addMSecs(int(value)).toString(QString::fromLatin1("HH:mm:ss")));
-    infoview->setCurrentTime(int(value));
 }
 
 

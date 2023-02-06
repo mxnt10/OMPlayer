@@ -30,8 +30,6 @@ public Q_SLOTS:
 
 protected:
     void hideEvent(QHideEvent *event) override;
-    void showEvent(QShowEvent *event) override;
-    void timerEvent(QTimerEvent *event) override;
 
 Q_SIGNALS:
     void emitFormat(const QString &format, int duration);
@@ -44,7 +42,7 @@ private Q_SLOTS:
                        const QString &format, int duration);
 
 private:
-    enum TypeSize{NormalSize = 0, InitialSize = 1, HeaderSize = 2};
+    enum TypeSize{ NormalSize = 0, InitialSize = 1, HeaderSize = 2 };
     void visibility();
     void settaginfos();
     void setSize(TypeSize size);

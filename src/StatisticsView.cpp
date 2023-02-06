@@ -1,4 +1,3 @@
-#include <QCloseEvent>
 #include <QHeaderView>
 #include <QLayout>
 #include <QScreen>
@@ -489,31 +488,6 @@ void StatisticsView::setFile(const QString &file) {
 
 /** Evento para finalizar o temporizador */
 void StatisticsView::hideEvent(QHideEvent *event) {
-    killTimer(timer);
     resetValues();
     QDialog::hideEvent(event);
-}
-
-
-/** Evento para iniciar o temporizador */
-void StatisticsView::showEvent(QShowEvent *event) {
-    timer = startTimer(1000);
-    Dialog::showEvent(event);
-}
-
-
-/** Evento de temporização */
-void StatisticsView::timerEvent(QTimerEvent *event) {
-    if (event->timerId() != timer || statistics.url.isEmpty()) return;
-
-    if (QString::compare(currentStatistics.url, url) != 0) {
-        videoItems[6]->setData(1, Qt::DisplayRole, QString::number(statistics.video.frame_rate, 'f', 2));
-        killTimer(timer);
-        return;
-    }
-
-    if (statistics.video.frame_rate != 0)
-        videoItems[6]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
-                QString::number(statistics.video.frame_rate, 'f', 2),
-                QString::number(statistics.video_only.currentDisplayFPS(),'f', 2)));
 }

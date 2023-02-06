@@ -19,7 +19,6 @@ public:
     ~StatisticsView() override;
     void setStatistics(const QtAV::Statistics &s = QtAV::Statistics());
     void setCurrentStatistics(const QtAV::Statistics &s) { currentStatistics = s; };
-    void setCurrentTime(int current);
     void setFile(const QString &file);
     void changeIcons();
     void resetValues();
@@ -39,7 +38,7 @@ private Q_SLOTS:
     void setMd5(const QString &md5);
     void setItemValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
                        const QStringList &valuesDual, const QStringList &metadataval,
-                       const QString &format, int duration);
+                       const QString &format, int duration, const QStringList &rat);
 
 private:
     enum TypeSize{ NormalSize = 0, InitialSize = 1, HeaderSize = 2 };
@@ -60,7 +59,7 @@ private:
     QtAV::Statistics statistics{}, currentStatistics{};
     QTabWidget *tab{};
     QString vuleft{}, vuright{}, url{};
-    int timer{0};
+    QStringList saveratio{};
 
     QList<int> fuhdw{7680, 8192, 10080}; //8k with
     QList<int> fuhdh{5120, 4320};        //8k heith

@@ -17,7 +17,7 @@ public:
 Q_SIGNALS:
     void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
                     const QStringList &valuesDual, const QStringList &metadataval,
-                    const QString &format, int duration);
+                    const QString &format, int duration, const QStringList &rat);
     void workRequested();
     void finished();
 
@@ -28,10 +28,10 @@ private:
     static QString setFormat(const QString &format);
     static QString convertByte(auto byte);
     static QString convertBit(auto bit);
-    static QString convertAspectRatio(int x, int y);
+    QString convertAspectRatio(int x, int y);
     static QString convertHz(auto hz);
 
-    QString file{};
+    QString file{}, rat{};
     QtAV::Statistics statistics{};
     MediaInfoDLL::MediaInfo MI{};
 };

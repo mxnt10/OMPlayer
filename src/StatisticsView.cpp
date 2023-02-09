@@ -155,31 +155,27 @@ QStringList StatisticsView::getBaseInfoKeys() {
 
 /** Especificações para informações de vídeo */
 QStringList StatisticsView::getVideoInfoKeys() {
-    return { tr("Codec"),        // 0
-             tr("Decoder"),       // 1
-             tr("Bit Rate"),       // 2
-             tr("Aspect Ratio"),    // 3
-             tr("Size"),             // 4
-             tr("Frames"),            // 5
-             tr("Frame Rate"),         // 6
-             tr("Bit Depth"),           // 7
-             tr("Chroma Subsampling") }; // 8
+    return { tr("Format"),        // 0
+             tr("Codec ID"),       // 1
+             tr("Bit Rate"),        // 2
+             tr("Aspect Ratio"),     // 3
+             tr("Size"),              // 4
+             tr("Frame Rate"),         // 5
+             tr("Bit Depth"),           // 6
+             tr("Chroma Subsampling") }; // 7
 }
 
 
 /** Especificações para informações de áudio */
 QStringList StatisticsView::getAudioInfoKeys() {
-    return { tr("Codec"),      // 0
-             tr("Decoder"),     // 1
-             tr("Bit Rate"),     // 2
+    return { tr("Format"),      // 0
+             tr("Codec ID"),     // 1
+             tr("Bit Rate"),      // 2
              tr("Sample Rate"),   // 3
-             tr("Sample Format"), // 4
-             tr("Channels"),      // 5
-             tr("Frames"),        // 6
-             tr("Frame Size"),    // 7
-             tr("Frame Rate"),    // 8
-             tr("Bit Depth"),     // 9
-             tr("VU Meter") };    // 10
+             tr("Channels"),      // 4
+             tr("Frame Rate"),    // 5
+             tr("Bit Depth"),     // 6
+             tr("VU Meter") };    // 7
 }
 
 
@@ -198,9 +194,10 @@ QStringList StatisticsView::getMetaDataKeys() {
 /** Setando as informações de mídia */
 void StatisticsView::setItemValues(const QStringList &values, const QStringList &valuesVideo,
                                    const QStringList &valuesAudio, const QStringList &valuesDual,
-                                   const QStringList &metadataval,
-                                   const QString &format, int duration) {
+                                   const QStringList &metadataval, const QString &format, int duration,
+                                   const QStringList &rat) {
     Q_EMIT emitFormat(format, duration);
+    saveratio = rat;
 
     QList<QList<QTreeWidgetItem*>> item{baseItems, videoItems, audioItems, audioDual, metadata};
     QList<QStringList> v{values, valuesVideo, valuesAudio, valuesDual, metadataval};
@@ -257,8 +254,6 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     qDebug("%s(%sStatisticsView%s)%s::%sAtualizando informações para %s ...\033[0m", GRE, RED, GRE, RED, UPD,
            STR(QString(s.url).remove(QRegExp("\\/.+\\/"))));
 
-//    qDebug() << s.metadata.keys();
-
     /** Redefinindo informações */
     resetValues();
     if (!s.url.isEmpty()) {
@@ -270,22 +265,6 @@ void StatisticsView::setStatistics(const QtAV::Statistics& s) {
     if (thread2->isRunning()) thread2->quit();
     statisticsworker->setFile(url, s);
     statisticsworker->requestWork();
-}
-
-
-/** Função para setar a duração atual da mídia reproduzida */
-void StatisticsView::setCurrentTime(int current) {
-    if (baseItems[0]->data(1, Qt::DisplayRole).toString().isEmpty() || statistics.url.isEmpty()) return;
-
-    /** Resetando tempo de execução ao reproduzir a próxima mídia */
-    if (QString::compare(currentStatistics.url, url) != 0) {
-        baseItems[5]->setData(1, Qt::DisplayRole, statistics.duration.toString(QString::fromLatin1("HH:mm:ss")));
-        return;
-    }
-
-    baseItems[5]->setData(1, Qt::DisplayRole, QString::fromLatin1("%1 / %2").arg(
-            QTime(0, 0, 0).addMSecs(current).toString(QString::fromLatin1("HH:mm:ss")),
-            statistics.duration.toString(QString::fromLatin1("HH:mm:ss"))));
 }
 
 
@@ -353,16 +332,13 @@ void StatisticsView::settaginfos() {
     ratio->setVisible(true);
     screen->setVisible(false);
 
-    if (videoItems[3]->data(1, Qt::DisplayRole).toString().split(' ')[0] == "16:9")
-        Utils::changeIcon(ratio, "ratio169");
-    else if (videoItems[3]->data(1, Qt::DisplayRole).toString().split(' ')[0] == "4:3")
-        Utils::changeIcon(ratio, "ratio43");
+    if (saveratio[0] == "16:9") Utils::changeIcon(ratio, "ratio169");
+    else if (saveratio[0] == "4:3") Utils::changeIcon(ratio, "ratio43");
     else ratio->setVisible(false);
 
-    QStringList size = videoItems[4]->data(1, Qt::DisplayRole).toString().split(' ')[0].split('x');
-    if (size[0].toInt() == 0) return;
-    int w = size[0].toInt();
-    int h = size[1].toInt();
+    if (saveratio[1].toInt() == 0 || saveratio[2].toInt() == 0) return;
+    int w = saveratio[1].toInt();
+    int h = saveratio[2].toInt();
 
     QList<QList<int>> itw{fuhdw, uhdpw, uhdw};
     QList<QList<int>> ith{fuhdh, uhdph, uhdh};
@@ -461,7 +437,7 @@ void StatisticsView::changeIcons() {
 void StatisticsView::setRightDB(float value) {
     if (statistics.url.isEmpty()) return;
     vuright = QString::number(value);
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
+    audioItems[7]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
 }
 
 
@@ -469,7 +445,7 @@ void StatisticsView::setRightDB(float value) {
 void StatisticsView::setLeftDB(float value) {
     if (statistics.url.isEmpty()) return;
     vuleft = QString::number(value);
-    audioItems[10]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
+    audioItems[7]->setData(1, Qt::DisplayRole, QString::fromLatin1("( %1 dB ) ( %2 dB )").arg(vuleft, vuright));
 }
 
 

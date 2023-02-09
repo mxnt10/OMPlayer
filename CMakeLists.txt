@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer VERSION 2023.01.29)
+project(OMPlayer VERSION 2023.02.08)
 set(MI_VER 0.2212.0)
 set(ZEN_VER 0.4.40)
 
@@ -53,7 +53,7 @@ endif ()
 
 
 # Buscando sources do Qt5 e QtAV
-find_package(Qt5 COMPONENTS Core DBus Gui Quick Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Core DBus Gui Quick Widgets Xml REQUIRED)
 find_package(QtAV REQUIRED)
 
 
@@ -144,6 +144,7 @@ target_link_libraries(
         Qt5::Gui
         Qt5::Quick
         Qt5::Widgets
+        Qt5::Xml
         mediainfo dl
         ${QTAV} ${QTAVWIDGETS_LIBRARIES}
 )

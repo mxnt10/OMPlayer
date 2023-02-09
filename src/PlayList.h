@@ -42,9 +42,14 @@ protected:
 private:
     enum M3UFormat {M3U8 = 0, DetectFormat = 1};
     enum PLS {Show = 0, Hide = 1};
-    void load_m3u(const QString& file, M3UFormat format);
+    void load_m3u(const QString &file, M3UFormat format);
+    void loadXSPF(const QString &filename);
     void insertItemAt(const PlayListItem &item, int row);
     void fadePls(PLS option);
+
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
 
 Q_SIGNALS:
     void aboutToPlay(const QString &url);
@@ -57,6 +62,9 @@ Q_SIGNALS:
     void enterListView();
     void leaveListView();
     void nomousehide();
+
+#pragma clang diagnostic pop
+
 
 public Q_SLOTS:
     void getFiles();

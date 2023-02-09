@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QDebug>
+#include <QDomDocument>
 #include <QFile>
 #include <QLayout>
 #include <QMoveEvent>
@@ -204,8 +205,12 @@ void PlayList::addItems(const QStringList &files) {
         QString suffix = QFileInfo(file).suffix().toLower();
 
         if (!QFileInfo(file).isFile()) continue;
-        else if (suffix == "m3u8" || suffix == "m3u") {
-            load_m3u(file, DetectFormat);
+        else if (QString::compare(suffix, "m3u8", Qt::CaseInsensitive) == 0 ||
+                 QString::compare(suffix, "m3u", Qt::CaseInsensitive) == 0) {
+            load_m3u(file, PlayList::DetectFormat);
+            return;
+        } else if (QString::compare(suffix, "xspf", Qt::CaseInsensitive) == 0) {
+            loadXSPF(file);
             return;
         } else {
             insert(file, a + t - rmRows);
@@ -230,50 +235,50 @@ void PlayList::addItems(const QStringList &files) {
 }
 
 
-//void Playlist::loadXSPF(const QString & filename) {
-//    qDebug() << "Playlist::loadXSPF:" << filename;
-//
-//    QFile f(filename);
-//    if (!f.open(QIODevice::ReadOnly)) {
-//        return;
-//    }
-//
-//    QDomDocument dom_document;
-//    bool ok = dom_document.setContent(f.readAll());
-//    qDebug() << "Playlist::loadXSPF: success:" << ok;
-//    if (!ok) return;
-//
-//    QDomNode root = dom_document.documentElement();
-//    qDebug() << "Playlist::loadXSPF: tagname:" << root.toElement().tagName();
-//
-//    QDomNode child = root.firstChildElement("trackList");
-//    if (!child.isNull()) {
-//        clear();
-//
-//        qDebug() << "Playlist::loadXSPF: child:" << child.nodeName();
-//        QDomNode track = child.firstChildElement("track");
-//        while (!track.isNull()) {
-//            QString location = QUrl::fromPercentEncoding(track.firstChildElement("location").text().toLatin1());
-//            QString title = track.firstChildElement("title").text();
-//            int duration = track.firstChildElement("duration").text().toInt();
-//
-//            qDebug() << "Playlist::loadXSPF: location:" << location;
-//            qDebug() << "Playlist::loadXSPF: title:" << title;
-//            qDebug() << "Playlist::loadXSPF: duration:" << duration;
-//
-//            addItem( location, title, (double) duration / 1000 );
-//
-//            track = track.nextSiblingElement("track");
-//        }
-//
-//        //list();
-//        setPlaylistFilename(filename);
-//        setModified( false );
-//
-//        if (shuffleAct->isChecked()) shuffle(true);
-//        if (start_play_on_load) startPlay();
-//    }
-//}
+/** Função para abrir playlist no formato xspf */
+void PlayList::loadXSPF(const QString &filename) {
+    int i = 0;
+    QFile f(filename);
+    if (!f.open(QIODevice::ReadOnly)) return;
+
+    QDomDocument dom_document;
+    if (!dom_document.setContent(f.readAll())) return;
+
+    QDomNode root = dom_document.documentElement();
+    qDebug() << "Playlist::loadXSPF: tagname:" << root.toElement().tagName();
+
+    QDomNode child = root.firstChildElement("trackList");
+    if (!child.isNull()) {
+        clearItems();
+
+        qDebug() << "Playlist::loadXSPF: child:" << child.nodeName();
+        QDomNode track = child.firstChildElement("track");
+        while (!track.isNull()) {
+            QString url = QUrl::fromPercentEncoding(track.firstChildElement("location").text().toLatin1());
+            QString title = track.firstChildElement("title").text();
+            int duration = track.firstChildElement("duration").text().toInt();
+
+            qDebug() << "Playlist::loadXSPF: location:" << url;
+            qDebug() << "Playlist::loadXSPF: title:" << title;
+            qDebug() << "Playlist::loadXSPF: duration:" << duration;
+
+            QFile fi{url};
+            if (fi.exists()) {
+                insert(url, i, qint64(duration));
+                i++;
+            }
+
+            track = track.nextSiblingElement("track");
+        }
+
+        /** Verificando visibilidade de lista vazia */
+        if (setListSize() == 0) cleanlist->setVisible(true);
+        else cleanlist->setVisible(false);
+
+        save();
+        Q_EMIT firstPlay(getItems(0), 0);
+    }
+}
 
 
 /** Função para carregar uma playlist no formato m3u/m3u8 */
@@ -727,7 +732,8 @@ void PlayList::fadePls(PLS option) {
 
 /** Mapeador de eventos que está servindo para ocultar e desocultar a playlist */
 void PlayList::mouseMoveEvent(QMouseEvent *event) {
-    if (*QApplication::overrideCursor() == QCursor(Qt::SizeHorCursor)) {
+    if (resize) {
+        if (*QApplication::overrideCursor() != QCursor(Qt::SizeHorCursor)) resizeMouse();
         int subsize = startpos - event->x();
         int size = startsize + subsize;
         if (size >= 300 && size < 876 && resize) {

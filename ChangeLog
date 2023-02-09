@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Release 2023.01.29 ] ################################################
+## [ Release 2023.02.08 ] ################################################
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
@@ -14,6 +14,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Adicionado scripts new_version e newchangelog em common.
  - Adicionado checkbox.qss em qss.
  - InfoView com suporte dual áudio.
+ - Adicionado suporte a playlist xspf.
 ###
 
 ### Upgraded / Atualizado
@@ -35,6 +36,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Refatoração de código nos diálogos.
  - Pequenos ajustes em geral.
  - Ajustes no CMakeLists.
+ - Modificações das informações de mídia com base no libmediainfo.
 ###
 
 ### Removed / Removido
@@ -54,6 +56,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Correções e refatoração no código de infoview.
  - Corrigido pequenos bugs no fullscreen.
  - Correções nos efeitos do menu de contexto.
+ - Correções na verificação do sufixo das playlists m3u/m3u8.
+ - Corrigido problemas com o redirecionamento da playlist.
 ###
 
 ##########################################################################

@@ -20,8 +20,15 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void closeEvent(QCloseEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void emitclose();
+
+#pragma clang diagnostic pop
+
 
 private:
     QGraphicsOpacityEffect *effect{};

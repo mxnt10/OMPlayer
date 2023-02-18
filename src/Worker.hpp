@@ -12,10 +12,17 @@ public:
     void requestWork() { Q_EMIT workRequested(); };
     void setFile(const QString &val) { file = val; };
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void workRequested();
     void valueMD5(const QString &value);
     void finished();
+
+#pragma clang diagnostic pop
+
 
 public Q_SLOTS:
     void doWork();

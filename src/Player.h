@@ -21,7 +21,7 @@
 #include "EventFilter.hpp"
 #include "PlayList.h"
 #include "Settings.hpp"
-#include "StatisticsView.h"
+#include "StatisticsView.hpp"
 
 class OMPlayer : public QWidget {
 Q_OBJECT

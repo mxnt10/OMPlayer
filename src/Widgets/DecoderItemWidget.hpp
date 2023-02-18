@@ -22,8 +22,15 @@ public:
     void setName(const QString& name) { check->setText(name); }
     void setDescription(const QString& des) { check->setText(check->text() + " - " + des); }
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void enableChanged();
+
+#pragma clang diagnostic pop
+
 
 private Q_SLOTS:
     void checkPressed();

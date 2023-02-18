@@ -28,13 +28,20 @@ public:
 private:
     static QString changeIconsStyle();
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
-    void emitclose();
+    void onclose();
     void emitvalue(const QString &value);
     void changethemeicon();
 
+#pragma clang diagnostic pop
+
+
 private Q_SLOTS:
-    void rendererSelect(Render &value);
+    void rendererSelect(Settings::Render &value);
     void setIcon(const QString &index);
 
 private:

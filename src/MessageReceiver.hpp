@@ -12,8 +12,15 @@ public:
 public slots:
     void receivedMessage(int instanceId, const QByteArray& message);
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void parms(const QStringList &lst);
+
+#pragma clang diagnostic pop
+
 };
 
 #endif //OMPLAYER_MESSAGERECEIVER_HPP

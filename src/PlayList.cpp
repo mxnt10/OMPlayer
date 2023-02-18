@@ -200,8 +200,7 @@ void PlayList::addItems(const QStringList &files) {
     int t = model->rowCount(QModelIndex());
     rmRows = 0;
 
-    for (int i = 0; i < files.size(); ++i) {
-        const QString &file = files.at(i);
+    for (const auto &file : files) {
         QString suffix = QFileInfo(file).suffix().toLower();
 
         if (!QFileInfo(file).isFile()) continue;
@@ -245,25 +244,18 @@ void PlayList::loadXSPF(const QString &filename) {
     if (!dom_document.setContent(f.readAll())) return;
 
     QDomNode root = dom_document.documentElement();
-    qDebug() << "Playlist::loadXSPF: tagname:" << root.toElement().tagName();
-
     QDomNode child = root.firstChildElement("trackList");
+
     if (!child.isNull()) {
         clearItems();
 
-        qDebug() << "Playlist::loadXSPF: child:" << child.nodeName();
         QDomNode track = child.firstChildElement("track");
         while (!track.isNull()) {
-            QString url = QUrl::fromPercentEncoding(track.firstChildElement("location").text().toLatin1());
-            QString title = track.firstChildElement("title").text();
+            QString url = QUrl::fromPercentEncoding(
+                    track.firstChildElement("location").text().toLatin1()).remove("file://");
             int duration = track.firstChildElement("duration").text().toInt();
 
-            qDebug() << "Playlist::loadXSPF: location:" << url;
-            qDebug() << "Playlist::loadXSPF: title:" << title;
-            qDebug() << "Playlist::loadXSPF: duration:" << duration;
-
-            QFile fi{url};
-            if (fi.exists()) {
+            if (QFileInfo::exists(url)) {
                 insert(url, i, qint64(duration));
                 i++;
             }

@@ -11,9 +11,16 @@ Q_OBJECT
 public:
     explicit VUMeterFilter(QObject* parent = nullptr);
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void leftLevelChanged(float value);
     void rightLevelChanged(float value);
+
+#pragma clang diagnostic pop
+
 
 protected:
     void process(Statistics* statistics, AudioFrame* frame) override;

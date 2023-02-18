@@ -13,7 +13,7 @@
 /** Construtor que define a interface */
 About::About(QWidget *parent) : Dialog(parent) {
     setMaximumSize(0, 0);
-    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT onclose(); });
 
 
     /** Nome do programa e descrição e ícone */

@@ -53,10 +53,10 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     screensaver = new ScreenSaver(this);
     connect(sett, &Settings::changethemeicon, [this](){ changeIcons(); });
     connect(sett, &Settings::emitvalue, this, &OMPlayer::setRenderer);
-    connect(sett, &Settings::emitclose, this, &OMPlayer::closeDialog);
-    connect(infoview, &StatisticsView::emitclose, this, &OMPlayer::closeDialog);
+    connect(sett, &Settings::onclose, this, &OMPlayer::closeDialog);
+    connect(infoview, &StatisticsView::onclose, this, &OMPlayer::closeDialog);
     connect(infoview, &StatisticsView::emitFormat, this, &OMPlayer::changePlaylist);
-    connect(about, &About::emitclose, this, &OMPlayer::closeDialog);
+    connect(about, &About::onclose, this, &OMPlayer::closeDialog);
 
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */

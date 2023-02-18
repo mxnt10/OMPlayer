@@ -1,5 +1,5 @@
-#ifndef OMPLAYER_STATISTICSVIEW_H
-#define OMPLAYER_STATISTICSVIEW_H
+#ifndef OMPLAYER_STATISTICSVIEW_HPP
+#define OMPLAYER_STATISTICSVIEW_HPP
 
 #include <QThread>
 #include <QtAV/Statistics.h>
@@ -30,9 +30,16 @@ public Q_SLOTS:
 protected:
     void hideEvent(QHideEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void emitFormat(const QString &format, int duration);
-    void emitclose();
+    void onclose();
+
+#pragma clang diagnostic pop
+
 
 private Q_SLOTS:
     void setMd5(const QString &md5);
@@ -73,4 +80,4 @@ private:
     StatisticsWorker *statisticsworker;
 };
 
-#endif //OMPLAYER_STATISTICSVIEW_H
+#endif //OMPLAYER_STATISTICSVIEW_HPP

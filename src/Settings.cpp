@@ -15,7 +15,7 @@ using namespace QtAV;
 /** Classe principal das configurações */
 Settings::Settings(QWidget *parent) : Dialog(parent) {
     setFixedWidth(400);
-    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT onclose(); });
     decoder = new Decoder(this);
 
 

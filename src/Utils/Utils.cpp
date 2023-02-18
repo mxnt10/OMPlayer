@@ -261,13 +261,13 @@ QString Utils::scanXDGData() {
     if (env.isEmpty()) return {};
 
     QStringList splitt = env.split(':');
-    for (int i = 0; i < splitt.size(); i ++) {
-        QDir dir(splitt[i] + "/usr/share/OMPlayer");
+    for (const auto &i : splitt) {
+        QDir dir(i + "/usr/share/OMPlayer");
         if (dir.exists()) {
             qDebug("%s(%sUtils%s)%s::%sUsando XDG_DATA_DIRS: %s%s ...\033[0m",
-                   GRE, RED, GRE, RED, HID, SHW, STR(splitt[i]));
-            def.definedXDG = splitt[i];
-            return splitt[i];
+                   GRE, RED, GRE, RED, HID, SHW, STR(i));
+            def.definedXDG = i;
+            return i;
         }
     }
     return {};

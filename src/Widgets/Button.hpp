@@ -21,10 +21,17 @@ protected:
     void mousePressEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void longPress();
     void loopPress();
     void customPress();
+
+#pragma clang diagnostic pop
+
 
 private:
     int num{0};

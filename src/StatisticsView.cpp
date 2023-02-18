@@ -3,7 +3,7 @@
 #include <QScreen>
 #include <Utils>
 
-#include "StatisticsView.h"
+#include "StatisticsView.hpp"
 
 
 /**********************************************************************************************************************/
@@ -11,7 +11,7 @@
 
 /** Interface principal para visualizar as informações de mídia */
 StatisticsView::StatisticsView(QWidget *parent) : Dialog(parent) {
-    connect(this, &Dialog::emitclose, [this](){ Q_EMIT emitclose(); });
+    connect(this, &Dialog::emitclose, [this](){ Q_EMIT onclose(); });
 
     /** Usando multithread para buscar arquivos */
     thread = new QThread();

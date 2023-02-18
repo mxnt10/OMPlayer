@@ -17,6 +17,10 @@ public:
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void emitMouseMove();
     void emitMousePress();
@@ -34,6 +38,9 @@ Q_SIGNALS:
     void emitPlay();
     void emitNext();
     void emitPrevious();
+
+#pragma clang diagnostic pop
+
 
 private:
     bool contextmenu{false}, fixed{false}, moving{false}, sett{false};

@@ -21,10 +21,17 @@ protected:
     void leaveEvent(QEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void emitEnter();
     void emitLeave();
     void onHover(int pos, int value);
+
+#pragma clang diagnostic pop
+
 
 private Q_SLOTS:
     void getValue(int value) { val = value; };

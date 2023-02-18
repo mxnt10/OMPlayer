@@ -11,10 +11,17 @@ public:
     void requestWork();
     void End();
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void workRequested();
     void looping();
     void finished();
+
+#pragma clang diagnostic pop
+
 
 public Q_SLOTS:
     void doLoop();

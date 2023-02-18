@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(OMPlayer VERSION 2023.02.08)
+project(OMPlayer VERSION 2023.02.17)
 set(MI_VER 0.2212.0)
 set(ZEN_VER 0.4.40)
 

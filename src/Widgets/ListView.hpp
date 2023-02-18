@@ -14,8 +14,14 @@ public:
 protected:
     void contextMenuEvent(QContextMenuEvent *event) override;
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void clickedRight(QModelIndex index);
+
+#pragma clang diagnostic pop
 
 };
 

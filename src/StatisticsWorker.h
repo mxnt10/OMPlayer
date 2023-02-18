@@ -14,12 +14,19 @@ public:
     void setFile(const QString &val, const QtAV::Statistics &s = QtAV::Statistics()) { file = val; statistics = s; };
     void requestWork() { Q_EMIT workRequested(); };
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
     void baseValues(const QStringList &values, const QStringList &valuesVideo, const QStringList &valuesAudio,
                     const QStringList &valuesDual, const QStringList &metadataval,
                     const QString &format, int duration, const QStringList &rat);
     void workRequested();
     void finished();
+
+#pragma clang diagnostic pop
+
 
 public Q_SLOTS:
     void doWork();

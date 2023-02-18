@@ -26,7 +26,7 @@ private:
     qint64 fduration{0};
 };
 
-Q_DECLARE_METATYPE(PlayListItem);
+Q_DECLARE_METATYPE(PlayListItem)
 
 QDataStream &operator>>(QDataStream & s, PlayListItem & p);
 QDataStream &operator<<(QDataStream & s, const PlayListItem &p);

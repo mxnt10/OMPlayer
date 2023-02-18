@@ -18,8 +18,15 @@ public:
     ~About() override;
     void changeIcons();
 
+
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "NotImplementedFunctions"
+
 Q_SIGNALS:
-    void emitclose();
+    void onclose();
+
+#pragma clang diagnostic pop
+
 
 private:
     static QString getTextMaintainer();

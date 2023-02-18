@@ -112,6 +112,11 @@ file(GLOB WIDGETS_FILES ${PROJECT_SOURCE_DIR}/src/Widgets/*)
 update_deps_file(${WIDGETS_FILES})
 
 
+# Buscando filtros do programa
+file(GLOB FILTERS_FILES ${PROJECT_SOURCE_DIR}/src/Filters/*)
+update_deps_file(${FILTERS_FILES})
+
+
 # Buscando utilitários do programa
 file(GLOB UTILS_FILES ${PROJECT_SOURCE_DIR}/src/Utils/*)
 #string(REGEX MATCHALL "${PROJECT_SOURCE_DIR}/src/Utils/[U|J|P][a-zA-Z]*[.][a-zA-Z]*" UTILS_FILES ${UTILS_FILES})
@@ -121,7 +126,7 @@ update_deps_file(${UTILS_FILES})
 # Criando o executável do programa
 add_executable(
         OMPlayer
-        ${SRC_FILES} ${PLS_FILES} ${WIDGETS_FILES} ${UTILS_FILES} ${SRC_SCREENSAVER}
+        ${FILTERS_FILES} ${SRC_FILES} ${PLS_FILES} ${WIDGETS_FILES} ${UTILS_FILES} ${SRC_SCREENSAVER}
 )
 
 

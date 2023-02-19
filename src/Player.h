@@ -103,7 +103,6 @@ private Q_SLOTS:
 
 private:
     About *about{};
-    QtAV::AVPlayer *mediaPlayer{};
     Button *playBtn{}, *stopBtn{}, *nextBtn{}, *previousBtn{};
     Button *replayBtn{}, *shuffleBtn{}, *volumeBtn{};
     CWidget *wctl{}, *wvol{}, *prev{};
@@ -125,6 +124,8 @@ private:
     Settings *sett{};
     StatisticsView *infoview{};
     Slider *slider{}, *volume{};
+    QtAV::AVPlayer *mediaPlayer{};
+    QtAV::SubtitleFilter *subtitle{};
     QtAV::VideoRenderer *video{};
     QtAV::VideoPreviewWidget *preview{};
     bool control{false}, listmenu{false}, nomousehide{false};

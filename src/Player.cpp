@@ -61,8 +61,6 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
     /** Parte principal do programa que permite o funcionamento do reprodutor */
     mediaPlayer = new QtAV::AVPlayer(this);
-    mediaPlayer->setBufferMode(QtAV::BufferMode::BufferPackets);
-    mediaPlayer->setBufferValue(1);
     connect(mediaPlayer->audio(), &QtAV::AudioOutput::volumeChanged, this, &OMPlayer::volumeFinished);
     connect(mediaPlayer, &QtAV::AVPlayer::mediaStatusChanged, this, &OMPlayer::onMediaStatusChanged);
     connect(mediaPlayer, &QtAV::AVPlayer::seekFinished, this, &OMPlayer::seekFinished);
@@ -397,6 +395,7 @@ void OMPlayer::setRenderer(const QString &op) {
 
     /** Ao recriar o widget, o índice do QStackWidget precisará ser definido novamente */
     if (!video && !video->isAvailable()) video = new QtAV::VideoOutput(this);
+    if (subtitle) subtitle->uninstall();
     mediaPlayer->setRenderer(video);
     stack->addWidget(video->widget());
     if (playing) stack->setCurrentIndex(1);
@@ -408,6 +407,7 @@ void OMPlayer::setRenderer(const QString &op) {
         mediaPlayer->renderer()->forcePreferredPixelFormat(true);
     else mediaPlayer->renderer()->forcePreferredPixelFormat(false);
 
+    if (subtitle) subtitle->installTo(video);
     if (video) qDebug("%s(%sSettings%s)%s::%sSetando rendenização %s %i ...\033[0m",
                       GRE, RED, GRE, RED, BLU, STR(op), video->id());
 }
@@ -492,6 +492,19 @@ void OMPlayer::setSelect(int item) {
 
 /** Função geral para execução de arquivos multimídia */
 void OMPlayer::play(const QString &isplay, int index) {
+
+    /** Além de ser ruim, o subtítulo vive dando falha de segmentação se executar mais de uma música com legenda.
+     * Então, só reconstruindo o filtro do subtítulo pra resolver. */
+    delete subtitle;
+    subtitle = new SubtitleFilter(this);
+    subtitle->setPlayer(mediaPlayer);
+    subtitle->installTo(video);
+    QFont font("Times", 18, QFont::Bold);
+    font.setHintingPreference(QFont::PreferFullHinting);
+    font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferAntialias | QFont::PreferQuality));
+    subtitle->setFont(font);
+    subtitle->setColor(QColor(255, 255, 0));
+
     this->setWindowTitle(Utils::mediaTitle(isplay));
     speedBox->setValue(1);
     mediaPlayer->setSpeed(1);
@@ -1356,6 +1369,8 @@ void OMPlayer::changeEvent(QEvent *event) {
 
 /** Ação ao fechar o programa */
 void OMPlayer::closeEvent(QCloseEvent *event) {
+    if (subtitle) subtitle->uninstall();
+    delete subtitle;
     screensaver->enable();
     playlist->save();
     qDebug("%s(%sInterface%s)%s::%sFinalizando o Reprodutor Multimídia !\033[0m", GRE, RED, GRE, RED, CYA);

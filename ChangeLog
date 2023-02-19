@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 
-## [ Release 2023.02.08 ] ################################################
+## [ Release 2023.02.19 ] ################################################
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
@@ -15,6 +15,7 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Adicionado checkbox.qss em qss.
  - InfoView com suporte dual áudio.
  - Adicionado suporte a playlist xspf.
+ - Suporte a legenda.
 ###
 
 ### Upgraded / Atualizado
@@ -58,6 +59,9 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Correções nos efeitos do menu de contexto.
  - Correções na verificação do sufixo das playlists m3u/m3u8.
  - Corrigido problemas com o redirecionamento da playlist.
+ - Pequenas correções de código.
+ - Ignorando função não definida nas definições dos sinais de emissão.
+ - Resolvendo alertas de função não virtual com emitclose().
 ###
 
 ##########################################################################

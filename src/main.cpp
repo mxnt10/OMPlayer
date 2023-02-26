@@ -9,6 +9,7 @@
  *      - Qt5
  *      - QtAV
  *      - libnotify
+ *      - libass (para o ffmpeg)
  *
  * Dependências incluídas:
  *      - libmediainfo

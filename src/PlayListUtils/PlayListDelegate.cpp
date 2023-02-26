@@ -64,7 +64,7 @@ void PlayListDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
     }
 
 
-    /** Definindo os itens da playlist */
+    /** Definindo os itens da playlist ♪ ♫ ► ★ */
     QFont ft;
     ft.setBold(detail);
     ft.setPixelSize(11);

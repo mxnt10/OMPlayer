@@ -7,10 +7,12 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
 
 ### Added / Adicionado
  - Adicionado os códigos fonte:
-    - Dialog.{cpp/h} em src/Widgets.
-    - ListView.{cpp/h} em src/Widgets.
-    - Frame.{cpp/h} em src/Widgets.
-    - CWidget.{cpp/h} em src/Widgets.
+    - Dialog.{cpp/hpp} em src/Widgets.
+    - ListView.{cpp/hpp} em src/Widgets.
+    - Frame.{cpp/hpp} em src/Widgets.
+    - CWidget.{cpp/hpp} em src/Widgets.
+    - Subtitle.{cpp/hpp} em src/Settings.
+    - Renderer.{cpp/hpp} em src/Settings.
  - Adicionado scripts new_version e newchangelog em common.
  - Adicionado checkbox.qss em qss.
  - InfoView com suporte dual áudio.
@@ -38,6 +40,8 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Pequenos ajustes em geral.
  - Ajustes no CMakeLists.
  - Modificações das informações de mídia com base no libmediainfo.
+ - Adicionado mais opções de sufixos de legenda.
+ - Modificações no sistema de cálculo do checksum.
 ###
 
 ### Removed / Removido
@@ -59,9 +63,9 @@ Todas as mudanças notáveis neste projeto serão documentadas neste arquivo.
  - Correções nos efeitos do menu de contexto.
  - Correções na verificação do sufixo das playlists m3u/m3u8.
  - Corrigido problemas com o redirecionamento da playlist.
- - Pequenas correções de código.
  - Ignorando função não definida nas definições dos sinais de emissão.
  - Resolvendo alertas de função não virtual com emitclose().
+ - Pequenas correções de código.
 ###
 
 ##########################################################################

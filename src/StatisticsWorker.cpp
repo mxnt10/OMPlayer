@@ -34,10 +34,7 @@ void StatisticsWorker::doWork() {
 
     QFileInfo mfile{file};
     MI.Open(file.toStdWString());
-
     auto format = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Format")));
-    auto duration = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("Duration")));
-    auto bitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_General, 0, __T("OverallBitRate")));
 
     if (QString::compare(format, "MPEG Audio") == 0) {
         auto profile = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, 0, __T("Format_Profile")));
@@ -45,41 +42,41 @@ void StatisticsWorker::doWork() {
         else if (QString::compare(profile, "Layer 2") == 0) format = "MP2";
     }
 
-    qDebug() << format << statistics.format;
-    cout << QString::fromStdWString(MI.Inform()).toStdString();
+    //cout << QString::fromStdWString(MI.Inform()).toStdString();
 
-    values << QString(file).remove(QRegExp("\\/(?:.(?!\\/))+$"))
-           << QString(file).remove(QRegExp("\\/.+\\/"))
+    values << mfile.absolutePath()
+           << mfile.fileName()
            << convertByte((float) mfile.size())
            << setFormat(format)
-           << convertBit(bitrate.toFloat())
-           << QTime(0, 0, 0).addMSecs(duration.toInt()).toString(QString::fromLatin1("HH:mm:ss"));
+           << convertBit(statistics.bit_rate)
+           << statistics.duration.toString(QString::fromLatin1("HH:mm:ss"));
 
     /** Informações de vídeo */
-    auto w = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Width")));
-    auto h = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Height")));
+    auto w = statistics.video_only.width;
+    auto h = statistics.video_only.height;
     auto videoformat = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format")));
     auto videofmtinfo = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("Format/Info")));
     auto videocodec = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("CodecID")));
     auto videocinfo = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("CodecID/Info")));
-    auto videobitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("BitRate")));
-    auto framerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("FrameRate")));
     auto bitdepth = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Video, 0, __T("BitDepth")));
 
-    if (videofmtinfo.isEmpty()) valuesVideo << videoformat;
+    if (videofmtinfo.isEmpty()) valuesVideo << setFormatInfo(videoformat);
     else valuesVideo << QString::fromLatin1("%1 (%2)").arg(videoformat, videofmtinfo);
 
-    if (videocinfo.isEmpty()) valuesVideo << videocodec;
+    if (videocinfo.isEmpty()) valuesVideo << setCodecInfo(videocodec);
     else valuesVideo << QString::fromLatin1("%1 (%2)").arg(videocodec, videocinfo);
 
-    valuesVideo << convertBit(videobitrate.toFloat())
-                << convertAspectRatio(w.toInt(), h.toInt());
+    valuesVideo << convertBit(statistics.video.bit_rate)
+                << convertAspectRatio(w, h);
 
-    if (w.toInt() == 0 || h.toInt() == 0) valuesVideo << "";
-    else valuesVideo << QString::fromLatin1("%1x%2").arg(w, h);
+    if (w == 0 || h == 0) valuesVideo << "";
+    else valuesVideo << QString::fromLatin1("%1x%2").arg(w).arg(h);
 
-    if (framerate.toFloat() == 0) valuesVideo << "";
-    else valuesVideo << QString::number(framerate.toFloat(), 'f', 2);
+    if (statistics.video.frame_rate == 0) valuesVideo << "";
+    else valuesVideo << QString::number(statistics.video.frame_rate, 'f', 2);
+
+    if (statistics.video.frames == 0) valuesVideo << "";
+    else valuesVideo << QString::number(statistics.video.frames);
 
     if (bitdepth.isEmpty()) valuesVideo << "";
     else valuesVideo << bitdepth + " bits";
@@ -89,47 +86,46 @@ void StatisticsWorker::doWork() {
     int i = 0;
     /** Informações de áudio com suporte dual áudio */
     foreach(QStringList audio, listAudio) {
+        QtAV::Statistics actual{};
+        if (i == 0) actual = statistics;
+        else if (i == 1) actual = dualstatistics;
+
+        auto channel = actual.audio_only.channels;
+        auto channellayout = actual.audio_only.channel_layout;
         auto audioformat = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("Format")));
         auto audiofmtinfo = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("Format/Info")));
         auto audiocodec = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("CodecID")));
-        auto audiobitrate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("BitRate")));
-        auto samplerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("SamplingRate")));
-        auto channel = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("Channels")));
-        auto channellayout = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("ChannelLayout")));
-        auto audioframerate = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("FrameRate")));
         auto audiobitdepth = QString::fromStdWString(MI.Get(MediaInfoDLL::Stream_Audio, i, __T("BitDepth")));
 
-        if (QString::compare(channellayout, "L R") == 0) channellayout = "stereo";
-        else if (QString::compare(channellayout, "C") == 0) channellayout = "mono";
-        else if (channellayout.isEmpty()) {
-            if (channel.toInt() == 2) channellayout = "stereo";
-            else if (channel.toInt() == 1) channellayout = "mono";
-        }
-
-        if (audiofmtinfo.isEmpty()) audio << audioformat;
+        if (audiofmtinfo.isEmpty()) audio << setFormatInfo(audioformat);
         else audio << QString::fromLatin1("%1 (%2)").arg(audioformat, audiofmtinfo);
 
-        audio << audiocodec;
+        audio << setCodecInfo(audiocodec)
+              << convertBit(actual.audio.bit_rate)
+              << convertHz(actual.audio_only.sample_rate)
+              << actual.audio_only.sample_fmt;
 
-        if (audiobitrate.isEmpty()) audio << "";
-        else audio << convertBit(audiobitrate.toFloat());
+        if (channel == 0) audio << "";
+        else if (channellayout.isEmpty()) audio << QString::number(channel);
+        else audio << QString::fromLatin1("%1 (layout %2)").arg(channel).arg(channellayout);
 
-        audio << convertHz(samplerate.toFloat());
+        if (actual.audio.frame_rate == 0) audio << "";
+        else audio << QString::number(actual.audio.frame_rate);
 
-        if (channel.isEmpty()) audio << "";
-        else if (channellayout.isEmpty()) audio << channel;
-        else audio << QString::fromLatin1("%1 (layout %2)").arg(channel, channellayout);
+        if (actual.audio_only.frame_size == 0) audio << "";
+        else audio << QString::number(actual.audio_only.frame_size);
 
-        if (audioframerate.isEmpty()) audio << "";
-        else audio << QString::number(audioframerate.toFloat(), 'f', 2);
+        if (actual.audio.frames == 0) audio << "";
+        else audio << QString::number(actual.audio.frames);
 
         if (audiobitdepth.isEmpty()) audio << "";
         else audio << audiobitdepth + " bits";
-        listAudio[i] << audio;
+
+        /** Gravando as informações */
+        if (i == 0) valuesAudio << audio;
+        else if (i == 1) valuesDual << audio;
         i++;
     }
-    valuesAudio << listAudio[0];
-    valuesDual << listAudio[1];
 
     if (!statistics.metadata.isEmpty()) {
         QStringList keys{statistics.metadata.keys()};
@@ -137,27 +133,27 @@ void StatisticsWorker::doWork() {
             if (keys.contains(inf, Qt::CaseInsensitive)) {
                 if (inf == "date") {
                     QDate dt = QDate::fromString(statistics.metadata.value(
-                            keys.filter(inf, Qt::CaseInsensitive)[0]), "yyyyMMdd");
+                            keys.filter(inf, Qt::CaseInsensitive).at(0)), "yyyyMMdd");
                     metadata << dt.toString("yyyy-MM-dd");
                 } else if (inf == "track") {
                     QStringList tm = keys.filter("track", Qt::CaseInsensitive);
                     if (tm.contains("tracktotal", Qt::CaseInsensitive)) {
 
-                        QString tot = statistics.metadata.value(tm.filter("tracktotal", Qt::CaseInsensitive)[0]);
-                        tm.removeOne(keys.filter("tracktotal", Qt::CaseInsensitive)[0]);
-                        QString tr = statistics.metadata.value(tm.filter("track", Qt::CaseInsensitive)[0]);
+                        QString tot = statistics.metadata.value(tm.filter("tracktotal", Qt::CaseInsensitive).at(0));
+                        tm.removeOne(keys.filter("tracktotal", Qt::CaseInsensitive).at(0));
+                        QString tr = statistics.metadata.value(tm.filter("track", Qt::CaseInsensitive).at(0));
 
-                        if (tot == "") metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
+                        if (QString::compare(tot, "") == 0)
+                            metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive).at(0));
                         else metadata << QString::fromLatin1("%1 / %2").arg(tr, tot);
 
-                    } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
-                } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive)[0]);
+                    } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive).at(0));
+                } else metadata << statistics.metadata.value(keys.filter(inf, Qt::CaseInsensitive).at(0));
             } else metadata << "";
         }
     }
 
-    Q_EMIT baseValues(values, valuesVideo, valuesAudio, valuesDual, metadata, format,
-                      duration.toInt(), {rat, w, h});
+    Q_EMIT baseValues(values, valuesVideo, valuesAudio, valuesDual, metadata, format);
     MI.Close();
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
@@ -166,17 +162,42 @@ void StatisticsWorker::doWork() {
 
 
 /** Reescrevendo o texto de alguns formatos */
-QString StatisticsWorker::setFormat(const QString &format) {
+QString StatisticsWorker::setFormat(const QString &format) const {
     switch (Hash::hash(format.toStdString())) {
-        case "MPEG-PS"_hash:  return "mpeg - MPEG-PS (MPEG-2 Program Stream)";
         case "MPEG-4"_hash:   return "mp4 - MPEG-4 (Moving Picture Expert Group 4)";
         case "Matroska"_hash: return "mkv - Matroska (Matroska Video)";
         case "WebM"_hash:     return "webm - WebM (Web Media)";
-        case "DV"_hash:       return "dv - DV (Digital Video)";
         case "MP3"_hash:      return "mp3 - MP3 (MPEG Audio Layer 3)";
         case "MP2"_hash:      return "mp2 - MP2 (MPEG Audio Layer 2)";
-        case "Wave"_hash:     return "wav - WAV / WAVE (Waveform Audio)";
-        default:              return format;
+        default:              return statistics.format;
+    }
+}
+
+
+/** Reescrevendo algumas informações de formatos de vídeo e áudio */
+QString StatisticsWorker::setFormatInfo(const QString &finfo) {
+    switch (Hash::hash(finfo.toStdString())) {
+        case "PCM"_hash:  return QString::fromLatin1("%1 (%2)").arg(finfo, "Pulse-Code Modulation");
+        case "DV"_hash:   return QString::fromLatin1("%1 (%2)").arg(finfo, "Digital Video Encoding");
+        case "FFV1"_hash: return QString::fromLatin1("%1 (%2)").arg(finfo, "FF Video Codec 1");
+        case "YUV"_hash:  return QString::fromLatin1("%1 (%2)").arg(finfo, "YUV Format");
+        case "VP9"_hash:  return QString::fromLatin1("%1 (%2)").arg(finfo, "VP9 Video Format");
+        case "VP8"_hash:  return QString::fromLatin1("%1 (%2)").arg(finfo, "VP8 Video Format");
+        case "Opus"_hash: return QString::fromLatin1("%1 (%2)").arg(finfo, "Opus Interactive Audio Format");
+        default: return finfo;
+    }
+}
+
+
+/** Reescrevendo informações de alguns codecs */
+QString StatisticsWorker::setCodecInfo(const QString &cinfo) {
+    switch (Hash::hash(cinfo.toStdString())) {
+        case "V_VP9"_hash:  return QString::fromLatin1("%1 (%2)").arg(cinfo, "VP9 Codec Format");
+        case "V_VP8"_hash:  return QString::fromLatin1("%1 (%2)").arg(cinfo, "VP8 Codec Format");
+        case "A_OPUS"_hash: return QString::fromLatin1("%1 (%2)").arg(cinfo, "Opus Interactive Audio Codec");
+        case "A_EAC3"_hash: return QString::fromLatin1("%1 (%2)").arg(cinfo, "Enhanced AC-3 Codec");
+        case "v210"_hash:   return QString::fromLatin1("%1 (%2)").arg(cinfo, "V210 Video Codec");
+        default: return cinfo;
     }
 }
 
@@ -280,6 +301,14 @@ QString StatisticsWorker::convertHz(auto hz) {
     }
 
     return QString::number(hert) + " " + herts;
+}
+
+
+/** Setando as informações a serem processadas */
+void StatisticsWorker::setFile(const QString &val, const QtAV::Statistics &s, const QtAV::Statistics &d) {
+    file = val;
+    statistics = s;
+    dualstatistics = d;
 }
 
 #undef DG_T

@@ -49,6 +49,8 @@ private:
     void updateChannelMenu();
     void initAudioTrackMenu();
     void fadeWctl(OMPlayer::FADE Option);
+    void runSubtitle();
+    QString mapFirstSubtitle();
 
 private Q_SLOTS:
     void setSelect(int item);
@@ -93,6 +95,8 @@ private Q_SLOTS:
     void changeChannel(QAction *action);
     void changeAudioTrack(QAction *action);
     void changeIcons(OMPlayer::STATUS change = Default);
+    void enableSubtitle(bool val);
+    void charsetSubtitle();
     void onMediaStatusChanged();
     void handleError(const QtAV::AVError &error);
     void ShowContextMenu(const QPoint &pos);

@@ -6,6 +6,7 @@
 #include <Frame>
 #include <Utils>
 
+#include "Extensions.hpp"
 #include "VUMeterFilter.hpp"
 #include "Player.h"
 
@@ -26,6 +27,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     this->setStyleSheet(Utils::setStyle("global"));
     this->move(QGuiApplication::screens().at(0)->geometry().center() - frameGeometry().center());
     double vol = JsonTools::floatJson("volume");
+    int max_vol = JsonTools::intJson("max_volume");
 
 
     /** Fundo preto */
@@ -51,6 +53,11 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     sett = new Settings(this);
     infoview = new StatisticsView(this);
     screensaver = new ScreenSaver(this);
+    connect(sett, &Settings::emitcolor, [this](const QColor &c){ if (playing) subtitle->setColor(c); });
+    connect(sett, &Settings::emitfont, [this](const QFont &f){ if (playing) subtitle->setFont(f); });
+    connect(sett, &Settings::emitEngine, [this](const QString &s){ if (playing) subtitle->setEngines({s});});
+    connect(sett, &Settings::emitEnableSub, this, &OMPlayer::enableSubtitle);
+    connect(sett, &Settings::emitCharset, this, &OMPlayer::charsetSubtitle);
     connect(sett, &Settings::changethemeicon, [this](){ changeIcons(); });
     connect(sett, &Settings::emitvalue, this, &OMPlayer::setRenderer);
     connect(sett, &Settings::onclose, this, &OMPlayer::closeDialog);
@@ -130,8 +137,8 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
 
 
     /** Controle do volume */
-    volume = new Slider(this, false, 90, null, 100, "volume");
-    volume->setValue(int(vol * 100));
+    volume = new Slider(this, false, 100, null, max_vol, "volume");
+    volume->setValue(int(vol * max_vol));
     mediaPlayer->audio()->setVolume(vol);
     connect(volume, &Slider::onHover, this, &OMPlayer::onTimeVolume);
     connect(volume, &Slider::sliderMoved, this, &OMPlayer::setVolume);
@@ -152,7 +159,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     auto line = new Line::Frame(Line::Frame::Vertical, 25);
     auto *buttons = new QHBoxLayout();
     buttons->addStretch(1);
-    buttons->addSpacing(35);
+    buttons->addSpacing(20);
     buttons->addWidget(replayBtn);
     buttons->addWidget(shuffleBtn);
     buttons->addSpacing(5);
@@ -163,6 +170,7 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     buttons->addWidget(playBtn);
     buttons->addWidget(nextBtn);
     buttons->addWidget(volumeBtn);
+    buttons->addSpacing(5);
     buttons->addWidget(volume);
     buttons->addStretch(1);
 
@@ -298,18 +306,18 @@ OMPlayer::OMPlayer(QWidget *parent) : QWidget(parent) {
     aspectAction = subMenu->addAction(Utils::aspectStr(Utils::AspectVideo));
     aspectAction->setData(Utils::aspectNum(Utils::AspectVideo));
     connect(subMenu, &ClickableMenu::triggered, this, &OMPlayer::switchAspectRatio);
-    subMenu->addAction(Utils::aspectStr(Utils::AspectAuto ))->setData(Utils::AspectAuto);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect11   ))->setData(Utils::Aspect11);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect21   ))->setData(Utils::Aspect21);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect32   ))->setData(Utils::Aspect32);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect43   ))->setData(Utils::Aspect43);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect54   ))->setData(Utils::Aspect54);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect118  ))->setData(Utils::Aspect118);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect149  ))->setData(Utils::Aspect149);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect1410 ))->setData(Utils::Aspect1410);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect169  ))->setData(Utils::Aspect169);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect1610 ))->setData(Utils::Aspect1610);
-    subMenu->addAction(Utils::aspectStr(Utils::Aspect235  ))->setData(Utils::Aspect235);
+    subMenu->addAction(Utils::aspectStr(Utils::AspectAuto))->setData(Utils::AspectAuto);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect11  ))->setData(Utils::Aspect11);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect21  ))->setData(Utils::Aspect21);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect32  ))->setData(Utils::Aspect32);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect43  ))->setData(Utils::Aspect43);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect54  ))->setData(Utils::Aspect54);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect118 ))->setData(Utils::Aspect118);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect149 ))->setData(Utils::Aspect149);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect1410))->setData(Utils::Aspect1410);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect169 ))->setData(Utils::Aspect169);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect1610))->setData(Utils::Aspect1610);
+    subMenu->addAction(Utils::aspectStr(Utils::Aspect235 ))->setData(Utils::Aspect235);
     ag = new QActionGroup(subMenu);
     ag->setExclusive(true);
 
@@ -486,32 +494,23 @@ void OMPlayer::setSelect(int item) {
         qDebug("%s(%sPlaylist%s)%s::%sSelecionando item %s manualmente ...\033[0m",
                GRE, RED, GRE, RED, ORA, STR(Utils::mediaTitle(playlist->getItems(item))));
     }
-    if(item > (-1)) infoview->setFile(playlist->getItems(item));
 }
 
 
 /** Função geral para execução de arquivos multimídia */
 void OMPlayer::play(const QString &isplay, int index) {
-
-    /** Além de ser ruim, o subtítulo vive dando falha de segmentação se executar mais de uma música com legenda.
-     * Então, só reconstruindo o filtro do subtítulo pra resolver. */
-    delete subtitle;
-    subtitle = new SubtitleFilter(this);
-    subtitle->setPlayer(mediaPlayer);
-    subtitle->installTo(video);
-    QFont font("Times", 18, QFont::Bold);
-    font.setHintingPreference(QFont::PreferFullHinting);
-    font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferAntialias | QFont::PreferQuality));
-    subtitle->setFont(font);
-    subtitle->setColor(QColor(255, 255, 0));
-
     this->setWindowTitle(Utils::mediaTitle(isplay));
     speedBox->setValue(1);
     mediaPlayer->setSpeed(1);
+    runSubtitle();
+
+    /** Reproduzindo */
     mediaPlayer->stop();
     mediaPlayer->setPriority(sett->decoderPriorityNames());
     mediaPlayer->setOptionsForVideoCodec(sett->videoDecoderOptions());
     mediaPlayer->play(isplay);
+
+    /** Atualizando as variáveis de controle */
     if (index > (-1)) {
         playlist->selectCurrent(index);
 
@@ -647,8 +646,7 @@ void OMPlayer::onStart() {
     Utils::changeIcon(playBtn, "pause");
     stack->setCurrentIndex(1);
     slider->setDisabled(false);
-    if (!showsett) infoview->setStatistics(mediaPlayer->statistics());
-    infoview->setCurrentStatistics(mediaPlayer->statistics());
+    infoview->setFile(mediaPlayer->file());
 
     /** Definindo dimensões para o preview */
     Width = mediaPlayer->statistics().video_only.width;
@@ -1183,7 +1181,6 @@ void OMPlayer::changeAudioTrack(QAction *action){
     if (trackAction) trackAction->setChecked(false);
     trackAction = action;
     trackAction->setChecked(true);
-    if (infoview && infoview->isVisible()) infoview->setStatistics(mediaPlayer->statistics());
 }
 
 
@@ -1239,6 +1236,67 @@ void OMPlayer::changeIcons(OMPlayer::STATUS change) {
         Utils::changeMenuIcon(aspectratio, "aspectratio");
         Utils::changeMenuIcon(speed, "speed");
         Utils::changeMenuIcon(audiotrack, "track");
+    }
+}
+
+
+/** Executando o subtítulo */
+void OMPlayer::runSubtitle() {
+    /** Além de ser ruim, o subtítulo vive dando falha de segmentação se executar mais de uma música com legenda.
+    * Então, só reconstruindo o filtro do subtítulo pra resolver. */
+    if (subtitle) subtitle->uninstall();
+    delete subtitle;
+    subtitle = new SubtitleFilter(this);
+    subtitle->setPlayer(mediaPlayer);
+    subtitle->installTo(video);
+    if (!JsonTools::boolJson("sub_enable")) enableSubtitle(false);
+    subtitle->setAutoLoad(JsonTools::boolJson("sub_autoload"));
+    subtitle->setCodec(QByteArray::fromStdString(JsonTools::stringJson("sub_charset").toStdString()));
+    subtitle->setEngines({JsonTools::stringJson("sub_engine")});
+
+    /** Setando uma fonte para a legenda se possível */
+    if (QString::compare(JsonTools::stringJson("sub_font"), "undefined") != 0) {
+        QFont font;
+        font.fromString(JsonTools::stringJson("sub_font"));
+        font.setHintingPreference(QFont::PreferFullHinting);
+        font.setStyleStrategy(static_cast<QFont::StyleStrategy>(QFont::PreferAntialias | QFont::PreferQuality));
+        subtitle->setFont(font);
+    }
+
+    /** Setando uma cor para a legenda se possível */
+    if (QString::compare(JsonTools::stringJson("sub_color"), "undefined") != 0) {
+        QStringList s{JsonTools::stringJson("sub_color").split("-")};
+        subtitle->setColor(QColor(s[0].toInt(), s[1].toInt(), s[2].toInt()));
+    }
+}
+
+
+/** Retorna uma lista de todas as legendas encontradas para a mídia atual */
+QString OMPlayer::mapFirstSubtitle() {
+    QFileInfo file{mediaPlayer->file()};
+    QString base{mediaPlayer->file().remove(file.suffix())};
+    Extensions e;
+    foreach(const QString s, e.subtitles()) if (QFileInfo::exists(base + s)) return base + s;
+    return {};
+}
+
+
+/** Ativação da legenda */
+void OMPlayer::enableSubtitle(bool val) {
+    if (playing) {
+        if (val) {
+            subtitle->installTo(video);
+            mediaPlayer->setRenderer(video);
+        } else subtitle->uninstall();
+    }
+}
+
+
+/** Definindo o conjunto de caracteres da legenda */
+void OMPlayer::charsetSubtitle() {
+    if (playing) {
+        runSubtitle();
+        if (!mapFirstSubtitle().isEmpty()) subtitle->setFile(mapFirstSubtitle());
     }
 }
 

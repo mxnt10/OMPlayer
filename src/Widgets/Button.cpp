@@ -112,9 +112,8 @@ void Button::mousePressEvent(QMouseEvent *event) {
     setIconSize(QSize(num - 2, num - 2));
 
     if (type == Button::LoopBtn || type == Button::DoubleBtn) {
-        block = emitted = prevent = false;
-        QTimer::singleShot(300, this, [this]() {
-            prevent = true;
+        block = emitted = false;
+        QTimer::singleShot(300, [this]() {
             if (!block) {
                 setIcon(icon2);
                 if (type == Button::LoopBtn) loop->requestWork();
@@ -131,9 +130,13 @@ void Button::mousePressEvent(QMouseEvent *event) {
 
 /** Finalizando o efeito do botão */
 void Button::mouseReleaseEvent(QMouseEvent *event) {
+    if (!prevent) return;
     setIconSize(QSize(num + 2, num + 2));
 
     if (type == Button::LoopBtn || type == Button::DoubleBtn) {
+        prevent = false;
+        QTimer::singleShot(1500, [this]() { prevent = true; });
+
         block = true;
         if (type == Button::LoopBtn) {
             if (thread->isRunning()) {

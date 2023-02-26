@@ -52,6 +52,7 @@ void Dialog::onClose() {
 void Dialog::showEvent(QShowEvent *event) {
     onclose = false;
     Utils::fadeDiag(animation, 0, 1);
+    Q_EMIT activeShow();
     QDialog::showEvent(event);
 }
 

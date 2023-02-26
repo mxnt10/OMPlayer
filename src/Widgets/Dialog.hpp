@@ -25,6 +25,7 @@ protected:
 #pragma ide diagnostic ignored "NotImplementedFunctions"
 
 Q_SIGNALS:
+    void activeShow();
     void emitclose();
 
 #pragma clang diagnostic pop

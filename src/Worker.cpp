@@ -26,10 +26,17 @@ void Worker::doWork() {
     DG_T << "Iniciando o thread " << QThread::currentThreadId();
 
     QString hash{Utils::setHash(file)};
-    Q_EMIT valueMD5(hash);
+    if (!emitValue) Q_EMIT valueMD5(hash);
 
     DG_T << "Finalizando o thread " << QThread::currentThreadId();
     Q_EMIT finished();
+}
+
+
+/** Solicitando a execução do thread */
+void Worker::requestWork() {
+    emitValue = false;
+    Q_EMIT workRequested();
 }
 
 #undef DG_T

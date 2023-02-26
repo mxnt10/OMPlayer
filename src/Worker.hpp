@@ -9,8 +9,9 @@ Q_OBJECT
 public:
     explicit Worker(QObject *parent = nullptr);
 
-    void requestWork() { Q_EMIT workRequested(); };
+    void requestWork();
     void setFile(const QString &val) { file = val; };
+    void noEmit(bool val) { emitValue = val; };
 
 
 #pragma clang diagnostic push
@@ -29,6 +30,7 @@ public Q_SLOTS:
 
 private:
     QString file{};
+    bool emitValue{false};
 };
 
 #endif //OMPLAYER_WORKER_H

@@ -20,7 +20,14 @@ QString JsonTools::defaultJson() {
            "    \"pls_size\": 295,"
            "    \"renderer\": \"OpenGL\","
            "    \"theme\": \"circle\","
-           "    \"volume\": 1"
+           "    \"volume\": 1,"
+           "    \"max_volume\": 100,"
+           "    \"sub_enable\": true,"
+           "    \"sub_autoload\": true,"
+           "    \"sub_engine\": \"FFmpeg\","
+           "    \"sub_charset\": \"Auto Detect\","
+           "    \"sub_color\": \"undefined\","
+           "    \"sub_font\": \"undefined\""
            "}";
 }
 

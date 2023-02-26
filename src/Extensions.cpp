@@ -52,8 +52,12 @@ Extensions::Extensions() {
     _wav << "wav" << "wp" << "wvp" << "wv";
     _other_audio << "mpc" << "dts" << "ape" << "thd" << "shn";
 
-	_subtitles << "srt" << "sub" << "ssa" << "ass" << "idx" << "txt"
-               << "smi" << "rt" << "utf" << "aqt" << "vtt" << "mpsub";
+	_subtitles << "aqt" << "ass" << "jacosub" << "microdvd" << "txt" << "mpl2" << "sub" << "pjs" << "rt" << "smi"
+               << "sami" << "srt" << "stl" << "sup" << "idx" << "vtt" << "ssa" << "dvbsub" << "dvdsub" << "mov_text"
+               << "subrip" << "text" << "ttml" << "webvtt" << "xsub" << "cc_dec" << "pgssub" << "realtext"
+               << "subviewer" << "subviewer1" << "vplayer" << "libzvbi_teletextdec" << "dvd_subtitle"
+               << "dvb_subtitle" << "hdmv_pgs_subtitle" << "dvb_teletext" << "eia_608" << "hdmv_text_subtitle"
+               << "arib_caption" << "utf" << "mpsub";
 
 	_playlist << "m3u" << "m3u8" << "pls" << "xspf";
 
